@@ -117,6 +117,12 @@ actually do:
 
 `--diverse` still gives the historical one-model-per-agent roster.
 
+AUTO plans against the card that is actually present. `nvidia-smi` is consulted
+when available and ignored when not; the budget is 75% of total VRAM, floored
+at 3GB and capped at 40GB, falling back to the documented 6.0GB default when
+the GPU cannot be identified. Before this, a 24GB card planned against 6GB and
+refused rosters it could have held three times over.
+
 ## Follow-up: the repetition had a cause, and it was fixable
 
 `--fit`'s one clear measured weakness was repetition — 13.3% near-duplicate

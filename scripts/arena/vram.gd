@@ -133,3 +133,48 @@ static func _cheapest_sum(costs: Array, chosen: Array, candidate: int,
 	for i in count:
 		total += rest[i]
 	return total
+
+
+## Fraction of the card to plan against. The rest is context, KV cache, the
+## desktop compositor and whatever else already holds video memory.
+const USABLE_FRACTION := 0.75
+
+## Smallest and largest budgets worth planning with, in GB. The floor keeps a
+## tiny or misreported card from producing an empty roster; the ceiling stops a
+## very large card from trying to hold more models than the arena has agents.
+const MIN_BUDGET_GB := 3.0
+const MAX_BUDGET_GB := 40.0
+
+
+## Budget derived from the card actually present, in GB.
+##
+## DEFAULT_BUDGET_GB is 6.0 because that is right for the 8GB card this was
+## built on and wrong for everybody else: a 24GB card was planning against 6GB
+## and refusing rosters it could hold three times over, while a 6GB card was
+## planning against more than it has.
+##
+## nvidia-smi is used when present and ignored when not, exactly like the lms
+## CLI. Returns DEFAULT_BUDGET_GB when the card cannot be identified, so no
+## machine is worse off than before.
+static func budget_from_gpu(total_mib: int) -> float:
+	if total_mib <= 0:
+		return DEFAULT_BUDGET_GB
+	var gb := float(total_mib) / 1024.0 * USABLE_FRACTION
+	return clampf(gb, MIN_BUDGET_GB, MAX_BUDGET_GB)
+
+
+## Parse `nvidia-smi --query-gpu=memory.total --format=csv,noheader` output.
+## Accepts "8151 MiB" and a bare "8151". Returns 0 when nothing usable is
+## there, which callers treat as "unknown" rather than "zero".
+static func parse_gpu_memory_mib(text: String) -> int:
+	var first := text.strip_edges().split("\n")[0].strip_edges()
+	var digits := ""
+	for i in first.length():
+		var c := first[i]
+		if c >= "0" and c <= "9":
+			digits += c
+		elif digits != "":
+			break
+	if digits == "":
+		return 0
+	return int(digits)

@@ -123,6 +123,50 @@ func _run() -> void:
 	_check("an empty catalogue plans nothing",
 		V.plan_fit([], 6.0, 5).is_empty())
 
+	# --- budget from the card actually present --------------------------
+	_check("an 8GB card plans against about 6GB",
+		absf(V.budget_from_gpu(8151) - 5.97) < 0.1,
+		"got %.2f" % V.budget_from_gpu(8151))
+
+	# 24GB * 0.75 = 18.0, which is exactly 3x the 8GB default -- the first
+	# version of this check asserted "> 3x" and failed on the tie.
+	_check("a 24GB card plans against three times the 8GB default",
+		absf(V.budget_from_gpu(24576) - 18.0) < 0.01,
+		"got %.2f" % V.budget_from_gpu(24576))
+
+	_check("a 6GB card plans against less than the 8GB default",
+		V.budget_from_gpu(6144) < V.DEFAULT_BUDGET_GB,
+		"got %.2f" % V.budget_from_gpu(6144))
+
+	_check("a tiny card still gets a usable floor, not zero",
+		V.budget_from_gpu(2048) >= V.MIN_BUDGET_GB)
+
+	_check("an enormous card is capped rather than unbounded",
+		V.budget_from_gpu(196608) <= V.MAX_BUDGET_GB)
+
+	_check("an unknown card falls back to the documented default",
+		is_equal_approx(V.budget_from_gpu(0), V.DEFAULT_BUDGET_GB))
+
+	_check("a negative reading is treated as unknown",
+		is_equal_approx(V.budget_from_gpu(-1), V.DEFAULT_BUDGET_GB))
+
+	_check("nvidia-smi output parses",
+		V.parse_gpu_memory_mib("8151 MiB") == 8151,
+		"got %d" % V.parse_gpu_memory_mib("8151 MiB"))
+
+	_check("a bare number parses",
+		V.parse_gpu_memory_mib("24576") == 24576)
+
+	_check("only the first GPU is taken",
+		V.parse_gpu_memory_mib("8151 MiB
+24576 MiB") == 8151)
+
+	_check("junk output is unknown, not zero-budget",
+		V.parse_gpu_memory_mib("no devices found") == 0)
+
+	_check("empty output is unknown",
+		V.parse_gpu_memory_mib("") == 0)
+
 	_report()
 
 

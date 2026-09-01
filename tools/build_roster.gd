@@ -258,9 +258,9 @@ func _on_models(result: int, code: int, _h: PackedStringArray, body: PackedByteA
 	if _auto and _fit <= 0.0:
 		# AUTO starts at the top rung: as many co-resident, verified,
 		# chat-capable architectures as the card will hold.
-		_fit = DEFAULT_FIT_GB
 		print("
 AUTO: choosing a mode from what this machine can actually do.")
+		_fit = _detect_budget_gb()
 
 	if _fit > 0.0:
 		# Selection here is by what can COEXIST in VRAM, so it does not use
@@ -890,3 +890,21 @@ func _probe_verified(id: String) -> String:
 	# holding VRAM" state and the candidate is skipped for no reason.
 	await create_timer(3.0).timeout
 	return await _probe_one(id)
+
+## Ask the GPU how much memory it has, so AUTO plans against the real card.
+##
+## Optional, exactly like the lms CLI: if nvidia-smi is absent the documented
+## 6.0GB default stands and nothing is worse than before. Without this a 24GB
+## card planned against 6GB and refused rosters it could hold three times over.
+func _detect_budget_gb() -> float:
+	var out: Array = []
+	var code := OS.execute("nvidia-smi",
+		["--query-gpu=memory.total", "--format=csv,noheader"], out, true)
+	if code != 0 or out.is_empty():
+		return VramScript.DEFAULT_BUDGET_GB
+	var mib := VramScript.parse_gpu_memory_mib(str(out[0]))
+	if mib <= 0:
+		return VramScript.DEFAULT_BUDGET_GB
+	var gb: float = VramScript.budget_from_gpu(mib)
+	print("   detected %d MiB of VRAM; planning against %.1f GB" % [mib, gb])
+	return gb
