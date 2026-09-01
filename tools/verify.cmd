@@ -68,6 +68,7 @@ call :check "scripts/arena/cinematic_selftest.gd"         "cinematic bridge"    
 call :check "scripts/arena/scar_lattice_selftest.gd"      "scar lattice"        "0 failure"
 call :check "scripts/arena/compat_selftest.gd"            "system-role compat"  "0 failure"
 call :check "tools/adversarial.gd"                        "adversarial pass"    "ADVERSARIAL OK"
+call :check "tools/offline_selftest.gd"                   "offline behaviour"   "OFFLINE OK"
 
 REM ---- JSON + preset legality ---------------------------------------------
 "%GODOT%" --headless --path . --script tools/verify_configs.gd >"%TEMP%\sa_cfg.txt" 2>&1

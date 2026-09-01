@@ -85,6 +85,9 @@ jobs:
       - name: Adversarial pass
         run: ~/godot/godot --headless --path . --script tools/adversarial.gd 2>&1 | tee out.log; grep -q "ADVERSARIAL OK" out.log
 
+      - name: Offline behaviour (LM Studio absent)
+        run: ~/godot/godot --headless --path . --script tools/offline_selftest.gd 2>&1 | tee out.log; grep -q "OFFLINE OK" out.log
+
       - name: Configs, presets and required files
         run: ~/godot/godot --headless --path . --script tools/verify_configs.gd 2>&1 | tee cfg.log; grep -q "CONFIGS OK" cfg.log
 
