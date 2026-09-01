@@ -1,0 +1,50 @@
+﻿SILICON ARENA - QUICK START
+
+1) Start LM Studio
+- Open LM Studio.
+- Go to Developer / Local Server.
+- Turn ON server at: http://127.0.0.1:1234
+- Keep LM Studio open.
+
+2) Start the Arena
+- Double-click: start_arena.cmd
+- Or run Godot manually on this project folder.
+
+3) Load Models (local)
+- The models you added are in the .lmstudio/models folder inside this directory.
+- In LM Studio, go to Settings -> General -> Models Folder and point it to:
+  C:\Users\cleve\Downloads\CLI\silicon_arena\.lmstudio\models
+- Preset 5 is pre-configured to use these high-end local files (Gemma 3, R1, Phi 4).
+
+4) Switch Presets
+- Use preset buttons or hotkeys below to flip between saved presets and your custom one.
+
+5) Hotkeys
+- F1 = Toggle info text
+- F2 / F3 = Next / Previous preset
+- F4 = Restart current preset
+- F5 = Save snapshot (history + models) to artifact_forge/logs
+- 1 / 2 / 3 / 4 / 5 = Jump directly to preset 1-5
+
+6) Arena Rules (baked in)
+- Replies under 40 words, witty/spicy but not rude, no meta.
+- Each turn pulls a random topic (rigs, mirroring, MoE vs dense, etc.).
+- System prompt enforces rules automatically.
+
+7) Edit Presets
+- Edit res://presets.json (or create user://presets.json) with arrays of agents.
+- Each agent: {"name": "Gem", "color": "#ff6b6b", "model": "qwen2.5-7b-instruct"}
+- Missing or invalid presets fall back to built-in defaults.
+
+8) 8GB VRAM safety knobs
+- MAX_TOKENS (default 96)
+- TURN_INTERVAL_SEC (default 2.0)
+- Keep models around 1B-4B for best stability.
+- Arena runs requests one-at-a-time to avoid VRAM spikes.
+
+Key files:
+- scenes/main.tscn
+- scripts/main.gd
+- scripts/api/lm_studio_client.gd
+- start_arena.cmd
+- presets.json (editable)

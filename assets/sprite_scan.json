@@ -1,0 +1,605 @@
+[
+  {
+    "path": "C:\\Users\\cleve\\Downloads\\CLI\\Styloo Guns Asset Pack GLTF FBX V1.1.zip",
+    "packed": true,
+    "shape": "UNUSABLE",
+    "detail": {
+      "reason": "contains no PNG files"
+    },
+    "files": 65
+  },
+  {
+    "path": "C:\\Users\\cleve\\Downloads\\CLI\\TwitchDownloader-master.zip",
+    "packed": true,
+    "shape": "TILESET_OR_PROPS",
+    "detail": {
+      "png_count": 21,
+      "dirs": 1
+    },
+    "files": 304
+  },
+  {
+    "path": "C:\\Users\\cleve\\Downloads\\CLI\\ai-trial-sniffer.zip",
+    "packed": true,
+    "shape": "UNUSABLE",
+    "detail": {
+      "reason": "contains no PNG files"
+    },
+    "files": 15
+  },
+  {
+    "path": "C:\\Users\\cleve\\Downloads\\CLI\\aseprite-main.zip",
+    "packed": true,
+    "shape": "TILESET_OR_PROPS",
+    "detail": {
+      "png_count": 27,
+      "dirs": 5
+    },
+    "files": 1914
+  },
+  {
+    "path": "C:\\Users\\cleve\\Downloads\\CLI\\craftpix-net-106469-top-down-crystals-pixel-art.zip",
+    "packed": true,
+    "shape": "TILESET_OR_PROPS",
+    "detail": {
+      "png_count": 165,
+      "dirs": 6
+    },
+    "files": 169
+  },
+  {
+    "path": "C:\\Users\\cleve\\Downloads\\CLI\\craftpix-net-169442-free-2d-top-down-pixel-dungeon-asset-pack.zip",
+    "packed": true,
+    "shape": "SPRITE_SHEET",
+    "detail": {
+      "strips": [
+        {
+          "file": "Objects.png",
+          "w": 384,
+          "h": 96,
+          "frames": 4
+        }
+      ],
+      "strip_count": 1
+    },
+    "files": 41
+  },
+  {
+    "path": "C:\\Users\\cleve\\Downloads\\CLI\\craftpix-net-255216-free-basic-pixel-art-ui-for-rpg(1).zip",
+    "packed": true,
+    "shape": "TILESET_OR_PROPS",
+    "detail": {
+      "png_count": 20,
+      "dirs": 2
+    },
+    "files": 37
+  },
+  {
+    "path": "C:\\Users\\cleve\\Downloads\\CLI\\craftpix-net-266622-free-top-down-pixel-art-cave-objects.zip",
+    "packed": true,
+    "shape": "TILESET_OR_PROPS",
+    "detail": {
+      "png_count": 103,
+      "dirs": 7
+    },
+    "files": 107
+  },
+  {
+    "path": "C:\\Users\\cleve\\Downloads\\CLI\\craftpix-net-345639-free-dark-elf-queen-avatar-icon-pixel-pack-for-dialogue.zip",
+    "packed": true,
+    "shape": "TILESET_OR_PROPS",
+    "detail": {
+      "png_count": 7,
+      "dirs": 2
+    },
+    "files": 13
+  },
+  {
+    "path": "C:\\Users\\cleve\\Downloads\\CLI\\craftpix-net-381552-free-water-and-fire-magic-sprite-vector-pack.zip",
+    "packed": true,
+    "shape": "TILESET_OR_PROPS",
+    "detail": {
+      "png_count": 58,
+      "dirs": 7
+    },
+    "files": 138
+  },
+  {
+    "path": "C:\\Users\\cleve\\Downloads\\CLI\\craftpix-net-505052-free-forest-objects-top-down-pixel-art.zip",
+    "packed": true,
+    "shape": "TILESET_OR_PROPS",
+    "detail": {
+      "png_count": 82,
+      "dirs": 4
+    },
+    "files": 86
+  },
+  {
+    "path": "C:\\Users\\cleve\\Downloads\\CLI\\craftpix-net-529677-free-wizard-sprite-sheets-pixel-art.zip",
+    "packed": true,
+    "shape": "SPRITE_SHEET",
+    "detail": {
+      "strips": [
+        {
+          "file": "Jump.png",
+          "w": 1152,
+          "h": 128,
+          "frames": 9
+        },
+        {
+          "file": "Charge.png",
+          "w": 768,
+          "h": 64,
+          "frames": 12
+        },
+        {
+          "file": "Idle.png",
+          "w": 896,
+          "h": 128,
+          "frames": 7
+        },
+        {
+          "file": "Hurt.png",
+          "w": 384,
+          "h": 128,
+          "frames": 3
+        },
+        {
+          "file": "Run.png",
+          "w": 1024,
+          "h": 128,
+          "frames": 8
+        },
+        {
+          "file": "Flame_jet.png",
+          "w": 1792,
+          "h": 128,
+          "frames": 14
+        },
+        {
+          "file": "Walk.png",
+          "w": 768,
+          "h": 128,
+          "frames": 6
+        },
+        {
+          "file": "Dead.png",
+          "w": 768,
+          "h": 128,
+          "frames": 6
+        },
+        {
+          "file": "Attack_2.png",
+          "w": 512,
+          "h": 128,
+          "frames": 4
+        },
+        {
+          "file": "Fireball.png",
+          "w": 1024,
+          "h": 128,
+          "frames": 8
+        },
+        {
+          "file": "Attack_1.png",
+          "w": 512,
+          "h": 128,
+          "frames": 4
+        },
+        {
+          "file": "Jump.png",
+          "w": 1024,
+          "h": 128,
+          "frames": 8
+        }
+      ],
+      "strip_count": 33
+    },
+    "files": 42
+  },
+  {
+    "path": "C:\\Users\\cleve\\Downloads\\CLI\\craftpix-net-654184-main-characters-home-free-top-down-pixel-art-asset.zip",
+    "packed": true,
+    "shape": "SPRITE_SHEET",
+    "detail": {
+      "strips": [
+        {
+          "file": "Smoke_animation.png",
+          "w": 288,
+          "h": 48,
+          "frames": 6
+        },
+        {
+          "file": "Smoke_animation.png",
+          "w": 288,
+          "h": 48,
+          "frames": 6
+        }
+      ],
+      "strip_count": 2
+    },
+    "files": 35
+  },
+  {
+    "path": "C:\\Users\\cleve\\Downloads\\CLI\\craftpix-net-695666-free-undead-tileset-top-down-pixel-art.zip",
+    "packed": true,
+    "shape": "TILESET_OR_PROPS",
+    "detail": {
+      "png_count": 262,
+      "dirs": 4
+    },
+    "files": 275
+  },
+  {
+    "path": "C:\\Users\\cleve\\Downloads\\CLI\\craftpix-net-789196-free-top-down-hunt-animals-pixel-sprite-pack.zip",
+    "packed": true,
+    "shape": "TILESET_OR_PROPS",
+    "detail": {
+      "png_count": 114,
+      "dirs": 11
+    },
+    "files": 331
+  },
+  {
+    "path": "C:\\Users\\cleve\\Downloads\\CLI\\craftpix-net-815388-50-free-rpg-mushroom-icons.zip",
+    "packed": true,
+    "shape": "TILESET_OR_PROPS",
+    "detail": {
+      "png_count": 100,
+      "dirs": 2
+    },
+    "files": 103
+  },
+  {
+    "path": "C:\\Users\\cleve\\Downloads\\CLI\\extinct_os-__-splat-text-processor.zip",
+    "packed": true,
+    "shape": "UNUSABLE",
+    "detail": {
+      "reason": "contains no PNG files"
+    },
+    "files": 11
+  },
+  {
+    "path": "C:\\Users\\cleve\\Downloads\\CLI\\godot_pixelorama_importer-master.zip",
+    "packed": true,
+    "shape": "TILESET_OR_PROPS",
+    "detail": {
+      "png_count": 1,
+      "dirs": 1
+    },
+    "files": 11
+  },
+  {
+    "path": "C:\\Users\\cleve\\Downloads\\CLI\\mcp-0.3.0.zip",
+    "packed": true,
+    "shape": "UNUSABLE",
+    "detail": {
+      "reason": "contains no PNG files"
+    },
+    "files": 9
+  },
+  {
+    "path": "C:\\Users\\cleve\\Downloads\\CLI\\v1_SNAPSHOT_20260424_1525.zip",
+    "shape": "UNUSABLE",
+    "detail": {
+      "reason": "corrupt or not a zip"
+    }
+  },
+  {
+    "path": "C:\\Users\\cleve\\Downloads\\CLI\\silicon_arena\\assets\\PNG",
+    "packed": false,
+    "shape": "TILESET_OR_PROPS",
+    "detail": {
+      "png_count": 181,
+      "dirs": 5
+    },
+    "files": 181
+  },
+  {
+    "path": "C:\\Users\\cleve\\Downloads\\CLI\\silicon_arena\\assets\\characters",
+    "packed": false,
+    "shape": "TILESET_OR_PROPS",
+    "detail": {
+      "png_count": 334,
+      "dirs": 22
+    },
+    "files": 668
+  },
+  {
+    "path": "C:\\Users\\cleve\\Downloads\\CLI\\silicon_arena\\assets\\craftpix-064112-free-orc-ogre-and-goblin-chibi-2d-game-sprites",
+    "packed": false,
+    "shape": "SEQUENCE_CHARACTER",
+    "detail": {
+      "characters": {
+        "Goblin": {
+          "Dying": 15,
+          "Falling Down": 6,
+          "Hurt": 12,
+          "Idle": 18,
+          "Idle Blinking": 18,
+          "Kicking": 12,
+          "Running": 12,
+          "Slashing": 12,
+          "Sliding": 6,
+          "Throwing": 12,
+          "Walking": 24
+        },
+        "Ogre": {
+          "Dying": 15,
+          "Falling Down": 6,
+          "Hurt": 12,
+          "Idle": 18,
+          "Idle Blinking": 18,
+          "Kicking": 12,
+          "Running": 12,
+          "Slashing": 12,
+          "Sliding": 6,
+          "Throwing": 12,
+          "Walking": 24
+        },
+        "Orc": {
+          "Dying": 15,
+          "Falling Down": 6,
+          "Hurt": 12,
+          "Idle": 18,
+          "Idle Blinking": 18,
+          "Kicking": 12,
+          "Running": 12,
+          "Slashing": 12,
+          "Sliding": 6,
+          "Throwing": 12,
+          "Walking": 24
+        }
+      }
+    },
+    "files": 1376
+  },
+  {
+    "path": "C:\\Users\\cleve\\Downloads\\CLI\\silicon_arena\\assets\\craftpix-891123-free-golems-chibi-2d-game-sprites2",
+    "packed": false,
+    "shape": "SEQUENCE_CHARACTER",
+    "detail": {
+      "characters": {
+        "Golem_1": {
+          "Dying": 15,
+          "Falling Down": 6,
+          "Hurt": 12,
+          "Idle": 18,
+          "Idle Blinking": 18,
+          "Kicking": 12,
+          "Running": 12,
+          "Slashing": 12,
+          "Sliding": 6,
+          "Throwing": 12,
+          "Walking": 24
+        },
+        "Golem_2": {
+          "Dying": 15,
+          "Falling Down": 6,
+          "Hurt": 12,
+          "Idle": 18,
+          "Idle Blinking": 18,
+          "Kicking": 12,
+          "Running": 12,
+          "Slashing": 12,
+          "Sliding": 6,
+          "Throwing": 12,
+          "Walking": 24
+        },
+        "Golem_3": {
+          "Dying": 15,
+          "Falling Down": 6,
+          "Hurt": 12,
+          "Idle": 18,
+          "Idle Blinking": 18,
+          "Kicking": 12,
+          "Running": 12,
+          "Slashing": 12,
+          "Sliding": 6,
+          "Throwing": 12,
+          "Walking": 24
+        }
+      }
+    },
+    "files": 1376
+  },
+  {
+    "path": "C:\\Users\\cleve\\Downloads\\CLI\\silicon_arena\\assets\\craftpix-net-140672-free-chibi-skeleton-warrior-character-sprites",
+    "packed": false,
+    "shape": "SEQUENCE_CHARACTER",
+    "detail": {
+      "characters": {
+        "Skeleton_Warrior_1": {
+          "Dying": 15,
+          "Falling Down": 6,
+          "Hurt": 12,
+          "Idle": 18,
+          "Idle Blinking": 18,
+          "Kicking": 12,
+          "Running": 12,
+          "Slashing": 12,
+          "Sliding": 6,
+          "Throwing": 12,
+          "Walking": 24
+        },
+        "Skeleton_Warrior_2": {
+          "Dying": 15,
+          "Falling Down": 6,
+          "Hurt": 12,
+          "Idle": 18,
+          "Idle Blinking": 18,
+          "Kicking": 12,
+          "Running": 12,
+          "Slashing": 12,
+          "Sliding": 6,
+          "Throwing": 12,
+          "Walking": 24
+        },
+        "Skeleton_Warrior_3": {
+          "Dying": 15,
+          "Falling Down": 6,
+          "Hurt": 12,
+          "Idle": 18,
+          "Idle Blinking": 18,
+          "Kicking": 12,
+          "Running": 12,
+          "Slashing": 12,
+          "Sliding": 6,
+          "Throwing": 12,
+          "Walking": 24
+        }
+      }
+    },
+    "files": 1382
+  },
+  {
+    "path": "C:\\Users\\cleve\\Downloads\\CLI\\silicon_arena\\assets\\craftpix-net-935193-free-chibi-necromancer-of-the-shadow-character-sprites",
+    "packed": false,
+    "shape": "SEQUENCE_CHARACTER",
+    "detail": {
+      "characters": {
+        "Necromancer_of_the_Shadow_1": {
+          "Dying": 15,
+          "Falling Down": 6,
+          "Hurt": 12,
+          "Idle": 18,
+          "Idle Blinking": 18,
+          "Kicking": 12,
+          "Running": 12,
+          "Slashing": 12,
+          "Sliding": 6,
+          "Throwing": 12,
+          "Walking": 24
+        },
+        "Necromancer_of_the_Shadow_2": {
+          "Dying": 15,
+          "Falling Down": 6,
+          "Hurt": 12,
+          "Idle": 18,
+          "Idle Blinking": 18,
+          "Kicking": 12,
+          "Running": 12,
+          "Slashing": 12,
+          "Sliding": 6,
+          "Throwing": 12,
+          "Walking": 24
+        },
+        "Necromancer_of_the_Shadow_3": {
+          "Dying": 15,
+          "Falling Down": 6,
+          "Hurt": 12,
+          "Idle": 18,
+          "Idle Blinking": 18,
+          "Kicking": 12,
+          "Running": 12,
+          "Slashing": 12,
+          "Sliding": 6,
+          "Throwing": 12,
+          "Walking": 24
+        }
+      }
+    },
+    "files": 1383
+  },
+  {
+    "path": "C:\\Users\\cleve\\Downloads\\CLI\\silicon_arena\\assets\\craftpix-net-958568-free-cursed-land-top-down-pixel-art-tileset",
+    "packed": false,
+    "shape": "TILESET_OR_PROPS",
+    "detail": {
+      "png_count": 144,
+      "dirs": 4
+    },
+    "files": 300
+  },
+  {
+    "path": "C:\\Users\\cleve\\Downloads\\CLI\\silicon_arena\\assets\\tiles",
+    "packed": false,
+    "shape": "TILESET_OR_PROPS",
+    "detail": {
+      "png_count": 26,
+      "dirs": 1
+    },
+    "files": 53
+  },
+  {
+    "path": "C:\\Users\\cleve\\Downloads\\CLI\\silicon_arena\\Dead Swamp.zip",
+    "packed": true,
+    "shape": "SPRITE_SHEET",
+    "detail": {
+      "strips": [
+        {
+          "file": "swamp-br\u00fche animated-v5.png",
+          "w": 384,
+          "h": 128,
+          "frames": 3
+        }
+      ],
+      "strip_count": 1
+    },
+    "files": 14
+  },
+  {
+    "path": "C:\\Users\\cleve\\Downloads\\CLI\\silicon_arena\\HAS Starter Pack.zip",
+    "packed": true,
+    "shape": "TILESET_OR_PROPS",
+    "detail": {
+      "png_count": 7,
+      "dirs": 1
+    },
+    "files": 7
+  },
+  {
+    "path": "C:\\Users\\cleve\\Downloads\\CLI\\silicon_arena\\MiniPack.zip",
+    "packed": true,
+    "shape": "TILESET_OR_PROPS",
+    "detail": {
+      "png_count": 39,
+      "dirs": 1
+    },
+    "files": 79
+  },
+  {
+    "path": "C:\\Users\\cleve\\Downloads\\CLI\\silicon_arena\\Top_Down_Kingdom_Tileset_FREE.zip",
+    "packed": true,
+    "shape": "SPRITE_SHEET",
+    "detail": {
+      "strips": [
+        {
+          "file": "Villager.png",
+          "w": 48,
+          "h": 16,
+          "frames": 3
+        }
+      ],
+      "strip_count": 1
+    },
+    "files": 12
+  },
+  {
+    "path": "C:\\Users\\cleve\\Downloads\\CLI\\silicon_arena\\[FREE] Mini Dungeon Tileset.zip",
+    "packed": true,
+    "shape": "TILESET_OR_PROPS",
+    "detail": {
+      "png_count": 24,
+      "dirs": 8
+    },
+    "files": 28
+  },
+  {
+    "path": "C:\\Users\\cleve\\Downloads\\CLI\\silicon_arena\\craftpix-net-381552-free-water-and-fire-magic-sprite-vector-pack(1).zip",
+    "packed": true,
+    "shape": "TILESET_OR_PROPS",
+    "detail": {
+      "png_count": 58,
+      "dirs": 7
+    },
+    "files": 138
+  },
+  {
+    "path": "C:\\Users\\cleve\\Downloads\\CLI\\silicon_arena\\craftpix-net-381552-free-water-and-fire-magic-sprite-vector-pack.zip",
+    "shape": "UNUSABLE",
+    "detail": {
+      "reason": "corrupt or not a zip"
+    }
+  }
+]

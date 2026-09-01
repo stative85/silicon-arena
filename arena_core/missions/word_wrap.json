@@ -1,0 +1,9 @@
+{
+  "id": "word_wrap",
+  "objective": "Implement a word-wrapping function that breaks a paragraph of text into lines no longer than a given width. Wrap at word boundaries. Collapse runs of whitespace. Return an empty list for empty or whitespace-only input. If a single word is longer than the width, hard-split it across lines rather than emitting an over-long line. Lines must have no leading or trailing whitespace. Raise ValueError if width is not a positive integer.",
+  "contract": "def wrap_text(text: str, width: int) -> list[str]",
+  "tests_file": "word_wrap_tests.py",
+  "artifact_name": "solution.py",
+  "max_cycles": 4,
+  "timeout": 20.0
+}

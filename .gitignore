@@ -1,0 +1,52 @@
+# Godot editor cache and imported assets
+.godot/
+
+# LM Studio (models, app binaries, credentials)
+.lmstudio/
+LM Studio/
+
+# Executables and archives
+*.exe
+*.zip
+
+# Unused source art formats (game only uses PNGs)
+EPS/
+SCML/
+Icons/
+AI/
+__MACOSX/
+*.psd
+*.ai
+
+# Generated audio (regenerate with generate_arena_audio.py)
+audio/
+
+# Build exports (generated via Godot editor)
+exports/
+
+# Legacy output directories
+ghost_archive/
+
+# Python
+__pycache__/
+*.pyc
+
+# Backup and stale files
+*.bak
+*.gd.txt
+
+# Personal/draft text files in scripts (not project code)
+scripts/*.txt
+
+# OS metadata
+Thumbs.db
+.DS_Store
+Desktop.ini
+
+# Sensitive files
+*.env
+.env.*
+
+# Editor/script backups
+*.bak
+*.bak.*

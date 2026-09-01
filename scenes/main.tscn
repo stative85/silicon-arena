@@ -1,0 +1,38 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/main.gd" id="1_main"]
+
+[node name="Main" type="Node2D"]
+script = ExtResource("1_main")
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="UIPanel" type="Panel" parent="CanvasLayer"]
+offset_left = 16.0
+offset_top = 16.0
+offset_right = 760.0
+offset_bottom = 360.0
+
+[node name="InfoLabel" type="RichTextLabel" parent="CanvasLayer/UIPanel"]
+layout_mode = 0
+offset_left = 12.0
+offset_top = 10.0
+offset_right = 732.0
+offset_bottom = 334.0
+bbcode_enabled = true
+text = "[b]Silicon Arena[/b]\nArena booting..."
+scroll_active = false
+
+[node name="PresetPanel" type="Panel" parent="CanvasLayer"]
+offset_left = 16.0
+offset_top = 372.0
+offset_right = 760.0
+offset_bottom = 432.0
+
+[node name="PresetRow" type="HBoxContainer" parent="CanvasLayer/PresetPanel"]
+layout_mode = 0
+offset_left = 8.0
+offset_top = 8.0
+offset_right = 736.0
+offset_bottom = 52.0
+theme_override_constants/separation = 8

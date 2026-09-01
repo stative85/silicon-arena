@@ -1,0 +1,16 @@
+[gd_scene load_steps=3 format=3]
+
+[sub_resource type="Gradient" id="Gradient_agent"]
+offsets = PackedFloat32Array(0, 1)
+colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_agent"]
+gradient = SubResource("Gradient_agent")
+width = 24
+height = 24
+
+[node name="AgentSprite" type="Node2D"]
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = SubResource("GradientTexture2D_agent")
+centered = true

@@ -1,0 +1,10 @@
+[gd_scene format=3 uid="uid://b43cny23n8ilv"]
+
+[ext_resource type="Texture2D" uid="uid://crqmfvmjk10qv" path="res://assets/tiles/WWT-01.png" id="1_kyjdr"]
+
+[node name="sprite2D" type="Node2D" unique_id=1438736966]
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=514615432]
+position = Vector2(640.00006, 320)
+scale = Vector2(-8.405342, 9.797412)
+texture = ExtResource("1_kyjdr")

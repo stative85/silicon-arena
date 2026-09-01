@@ -1,0 +1,191 @@
+[
+  [
+    {
+      "name": "Qwen 3B",
+      "color": "#3db1ff",
+      "model": "lmstudio-community/Qwen2.5-3B-Instruct-GGUF"
+    },
+    {
+      "name": "Gemma 2B",
+      "color": "#5ad78c",
+      "model": "google/gemma-2-2b-it-GGUF"
+    },
+    {
+      "name": "Llama 3B",
+      "color": "#ff6b6b",
+      "model": "lmstudio-community/Llama-3.2-3B-Instruct-GGUF"
+    },
+    {
+      "name": "Phi 3.5",
+      "color": "#ffa502",
+      "model": "microsoft/Phi-3.5-mini-instruct-GGUF"
+    },
+    {
+      "name": "Danube 4B",
+      "color": "#c471ed",
+      "model": "H2OAI/h2o-danube3-4b-it-GGUF"
+    }
+  ],
+  [
+    {
+      "name": "Smol 1.7B",
+      "color": "#ff8f70",
+      "model": "HuggingFaceTB/SmolLM2-1.7B-Instruct-GGUF"
+    },
+    {
+      "name": "Qwen 1.5B",
+      "color": "#3db1ff",
+      "model": "lmstudio-community/Qwen2.5-1.5B-Instruct-GGUF"
+    },
+    {
+      "name": "Llama 1B",
+      "color": "#68eb86",
+      "model": "lmstudio-community/Llama-3.2-1B-Instruct-GGUF"
+    },
+    {
+      "name": "Gemma 2B",
+      "color": "#5ad78c",
+      "model": "google/gemma-2-2b-it-GGUF"
+    },
+    {
+      "name": "StableLM 3B",
+      "color": "#48bcf2",
+      "model": "stabilityai/stablelm-zephyr-3b-GGUF"
+    }
+  ],
+  [
+    {
+      "name": "Granite 4",
+      "color": "#e74c3c",
+      "model": "lmstudio-community/granite-4.0-h-tiny-GGUF"
+    },
+    {
+      "name": "LFM2 2.6B",
+      "color": "#e056fd",
+      "model": "LiquidAI/LFM2-2.6B-Exp-GGUF"
+    },
+    {
+      "name": "Ministral 3B",
+      "color": "#ffa502",
+      "model": "lmstudio-community/Ministral-3-3B-Instruct-2512-GGUF"
+    },
+    {
+      "name": "Nemotron 4B",
+      "color": "#76b900",
+      "model": "lmstudio-community/NVIDIA-Nemotron-3-Nano-4B-GGUF"
+    },
+    {
+      "name": "Phi 3 Mini",
+      "color": "#f1c40f",
+      "model": "microsoft/Phi-3-mini-4k-instruct-gguf"
+    }
+  ],
+  [
+    {
+      "name": "Qwen 3B",
+      "color": "#3db1ff",
+      "model": "lmstudio-community/Qwen2.5-3B-Instruct-GGUF"
+    },
+    {
+      "name": "Gemma 2B",
+      "color": "#5ad78c",
+      "model": "google/gemma-2-2b-it-GGUF"
+    },
+    {
+      "name": "Llama 3B",
+      "color": "#ff6b6b",
+      "model": "lmstudio-community/Llama-3.2-3B-Instruct-GGUF"
+    },
+    {
+      "name": "Phi 3.5",
+      "color": "#ffa502",
+      "model": "microsoft/Phi-3.5-mini-instruct-GGUF"
+    },
+    {
+      "name": "Danube 4B",
+      "color": "#c471ed",
+      "model": "H2OAI/h2o-danube3-4b-it-GGUF"
+    }
+  ],
+  [
+    {
+      "name": "Grok 3B",
+      "color": "#ffa502",
+      "model": "mradermacher/Grok_HumanLike_Llama-3.2-3B-Instruct-GGUF"
+    },
+    {
+      "name": "Next2 Fast",
+      "color": "#f1c40f",
+      "model": "next2-fast-i1"
+    },
+    {
+      "name": "Smol 1.7B",
+      "color": "#ff8f70",
+      "model": "HuggingFaceTB/SmolLM2-1.7B-Instruct-GGUF"
+    },
+    {
+      "name": "Qwen 3B",
+      "color": "#3db1ff",
+      "model": "lmstudio-community/Qwen2.5-3B-Instruct-GGUF"
+    },
+    {
+      "name": "Llama 1B",
+      "color": "#68eb86",
+      "model": "lmstudio-community/Llama-3.2-1B-Instruct-GGUF"
+    }
+  ],
+  [
+    {
+      "name": "Deckard 6B",
+      "color": "#e6ac00",
+      "model": "mradermacher/Qwen3-Deckard-Large-Almost-Human-6B-III-150-i1-GGUF"
+    },
+    {
+      "name": "GPT-5 Jr",
+      "color": "#1abc9c",
+      "model": "mradermacher/GPT-5-Distill-llama3.2-3B-Instruct-Heretic-i1-GGUF"
+    },
+    {
+      "name": "Grok Brain",
+      "color": "#e74c3c",
+      "model": "TeichAI/Qwen3-4B-Instruct-grok-4-fast-brainstorming-distill"
+    },
+    {
+      "name": "Opus Shard",
+      "color": "#3498db",
+      "model": "mradermacher/Gemma-2-2B-Opus-Instruct-GGUF"
+    },
+    {
+      "name": "Wizard 7B",
+      "color": "#9b59b6",
+      "model": "TheBloke/Wizard-Vicuna-7B-Uncensored-GGUF"
+    }
+  ],
+  [
+    {
+      "name": "Hauhau",
+      "color": "#ff4757",
+      "model": "gemma-4-e2b-uncensored-hauhaucus-aggressive"
+    },
+    {
+      "name": "Deckard II",
+      "color": "#e6ac00",
+      "model": "qwen3-deckard-large-almost-human-6b-iii-150-ii"
+    },
+    {
+      "name": "Next2 II",
+      "color": "#f1c40f",
+      "model": "next2-fast-ii"
+    },
+    {
+      "name": "Danube 4B",
+      "color": "#00d2ff",
+      "model": "h2o-danube3-4b-chat"
+    },
+    {
+      "name": "Grok Jr",
+      "color": "#ffa502",
+      "model": "grok_humanlike_llama-3.2-3b-instruct"
+    }
+  ]
+]
