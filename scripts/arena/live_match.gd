@@ -58,7 +58,17 @@ var _doom := 0.0
 var _waiting := false
 var _wait_started_ms := 0
 var _elapsed := 0.0
-var _wait_for_client_sec := 0.0
+## How long to hold turn one open for an overlay to attach.
+##
+## 0 means WAIT FOREVER, matching cinematic_live_server.gd's documented
+## convention. That used to be the DEFAULT, which meant a plain headless run
+## with no browser sat at the start barrier indefinitely, printing one
+## WAITING_FOR_CLIENTS line and nothing else — indistinguishable from a hang,
+## and it made every headless live run from a clean clone useless.
+##
+## The default is now bounded: an overlay still gets a generous window, and an
+## unattended run always starts on its own. Use --no-wait to start immediately.
+var _wait_for_client_sec := 45.0
 var _request_timeout_sec := 90.0
 ## What a human last said, and when. Kept for a few turns only.
 var _human_line := ""
@@ -184,6 +194,10 @@ func _parse_args() -> void:
 				if v != "": _max_turns = maxi(int(v), 1); i += 1
 			"--wait-sec":
 				if v != "": _wait_for_client_sec = maxf(float(v), 0.0); i += 1
+			"--no-wait":
+				# Explicit "start now". 0 cannot mean this: it is already
+				# spoken for as "wait forever".
+				_wait_for_client_sec = -1.0
 			"--timeout-sec":
 				if v != "": _request_timeout_sec = maxf(float(v), 5.0); i += 1
 			"--betray-turn":
@@ -214,8 +228,8 @@ func _load_roster() -> bool:
 			printerr("    %s" % cand)
 		printerr("  build one with:")
 		printerr("    godot --headless --path . --script tools/build_roster.gd")
-		printerr("  (that writes user://presets.json from your installed models;")
-		printerr("   copy it to config/arena-roster.v1.json for the live path)")
+		printerr("  (that writes config/arena-roster.v1.json directly. Add")
+		printerr("   -- --balanced for fewer cold model loads per round.)")
 		return false
 	var parsed = JSON.parse_string(f.get_as_text())
 	f.close()
@@ -329,6 +343,10 @@ func tick(delta: float) -> void:
 		if state_ready and cine_ready:
 			_started = true
 			print("LIVE_ARENA CLIENT_READY both bridges attached after %.1fs" % _elapsed)
+			_begin()
+		elif _wait_for_client_sec < 0.0:
+			_started = true
+			print("LIVE_ARENA CLIENT_READY --no-wait, starting without an overlay")
 			_begin()
 		elif _wait_for_client_sec > 0.0 and _elapsed >= _wait_for_client_sec:
 			# Bounded fallback so a headless run without a browser still works.
