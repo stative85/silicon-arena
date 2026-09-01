@@ -53,3 +53,7 @@ Desktop.ini
 
 # local launch notes, not part of the project
 .launch/
+
+# Generated proof artifacts — regenerate with tools/prove.gd
+docs/proof/latest/
+docs/proof/baseline/

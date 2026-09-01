@@ -15,16 +15,30 @@ never ran and the restore silently copied nothing.
 """
 import argparse
 import pathlib
+import os
 import shutil
 import subprocess
 import sys
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 SRC = ROOT / "scripts" / "arena" / "scar_lattice.gd"
-GODOT = pathlib.Path(
-    "C:/Users/cleve/Downloads/Godot_v4.6-stable_win64.exe/"
-    "Godot_v4.6-stable_win64_console.exe"
-)
+def _find_godot() -> pathlib.Path:
+    """Locate Godot without hardcoding one developer's Downloads folder."""
+    env = os.environ.get("GODOT_BIN")
+    if env and pathlib.Path(env).exists():
+        return pathlib.Path(env)
+    for name in ("godot", "godot.exe", "Godot_v4.6-stable_win64_console.exe",
+                 "Godot_v4.6-stable_win64.exe"):
+        found = shutil.which(name)
+        if found:
+            return pathlib.Path(found)
+    raise SystemExit(
+        "Godot not found. Set GODOT_BIN to your Godot 4.6 executable, "
+        "or put godot on PATH."
+    )
+
+
+GODOT = _find_godot()
 MARK = "MUTANT"
 
 # name, phase, old, new, what the mutation asserts is not being checked

@@ -1,6 +1,6 @@
 {
  "schema_version": "1.0",
- "generated_at": "EXAMPLE \u2014 regenerate with `lms ls --json`. Includes common public models so shipped presets validate on a fresh clone.",
+ "generated_at": "EXAMPLE \u2014 regenerate with `lms ls --json`. Public models only; private/local checkpoints are intentionally excluded.",
  "source": "lms ls --json",
  "policy": {
   "max_param_b": 7,
@@ -20,50 +20,6 @@
   "total": 98
  },
  "models": [
-  {
-   "modelKey": "britannica1771-4b-p2-30",
-   "displayName": "Britannica1771 4B P2 30",
-   "paramsString": "4B",
-   "paramsB": 4,
-   "activeParamsB": null,
-   "isMoE": false,
-   "quantization": "Q4_K_M",
-   "eligible": true,
-   "exclusionReason": ""
-  },
-  {
-   "modelKey": "britannica1771-full-4b-v7",
-   "displayName": "Britannica1771 FULL 4B v7",
-   "paramsString": "4B",
-   "paramsB": 4,
-   "activeParamsB": null,
-   "isMoE": false,
-   "quantization": "Q4_K_M",
-   "eligible": true,
-   "exclusionReason": ""
-  },
-  {
-   "modelKey": "britannica1771-full-4b-v6",
-   "displayName": "Britannica1771 FULL 4B v6",
-   "paramsString": "4B",
-   "paramsB": 4,
-   "activeParamsB": null,
-   "isMoE": false,
-   "quantization": "Q4_K_M",
-   "eligible": true,
-   "exclusionReason": ""
-  },
-  {
-   "modelKey": "britannica1771-full-4b-v5",
-   "displayName": "Britannica1771 FULL 4B v5",
-   "paramsString": "4B",
-   "paramsB": 4,
-   "activeParamsB": null,
-   "isMoE": false,
-   "quantization": "Q4_K_M",
-   "eligible": true,
-   "exclusionReason": ""
-  },
   {
    "modelKey": "gpt-2-xl",
    "displayName": "GPT 2 XL",
@@ -107,61 +63,6 @@
    "quantization": "Q5_K_M",
    "eligible": false,
    "exclusionReason": "8.2B exceeds the 7B ceiling"
-  },
-  {
-   "modelKey": "britannica1771-full-4b-v4",
-   "displayName": "Britannica1771 FULL 4B v4",
-   "paramsString": "4B",
-   "paramsB": 4,
-   "activeParamsB": null,
-   "isMoE": false,
-   "quantization": "Q4_K_M",
-   "eligible": true,
-   "exclusionReason": ""
-  },
-  {
-   "modelKey": "britannica1771-full-4b-v3",
-   "displayName": "Britannica1771 FULL 4B v3",
-   "paramsString": "4B",
-   "paramsB": 4,
-   "activeParamsB": null,
-   "isMoE": false,
-   "quantization": "Q4_K_M",
-   "eligible": true,
-   "exclusionReason": ""
-  },
-  {
-   "modelKey": "britannica1771-full-4b-v2",
-   "displayName": "Britannica1771 FULL 4B v2",
-   "paramsString": "4B",
-   "paramsB": 4,
-   "activeParamsB": null,
-   "isMoE": false,
-   "quantization": "Q4_K_M",
-   "eligible": true,
-   "exclusionReason": ""
-  },
-  {
-   "modelKey": "britannica1771-full-4b",
-   "displayName": "Britannica1771 FULL 4B",
-   "paramsString": "4B",
-   "paramsB": 4,
-   "activeParamsB": null,
-   "isMoE": false,
-   "quantization": "Q4_K_M",
-   "eligible": true,
-   "exclusionReason": ""
-  },
-  {
-   "modelKey": "britannica-v1-4b",
-   "displayName": "Britannica v1 4B",
-   "paramsString": "4.0B",
-   "paramsB": 4,
-   "activeParamsB": null,
-   "isMoE": false,
-   "quantization": "Q4_K_M",
-   "eligible": true,
-   "exclusionReason": ""
   },
   {
    "modelKey": "phoneorderagent-4b-v10",
@@ -344,17 +245,6 @@
    "displayName": "Logical Elyza Llama2 7B Fast Instruct",
    "paramsString": "7B",
    "paramsB": 7,
-   "activeParamsB": null,
-   "isMoE": false,
-   "quantization": "Q6_K",
-   "eligible": true,
-   "exclusionReason": ""
-  },
-  {
-   "modelKey": "next2-fast-i1",
-   "displayName": "Next2 Fast I1",
-   "paramsString": "3.9B",
-   "paramsB": 3.9,
    "activeParamsB": null,
    "isMoE": false,
    "quantization": "Q6_K",
