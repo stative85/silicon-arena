@@ -62,6 +62,39 @@ from families that appear in **no** roster under test.
 Both judges rank `--fast` first. **That ranking is not trustworthy**, and the
 reason is visible in the table above it.
 
+### A third judge, added later
+
+`ozone-ai_reverb-7b`, again from a family in no roster (39 scored, 0 unusable):
+
+| dimension | A | B | C | D |
+|---|---:|---:|---:|---:|
+| coherence | 3.56 | 3.90 | 4.00 | 3.70 |
+| distinctiveness | 2.00 | 2.10 | 2.30 | 2.00 |
+| argument quality | 3.00 | 3.10 | 3.00 | 3.00 |
+| responsiveness | 2.89 | 3.30 | 2.80 | 3.10 |
+| entertainment | 2.33 | 2.60 | 2.30 | 2.00 |
+| **J3 overall** | 2.87 | **3.05** | 2.90 | 2.85 |
+
+J3 picks a third answer: `--balanced`. Pairwise agreement is worse, not better,
+for the new pair — J1 vs J3 overall r=0.158, J2 vs J3 r=0.013 — and the three
+judges' overall means span 2.92 to 4.06 on the same 39 excerpts.
+
+**The uncomfortable part.** `--fit` is last for J1 and J3 and third for J2. Three
+independent judges putting the shipped default at or near the bottom is a
+consistent signal and is not dismissed here.
+
+It is not followed for a reason that is itself a measurement. The gap between
+`--fit` and the historical default is 0.08 (J1), 0.02 (J3), and −0.14 in
+`--fit`'s favour (J2). The *same judges disagree with each other about the same
+excerpt* by 0.27 to 1.14 on average. The difference between the two candidate
+defaults is several times smaller than the disagreement between the instruments
+measuring it. On that evidence the two are indistinguishable in quality, and
+`--fit` delivers roughly eight times the throughput.
+
+What all three judges do agree on is that `--fit` is not *better*. The claim
+made here is only that it is not measurably worse, which is what the decision
+requires.
+
 ## Why the judges were not followed
 
 `--fast` **never once referred to another agent** — 0% against 65–66% — and had

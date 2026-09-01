@@ -98,26 +98,32 @@ def main():
         print("\n" + "=" * 78)
         print("JUDGE AGREEMENT  (a measurement, not a validation)")
         print("=" * 78)
-        A, B = judges[0], judges[1]
-        common = sorted(set(A["scores"]) & set(B["scores"]))
-        print("  excerpts scored by both: %d" % len(common))
-        for d in DIMENSIONS + ["OVERALL"]:
-            if d == "OVERALL":
-                xa = [mean([A["scores"][e][k] for k in DIMENSIONS]) for e in common]
-                xb = [mean([B["scores"][e][k] for k in DIMENSIONS]) for e in common]
-            else:
-                xa = [A["scores"][e][d] for e in common]
-                xb = [B["scores"][e][d] for e in common]
-            mad = mean([abs(xa[i] - xb[i]) for i in range(len(xa))])
-            exact = mean([1.0 if abs(xa[i] - xb[i]) < 1e-9 else 0.0
-                          for i in range(len(xa))])
-            print("  %-18s pearson r=%6.3f   mean|diff|=%.2f   exact=%.0f%%   means %.2f / %.2f"
-                  % (d, pearson(xa, xb), mad, exact * 100, mean(xa), mean(xb)))
-        ca = [per_judge_cond[A["tag"]][c] for c in conds]
-        cb = [per_judge_cond[B["tag"]][c] for c in conds]
-        print("  condition-ranking spearman: %.3f" % spearman(ca, cb))
-        agree = (conds[ca.index(max(ca))] == conds[cb.index(max(cb))])
-        print("  judges pick the same best condition: %s" % ("YES" if agree else "NO"))
+        print("Two judges agreeing can mean the excerpts really differ, or that")
+        print("both share a bias. Nothing here can tell those apart.")
+
+    for ai in range(len(judges)):
+        for bi in range(ai + 1, len(judges)):
+            A, B = judges[ai], judges[bi]
+            common = sorted(set(A["scores"]) & set(B["scores"]))
+            print("\n--- %s vs %s --- (%d excerpts scored by both)"
+                  % (A["tag"], B["tag"], len(common)))
+            for d in DIMENSIONS + ["OVERALL"]:
+                if d == "OVERALL":
+                    xa = [mean([A["scores"][e][k] for k in DIMENSIONS]) for e in common]
+                    xb = [mean([B["scores"][e][k] for k in DIMENSIONS]) for e in common]
+                else:
+                    xa = [A["scores"][e][d] for e in common]
+                    xb = [B["scores"][e][d] for e in common]
+                mad = mean([abs(xa[i] - xb[i]) for i in range(len(xa))])
+                exact = mean([1.0 if abs(xa[i] - xb[i]) < 1e-9 else 0.0
+                              for i in range(len(xa))])
+                print("  %-18s pearson r=%6.3f   mean|diff|=%.2f   exact=%3.0f%%   means %.2f / %.2f"
+                      % (d, pearson(xa, xb), mad, exact * 100, mean(xa), mean(xb)))
+            ca = [per_judge_cond[A["tag"]][c] for c in conds]
+            cb = [per_judge_cond[B["tag"]][c] for c in conds]
+            print("  condition-ranking spearman: %.3f" % spearman(ca, cb))
+            agree = (conds[ca.index(max(ca))] == conds[cb.index(max(cb))])
+            print("  same best condition: %s" % ("YES" if agree else "NO"))
 
     print("\n" + "=" * 78)
     print("THROUGHPUT vs QUALITY")
