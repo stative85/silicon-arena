@@ -43,7 +43,14 @@ these models never speak. They are reported explicitly:
            reasoning_content N chars. Not usable in a roster.
 ```
 
-Observed on `deepseek-r1-distill-qwen-7b`. Pick a non-thinking model.
+Observed on `deepseek-r1-distill-qwen-7b` and
+`qwen3-4b-instruct-grok-4-fast-brainstorming-distill`.
+
+**No metadata identifies these.** `chatCapable` is null for all 17
+reasoning-marked models in the sample catalog, and name heuristics fail in both
+directions — the second example above contains "instruct". `build_roster.gd`
+therefore probes each candidate with one real request and accepts only models
+that return text. That is why building a roster is slow.
 
 **Base / non-instruct checkpoints.** A continued-pretraining checkpoint has no
 chat template and will not hold a turn. `tools/build_roster.gd` scores these
