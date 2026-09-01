@@ -110,6 +110,8 @@ def main():
                          "the compression experiment")
     ap.add_argument("--max-tokens", dest="max_tokens", default="",
                     help="token ceiling passed to live_match")
+    ap.add_argument("--pipeline", action="store_true",
+                    help="one-turn-deep pipeline arm")
     ap.add_argument("--no-trim", dest="no_trim", action="store_true",
                     help="disable sentence trimming for an A/B arm")
     ap.add_argument("--reset", action="store_true",
@@ -176,6 +178,8 @@ def main():
         extra.append("--no-trim")
     if a.max_tokens:
         extra += ["--max-tokens", a.max_tokens]
+    if a.pipeline:
+        extra.append("--pipeline")
     p = subprocess.run([g, "--headless", "--path", ROOT, "--script",
                         "scripts/arena/live_match.gd", "--",
                         "--turns", str(a.turns), "--no-wait",
@@ -191,6 +195,9 @@ def main():
     fails = [{"speaker": m.group(1).strip(), "why": m.group(2)}
              for m in (FAIL.match(l) for l in log.splitlines()) if m]
 
+    for line in log.splitlines():
+        if line.startswith("LIVE_ARENA PIPELINE") or line.startswith("LIVE_ARENA DWELL"):
+            rec.setdefault("guards", []).append(line.strip())
     base = len(rec["speeches"])
     for s in sp:
         s["n"] += base

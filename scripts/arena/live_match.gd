@@ -110,6 +110,41 @@ var _t_publish := 0
 var _t_schedule_gap := 0
 var _t_turn_total := 0
 var _turn_cycle_started_ms := 0
+
+## ── One-turn-deep pipeline ────────────────────────────────────────────────
+##
+## Generation (~2.7s) is shorter than the pause a viewer needs to read the
+## current reply (1.2s headless, 4.0s in the visual app). So the next agent's
+## request is dispatched the moment the current reply is COMMITTED, and its
+## answer is held until the pause expires. Turn cost becomes
+## max(pause, generation) instead of pause + generation.
+##
+## Exactly one request may be outstanding, which makes out-of-order reveals
+## structurally impossible. Deeper speculation is deliberately not built: a
+## template switch or a human line invalidates queued turns, and several stale
+## branches is a lifecycle system nobody asked for.
+var _pipeline := false
+
+## Bumped by anything that invalidates a reply already in flight. A held reply
+## whose epoch no longer matches is discarded rather than shown.
+var _dispatch_epoch := 0
+
+## The reply waiting for the reading pause to expire, or empty.
+var _pending: Dictionary = {}
+
+## When the current reply has been on screen long enough to reveal the next.
+var _reveal_at := 0.0
+
+## Guard counters, printed at the end and asserted by the experiment.
+var _g_stale_discarded := 0
+var _g_max_outstanding := 0
+var _g_outstanding := 0
+
+## Shortest time any reply was the current one, in ms. The pipeline must never
+## buy throughput by flashing a turn past the viewer faster than the reading
+## pause it replaced.
+var _g_min_reveal_gap := 999999
+var _g_last_reveal_ms := 0
 var _history := []
 ## Some local prompt templates reject a system role outright (danube3 is one:
 ## LM Studio returns 400 "System role not supported"). Detected once on the
@@ -236,6 +271,8 @@ func _parse_args() -> void:
 					i += 1
 			"--max-tokens":
 				if v != "": _max_tokens_override = maxi(int(v), 8); i += 1
+			"--pipeline":
+				_pipeline = true
 			"--no-trim":
 				_trim_sentences = false
 			"--exit-on-complete":
@@ -404,6 +441,15 @@ func tick(delta: float) -> void:
 	if _finished:
 		return
 
+	# A held reply is revealed once the current one has had its reading pause.
+	# This runs BEFORE the _waiting guard: in pipelined mode the next request is
+	# already in flight while the previous answer waits its turn on screen.
+	if _pipeline and not _pending.is_empty() and _elapsed >= _reveal_at:
+		var due := _pending
+		_pending = {}
+		_reveal(due["agent"], due["text"], int(due["latency"]))
+		return
+
 	if _waiting:
 		# Hard timeout. Never wait forever for inference.
 		if Time.get_ticks_msec() - _wait_started_ms > int(_request_timeout_sec * 1000.0) + 5000:
@@ -475,13 +521,17 @@ func _run_turn() -> void:
 	_wait_started_ms = Time.get_ticks_msec()
 	var started_ms := _wait_started_ms
 	var captured := agent
+	var captured_epoch := _dispatch_epoch
+	if _pipeline:
+		_g_outstanding += 1
+		_g_max_outstanding = maxi(_g_max_outstanding, _g_outstanding)
 
 	_client.chat_completion(
 		agent["display_name"],
 		agent["model_key"],
 		messages,
 		func(ok: bool, content: String, http_code: int):
-			_on_reply(captured, ok, content, http_code, started_ms),
+			_on_reply(captured, ok, content, http_code, started_ms, captured_epoch),
 		{
 			"temperature": float(_inference.get("temperature", 0.85)),
 			"max_tokens": _effective_max_tokens(),
@@ -627,7 +677,7 @@ func _build_messages(agent: Dictionary) -> Array:
 	return msgs
 
 
-func _on_reply(agent: Dictionary, ok: bool, content: String, http_code: int, started_ms: int) -> void:
+func _on_reply(agent: Dictionary, ok: bool, content: String, http_code: int, started_ms: int, epoch_at_dispatch: int = -1) -> void:
 	_waiting = false
 	var latency := Time.get_ticks_msec() - started_ms
 	_runtime["state"] = "idle"
@@ -683,6 +733,32 @@ func _on_reply(agent: Dictionary, ok: bool, content: String, http_code: int, sta
 		text = SpeechCleanScript.trim_to_last_sentence(text)
 	var _t_after_sanitize := Time.get_ticks_msec()
 	_t_sanitize += _t_after_sanitize - _t_reply_in
+	# PIPELINED: hold this answer until the current one has had its reading
+	# pause, then reveal it from tick(). The request for it was dispatched the
+	# moment the previous reply was committed, so generation has been running
+	# underneath the pause rather than after it.
+	if _pipeline:
+		_g_outstanding = maxi(_g_outstanding - 1, 0)
+		if epoch_at_dispatch != _dispatch_epoch:
+			# Something invalidated this turn while it was in flight. Showing it
+			# would put a reply from a superseded state on screen.
+			_g_stale_discarded += 1
+			_next_turn_at = _elapsed
+			return
+		_pending = {"agent": agent, "text": text, "latency": latency}
+		return
+
+	_reveal(agent, text, latency)
+
+
+## Commit a reply: it becomes the canonical turn, is published everywhere, and
+## (when pipelining) the next request goes out immediately so the next model
+## generates during this reply's time on screen.
+func _reveal(agent: Dictionary, text: String, latency: int) -> void:
+	var _reveal_started_ms := Time.get_ticks_msec()
+	if _g_last_reveal_ms > 0:
+		_g_min_reveal_gap = mini(_g_min_reveal_gap, _reveal_started_ms - _g_last_reveal_ms)
+	_g_last_reveal_ms = _reveal_started_ms
 	agent["state"] = "speaking"
 	agent["last_message"] = text
 	agent["last_message_at_ms"] = Time.get_ticks_msec()
@@ -735,7 +811,7 @@ func _on_reply(agent: Dictionary, ok: bool, content: String, http_code: int, sta
 		"timestamp": Time.get_datetime_string_from_system(true),
 	})
 
-	_t_publish += Time.get_ticks_msec() - _t_after_sanitize
+	_t_publish += Time.get_ticks_msec() - _reveal_started_ms
 	# The clock for the gap to the NEXT dispatch starts here.
 	_turn_cycle_started_ms = Time.get_ticks_msec()
 	print("LIVE_ARENA TURN %d %s (%dms) %s" % [
@@ -751,12 +827,19 @@ func _on_reply(agent: Dictionary, ok: bool, content: String, http_code: int, sta
 	_turn += 1
 	# Brief settle so the overlay shows SPEAKING before the next THINKING.
 	_next_turn_at = _elapsed + 1.2
+	_reveal_at = _next_turn_at
 
 	if _turn >= _max_turns:
 		_end_match()
 	else:
 		agent["state"] = "waiting"
 		_state.publish_delta({}, {agent["agent_id"]: {"state": "waiting"}})
+		# The canonical turn is committed above, so the next agent composes
+		# FROM the reply now on screen -- it is never answering something it
+		# has not been given. Dispatching here is what overlaps generation with
+		# the reading pause.
+		if _pipeline and not _waiting:
+			_run_turn()
 
 
 func _on_turn_failed(agent: Dictionary, why: String, rejected := false) -> void:
@@ -904,6 +987,10 @@ func _end_match() -> void:
 	# Where the wall-clock went, so "overhead" stops being one opaque number.
 	var turns := maxi(_turn, 1)
 	var accounted := _t_generate + _t_sanitize + _t_publish + _t_schedule_gap
+	if _pipeline:
+		print("LIVE_ARENA PIPELINE stale_discarded=%d max_outstanding=%d min_reveal_gap=%dms"
+			% [_g_stale_discarded, _g_max_outstanding, _g_min_reveal_gap])
+	print("LIVE_ARENA DWELL min_reveal_gap=%dms" % _g_min_reveal_gap)
 	print("LIVE_ARENA TIMING per turn (ms): generate=%d sanitize=%d publish=%d gap=%d accounted=%d"
 		% [_t_generate / turns, _t_sanitize / turns, _t_publish / turns,
 			_t_schedule_gap / turns, accounted / turns])

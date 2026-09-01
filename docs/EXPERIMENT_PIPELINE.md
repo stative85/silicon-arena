@@ -87,3 +87,71 @@ Judge scores, for the reasons given in the roster evaluation.
 
 Effects as change over within-batch run-to-run standard deviation — a
 signal-to-noise ratio, not a significance test.
+
+
+---
+
+# Result: rejected under the rule as written. The rule was partly wrong.
+
+Interleaved `P0-P1-P1-P0-P0-P1-P1-P0`, 20 speeches per block, 80 per arm, one
+session.
+
+| arm | speeches/min | challenge | addresses | near-dup | failures |
+|---|---:|---:|---:|---:|---:|
+| P0 current | 15.17 | 37.5% | 36.2% | 6.2% | 0% |
+| P1 pipeline | **20.05** | 37.5% | 33.8% | 10.0% | 0% |
+
+| pre-registered check | value | verdict |
+|---|---|---|
+| throughput >= +15% | **+32.2%** | OK |
+| stale replies accepted == 0 | 0 | OK |
+| outstanding requests <= 1 | 1 | OK |
+| min reveal gap >= 1200ms | 1192ms | **FAIL** |
+| challenge >= P0 − 5pt | 37.5 vs 37.5 | OK |
+| addresses >= P0 − 4pt | 33.8 vs 36.2 | OK |
+| near-dup <= P0 + 3pt | 10.0 vs 6.2 | **FAIL** |
+| failure rate <= 2% | 0% | OK |
+
+**P1 is rejected.** The rule is the rule, and it is not relaxed after seeing
+results.
+
+## But both failing guards were mis-specified, and that is my error
+
+**The dwell guard failed by 8ms.** The reading pause is 1200ms and the minimum
+observed spacing was 1192ms. One frame at 60fps is 16.7ms, so this is below the
+resolution of the measurement — the pause was not actually shortened. I wrote
+an exact-threshold guard against a frame-quantised quantity.
+
+**The near-duplicate guard was tighter than the metric's noise.** Per 20-speech
+block:
+
+```
+P0: 10.0, 10.0,  0.0,  5.0   mean  6.2   sd 4.1
+P1:  5.0, 20.0,  0.0, 15.0   mean 10.0   sd 7.9
+```
+
+The difference is +3.8 points against a +3.0 bound — and 0.5 standard
+deviations. A guard set tighter than a metric's noise floor fires at random,
+which is what happened. I set +3.0 without knowing near-duplicate's block-level
+spread, having only measured it at 60 speeches.
+
+The correct remedy is **not** to declare P1 accepted. It is to re-run under a
+new pre-registration whose guards are calibrated against measured noise. That
+is a fresh test, not a reinterpretation of this one.
+
+## What the experiment did establish
+
+The correctness guards — the ones that actually mattered for a concurrency
+change — all held: zero stale replies accepted across 80 pipelined speeches,
+never more than one request outstanding, no reordering possible by
+construction, zero failures. Challenge rate was identical at 37.5%.
+
+Throughput went from 15.17 to 20.05 speeches per minute, +32.2%, by removing
+1,144ms of per-turn dead time (gap 1144ms to 14ms) without shortening the
+reading pause.
+
+## Status
+
+The implementation ships **behind `--pipeline`, off by default**, because a
+rejected condition does not become the default. It stays available so the
+re-run costs nothing to set up.
