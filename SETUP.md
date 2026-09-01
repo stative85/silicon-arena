@@ -43,7 +43,55 @@
 
 ---
 
-## Step 3: Run Silicon Arena
+## Step 3: Import the project once
+
+A fresh clone has no `.godot/` cache, so Godot has not yet registered the
+`class_name` types. Without this you get a wall of
+`Identifier "TemplateManager" not declared` parse errors.
+
+```
+godot --headless --editor --quit --path .
+```
+
+Or just open it in the editor and let it finish importing. Once only.
+
+## Step 4: Build a roster from YOUR installed models
+
+The shipped presets name portable public models so the repository is not tied
+to one machine — which means they are probably **not** what you have
+downloaded. Point the arena at your own models:
+
+```
+godot --headless --path . --script tools/build_roster.gd
+```
+
+The 7B ceiling is applied *before* selection, so an oversized model cannot
+enter the roster. Models are ranked by chat-capability and spread across
+families.
+
+## Step 5: Check the machine before launching
+
+```
+tools\doctor.cmd
+```
+
+```
+SILICON ARENA DOCTOR
+--------------------
+Godot              OK    4.6-stable (official)
+Project import     OK    class registry present
+LM Studio          OK    http://127.0.0.1:1234/v1
+Installed models   OK    98
+Model catalog      OK    57 eligible, ceiling 7B
+Eligible <=7B      OK    60 of 98 installed models permitted
+Roster             OK    5/5 valid (user://presets.json)
+READY
+```
+
+Every non-OK line names a concrete fix. `NOT READY` means something would stop
+the arena; a `WARN` will still run.
+
+## Step 6: Run Silicon Arena
 
 ### Option A: Double-click the launcher
 Run `start_arena.cmd` in the Silicon Arena folder. It auto-detects Godot on your PATH, in the project directory, or in your Downloads folder.
@@ -56,7 +104,7 @@ Run `start_arena.cmd` in the Silicon Arena folder. It auto-detects Godot on your
 
 ---
 
-## Step 4: First Launch
+## Step 7: First Launch
 
 1. If LM Studio is running with a loaded model, agents will start debating immediately
 2. Use **1-7** number keys to switch between presets (different model rosters)
@@ -73,15 +121,44 @@ Run `start_arena.cmd` in the Silicon Arena folder. It auto-detects Godot on your
 - Confirm the server URL is `http://127.0.0.1:1234` (default)
 
 ### Agents show as "broken" (red indicator, skipped)
-- The model in the preset isn't loaded in LM Studio
-- Load the model, or change the agent's model in the Arena Builder (F6 → Roster tab)
-- HTTP 400 = model not found. Any other model that IS loaded will still work.
+- The console now names the actual reason. Read it before changing anything:
 
-### Agents not responding / long pauses
-- Small models (3B) are fast but may produce short or incoherent output
-- Large models (12B+) produce better output but take longer
-- Check the turn interval in Arena Builder (F6 → Config tab) — default is 5 seconds
-- Check LM Studio's server log for errors
+```
+[DISABLED] Mistral 7B — chat template rejects a system role (compat retry also failed)
+[SKIP] Deckard 6B — prompt exceeded the model's context window (fail 1/2)
+```
+
+- **HTTP 400 does NOT mean "model not found."** It means LM Studio rejected the
+  request — a chat template that refuses a system role, a malformed payload, or
+  a context overflow. The reason is printed; act on that, not on a guess.
+- A 400-disabled agent stays out for the session. Change its model with
+  F6 → Roster, or rebuild the whole roster:
+  `godot --headless --path . --script tools/build_roster.gd`
+- Repeated *no-response* failures are different: those cool down and rejoin
+  automatically.
+- Some models cannot participate at all — see `docs/KNOWN_LIMITATIONS.md`
+  (reasoning-only models, base checkpoints).
+
+### Long pauses between turns
+
+**This is almost always a cold model load, not a hang.** With LM Studio set to
+auto-unload, every turn that changes model reloads weights from disk. Measured
+on an RTX 5060 8GB: **18-38 seconds per swap**, against 0.06-0.26s once a model
+is resident (`docs/BENCHMARK_8GB.md`).
+
+The arena says so while it waits:
+
+```
+[LOADING] Mistral 7B Instruct — 20s (cold model swaps take 18-38s on 8GB)
+```
+
+To go faster, use fewer distinct models — a roster where consecutive turns
+share a model gets warm-path latency. A 3B mixed in among 7Bs will visibly
+snap.
+
+Note: models above the 7B ceiling are **refused**, not slow. Picking a 12B will
+not "produce better output but take longer" — it will not run at all. The F6
+picker hides them and says how many it hid.
 
 ### "REC FAILED: NO FFMPEG"
 - Clip recording (F10) requires FFmpeg on your system PATH

@@ -79,6 +79,51 @@ Then map model families to your character in `MODEL_CHAR_MAP`:
 
 ---
 
+## Before you open a pull request
+
+Run the whole deterministic suite. It needs no LM Studio and no GPU:
+
+```
+toolserify.cmd
+```
+
+```
+[PASS] project import
+[PASS] project parses
+[PASS] entrypoint parity
+[PASS] model policy
+[PASS] coherence
+[PASS] cinematic bridge
+[PASS] scar lattice
+[PASS] system-role compat
+[PASS] adversarial pass
+[PASS] required files, configs and presets
+VERIFY OK
+```
+
+CI runs the same thing on Linux for every push and pull request.
+
+### Two rules that are not negotiable
+
+**1. A new test must be shown to fail.** Reintroduce the defect it guards,
+watch it go red, restore, watch it go green. A suite that can only pass is not
+evidence. This is not hypothetical: an early version of the parity self-test
+matched `model_policy =`, which the *broken* code also satisfied, so it passed
+the exact bug it existed to catch.
+
+**2. If you add a load-bearing runtime setting, add it to the parity test.**
+Three separate production bugs had one cause — `live_match.gd` carried a
+runtime fact and `main.gd` inherited a default. Put required settings in
+`REQUIRED_ON_BOTH`, and put derived values in `INVARIANTS`, in
+`scripts/arena/entrypoint_parity_selftest.gd`.
+
+Never weaken these without evidence:
+
+- the 7B ceiling is enforced on the request path
+- no catalog means every request is refused (fail closed)
+- MoE models count TOTAL resident parameters, not active
+- the stall watchdog can never be shorter than the cold-load allowance
+
 ## Reporting Bugs
 
 Open an issue with:
