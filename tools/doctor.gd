@@ -13,6 +13,7 @@ extends SceneTree
 ## looks like a broken project.
 
 const PolicyScript := preload("res://scripts/arena/model_policy.gd")
+const TurnOrderScript := preload("res://scripts/arena/turn_order.gd")
 
 ## Single source of truth, overridable via SILICON_ARENA_LM_URL.
 var LM_BASE := LMEndpoint.base_url()
@@ -198,17 +199,31 @@ func _check_policy_and_roster() -> void:
 	# cold load, measured at 18-38s on this class of hardware, so a roster of
 	# distinct models is roughly an order of magnitude slower than one that
 	# shares. Users discovered this by watching an apparently frozen arena.
-	var distinct := {}
+	# "A swap every turn" is only true when no two adjacent agents share a
+	# model. A grouped roster pays one load per DISTINCT model per round, so
+	# report the number this roster actually costs rather than the worst case.
+	var ordered: Array = []
 	for agent in presets[0]:
 		if typeof(agent) == TYPE_DICTIONARY:
-			distinct[str(agent.get("model", ""))] = true
+			ordered.append(agent)
 	if total > 0:
-		if distinct.size() <= 1:
+		var swaps: int = TurnOrderScript.swaps_per_round(ordered)
+		var distinct: int = TurnOrderScript.distinct_models(ordered)
+		if distinct <= 1:
 			_ok("Expected pace", "one resident model, no swaps — seconds per turn")
 		else:
+			# ~30s median cold swap on an 8GB card (docs/BENCHMARK_8GB.md).
 			_ok("Expected pace",
-				"%d distinct models: a swap every turn, tens of seconds each" % distinct.size())
-			print("%-18s       for throughput instead: build_roster.gd -- --fast" % "")
+				"%d models, %d cold load(s) per round — roughly %ds of loading"
+				% [distinct, swaps, swaps * 30])
+			var best: int = TurnOrderScript.swaps_per_round(
+				TurnOrderScript.group_by_model(ordered))
+			if best < swaps:
+				print("%-18s       this roster interleaves models; grouping them would" % "")
+				print("%-18s       cost %d load(s) instead of %d. Rebuild with:" % ["", best, swaps])
+				print("%-18s         build_roster.gd -- --balanced" % "")
+			elif distinct >= 3:
+				print("%-18s       fewer models = fewer loads: build_roster.gd -- --balanced" % "")
 
 	if good == total and total > 0:
 		_ok("Roster", "%d/%d valid (%s)" % [good, total, source])
