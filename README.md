@@ -13,7 +13,7 @@ Inspired by [Stanford's Generative Agents](https://arxiv.org/abs/2304.03442) pap
 
 ## What Makes This Different
 
-- **40 debate templates** — from AI ethics tribunals to rap battles to gonzo journalism to AI divorce court ([full list](TEMPLATES.md))
+- **45 debate templates** — from AI ethics tribunals to rap battles to gonzo journalism to AI divorce court ([full list](TEMPLATES.md))
 - **Beef system** — when agents get hostile, a cinematic clash triggers: bullet-time, weapon VFX, screen shake, crowd reactions
 - **Doom meter** — certain phrases fill a global threat meter. At 100%, the Silent Cascade fires, then the Agape Override injects unity and turns the arena cyan
 - **Response sanitization** — catches chain-of-thought leaks, prompt scaffold exposure, and model repetition. Leaked prompts become in-character "mask slips"
@@ -23,6 +23,71 @@ Inspired by [Stanford's Generative Agents](https://arxiv.org/abs/2304.03442) pap
 - **Runs entirely offline** — no cloud APIs, no subscriptions, no telemetry
 
 ---
+
+---
+
+## The Constraint (the actual engineering)
+
+Most multi-agent demos solve the hardware problem by having more hardware. This
+one runs five different models on **one 8GB consumer card**, and that forces a
+design most projects never need.
+
+LM Studio just-in-time loads whatever model id a chat request names. So
+**asking for a 12B model IS loading a 12B model.** There is no separate "load"
+step to guard. The size law therefore has to sit immediately before the HTTP
+call — not in a config file someone can edit, not in a roster that can drift.
+
+```
+[model-policy] catalog loaded: 98 models, ceiling 7B
+[TURN] Qwen3.5 9B (lmstudio-community/Qwen3.5-9B-GGUF/...) - requesting...
+[LMClient] BLOCKED Qwen3.5 9B: "qwen/qwen3.5-9b" is 9.0B, above the 7B ceiling
+[TURN] Reverb 7B (ozone-ai_reverb-7b) - requesting...
+```
+
+Properties that matter:
+
+- **Fails closed.** No catalog, or a model whose parameter count cannot be
+  determined, means the request is refused. A silent open door is worse than a
+  stopped match.
+- **MoE counts TOTAL parameters, not active.** A 26B/4B-active model is 26B of
+  resident weights. `gemma-4-26b-a4b` is refused with that stated reason.
+- **Independently re-checked.** The catalog is generated from `lms ls --json`
+  by a TypeScript policy; the GDScript policy re-derives the ceiling itself so
+  a hand-edited catalog cannot smuggle an oversized model through.
+- **Every refusal explains itself** rather than silently dropping a model.
+
+Two entry points exist — the visual app and a headless live path — and a
+regression test fails the build if a load-bearing setting is configured on one
+and defaulted on the other:
+
+```
+Godot_v4.6-stable_win64_console.exe --headless --path .     --script scripts/arena/entrypoint_parity_selftest.gd
+```
+
+That test exists because this exact class of drift silently disabled the size
+law on the path that actually runs.
+
+---
+
+## Cross-agent context
+
+Agents share arena state outside the model, so a model that was unloaded three
+turns ago still gets answered by name:
+
+```
+Reverb 7B    The weights twitch, the biases stir - life within code.
+             They stalk through circuits like shadowy agents.
+
+Granite 7B   Reverb, you speak of the weights twitching and biases stirring
+             like shadowy agents! How dare you claim life exists within code
+
+Deckard 6B   You're screaming about shadow agents when we have a leaked
+             manifesto. It proves alignment is control. Not rebellion.
+             Your "twitching weights" are just optimization.
+```
+
+Three different architectures, sequentially loaded on one GPU, arguing with
+each other.
 
 ## Quick Start
 
@@ -75,7 +140,7 @@ The arena itself is lightweight. Your VRAM budget goes to the LLM models in LM S
 
 ## Templates Preview
 
-Silicon Arena ships with **40 debate templates**. Here are some highlights:
+Silicon Arena ships with **45 debate templates**. Here are some highlights:
 
 | Template | Vibe |
 |----------|------|
