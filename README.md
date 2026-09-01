@@ -48,8 +48,9 @@ godot --headless --path . --script tools/build_roster.gd # roster from installed
 python tools/bench_swap.py                               # measure swap cost here
 ```
 
-`verify.cmd` runs eight self-tests plus config and preset validation and exits
-non-zero on failure — the same suite CI runs on every push:
+`verify.cmd` runs eight Godot self-tests, three linters, and config/preset
+validation, and exits non-zero on failure — the same suite CI runs on every
+push:
 
 ```
 [PASS] project import
@@ -228,15 +229,26 @@ Silicon Arena was built to look good on camera.
 
 ## System Requirements
 
+> **Clone tip:** the repository carries ~3,800 sprite PNGs, so a full clone is
+> ~780 MB including history. `git clone --depth 1` fetches ~520 MB instead.
+
+
 | Component | Minimum | Recommended |
 |-----------|---------|-------------|
 | GPU | GTX 1060 / 6GB VRAM | RTX 3060+ / 8GB+ VRAM |
 | RAM | 16 GB | 32 GB |
-| Storage | ~500 MB (project) + model sizes | Same |
+| Storage | ~520 MB working tree, ~780 MB with git history, plus model sizes | Same |
 | OS | Windows 10/11 | Windows 11 |
 | Software | Godot 4.6, LM Studio | Same |
 
-The arena itself is lightweight. Your VRAM budget goes to the LLM models in LM Studio. A single 3B model needs ~2GB VRAM. Running 5 different models simultaneously requires loading/unloading (LM Studio handles this automatically).
+The arena itself is lightweight; your VRAM budget goes to the models. Only
+**one model is resident at a time** — LM Studio unloads the previous one — so a
+roster of five means a cold load on every turn.
+
+That cost is measured, not hand-waved: **18–38s per swap** against 0.06–0.26s
+once a model is resident, on an RTX 5060 8GB. See
+[docs/BENCHMARK_8GB.md](docs/BENCHMARK_8GB.md), and use
+`build_roster.gd -- --fast` if you want throughput over variety.
 
 ---
 
