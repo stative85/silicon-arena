@@ -259,7 +259,16 @@ func _filename_abuse() -> void:
 		print("   FAIL length not capped (%d)" % long_name.length())
 
 
+## Tests must not leave litter in the user directory. adv_bad_catalog.json and
+## adv_forged.json were accumulating in user:// on every run.
+func _cleanup() -> void:
+	for f in ["user://adv_bad_catalog.json", "user://adv_forged.json", "user://adv_catalog.json"]:
+		if FileAccess.file_exists(f):
+			DirAccess.remove_absolute(ProjectSettings.globalize_path(f))
+
+
 func _report() -> void:
+	_cleanup()
 	print("\n--- %d checks, %d failure(s) ---" % [_checks, _failures.size()])
 	if _failures.is_empty():
 		print("ADVERSARIAL OK")
