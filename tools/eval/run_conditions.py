@@ -143,12 +143,60 @@ def take_lock():
         fh.write(str(os.getpid()))
 
 
+def import_condition(name, flags):
+    """Rebuild a condition record from the match log already on disk.
+
+    A long run can be interrupted -- this environment stops background tasks --
+    and the transcript is the expensive part. It is written incrementally by the
+    arena, so an interrupted condition still has every turn it completed. This
+    recovers those instead of paying for them again.
+    """
+    path = newest_match_log()
+    sp = read_turns(path)
+    if not sp:
+        raise SystemExit("no turns in %s" % path)
+    roster_path = os.path.join(ROOT, "config", "arena-roster.v1.json")
+    roster = json.load(open(roster_path, encoding="utf-8"))
+    models = [s["model"] for s in sp]
+    # Wall clock from the log's own timestamps, plus the first turn's latency so
+    # the window is not systematically short by one generation.
+    stamps = []
+    for line in open(path, encoding="utf-8", errors="ignore"):
+        try:
+            d = json.loads(line)
+        except Exception:
+            continue
+        if d.get("kind") == "turn" and d.get("timestamp"):
+            stamps.append(d["timestamp"])
+    wall = 0.0
+    if len(stamps) >= 2:
+        import datetime
+        wall = (datetime.datetime.fromisoformat(stamps[-1])
+                - datetime.datetime.fromisoformat(stamps[0])).total_seconds()
+    wall += sp[0]["latency_ms"] / 1000.0
+    rec = {"condition": name, "flags": flags, "roster": roster, "models": models,
+           "distinct_models": len(set(models)), "wall_sec": wall, "build_sec": 0,
+           "timed_out": False, "imported_from": os.path.basename(path),
+           "speeches": sp, "failures": []}
+    with open(os.path.join(OUT, name + ".json"), "w", encoding="utf-8") as fh:
+        json.dump(rec, fh, indent=1)
+    print("imported %s: %d speeches, %d distinct model(s), %.0fs (%.2f/min)"
+          % (name, len(sp), len(set(models)), wall, len(sp) / (wall / 60.0)))
+    print("  NOTE: failure count unavailable for an imported condition.")
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--turns", type=int, default=70)
     ap.add_argument("--only", default="")
+    ap.add_argument("--import-as", dest="import_as", default="",
+                    help="rebuild this condition from the newest match log")
     a = ap.parse_args()
     os.makedirs(OUT, exist_ok=True)
+    if a.import_as:
+        flags = dict((n, f) for n, f in CONDITIONS).get(a.import_as, [])
+        import_condition(a.import_as, flags)
+        return
     take_lock()
     g = godot()
 
