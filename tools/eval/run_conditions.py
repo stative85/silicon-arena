@@ -121,12 +121,35 @@ def run(cmd, timeout):
         return out, time.time() - t0, True
 
 
+LOCK = os.path.join(OUT, "_running.lock")
+
+
+def take_lock():
+    """Refuse to run while another instance is alive.
+
+    Two overlapping runs share one LM Studio server and one roster file on
+    disk, so they silently corrupt each other's conditions -- one run's match
+    gets attributed to another's roster. That happened here: a detached run
+    that survived a kill kept writing condition files underneath a fresh run,
+    and the results had to be thrown away twice before the cause was obvious.
+    """
+    if os.path.exists(LOCK):
+        age = time.time() - os.path.getmtime(LOCK)
+        raise SystemExit(
+            "another run_conditions.py holds %s (%.0fs old). "
+            "If it is really gone, delete that file and retry." % (LOCK, age))
+    os.makedirs(OUT, exist_ok=True)
+    with open(LOCK, "w", encoding="utf-8") as fh:
+        fh.write(str(os.getpid()))
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--turns", type=int, default=70)
     ap.add_argument("--only", default="")
     a = ap.parse_args()
     os.makedirs(OUT, exist_ok=True)
+    take_lock()
     g = godot()
 
     for name, flags in CONDITIONS:
@@ -185,4 +208,8 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    finally:
+        if os.path.exists(LOCK):
+            os.remove(LOCK)

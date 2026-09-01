@@ -72,3 +72,6 @@ assets/COUPON.pdf
 # Generated from the models actually installed on THIS machine.
 # Machine-specific: model ids differ per user, so it is built, not shipped.
 config/arena-roster.v1.json
+
+# Evaluation working files: machine-specific transcripts and locks.
+tools/eval/runs/
