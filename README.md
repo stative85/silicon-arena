@@ -177,23 +177,29 @@ model and pays an 18-38s cold load. A round costs one cold load per *distinct
 model*, so the fix is fewer models, not fewer agents:
 
 ```
-godot --headless --path . --script tools/build_roster.gd -- --balanced
-godot --headless --path . --script tools/build_roster.gd -- --fast
+godot --headless --path . --script tools/build_roster.gd -- --fit
 ```
 
-Same build, same 260s window, same harness, RTX 5060 8GB, zero failures in all
-three:
+`--fit` picks the most distinct models that fit in VRAM *together*. Models that
+fit are never evicted, so nothing swaps. Same build, same 260s window, same
+harness, RTX 5060 8GB, zero failures in all four:
 
-| roster | distinct models | agents spoke |
-|---|---:|---:|
-| default | 5 | 8 |
-| `--balanced` | 2 | **33** |
-| `--fast` | 1 | 64 |
+| roster | distinct models | all resident | agents spoke |
+|---|---:|---|---:|
+| default | 5 | no | 8 |
+| `--balanced` | 2 | no | 33 |
+| `--fast` | 1 | yes | 64 |
+| **`--fit`** | **3** | **yes** | **90** |
 
-`--balanced` is the one to reach for: **4x the turns of the default roster**
-while two genuinely different architectures are still arguing. `--fast` is
-faster still but collapses to one model wearing five hats, so it is for long
-unattended streams and testing, not for the demo.
+**`--fit` beat the single-model roster while running three architectures**, with
+turns split evenly and no failures. The "variety costs throughput" trade is not
+a law — it is what happens when a roster overcommits VRAM. (Its models are also
+smaller, so some of the win is cheaper inference, not residency alone; the
+method and the honest caveats are in
+[docs/BENCHMARK_8GB.md](docs/BENCHMARK_8GB.md).)
+
+`--balanced` still exists for when you want specific larger models and will
+accept some swapping; `--fast` puts every agent on one model.
 
 Check the result any time with:
 

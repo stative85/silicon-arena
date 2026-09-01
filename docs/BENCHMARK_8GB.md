@@ -172,6 +172,77 @@ models the builder happens to pick — the balanced run drew two 7Bs while the
 diverse run included a 1.6B and a 4B that load faster. Treat the ratio as the
 result, not the absolute counts.
 
+## Models that fit together do not swap at all
+
+The premise underneath everything above -- one model resident, so every model
+change costs a cold load -- is only true when the models do not fit together.
+
+Alternating requests between two models, steady state, same card:
+
+| pair | estimated resident | per-turn cost |
+|---|---:|---:|
+| mistral-7b + elyza-7b | ~9 GB | 3.1s / 5.3s |
+| llama-3.2-3b + stablelm-1.6b | ~3 GB | 0.03-0.06s |
+
+The second pair matches the same-model baseline exactly (0.05s back to back).
+Nothing is being evicted: both are resident, and alternating is free. The first
+pair evicts each other every turn and pays a page-cache reload.
+
+So the "variety costs throughput" trade is not a law, it is what happens when
+the roster overcommits VRAM. `--fit` selects the most distinct models that fit
+a budget together:
+
+```
+godot --headless --path . --script tools/build_roster.gd -- --fit
+godot --headless --path . --script tools/build_roster.gd -- --fit=4.5
+```
+
+All four modes, same build, same 260-second window, same headless harness:
+
+| roster | distinct models | resident | agents spoke | failures |
+|---|---:|---|---:|---:|
+| diverse (default) | 5 | no, thrashes | 8 | 0 |
+| `--balanced` | 2 | no, ~9 GB | 33 | 0 |
+| `--fast` | 1 | yes | 64 | 0 |
+| **`--fit`** | **3** | **yes, ~5.1 GB** | **90** | **0** |
+
+`--fit` beat single-model `--fast` while running three architectures, with
+turns spread perfectly evenly (18 each) and no failures.
+
+Read that honestly: a fitting roster wins on two counts at once, and only one
+of them is residency. Its models are also *smaller* — 1.6B, 3B and 1B — so each
+reply is quicker to generate as well as free of loading. The claim this run
+supports is "no swapping **and** cheaper inference", not "residency alone is
+worth 26 speeches". What it does establish is that the trade-off the rest of
+this document describes is escapable rather than fundamental.
+
+The budget defaults to 6.0 GB of an 8 GB card, leaving room for context, KV
+cache and the desktop. Sizes are ESTIMATED from catalog parameter counts and
+quantisation, because the catalog carries no file sizes; the estimate is
+deliberately generous, since overcommitting is the failure this mode exists to
+avoid.
+
+### The probe has to look like a real request
+
+`--fit` first shipped with 36 failed turns out of 88. One selected model,
+`agentica-org_deepscaler-1.5b-preview`, returned HTTP 200 with empty content on
+every turn — the reasoning-only class the candidate probe exists to catch.
+
+The probe passed it because the probe was not representative. It asked
+"Say the word: ready" with `max_tokens` 16, which a reasoning model answers
+directly. Given the arena's actual shape — a system role, a debate prompt and
+`max_tokens` 110 — the same model spends the entire budget thinking:
+
+```
+old probe     -> content="Sure! How would you like to go?"   reasoning=0 chars
+arena-shaped  -> content=""                                  reasoning=559 chars
+```
+
+The probe now sends an arena-shaped request. It rejects that model, and also
+rejects `h2o-danube3-4b-chat`, which earlier diverse rosters had been shipping.
+A rejection now backfills from the ranked list instead of shrinking the roster,
+so one mute model no longer costs an entire architecture.
+
 ## Sustained operation
 
 A 400-second unattended run, three logical agents sharing one resident model:

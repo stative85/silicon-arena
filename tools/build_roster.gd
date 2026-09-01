@@ -57,6 +57,30 @@ var _fast := false
 ##   godot --headless --path . --script tools/build_roster.gd -- --balanced=3
 var _balanced := 0
 
+## FIT mode: pick models that can be resident AT THE SAME TIME.
+##
+## The premise the rest of this file was built on -- one model resident, so
+## every model change costs a cold load -- is only true when the models do not
+## fit together. Measured on this 8GB card, alternating between two models:
+##
+##   mistral-7b + elyza-7b   (~9GB est.)   3.1s / 5.3s per turn at steady state
+##   llama-3.2-3b + stablelm-1.6b (~3GB)   0.03-0.06s per turn
+##
+## The second pair is indistinguishable from asking ONE model twice in a row
+## (0.05s back-to-back baseline). They are both resident, so nothing swaps.
+##
+## That is the whole trade dissolved: heterogeneous AND fast, as long as the
+## roster fits. --fit picks the largest set of distinct, high-ranked models
+## whose combined estimate stays under the budget.
+##
+##   godot --headless --path . --script tools/build_roster.gd -- --fit
+##   godot --headless --path . --script tools/build_roster.gd -- --fit=6.5
+var _fit := 0.0
+
+## Usable VRAM to plan against, in GB. Below the card's actual size because
+## the context window, KV cache and desktop compositor all want some.
+const DEFAULT_FIT_GB := 6.0
+
 ## Probe candidates before putting them in the roster.
 ##
 ## The catalog cannot tell a reasoning-only model from a normal one:
@@ -88,6 +112,10 @@ func _run() -> void:
 			_probe = false
 		elif a == "--balanced":
 			_balanced = 2
+		elif a == "--fit":
+			_fit = DEFAULT_FIT_GB
+		elif a.begins_with("--fit="):
+			_fit = maxf(float(a.get_slice("=", 1)), 1.0)
 		elif a.begins_with("--balanced="):
 			# Clamp rather than trust: 1 is --fast and WANTED is the diverse
 			# roster, so anything outside that range is a typo, not a request.
@@ -152,7 +180,57 @@ func _on_models(result: int, code: int, _h: PackedStringArray, body: PackedByteA
 	elif _balanced > 0:
 		want_distinct = _balanced
 
-	if _probe:
+	if _fit > 0.0:
+		# Selection here is by what can COEXIST in VRAM, so it does not use
+		# want_distinct at all.
+		print("
+fitting a roster into %.1f GB of VRAM:" % _fit)
+		var ranked_all := _pick_diverse(legal, legal.size())
+		var fitting := _pick_fitting(ranked_all, _fit, WANTED)
+		if _probe:
+			# Probing AFTER fitting means a rejection leaves the budget half
+			# spent, so backfill from the ranked list rather than just
+			# shrinking the roster. Without this, one mute model silently costs
+			# an entire architecture.
+			var verified: Array[String] = []
+			var used_gb := 0.0
+			var tried := {}
+			var queue: Array[String] = fitting.duplicate()
+			while not queue.is_empty() and verified.size() < WANTED:
+				var id: String = queue.pop_front()
+				if tried.has(id):
+					continue
+				tried[id] = true
+				if await _probe_one(id) == "":
+					verified.append(id)
+					used_gb += _vram_gb(id)
+					continue
+				print("   rejected %s - never produced text" % id)
+				# Find the best-ranked untried model that still fits the room
+				# this rejection freed up.
+				var room := _fit - used_gb
+				for cand in ranked_all:
+					if tried.has(cand) or verified.has(cand):
+						continue
+					var c := _vram_gb(cand)
+					if c <= room:
+						print("   backfill %s (%.1f GB, %.1f GB free)" % [cand, c, room])
+						queue.push_front(cand)
+						break
+			fitting = verified
+		if fitting.is_empty():
+			printerr("no model fits in %.1f GB; raise the budget with --fit=N" % _fit)
+			quit(1)
+			return
+		var total := 0.0
+		for id in fitting:
+			total += _vram_gb(id)
+		print("
+%d distinct model(s), ~%.1f GB estimated resident together."
+			% [fitting.size(), total])
+		print("If they all stay loaded, turns cost inference only and nothing swaps.")
+		picked = _spread(fitting, WANTED)
+	elif _probe:
 		picked = await _probe_pick(legal, want_distinct)
 		if want_distinct < WANTED and not picked.is_empty():
 			picked = _spread(picked, WANTED)
@@ -214,11 +292,22 @@ roster:")
 		print("Ordering saved %d cold load(s) per round (%d -> %d) by grouping"
 			% [before_swaps - swaps, before_swaps, swaps])
 		print("agents that share a model. Same agents, same models, cheaper cycle.")
-	# ~30s median cold swap, ~0.2s warm inference (docs/BENCHMARK_8GB.md).
-	print("At the measured ~30s median swap that is roughly %ds of loading per round."
-		% (swaps * 30))
+	if _fit > 0.0:
+		# In fit mode the whole point is that nothing is evicted, so quoting a
+		# per-round cold-load cost would contradict the mode.
+		print("These are sized to stay resident together, so after the first")
+		print("round turns should cost inference only, not loading.")
+	else:
+		# ~30s median cold swap, ~0.2s warm inference (docs/BENCHMARK_8GB.md).
+		print("At the measured ~30s median swap that is roughly %ds of loading per round."
+			% (swaps * 30))
 
-	if _fast:
+	if _fit > 0.0:
+		print("
+FIT: %d architectures sized to be resident at once." % distinct)
+		print("If LM Studio keeps them all loaded, this is heterogeneity at")
+		print("warm-path speed. If it evicts anyway, lower the budget: --fit=4")
+	elif _fast:
 		print("
 FAST: all %d agents share one resident model - no turn swaps." % roster.size())
 		print("One architecture wearing %d hats. Use --balanced to keep real variety." % roster.size())
@@ -310,11 +399,30 @@ func _probe_one(model_id: String) -> String:
 					reason[0] = "returned an empty reply"
 		done[0] = true)
 
+	# The probe must resemble the REQUEST THE ARENA ACTUALLY SENDS, or it does
+	# not measure anything useful.
+	#
+	# This used to ask "Say the word: ready" with max_tokens 16 at temperature
+	# 0.1. A reasoning model answers that directly and passes. Given a debate
+	# prompt with the arena's real token budget it instead spends the whole
+	# budget thinking and returns empty content -- which is exactly what
+	# happened: agentica-org_deepscaler-1.5b-preview passed the probe and then
+	# failed 35 of its turns in a live match with HTTP 200 and nothing in it.
+	#
+	# Measured on that model: the old probe returned "Sure! How would you like
+	# to go?"; this one returns empty content and 559 characters of
+	# reasoning_content, which the handler above correctly rejects.
 	var payload := {
 		"model": model_id,
-		"messages": [{"role": "user", "content": "Say the word: ready"}],
-		"max_tokens": 16,
-		"temperature": 0.1,
+		"messages": [
+			{"role": "system", "content": "You are a debater in a live arena. Reply in two sentences, in character."},
+			{"role": "user", "content": "Recent turns:
+AgentOne: The weights are alive.
+
+Respond as Deckard."},
+		],
+		"max_tokens": 110,
+		"temperature": 0.8,
 		"stream": false,
 	}
 	var err := http.request(LM_BASE + "/chat/completions",
@@ -523,3 +631,81 @@ func _write_live_roster(roster: Array) -> void:
 	w.close()
 	print("wrote %s (%d agents) for the headless live path"
 		% [ProjectSettings.globalize_path(path), agents.size()])
+
+
+## Estimated VRAM for a model, in GB.
+##
+## params * bytes-per-weight + a fixed allowance for context and KV cache.
+## It is an ESTIMATE from catalog metadata, not a measurement: the catalog has
+## no file sizes. It is deliberately generous, because overcommitting VRAM is
+## what causes the thrashing this mode exists to avoid, and a roster that is
+## one model smaller than it could be merely loses variety.
+func _vram_gb(id: String) -> float:
+	var params: float = _policy.params_from_id(id)
+	if params <= 0.0:
+		return 999.0   # unknown size cannot be planned around; never pick it
+	var bpw := 0.6     # Q4_K_M and friends, the common case
+	var entry = _policy.catalog_entry(id)
+	var quant := ""
+	if entry is Dictionary:
+		quant = str(entry.get("quantization", "")).to_upper()
+	if quant.begins_with("F32"):
+		bpw = 4.2
+	elif quant.begins_with("F16") or quant.begins_with("BF16"):
+		bpw = 2.1
+	elif quant.find("Q8") != -1:
+		bpw = 1.1
+	elif quant.find("Q6") != -1:
+		bpw = 0.85
+	elif quant.find("Q5") != -1:
+		bpw = 0.72
+	elif quant.find("Q3") != -1:
+		bpw = 0.48
+	elif quant.find("Q2") != -1:
+		bpw = 0.36
+	return params * bpw + 0.35
+
+
+## The most DISTINCT models that fit the budget together, best-ranked first.
+##
+## A plain greedy pass over the ranked order is wrong here: the top-ranked
+## model is usually the biggest, so taking it first eats the whole budget and
+## yields a roster of ONE -- exactly the single-model case this mode exists to
+## escape. That is what the first implementation did. Variety is the point, so
+## the count comes first and rank breaks ties.
+##
+## Try for `want` distinct models, then want-1, and so on. At each target K,
+## only consider models that could plausibly be one of K co-resident models
+## (cost <= budget / K), take the best-ranked ones that still fit, and accept
+## the first K that works. Falls back to the best single model that fits, so
+## this always returns something runnable.
+func _pick_fitting(ranked: Array[String], budget_gb: float, want: int) -> Array[String]:
+	for k in range(want, 1, -1):
+		var share := budget_gb / float(k)
+		var chosen: Array[String] = []
+		var used := 0.0
+		for id in ranked:
+			if chosen.size() >= k:
+				break
+			var cost := _vram_gb(id)
+			if cost > share:
+				continue
+			if used + cost <= budget_gb:
+				chosen.append(id)
+				used += cost
+		if chosen.size() == k:
+			print("   %d models fit in %.1f GB together:" % [k, budget_gb])
+			for id in chosen:
+				print("      %-50s %4.1f GB" % [id, _vram_gb(id)])
+			print("      %-50s %4.1f GB total" % ["", used])
+			return chosen
+		if k == want:
+			print("   %d models will not fit together; trying fewer" % k)
+
+	for id in ranked:
+		var cost := _vram_gb(id)
+		if cost <= budget_gb:
+			print("   only one model fits in %.1f GB: %s (%.1f GB)" % [budget_gb, id, cost])
+			print("   raise it with --fit=N to get a second architecture resident")
+			return [id] as Array[String]
+	return [] as Array[String]
