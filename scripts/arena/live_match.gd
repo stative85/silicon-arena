@@ -95,6 +95,21 @@ var _log_path := ""
 var _started := false
 var _finished := false
 var _next_turn_at := 0.0
+
+## Where a turn's wall-clock actually goes.
+##
+## At the shipped ceiling a turn takes ~3.9s of which ~2.1s is generation. The
+## rest was known only as "overhead", which is not something you can optimise.
+## These buckets name it, so the choice between deleting delay and OVERLAPPING
+## it with the next model's inference can be made on measurements.
+##
+## Milliseconds, summed across the match and reported at the end.
+var _t_generate := 0
+var _t_sanitize := 0
+var _t_publish := 0
+var _t_schedule_gap := 0
+var _t_turn_total := 0
+var _turn_cycle_started_ms := 0
 var _history := []
 ## Some local prompt templates reject a system role outright (danube3 is one:
 ## LM Studio returns 400 "System role not supported"). Detected once on the
@@ -452,6 +467,10 @@ func _run_turn() -> void:
 	)
 
 	var messages := _build_messages(agent)
+	if _turn_cycle_started_ms > 0:
+		# Everything between the previous reply landing and this dispatch: the
+		# scheduler's inter-turn interval plus whatever ran in between.
+		_t_schedule_gap += Time.get_ticks_msec() - _turn_cycle_started_ms
 	_waiting = true
 	_wait_started_ms = Time.get_ticks_msec()
 	var started_ms := _wait_started_ms
@@ -642,6 +661,8 @@ func _on_reply(agent: Dictionary, ok: bool, content: String, http_code: int, sta
 	# the speaker's own label renders the name twice. Measured at 27 of 33
 	# speeches in one match. main.gd sanitises; this path did not sanitise at
 	# all, which is the entry-point drift this project keeps rediscovering.
+	var _t_reply_in := Time.get_ticks_msec()
+	_t_generate += latency
 	var text := SpeechCleanScript.strip_self_prefix(
 		content.strip_edges(), str(agent["display_name"]))
 	# Agents open by restating the previous speaker verbatim, sometimes nested
@@ -660,6 +681,8 @@ func _on_reply(agent: Dictionary, ok: bool, content: String, http_code: int, sta
 	# finished one.
 	if _trim_sentences:
 		text = SpeechCleanScript.trim_to_last_sentence(text)
+	var _t_after_sanitize := Time.get_ticks_msec()
+	_t_sanitize += _t_after_sanitize - _t_reply_in
 	agent["state"] = "speaking"
 	agent["last_message"] = text
 	agent["last_message_at_ms"] = Time.get_ticks_msec()
@@ -712,6 +735,9 @@ func _on_reply(agent: Dictionary, ok: bool, content: String, http_code: int, sta
 		"timestamp": Time.get_datetime_string_from_system(true),
 	})
 
+	_t_publish += Time.get_ticks_msec() - _t_after_sanitize
+	# The clock for the gap to the NEXT dispatch starts here.
+	_turn_cycle_started_ms = Time.get_ticks_msec()
 	print("LIVE_ARENA TURN %d %s (%dms) %s" % [
 		_turn + 1, agent["display_name"], latency, text.substr(0, 70).replace("\n", " ")])
 
@@ -875,6 +901,12 @@ func _end_match() -> void:
 		}),
 		"timestamp": Time.get_datetime_string_from_system(true),
 	})
+	# Where the wall-clock went, so "overhead" stops being one opaque number.
+	var turns := maxi(_turn, 1)
+	var accounted := _t_generate + _t_sanitize + _t_publish + _t_schedule_gap
+	print("LIVE_ARENA TIMING per turn (ms): generate=%d sanitize=%d publish=%d gap=%d accounted=%d"
+		% [_t_generate / turns, _t_sanitize / turns, _t_publish / turns,
+			_t_schedule_gap / turns, accounted / turns])
 	print("LIVE_ARENA COMPLETE turns=%d crown=%s" % [_turn, _crown])
 	print("LIVE_ARENA LOG %s" % ProjectSettings.globalize_path(_log_path))
 
