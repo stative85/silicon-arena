@@ -1345,6 +1345,11 @@ const TURN_INTERVAL_SEC := 5.0
 ## the client was still allowed 120s for a cold model load, so a model that
 ## was merely loading got skipped as unresponsive.
 const TURN_STALL_TIMEOUT_SEC := 150.0
+
+## Floor for the stall watchdog, whatever a saved config or the UI asks for.
+## Derived from the cold-load allowance so the two can never disagree: the
+## watchdog must always outlive a legitimate model swap.
+const MIN_STALL_TIMEOUT_SEC := COLD_LOAD_TIMEOUT_SEC + 20.0
 const DOOM_CASCADE_TIMEOUT_SEC := 12.0
 const AGENT_FAILURE_STREAK_LIMIT := 2
 const AGENT_FAILURE_COOLDOWN_SEC := 10.0
@@ -2062,7 +2067,14 @@ func _apply_builder_settings(settings: Dictionary) -> void:
 	_global_prompt_script = str(settings.get("global_script", "")).strip_edges()
 	_turn_prompt_script = str(settings.get("turn_script", "")).strip_edges()
 	_turn_interval_sec = maxf(float(settings.get("turn_interval_sec", _turn_interval_sec)), 0.5)
-	_turn_stall_timeout_sec = maxf(float(settings.get("stall_timeout_sec", _turn_stall_timeout_sec)), 5.0)
+	# A persisted config must not be able to reintroduce a fixed bug. Measured
+	# cold model swaps on this class of machine run 18-38s (docs/BENCHMARK_8GB.md),
+	# so a stall watchdog shorter than the client's cold-load allowance kills
+	# turns that are merely loading. An arena_builder_config.json saved before
+	# that measurement carried stall_timeout_sec=40 and did exactly that.
+	_turn_stall_timeout_sec = maxf(
+		float(settings.get("stall_timeout_sec", _turn_stall_timeout_sec)),
+		MIN_STALL_TIMEOUT_SEC)
 	_request_wait_buffer_sec = maxf(float(settings.get("request_wait_buffer_sec", _request_wait_buffer_sec)), 0.0)
 	_max_tokens_runtime = maxi(int(settings.get("max_tokens", _max_tokens_runtime)), 32)
 	_turn_temperature_runtime = clampf(float(settings.get("temperature", _turn_temperature_runtime)), 0.0, 2.0)

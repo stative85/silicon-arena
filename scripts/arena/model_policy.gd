@@ -204,6 +204,15 @@ func permit(model_key: String) -> bool:
 	return false
 
 
+## The raw catalog record for a model id, or null when it is not present.
+## Read-only accessor so callers can rank models without reaching into _by_key.
+func catalog_entry(model_id: String):
+	var key := resolve_key(model_id)
+	if key == "":
+		return null
+	return _by_key.get(key, null)
+
+
 func is_loaded() -> bool:
 	return _loaded
 

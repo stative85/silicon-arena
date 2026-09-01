@@ -1,0 +1,230 @@
+extends SceneTree
+
+## Build a legal roster from the models actually installed in LM Studio.
+##
+##   godot --headless --path . --script tools/build_roster.gd
+##
+## The shipped presets name portable public models so the repository is not
+## tied to one machine. The consequence is that on any given machine most of
+## them are not downloaded, and the arena looks broken when it is merely
+## pointed at models you do not have.
+##
+## This writes an "Installed Models" preset into user://presets.json built from
+## what this machine really has, with the size law applied BEFORE selection so
+## an oversized model can never enter the roster in the first place.
+##
+## It never touches res://presets.json — the public defaults stay portable.
+
+const PolicyScript := preload("res://scripts/arena/model_policy.gd")
+
+const LM_BASE := "http://127.0.0.1:1234/v1"
+const WANTED := 5
+const COLORS := ["c471ed", "3db1ff", "00d2ff", "5ad78c", "ff6b6b"]
+
+var _policy
+
+
+func _init() -> void:
+	_run.call_deferred()
+
+
+func _run() -> void:
+	print("\n=== build roster from installed models ===\n")
+	_policy = PolicyScript.new()
+	get_root().add_child(_policy)
+	_policy.load_catalog()
+	if not _policy.is_loaded():
+		printerr("model catalog not loaded — refusing to build a roster blind")
+		quit(2)
+		return
+
+	var http := HTTPRequest.new()
+	get_root().add_child(http)
+	await process_frame
+	http.timeout = 10.0
+	http.request_completed.connect(_on_models)
+	if http.request(LM_BASE + "/models") != OK:
+		printerr("cannot reach LM Studio at %s — start it and enable the local server" % LM_BASE)
+		quit(2)
+
+
+func _on_models(result: int, code: int, _h: PackedStringArray, body: PackedByteArray) -> void:
+	if result != HTTPRequest.RESULT_SUCCESS or code != 200:
+		printerr("LM Studio did not answer (result=%d code=%d). Start it, then Developer > Start Server." % [result, code])
+		quit(2)
+		return
+	var parsed = JSON.parse_string(body.get_string_from_utf8())
+	if typeof(parsed) != TYPE_DICTIONARY or not parsed.has("data"):
+		printerr("unexpected /v1/models body")
+		quit(2)
+		return
+
+	var installed: Array[String] = []
+	for m in parsed["data"]:
+		installed.append(str(m.get("id", "")))
+
+	# THE LAW FIRST. Selection only ever sees models already permitted, so an
+	# oversized or unresolvable id cannot reach the roster by any path.
+	var legal: Array[String] = []
+	for id in installed:
+		if _policy.check(id) == "":
+			legal.append(id)
+
+	print("installed: %d    permitted under the %.0fB ceiling: %d"
+		% [installed.size(), _policy.MAX_PARAM_B, legal.size()])
+
+	if legal.is_empty():
+		printerr("\nNo installed model is permitted under the %.0fB ceiling." % _policy.MAX_PARAM_B)
+		printerr("Download a model at or under %.0fB in LM Studio, or regenerate" % _policy.MAX_PARAM_B)
+		printerr("config/model-catalog.v1.json from `lms ls --json` if your models are missing from it.")
+		quit(1)
+		return
+
+	var picked := _pick_diverse(legal, WANTED)
+
+	if picked.size() < WANTED:
+		print("\nOnly %d eligible model(s) available; the arena wants %d." % [picked.size(), WANTED])
+		print("Building a %d-agent roster instead of failing. Download more small models" % picked.size())
+		print("to fill the roster out.")
+
+	var roster: Array = []
+	for i in picked.size():
+		roster.append({
+			"color": COLORS[i % COLORS.size()],
+			"model": picked[i],
+			"name": _display_name(picked[i]),
+		})
+
+	print("\nroster:")
+	for a in roster:
+		print("   %-18s %s" % [a["name"], a["model"]])
+
+	_write_user_preset(roster)
+	quit(0)
+
+
+## Prefer different model families over five builds of the same one. Family is
+## approximated by the leading token of the id, which is crude but good enough
+## to avoid a roster of four Britannica variants arguing with themselves.
+## Rank, then spread across families.
+##
+## Alphabetical order alone produced a roster containing a Bhojpuri
+## text-to-speech model and two base (non-instruct) checkpoints, all of which
+## are legal under the ceiling and useless in a debate. Ranking uses the
+## catalog's own evidence rather than the id string where possible.
+func _pick_diverse(legal: Array[String], want: int) -> Array[String]:
+	var scored: Array = []
+	for id in legal:
+		var sc := _score(id)
+		if sc < 0.0:
+			continue                     # not a chat model at all
+		scored.append({"id": id, "score": sc})
+	scored.sort_custom(func(a, b): return a["score"] > b["score"])
+
+	var out: Array[String] = []
+	var seen_family := {}
+	# Best of each distinct family first.
+	for e in scored:
+		if out.size() >= want:
+			break
+		var fam := _family(e["id"])
+		if seen_family.has(fam):
+			continue
+		seen_family[fam] = true
+		out.append(e["id"])
+	# Backfill from the ranked list if too few families exist.
+	for e in scored:
+		if out.size() >= want:
+			break
+		if not out.has(e["id"]):
+			out.append(e["id"])
+	return out
+
+
+func _family(id: String) -> String:
+	var tail := id.get_slice("/", id.get_slice_count("/") - 1)
+	return tail.split("-")[0]
+
+
+## Higher is better. Negative means "never put this in a debate roster".
+func _score(id: String) -> float:
+	var low := id.to_lower()
+
+	# Hard excludes: these are legal under the ceiling but cannot hold a turn.
+	for bad in ["tts", "text_to_speech", "text-to-speech", "whisper", "embed",
+			"embedding", "reranker", "ocr", "stable-diffusion", "clip-",
+			"bge-", "nomic", "vision-encoder"]:
+		if low.find(bad) != -1:
+			return -1.0
+
+	var s := 0.0
+	var m = _policy.catalog_entry(id)
+	if m != null:
+		if m.get("chatCapable", null) == true:
+			s += 100.0
+		var p = m.get("paramsB", null)
+		if p != null:
+			s += float(p) * 5.0          # bigger is generally more capable
+		if bool(m.get("vision", false)):
+			s -= 10.0                    # vision models tend to be weaker chatters
+	# Instruct/chat tuning is the single strongest signal available from the id.
+	for good in ["instruct", "-it", "chat", "zephyr", "hermes"]:
+		if low.find(good) != -1:
+			s += 40.0
+			break
+	# Base/pretrain checkpoints do not follow turn instructions.
+	for base in ["-base", "pretrain", "p2-", "-v1-", "completion"]:
+		if low.find(base) != -1:
+			s -= 60.0
+			break
+	return s
+
+
+func _display_name(model_id: String) -> String:
+	var tail := model_id.get_slice("/", model_id.get_slice_count("/") - 1)
+	tail = tail.replace("-GGUF", "").replace("_", " ").replace("-", " ")
+	var words := tail.split(" ", false)
+	var out: Array[String] = []
+	for w in words:
+		if out.size() >= 3:
+			break
+		out.append(w.capitalize() if w.length() > 2 else w.to_upper())
+	return " ".join(out)
+
+
+## Appends (or replaces) an "Installed Models" preset in user://presets.json.
+## res://presets.json is deliberately never modified.
+func _write_user_preset(roster: Array) -> void:
+	var path := "user://presets.json"
+	var presets: Array = []
+	if FileAccess.file_exists(path):
+		var f := FileAccess.open(path, FileAccess.READ)
+		if f != null:
+			var parsed = JSON.parse_string(f.get_as_text())
+			f.close()
+			if typeof(parsed) == TYPE_ARRAY:
+				presets = parsed
+	if presets.is_empty():
+		# Seed from the shipped defaults so the other presets still exist.
+		var rf := FileAccess.open("res://presets.json", FileAccess.READ)
+		if rf != null:
+			var rp = JSON.parse_string(rf.get_as_text())
+			rf.close()
+			if typeof(rp) == TYPE_ARRAY:
+				presets = rp
+
+	# Slot 0 is what the arena auto-loads, so put the working roster there and
+	# keep the shipped ones after it.
+	presets.push_front(roster)
+	while presets.size() > 8:
+		presets.pop_back()
+
+	var w := FileAccess.open(path, FileAccess.WRITE)
+	if w == null:
+		printerr("cannot write %s" % path)
+		return
+	w.store_string(JSON.stringify(presets, "\t"))
+	w.close()
+	print("\nwrote %s (slot 0 = Installed Models, %d agents)"
+		% [ProjectSettings.globalize_path(path), roster.size()])
+	print("Launch the arena; it loads slot 0 automatically.")
