@@ -70,6 +70,18 @@ const INVARIANTS := [
 	},
 ]
 
+## Facts that must be written down exactly ONCE. Each entry names a literal
+## that may appear only in its owning file; anywhere else is a second source of
+## truth waiting to disagree.
+const SINGLE_SOURCE := [
+	{
+		"literal": "127.0.0.1:1234",
+		"owner": "res://scripts/api/lm_endpoint.gd",
+		"label": "LM Studio endpoint is defined in exactly one place",
+		"why": "it was hardcoded in four files, so SILICON_ARENA_LM_URL was ignored by some of them",
+	},
+]
+
 
 ## Differences that ARE intentional. Each needs a reason, in writing.
 ## An entry here is a decision; a missing entry is a bug.
@@ -98,6 +110,7 @@ func _init() -> void:
 
 	_check_required(main_src, live_src)
 	_check_invariants()
+	_check_single_source()
 	_check_drift(main_src, live_src)
 	_report()
 
@@ -131,6 +144,38 @@ func _check_invariants() -> void:
 			print("  OK        %s" % item["label"])
 		else:
 			_fail("%s — missing in %s. %s" % [item["label"], item["file"], item["why"]])
+
+
+## A literal that belongs to one file must not appear in runtime code elsewhere.
+## Comments, tests and the owner itself are exempt: the point is to catch a
+## second DEFINITION, not a mention.
+func _check_single_source() -> void:
+	var runtime := [
+		"res://scripts/main.gd",
+		"res://scripts/arena/live_match.gd",
+		"res://tools/doctor.gd",
+		"res://tools/build_roster.gd",
+		"res://tools/prove.gd",
+	]
+	for item in SINGLE_SOURCE:
+		_checks += 1
+		var offenders: Array[String] = []
+		for path in runtime:
+			if path == item["owner"]:
+				continue
+			var src := _read(path)
+			for line in src.split("
+"):
+				var t := line.strip_edges()
+				if t.begins_with("#") or t.begins_with("##"):
+					continue
+				if t.find(item["literal"]) != -1:
+					offenders.append("%s: %s" % [path.get_file(), t.substr(0, 70)])
+		if offenders.is_empty():
+			print("  OK        %s" % item["label"])
+		else:
+			_fail("%s — also defined in: %s. %s"
+				% [item["label"], ", ".join(offenders), item["why"]])
 
 
 ## Anything live_match.gd preloads that main.gd never mentions is drift unless

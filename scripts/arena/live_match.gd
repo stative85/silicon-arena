@@ -239,7 +239,7 @@ func _load_roster() -> bool:
 		])
 	_runtime = {
 		"runtime_id": str(rt.get("runtime_id", "runtime-01")),
-		"endpoint": str(rt.get("endpoint", "http://127.0.0.1:1234/v1")),
+		"endpoint": str(rt.get("endpoint", LMEndpoint.base_url())),
 		"model_key": str(rt.get("model_key", "")),
 		"display_name": str(rt.get("display_name", "")),
 		"params_b": rt.get("params_b", null),
