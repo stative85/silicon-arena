@@ -50,6 +50,7 @@ class TurnManager extends Node:
 		return -1
 
 	func start_waiting(timeout: float):
+		_last_progress_bucket = 0
 		waiting = true
 		waiting_since_msec = Time.get_ticks_msec()
 		waiting_timeout_sec = timeout
@@ -59,11 +60,30 @@ class TurnManager extends Node:
 		waiting = false
 		waiting_since_msec = 0
 
+	## Emitted while a turn is still outstanding, so a cold model load does not
+	## look like a freeze. Measured swaps on an 8GB card are 18-38s
+	## (docs/BENCHMARK_8GB.md) and the app used to print nothing for that whole
+	## window.
+	signal turn_progress(agent_name: String, elapsed_sec: float)
+
+	var _last_progress_bucket := 0
+
 	func check_stall(agents: Array) -> bool:
 		if not waiting:
+			_last_progress_bucket = 0
 			return false
-			
+
 		var elapsed_sec := float(Time.get_ticks_msec() - waiting_since_msec) / 1000.0
+
+		# Heartbeat every 10s so a long JIT load is visibly progressing.
+		var bucket := int(elapsed_sec / 10.0)
+		if bucket > _last_progress_bucket and bucket > 0:
+			_last_progress_bucket = bucket
+			var who := "Unknown"
+			if not agents.is_empty():
+				who = agents[turn_index % agents.size()].name
+			turn_progress.emit(who, elapsed_sec)
+
 		if elapsed_sec >= waiting_timeout_sec:
 			var agent_name = "Unknown"
 			if not agents.is_empty():
@@ -1729,6 +1749,7 @@ func _ready():
 
 	_turn_manager = TurnManager.new()
 	add_child(_turn_manager)
+	_turn_manager.turn_progress.connect(_on_turn_progress)
 	_turn_manager.stall_detected.connect(func(agent_name, elapsed):
 		print("[TURN STALL] No reply from %s for %.1fs. Forcing skip." % [agent_name, elapsed])
 		_advance_epoch("stall:" + str(agent_name))
@@ -3594,6 +3615,12 @@ func _spawn_agent(agent_name: String, color: Color, model: String, slot_script: 
 		"fail_streak": 0,
 		"cooldown_until_msec": 0,
 	})
+
+## A long wait is almost always a cold model load, not a hang. Say so.
+func _on_turn_progress(agent_name: String, elapsed_sec: float) -> void:
+	print("[LOADING] %s — %.0fs (cold model swaps take 18-38s on 8GB; see docs/BENCHMARK_8GB.md)"
+		% [agent_name, elapsed_sec])
+
 
 func _process(delta):
 	if _turn_manager:
