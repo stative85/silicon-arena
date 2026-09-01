@@ -42,7 +42,17 @@ func _init() -> void:
 	for f in _failures:
 		print("  FAIL: " + f)
 	if _failures.is_empty():
-		print("cinematic bridge matches the TypeScript contract")
+		# Do not claim the cross-repo contract was checked when it was skipped.
+		# The schema lives in a private sibling repo, so on every public clone
+		# and in CI that comparison does not run — and this line was still
+		# asserting it had. A summary that overstates what ran is the same
+		# failure as a test that passes on absence.
+		if _skips.is_empty():
+			print("cinematic bridge matches the TypeScript contract")
+		else:
+			print("cinematic bridge OK (%d check(s) skipped; the TypeScript"
+				% _skips.size())
+			print("contract was NOT verified here — see SKIP above)")
 		quit(0)
 	else:
 		quit(2)
