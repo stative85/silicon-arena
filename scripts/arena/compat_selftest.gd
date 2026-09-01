@@ -28,6 +28,7 @@ func _init() -> void:
 	print("=== system-role compatibility ===\n")
 	_test_detector()
 	_test_fold()
+	_test_error_summary()
 	_report()
 
 
@@ -124,6 +125,40 @@ func _test_fold() -> void:
 	var wire := ClientScript._wire_body({"model": "m", "messages": [], "_compat_retry": true})
 	_check("_compat_retry is stripped before sending",
 		not wire.has("_compat_retry") and wire.has("model"))
+
+
+## A failure must explain itself in one actionable line. The arena used to say
+## "model not available (HTTP 400)" for a request-rejection, sending users to
+## download a model that was already installed.
+func _test_error_summary() -> void:
+	print("
+[errors] every failure explains itself, actionably")
+
+	var jinja := "Error rendering prompt with jinja template: \"Only user and assistant roles are supported!\""
+	_check("system-role rejection is named as such",
+		ClientScript.summarize_error(400, jinja).find("system role") != -1)
+
+	_check("context overflow is named",
+		ClientScript.summarize_error(400, "context length exceeded").find("context window") != -1)
+
+	_check("missing model is named",
+		ClientScript.summarize_error(404, "model not found").find("not have this model") != -1)
+
+	_check("out of VRAM is named",
+		ClientScript.summarize_error(500, "CUDA out of memory").find("VRAM") != -1)
+
+	_check("plain 400 does NOT claim the model is unavailable",
+		ClientScript.summarize_error(400, "{}").find("not available") == -1)
+
+	_check("timeout/no-response is named",
+		ClientScript.summarize_error(0, "").find("no response") != -1)
+
+	_check("unknown codes still produce something",
+		ClientScript.summarize_error(418, "teapot") != "")
+
+	_check("summary is one line",
+		ClientScript.summarize_error(400, jinja).find("
+") == -1)
 
 
 func _has_role(arr: Array, role: String) -> bool:

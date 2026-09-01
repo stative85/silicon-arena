@@ -302,6 +302,27 @@ static func _wire_body(body: Dictionary) -> Dictionary:
 	return out
 
 
+## A short, actionable reason for a failed request. Never more than one line.
+static func summarize_error(http_code: int, body: String) -> String:
+	var low := body.to_lower()
+	if is_system_role_rejection(http_code, body):
+		return "chat template rejects a system role (compat retry also failed)"
+	if low.find("context length") != -1 or low.find("context window") != -1:
+		return "prompt exceeded the model's context window"
+	if low.find("not found") != -1 or low.find("no model") != -1:
+		return "LM Studio does not have this model loaded or installed"
+	if low.find("out of memory") != -1 or low.find("vram") != -1:
+		return "ran out of VRAM loading this model"
+	match http_code:
+		400: return "LM Studio rejected the request (HTTP 400)"
+		404: return "model id not found in LM Studio (HTTP 404)"
+		500: return "LM Studio internal error (HTTP 500)"
+		503: return "LM Studio busy or still loading (HTTP 503)"
+	if http_code == 0:
+		return "no response from LM Studio (timeout or connection lost)"
+	return "HTTP %d" % http_code
+
+
 func _do_chat(agent_name: String, body: Dictionary, callback: Callable, timeout_sec: float = -1.0) -> void:
 	var effective_timeout_sec := maxf(timeout_sec, 1.0) if timeout_sec > 0.0 else request_timeout_sec
 	var http = HTTPRequest.new()
@@ -372,6 +393,11 @@ func _do_chat(agent_name: String, body: Dictionary, callback: Callable, timeout_
 				_do_chat(agent_name, retry_body, callback, effective_timeout_sec)
 				return
 			print("[LMClient] %s failed: result=%d code=%d body=%s" % [agent_name, result, response_code, error_body])
+			# On failure `text` is unused, so carry a short human reason up to
+			# the caller. Without it the arena can only say "not available",
+			# which is a wrong diagnosis for most 4xx and tells the user
+			# nothing they can act on.
+			text = summarize_error(response_code, error_body)
 		_finish_chat(http, deadline_timer, callback, success, text, response_code)
 	)
 	var headers_array = ["Content-Type: application/json"]

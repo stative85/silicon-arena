@@ -4267,7 +4267,13 @@ func _on_reply(agent, ok: bool, content: String, topic: String, gen: int = -1, h
 			agent["fail_streak"] = 0
 			agent["cooldown_until_msec"] = 0
 			_narrate_failure(agent, "disconnected")
-			print("DISABLED %s model not available (HTTP 400)" % agent.name)
+			# A 400 means LM Studio rejected the REQUEST, not that the model is
+			# missing. "not available" sent users hunting for a download that was
+			# never the problem. The client now supplies a real reason.
+			var why: String = content if content != "" else "LM Studio rejected the request (HTTP 400)"
+			print("[DISABLED] %s — %s" % [agent.name, why])
+			print("           out for this session. Pick another model with F6, or:")
+			print("           godot --headless --path . --script tools/build_roster.gd")
 			_turn_manager.advance_turn()
 			return
 		if http_code == LM_TIMEOUT_HTTP_CODE:
@@ -4282,7 +4288,8 @@ func _on_reply(agent, ok: bool, content: String, topic: String, gen: int = -1, h
 			agent["cooldown_until_msec"] = Time.get_ticks_msec() + int(AGENT_FAILURE_COOLDOWN_SEC * 1000.0)
 			_narrate_failure(agent, "cooldown")
 			print("[COOLDOWN] %s paused for %ds after repeated failures." % [agent.name, int(AGENT_FAILURE_COOLDOWN_SEC)])
-		print("[SKIP] %s no response (fail %d/%d)" % [agent.name, fail_streak, AGENT_FAILURE_STREAK_LIMIT])
+			var skip_why: String = content if content != "" else "no response"
+			print("[SKIP] %s — %s (fail %d/%d)" % [agent.name, skip_why, fail_streak, AGENT_FAILURE_STREAK_LIMIT])
 		_turn_manager.advance_turn()
 		return
 	agent["fail_streak"] = 0
