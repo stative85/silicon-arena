@@ -97,8 +97,32 @@ Download [LM Studio](https://lmstudio.ai/), load any GGUF model (3B-8B recommend
 ### 2. Install Godot 4.6
 Download [Godot 4.6](https://godotengine.org/download/) (standard, not .NET). No installation needed — it's a single executable.
 
-### 3. Run Silicon Arena
+### 3. First run — import the project once
+
+**Open the project in the Godot editor once before running it.** Godot builds
+its global class registry during import; without that pass you will get a wall
+of `Identifier "TemplateManager" not declared` parse errors. This is normal for
+any Godot project cloned from git — the `.godot/` cache is deliberately not
+committed.
+
+From the command line:
+
+```
+Godot_v4.6-stable_win64.exe --headless --editor --quit --path .
+```
+
+Or just open it in the editor and let it finish importing. Once only.
+
+### 4. Run Silicon Arena
 Double-click `start_arena.cmd`, or open the project in Godot and press Play.
+
+### 5. (Optional) Generate your own model catalog
+
+The arena ships with `config/model-catalog.example.json` so it runs out of the
+box. To enforce the size law against *your* installed models, generate
+`config/model-catalog.v1.json` from `lms ls --json` — it takes precedence.
+Without any catalog the policy still refuses oversized models by reading the
+size out of the model id, and refuses anything whose size it cannot read.
 
 > For detailed setup with model recommendations by VRAM tier, see [SETUP.md](SETUP.md).
 

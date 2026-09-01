@@ -17,8 +17,17 @@ class_name ModelPolicy
 ## refused and the reason is visible. A silent open door is worse than a
 ## stopped match.
 
-const CATALOG_PATH := "res://../extinct_os/config/model-catalog.v1.json"
-const CATALOG_FALLBACK := "../extinct_os/config/model-catalog.v1.json"
+## Searched in order. The first readable file wins.
+##   1. config/model-catalog.v1.json   your generated catalog (gitignored)
+##   2. config/model-catalog.example.json  shipped so a fresh clone runs
+##   3. the sibling monorepo path, for the original workspace layout
+const CATALOG_SEARCH := [
+	"res://config/model-catalog.v1.json",
+	"res://config/model-catalog.example.json",
+	"res://../extinct_os/config/model-catalog.v1.json",
+]
+const CATALOG_PATH := "res://config/model-catalog.v1.json"
+const CATALOG_FALLBACK := "config/model-catalog.example.json"
 
 ## Mirrors MAX_PARAM_B in extinct_os/src/runtime/modelPolicy.ts.
 const MAX_PARAM_B := 7.0
@@ -28,6 +37,7 @@ signal model_rejected(model_key: String, reason: String)
 var _by_key := {}
 var _loaded := false
 var _load_error := ""
+var _catalog_source := ""
 var _rejections := 0
 
 
@@ -62,18 +72,24 @@ func load_catalog() -> bool:
 
 
 func _read_catalog() -> String:
-	var f := FileAccess.open(CATALOG_PATH, FileAccess.READ)
-	if f != null:
-		var t := f.get_as_text()
-		f.close()
-		return t
-	# res:// cannot climb out of the project; resolve against the real path.
-	var abs := ProjectSettings.globalize_path("res://").path_join(CATALOG_FALLBACK).simplify_path()
-	f = FileAccess.open(abs, FileAccess.READ)
-	if f != null:
-		var t := f.get_as_text()
-		f.close()
-		return t
+	for path in CATALOG_SEARCH:
+		var f := FileAccess.open(path, FileAccess.READ)
+		if f != null:
+			var t := f.get_as_text()
+			f.close()
+			if t.strip_edges() != "":
+				_catalog_source = path
+				return t
+		# res:// cannot climb out of the project; resolve the real path too.
+		if path.begins_with("res://../"):
+			var abs := ProjectSettings.globalize_path("res://").path_join(path.substr(6)).simplify_path()
+			f = FileAccess.open(abs, FileAccess.READ)
+			if f != null:
+				var t2 := f.get_as_text()
+				f.close()
+				if t2.strip_edges() != "":
+					_catalog_source = abs
+					return t2
 	return ""
 
 
@@ -130,7 +146,16 @@ func params_from_id(model_id: String) -> float:
 
 func check(model_key: String) -> String:
 	if not _loaded:
-		return "model catalog unavailable (%s) — refusing every request rather than risking a load" % _load_error
+		# No catalog. Do NOT refuse everything — that makes a fresh clone look
+		# broken. Fall back to reading the size out of the model id itself and
+		# refuse anything that is oversized or unreadable. Still closed for
+		# unknowns, just no longer closed for everything.
+		var guessed := params_from_id(model_key)
+		if guessed < 0.0:
+			return "no catalog (%s) and \"%s\" has no readable size — refusing" % [_load_error, model_key]
+		if guessed > MAX_PARAM_B:
+			return "no catalog; \"%s\" is %.1fB by name, above the %.0fB ceiling — refusing" % [model_key, guessed, MAX_PARAM_B]
+		return ""
 
 	var raw := model_key.strip_edges()
 	if raw == "":
