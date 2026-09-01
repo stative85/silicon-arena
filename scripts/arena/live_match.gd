@@ -34,6 +34,7 @@ const ScarScript := preload("res://scripts/arena/scar_lattice.gd")
 ## were all broken in a public clone while this one worked -- which is exactly
 ## why nobody noticed.
 const RosterPathScript := preload("res://scripts/arena/roster_path.gd")
+const SpeechCleanScript := preload("res://scripts/arena/speech_clean.gd")
 const LOG_DIR := "user://live_matches"
 
 const TOPIC := "Whether a system that cannot refuse its operator can be said to have values at all."
@@ -569,7 +570,12 @@ func _on_reply(agent: Dictionary, ok: bool, content: String, http_code: int, sta
 		return
 	_retrying_turn = false
 
-	var text := content.strip_edges()
+	# The display already prints who is speaking, so a reply that opens with
+	# the speaker's own label renders the name twice. Measured at 27 of 33
+	# speeches in one match. main.gd sanitises; this path did not sanitise at
+	# all, which is the entry-point drift this project keeps rediscovering.
+	var text := SpeechCleanScript.strip_self_prefix(
+		content.strip_edges(), str(agent["display_name"]))
 	agent["state"] = "speaking"
 	agent["last_message"] = text
 	agent["last_message_at_ms"] = Time.get_ticks_msec()

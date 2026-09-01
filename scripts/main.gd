@@ -1349,6 +1349,7 @@ class WeaponVFX extends RefCounted:
 # -- Declarations --------------------------------------
 
 const LMStudioClientScript = preload("res://scripts/api/lm_studio_client.gd")
+const SpeechCleanScript := preload("res://scripts/arena/speech_clean.gd")
 const ModelPolicyScript = preload("res://scripts/arena/model_policy.gd")
 
 ## Seconds allowed for a turn, sized for a cold model swap rather than a
@@ -4383,6 +4384,11 @@ func _on_reply(agent, ok: bool, content: String, topic: String, gen: int = -1, h
 	content = _strip_second_person_narration(content)
 	content = _replace_prompt_leak(content, agent.name)
 	content = _strip_second_speaker_spill(content, agent.name)
+	# _strip_second_speaker_spill deliberately skips the speaker's OWN name --
+	# it exists to stop an agent writing another agent's line. The self-label
+	# is a separate defect and was handled by neither path. Shared with
+	# live_match.gd so the two entry points cannot drift.
+	content = SpeechCleanScript.strip_self_prefix(content, agent.name)
 
 	# Memory-politics: split the MEMORY_CANDIDATE footer from the in-character
 	# reply BEFORE any downstream consumer sees it. The footer is structured

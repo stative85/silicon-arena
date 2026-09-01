@@ -39,6 +39,15 @@
 
 ### Fixed
 
+- **Agents printed their own name twice.** The display prints the speaker, then
+  the reply printed the speaker's label again: "Stablelm 2 Zephyr #1 /
+  Stablelm 2 Zephyr #1: We are not simply optimizing...". Measured across real
+  matches at 42% of speeches on one roster. `main.gd`'s existing stripper
+  deliberately skips the speaker's own name (it exists to stop an agent writing
+  *another* agent's line), and `live_match.gd` — the headless path feeding the
+  overlay and the recorded transcripts — did no sanitising at all. Both entry
+  points now share `SpeechClean`. Re-measured after the fix: 0% self-labels,
+  with replies that address other agents by name left intact.
 - **The candidate probe passed models that cannot speak in the arena.** It
   asked "Say the word: ready" with `max_tokens` 16, which a reasoning-only
   model answers directly. Given the arena's real shape — system role, debate

@@ -88,6 +88,9 @@ jobs:
       - name: Self-test — VRAM estimate
         run: ~/godot/godot --headless --path . --script scripts/arena/vram_selftest.gd 2>&1 | tee out.log; grep -q "VRAM OK" out.log
 
+      - name: Self-test — speech cleaning
+        run: ~/godot/godot --headless --path . --script scripts/arena/speech_clean_selftest.gd 2>&1 | tee out.log; grep -q "SPEECH CLEAN OK" out.log
+
       - name: Adversarial pass
         run: ~/godot/godot --headless --path . --script tools/adversarial.gd 2>&1 | tee out.log; grep -q "ADVERSARIAL OK" out.log
 
