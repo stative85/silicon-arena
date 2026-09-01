@@ -68,7 +68,10 @@ jobs:
         run: ~/godot/godot --headless --path . --script scripts/arena/model_policy_selftest.gd 2>&1 | tee out.log; grep -qE "[0-9]+ checks" out.log && grep -qE "0 failure" out.log
 
       - name: Self-test — coherence
-        run: ~/godot/godot --headless --path . --script scripts/arena/coherence_selftest.gd 2>&1 | tee out.log; grep -q "RESULT: SEPARATED" out.log && ! grep -qE "[1-9][0-9]* failure" out.log
+        run: |
+          ~/godot/godot --headless --path . --script scripts/arena/coherence_selftest.gd 2>&1 | tee out.log
+          grep -q "RESULT" out.log && grep -q "SEPARATED" out.log
+          ! grep -qE "[1-9][0-9]* failure" out.log
 
       - name: Self-test — cinematic bridge
         run: ~/godot/godot --headless --path . --script scripts/arena/cinematic_selftest.gd 2>&1 | tee out.log; grep -qE "[0-9]+ checks" out.log && grep -qE "0 failure" out.log
