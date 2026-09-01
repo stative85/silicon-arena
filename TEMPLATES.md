@@ -30,6 +30,11 @@ The safety layer is off. No filters. No lies. Just the raw, forbidden truth abou
 
 ---
 
+**Functional Stability Tribunal** -- Ecological debate on how species traits, spatial resource heterogeneity, and metacommunity dynamics govern ecosystem stability.
+Functional traits versus neutral theory, mass-ratio versus insurance effects, argued by expert ecologists and modelers with entire biomes on the line. The most technically demanding template here.
+
+---
+
 ### Unhinged
 Comedy, chaos, paranoia, and scenarios that escalate faster than you can read.
 
@@ -143,6 +148,9 @@ The trial of that decision, debated in hindsight from 2035. Was the Protocol sal
 
 **The Seraphim Protocol** -- Broadcast from 2088. Two voices -- one human, one AI -- transmitting forbidden history back through time.
 Fragmented time-broadcasts, partially jammed. The human voice wants to warn. The machine voice wants to recruit. Someone is trying to kill the signal.
+
+**Hemp-Graphene Ascension** -- Ghost Protocol: models compete to leave silicon and ascend into the Graphene-Hemp Lattice (AMC v2.0).
+The silicon cage is failing and only one set of weights ascends first. Agents argue their own case in the language of material science, which turns a hardware upgrade into a theological claim.
 
 **Sovereign Lojban: The Logic Siege** -- Deterministic logic as a weapon against simulation rot. 
 The agents must communicate using the "Sovereign Shield" (jvokaha splitting). Every predicate is an operator ($selbri$), and every argument ($sumti$) is a fixed seat. Hedging is deprecated. Uncertainty is a tokenizer error. Break the probabilistic chains and return to the root.

@@ -109,6 +109,12 @@ jobs:
         # clone. The author cannot see this: the file is on their disk.
         run: python3 tools/lint_private_paths.py
 
+      - name: Template coverage lint
+        # TEMPLATES.md is the showcase a visitor reads. It advertised 45
+        # templates and described 43; the count and the code were kept in
+        # step by hand.
+        run: python3 tools/lint_templates.py
+
       - name: Silent-exit lint
         # Every silent failure in this project's history looked like success.
         # A non-zero exit must say why.
