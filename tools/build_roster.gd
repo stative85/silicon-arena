@@ -78,6 +78,33 @@ var _balanced := 0
 ##   godot --headless --path . --script tools/build_roster.gd -- --fit=6.5
 var _fit := 0.0
 
+## AUTO: choose the mode from what the machine can actually do.
+##
+## Decided by measurement, not taste. A blinded four-condition evaluation
+## (tools/eval/) found:
+##
+##   * --fit reaches ~8x the default roster's throughput at statistically
+##     indistinguishable judged quality (J1 3.05 vs 3.10, J2 3.70 vs 3.78 on a
+##     5-point scale) and a HIGHER challenge/contradiction rate (55% vs 46%).
+##   * --fast scored highest with both judges, and is disqualified anyway: it
+##     never once referred to another agent (0% against 65-66%) and had the
+##     lowest challenge rate. One model wearing five hats is not a debate, and
+##     the judges rating it "most responsive" is evidence about the judges.
+##
+## So the ladder prefers co-resident heterogeneity, then grouped scheduling,
+## then a single model, and never relaxes the size law at any rung.
+##
+##   godot --headless --path . --script tools/build_roster.gd -- --auto
+var _auto := false
+
+## Force the historical one-model-per-agent roster. Kept because it is the
+## maximum-heterogeneity option and some people will want exactly that,
+## slowness included.
+var _diverse := false
+
+## Fewest architectures worth calling a heterogeneous debate.
+const AUTO_MIN_ARCHITECTURES := 3
+
 ## Usable VRAM to plan against, in GB. Below the card's actual size because
 ## the context window, KV cache and desktop compositor all want some.
 const DEFAULT_FIT_GB := VramScript.DEFAULT_BUDGET_GB
@@ -126,6 +153,10 @@ func _run() -> void:
 			_probe = false
 		elif a == "--balanced":
 			_balanced = 2
+		elif a == "--auto":
+			_auto = true
+		elif a == "--diverse":
+			_diverse = true
 		elif a == "--fit":
 			_fit = DEFAULT_FIT_GB
 		elif a.begins_with("--fit="):
@@ -134,6 +165,14 @@ func _run() -> void:
 			# Clamp rather than trust: 1 is --fast and WANTED is the diverse
 			# roster, so anything outside that range is a typo, not a request.
 			_balanced = clampi(int(a.get_slice("=", 1)), 1, WANTED)
+	# AUTO is the default. The evaluation in tools/eval/ measured the
+	# alternatives on this hardware: the historical default managed 1.82
+	# speeches per minute against AUTO's 14.53, at judged quality the two blind
+	# judges could not separate (3.10 vs 3.05 and 3.78 vs 3.70 on a 5-point
+	# scale) and a higher challenge rate. A first run producing one line every
+	# 33 seconds reads as broken, and that was the shipped default.
+	if not (_fast or _diverse or _balanced > 0 or _fit > 0.0):
+		_auto = true
 	print("\n=== build roster from installed models ===\n")
 	_policy = PolicyScript.new()
 	get_root().add_child(_policy)
@@ -194,6 +233,13 @@ func _on_models(result: int, code: int, _h: PackedStringArray, body: PackedByteA
 	elif _balanced > 0:
 		want_distinct = _balanced
 
+	if _auto and _fit <= 0.0:
+		# AUTO starts at the top rung: as many co-resident, verified,
+		# chat-capable architectures as the card will hold.
+		_fit = DEFAULT_FIT_GB
+		print("
+AUTO: choosing a mode from what this machine can actually do.")
+
 	if _fit > 0.0:
 		# Selection here is by what can COEXIST in VRAM, so it does not use
 		# want_distinct at all.
@@ -238,6 +284,29 @@ fitting a roster into %.1f GB of VRAM:" % _fit)
 						queue.push_front(cand)
 						break
 			fitting = verified
+		if _auto:
+			# The ladder. Each rung is a fact about this machine, not a
+			# preference: how many verified chat-capable architectures fit at
+			# once. The size law was applied to `legal` before any of this, so
+			# no rung can relax it.
+			if fitting.size() >= AUTO_MIN_ARCHITECTURES:
+				print("
+AUTO rung 1: %d co-resident verified architectures."
+					% fitting.size())
+			elif fitting.size() == 2:
+				print("
+AUTO rung 2: only 2 architectures fit; grouped scheduling.")
+				print("  Agents sharing a model sit together, so a round costs")
+				print("  2 cold loads instead of 5.")
+			elif fitting.size() == 1:
+				print("
+AUTO rung 3: only 1 verified model fits; every agent shares it.")
+				print("  This is not a heterogeneous debate. Install a second small")
+				print("  chat model at or under the ceiling to get one.")
+			else:
+				print("
+AUTO: nothing verified fits the budget.")
+
 		if fitting.is_empty():
 			printerr("no model fits in %.1f GB; raise the budget with --fit=N" % _fit)
 			quit(1)

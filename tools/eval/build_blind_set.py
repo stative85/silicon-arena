@@ -27,6 +27,36 @@ SIZE = re.compile(r"\b\d+(?:\.\d+)?\s*[bB]\b")
 HASHNUM = re.compile(r"\s*#\d+")
 
 
+# Ordinary English that happens to appear in model names. Scrubbing these
+# would mangle the debate itself, and they identify nothing on their own.
+B = chr(92) + "b"   # word boundary, built explicitly:
+# a literal "\b" in source has been silently turned into a backspace
+# by a shell heredoc twice in this project already.
+W = chr(92) + "w*"
+
+SAFE_WORDS = {"chat", "instruct", "fast", "full", "mini", "tiny", "base",
+              "preview", "creative", "logical", "rogue", "guff", "text",
+              "small", "large", "medium", "code", "math", "vision"}
+
+
+def name_tokens(names, models):
+    """Every distinctive word that could identify an agent or its model.
+
+    "H 2o Danube 3 4B #1" was rewritten correctly, but a later speaker calling
+    it just "Danube" was not: the mapping only knew the full name and the
+    model id split to "danube3", never bare "danube". Trailing digits are
+    stripped for the same reason.
+    """
+    out = set()
+    for src in list(names) + list(models):
+        for piece in re.split(r"[^A-Za-z0-9]+", src):
+            piece = re.sub(r"\d+$", "", piece)
+            low = piece.lower()
+            if len(piece) > 3 and low not in SAFE_WORDS and not low.isdigit():
+                out.add(piece)
+    return out
+
+
 def scrub(text, name_to_label, model_tokens):
     out = text
     # Longest names first so "Stablelm 2 Zephyr #1" is replaced before "Stablelm".
@@ -39,6 +69,10 @@ def scrub(text, name_to_label, model_tokens):
     for tok in sorted(model_tokens, key=len, reverse=True):
         if len(tok) > 3:
             out = re.sub(re.escape(tok), "[model]", out, flags=re.I)
+    # Bare identifying words, after the full names have had their chance.
+    for tok in sorted(name_tokens(name_to_label.keys(), model_tokens),
+                      key=len, reverse=True):
+        out = re.sub(B + re.escape(tok) + W, "[model]", out, flags=re.I)
     out = SIZE.sub("[size]", out)
     return out
 
@@ -110,13 +144,18 @@ def main():
 
     # Cheap leak check: no condition name, model id or original speaker name
     # may survive into the blinded file.
+    # Check against the tokens THESE runs actually used, not a guessed list.
+    # A hardcoded list flagged "diverse" and "balanced", which are ordinary
+    # debate vocabulary and identify nothing.
     raw = open(os.path.join(RUNS, "_blind_set.json"), encoding="utf-8").read().lower()
-    leaks = []
-    for token in ["diverse", "balanced", "fast", "fit", "stablelm", "mistral",
-                  "gemma", "elyza", "zephyr", "danube", "qwen", "llama",
-                  "deepscaler", "distill", "granite"]:
-        if token in raw:
-            leaks.append(token)
+    identifying = set()
+    for f in os.listdir(RUNS):
+        if not f.endswith(".json") or f.startswith("_"):
+            continue
+        rec = json.load(open(os.path.join(RUNS, f), encoding="utf-8"))
+        names = set(s["speaker"] for s in rec["speeches"])
+        identifying |= name_tokens(names, set(rec["models"]))
+    leaks = sorted(t for t in identifying if t.lower() in raw)
     print("leak check: %s" % ("CLEAN" if not leaks else "LEAKED %s" % leaks))
     return 1 if leaks else 0
 

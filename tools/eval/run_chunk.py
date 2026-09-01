@@ -1,0 +1,169 @@
+#!/usr/bin/env python3
+"""Run one match chunk for a condition and append it to that condition's record.
+
+    python tools/eval/run_chunk.py --cond A_diverse --build     # roster once
+    python tools/eval/run_chunk.py --cond A_diverse --turns 15  # a chunk
+
+Why chunks: a diverse-roster condition needs about half an hour of real
+inference, and this environment stops long-running background work. Each
+condition is therefore run as several shorter matches with the SAME roster,
+and their turns are concatenated.
+
+The chunking is applied identically to every condition, so it cannot favour
+one. It does mean each condition contains several debate openings rather than
+one long debate, which is recorded in the report rather than hidden.
+
+VRAM is emptied and memory cleared once per condition, at --build time, not
+between chunks: between chunks the resident set is whatever the mode actually
+produces, which is the steady state being measured.
+"""
+import argparse
+import json
+import os
+import re
+import shutil
+import subprocess
+import sys
+import time
+
+ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+OUT = os.path.join(ROOT, "tools", "eval", "runs")
+USERDATA = os.path.join(os.environ.get("APPDATA", ""), "Godot", "app_userdata",
+                        "Silicon Arena")
+FAIL = re.compile(r"^LIVE_ARENA TURN_FAILED (.*?): (.*)$")
+
+CONDITIONS = {
+    "A_diverse": [],
+    "B_balanced": ["--balanced"],
+    "C_fast": ["--fast"],
+    "D_fit": ["--fit"],
+}
+
+
+def godot():
+    c = os.environ.get("GODOT") or (
+        r"C:\Users\cleve\Downloads\Godot_v4.6-stable_win64.exe"
+        r"\Godot_v4.6-stable_win64.exe")
+    if not os.path.exists(c):
+        sys.exit("godot not found; set GODOT")
+    return c
+
+
+def lms_unload():
+    exe = os.path.join(os.path.expanduser("~"), ".lmstudio", "bin", "lms.exe")
+    if not os.path.exists(exe):
+        return False
+    try:
+        subprocess.run([exe, "unload", "--all"], capture_output=True, timeout=120)
+        time.sleep(3)
+        return True
+    except Exception:
+        return False
+
+
+def newest_log():
+    d = os.path.join(USERDATA, "live_matches")
+    if not os.path.isdir(d):
+        return None
+    fs = [os.path.join(d, f) for f in os.listdir(d) if f.endswith(".jsonl")]
+    return max(fs, key=os.path.getmtime) if fs else None
+
+
+def read_turns(path):
+    out, stamps = [], []
+    if not path or not os.path.exists(path):
+        return out, 0.0
+    for line in open(path, encoding="utf-8", errors="ignore"):
+        try:
+            d = json.loads(line)
+        except Exception:
+            continue
+        if d.get("kind") != "turn":
+            continue
+        out.append({"n": int(d.get("turn", 0)),
+                    "speaker": str(d.get("display_name", "")).strip(),
+                    "model": str(d.get("model_key", "")),
+                    "latency_ms": int(d.get("latency_ms") or 0),
+                    "text": str(d.get("text", ""))})
+        if d.get("timestamp"):
+            stamps.append(d["timestamp"])
+    wall = 0.0
+    if len(stamps) >= 2:
+        import datetime
+        wall = (datetime.datetime.fromisoformat(stamps[-1])
+                - datetime.datetime.fromisoformat(stamps[0])).total_seconds()
+    if out:
+        wall += out[0]["latency_ms"] / 1000.0
+    return out, wall
+
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--cond", required=True, choices=sorted(CONDITIONS))
+    ap.add_argument("--turns", type=int, default=15)
+    ap.add_argument("--build", action="store_true")
+    a = ap.parse_args()
+    os.makedirs(OUT, exist_ok=True)
+    g = godot()
+    flags = CONDITIONS[a.cond]
+    path = os.path.join(OUT, a.cond + ".json")
+
+    if a.build:
+        print("freeing VRAM: %s" % ("ok" if lms_unload() else "lms unavailable"))
+        for name in ("scar_lattice", "live_matches"):
+            p = os.path.join(USERDATA, name)
+            if os.path.isdir(p):
+                shutil.rmtree(p, ignore_errors=True)
+        t0 = time.time()
+        subprocess.run([g, "--headless", "--path", ROOT, "--script",
+                        "tools/build_roster.gd", "--"] + flags,
+                       capture_output=True, text=True, encoding="utf-8",
+                       errors="ignore", timeout=3600)
+        roster = json.load(open(os.path.join(ROOT, "config",
+                                             "arena-roster.v1.json"), encoding="utf-8"))
+        models = [ag["model_key"] for ag in roster["agents"]]
+        rec = {"condition": a.cond, "flags": flags, "roster": roster,
+               "models": [], "distinct_models": len(set(models)),
+               "roster_models": sorted(set(models)),
+               "wall_sec": 0.0, "build_sec": time.time() - t0,
+               "chunks": 0, "timed_out": False, "speeches": [], "failures": []}
+        json.dump(rec, open(path, "w", encoding="utf-8"), indent=1)
+        print("built %s: %d agents, %d distinct model(s) in %.0fs"
+              % (a.cond, len(models), len(set(models)), rec["build_sec"]))
+        print("  " + ", ".join(sorted(set(models))))
+        return
+
+    rec = json.load(open(path, encoding="utf-8"))
+    before = newest_log()
+    p = subprocess.run([g, "--headless", "--path", ROOT, "--script",
+                        "scripts/arena/live_match.gd", "--",
+                        "--turns", str(a.turns), "--no-wait",
+                        "--exit-on-complete", "--timeout-sec", "120"],
+                       capture_output=True, text=True, encoding="utf-8",
+                       errors="ignore", timeout=3000)
+    log = (p.stdout or "") + (p.stderr or "")
+    cur = newest_log()
+    if cur == before:
+        print("no new match log; chunk produced nothing")
+        return
+    sp, wall = read_turns(cur)
+    fails = [{"speaker": m.group(1).strip(), "why": m.group(2)}
+             for m in (FAIL.match(l) for l in log.splitlines()) if m]
+
+    base = len(rec["speeches"])
+    for s in sp:
+        s["n"] += base
+        s["chunk"] = rec["chunks"] + 1
+    rec["speeches"].extend(sp)
+    rec["failures"].extend(fails)
+    rec["models"].extend(s["model"] for s in sp)
+    rec["wall_sec"] += wall
+    rec["chunks"] += 1
+    json.dump(rec, open(path, "w", encoding="utf-8"), indent=1)
+    print("%s chunk %d: +%d speeches (%d total), +%d failures, %.0fs (%.0fs total)"
+          % (a.cond, rec["chunks"], len(sp), len(rec["speeches"]),
+             len(fails), wall, rec["wall_sec"]))
+
+
+if __name__ == "__main__":
+    main()

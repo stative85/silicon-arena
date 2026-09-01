@@ -30,6 +30,7 @@ func _run() -> void:
 	_compat_abuse()
 	_filename_abuse()
 	_endpoint_forms()
+	_auto_ladder_obeys_the_law()
 	_report()
 
 
@@ -309,3 +310,50 @@ func _report() -> void:
 		for f in _failures:
 			print("  FAIL: %s" % f)
 		quit(1)
+
+
+## AUTO must not become a hole in the size law.
+##
+## The ladder picks a mode from what the machine can do -- three co-resident
+## architectures, else grouped, else one shared model. Every rung is allowed to
+## change HOW MANY models are used. No rung is allowed to change WHICH models
+## are eligible, and rung 4 of the specification is exactly that: never exceed
+## the 7B request law.
+##
+## This is a source-level check because the ladder lives inside a tool's main
+## flow. It asserts that the candidate pool the ladder draws from is the
+## already-filtered `legal` list, and that nothing in the file reintroduces the
+## raw installed list after filtering.
+func _auto_ladder_obeys_the_law() -> void:
+	var src := FileAccess.get_file_as_string("res://tools/build_roster.gd")
+	if src == "":
+		_bad("build_roster.gd unreadable", "cannot audit the AUTO ladder")
+		return
+
+	if src.find("_pick_diverse(legal, legal.size())") != -1:
+		_ok("AUTO draws candidates from the filtered list, not the installed list")
+	else:
+		_bad("AUTO draws candidates from the filtered list, not the installed list", "the fit/AUTO path must rank only permitted models")
+
+	if src.find("if _policy.check(id) == \"\":") != -1:
+		_ok("the permitted list is built by asking the policy about every id")
+	else:
+		_bad("the permitted list is built by asking the policy about every id", "legal must come from policy.check, not from a catalog flag")
+
+	# `installed` is the raw list from LM Studio. After `legal` is built, it
+	# must never be used as a selection source again.
+	var legal_at := src.find("var legal: Array[String] = []")
+	var tail := src.substr(legal_at) if legal_at >= 0 else src
+	var reuses := (tail.find("_pick_diverse(installed") != -1
+		or tail.find("_pick_fitting(installed") != -1
+		or tail.find("_spread(installed") != -1)
+	if not reuses:
+		_ok("the raw installed list is never a selection source after filtering")
+	else:
+		_bad("the raw installed list is never a selection source after filtering",
+			"a rung would be able to select an oversized model")
+
+	if src.find("AUTO_MIN_ARCHITECTURES") != -1:
+		_ok("AUTO has a floor on architectures rather than a hardcoded mode")
+	else:
+		_bad("AUTO has a floor on architectures rather than a hardcoded mode", "")

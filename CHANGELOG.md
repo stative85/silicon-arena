@@ -12,7 +12,18 @@
 
 ### Added
 
-- **`--fit` roster mode — the headline result.** Models that fit in VRAM
+- **AUTO is the new default roster mode**, chosen by a blinded four-condition
+  evaluation (`docs/ROSTER_EVALUATION.md`, harness in `tools/eval/`). It prefers
+  three or more co-resident probe-verified architectures, falls back to two with
+  grouped scheduling, then to one shared model, and never relaxes the 7B ceiling
+  — audited at source so no rung can select from the unfiltered installed list.
+  The old behaviour is `--diverse`. On this machine the previous default managed
+  **1.82 speeches/min against AUTO's 14.53**, at judged quality neither blind
+  judge could separate. Both judges actually ranked `--fast` first; it was not
+  followed, because `--fast` never once referred to another agent (0% vs 65%)
+  and had the lowest challenge rate while being scored *most responsive* — the
+  judges were not measuring what the word names.
+- **`--fit` roster mode.** Models that fit in VRAM
   together are never evicted, so a heterogeneous roster stops swapping
   entirely. Measured on an RTX 5060 8GB, same build, same 260s window, zero
   failures: **8 speeches (5 models, thrashing), 33 (`--balanced`), 64

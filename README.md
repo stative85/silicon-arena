@@ -177,12 +177,20 @@ model and pays an 18-38s cold load. A round costs one cold load per *distinct
 model*, so the fix is fewer models, not fewer agents:
 
 ```
-godot --headless --path . --script tools/build_roster.gd -- --fit
+godot --headless --path . --script tools/build_roster.gd
 ```
 
-`--fit` picks the most distinct models that fit in VRAM *together*. Models that
-fit are never evicted, so nothing swaps. Same build, same 260s window, same
-harness, RTX 5060 8GB, zero failures in all four:
+The default is **AUTO**: it picks a mode from what your machine can actually
+do — three or more co-resident chat-verified architectures if they fit, else
+two with grouped scheduling, else one shared model — and never relaxes the 7B
+ceiling at any rung. This default was chosen by a blinded four-condition
+evaluation, not by taste: see
+[docs/ROSTER_EVALUATION.md](docs/ROSTER_EVALUATION.md).
+
+`--fit`, `--balanced`, `--fast` and `--diverse` force a specific mode. `--fit`
+picks the most distinct models that fit in VRAM *together*; models that fit are
+never evicted, so nothing swaps. Same build, same 260s window, same harness,
+RTX 5060 8GB, zero failures in all four:
 
 | roster | distinct models | all resident | agents spoke |
 |---|---:|---|---:|
