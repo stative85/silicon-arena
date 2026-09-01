@@ -63,6 +63,7 @@ call :run_selftest coherence_selftest         "coherence"
 call :run_selftest cinematic_selftest         "cinematic bridge"
 call :run_selftest scar_lattice_selftest      "scar lattice"
 call :run_selftest compat_selftest            "system-role compat"
+call :run_selftest_tools adversarial          "adversarial pass"
 
 REM ---- JSON + preset legality ---------------------------------------------
 "%GODOT%" --headless --path . --script tools/verify_configs.gd >"%TEMP%\sa_cfg.txt" 2>&1
@@ -95,6 +96,18 @@ if errorlevel 1 (
     echo [FAIL] %~2
     set FAILED=1
   )
+) else (
+  echo [FAIL] %~2
+  findstr /R /C:"FAIL" "%TEMP%\sa_%~1.txt"
+  set FAILED=1
+)
+exit /b 0
+
+:run_selftest_tools
+"%GODOT%" --headless --path . --script tools/%~1.gd >"%TEMP%\sa_%~1.txt" 2>&1
+findstr /R /C:"[1-9][0-9]* failure" "%TEMP%\sa_%~1.txt" >nul
+if errorlevel 1 (
+  echo [PASS] %~2
 ) else (
   echo [FAIL] %~2
   findstr /R /C:"FAIL" "%TEMP%\sa_%~1.txt"
