@@ -2385,6 +2385,21 @@ static func _sanitize_filename(raw: String, fallback: String = "arena_clip") -> 
 	return out if out != "" else fallback
 
 
+## Shared ffmpeg invocation so the capture source is the only thing that varies.
+func _ffmpeg_args(input: String, out_path: String) -> Array:
+	return [
+		"-y",
+		"-f", "gdigrab",
+		"-framerate", "30",
+		"-i", input,
+		"-c:v", "libx264",
+		"-preset", "ultrafast",
+		"-crf", "23",
+		"-pix_fmt", "yuv420p",
+		out_path,
+	]
+
+
 func _start_recording(auto_stop_seconds: float = 0.0, clip_name: String = "") -> void:
 	if _recording:
 		return
@@ -2408,18 +2423,15 @@ func _start_recording(auto_stop_seconds: float = 0.0, clip_name: String = "") ->
 	# it goes, so a clip survives being killed mid-write.
 	var output_path = CLIP_DIR + "/%s_%d.mkv" % [safe_name, ts]
 
-	# Use GDI grab to capture the game window by title
-	var args := [
-		"-y",  # overwrite
-		"-f", "gdigrab",
-		"-framerate", "30",
-		"-i", "title=Silicon Arena",
-		"-c:v", "libx264",
-		"-preset", "ultrafast",
-		"-crf", "23",
-		"-pix_fmt", "yuv420p",
-		output_path,
-	]
+	# gdigrab captures by WINDOW TITLE, which must match the project name
+	# exactly and requires the window to exist right now. Headless, minimised
+	# or renamed, ffmpeg aborts with "Can't find window" and exits instantly —
+	# and the old code reported "CLIP SAVED" regardless.
+	#
+	# The title is read from the project rather than repeated here, so renaming
+	# the application cannot silently break recording.
+	var win_title: String = str(ProjectSettings.get_setting("application/config/name", "Silicon Arena"))
+	var args := _ffmpeg_args("title=%s" % win_title, output_path)
 
 	var pid = OS.create_process(FFMPEG_EXE, args)
 	if pid <= 0:
@@ -2476,8 +2488,15 @@ func _stop_recording() -> void:
 		print("[REC] Stopped recording (%.1fs) -> %s" % [duration_sec, saved])
 		_show_event_banner("CLIP SAVED")
 	else:
-		print("[REC] Stopped recording (%.1fs) but NO FILE was written to %s" % [duration_sec, _recording_path])
-		_show_event_banner("REC FAILED: NO FILE")
+		# The titled grab found no window. Say exactly that, and say what to do,
+		# rather than leaving a streamer with a banner and no file.
+		print("[REC] Stopped recording (%.1fs) but NO FILE was written to %s"
+			% [duration_sec, _recording_path])
+		print("      gdigrab captures by window title \"%s\". It cannot capture a"
+			% str(ProjectSettings.get_setting("application/config/name", "Silicon Arena")))
+		print("      headless or minimised window. Run the arena windowed and visible,")
+		print("      then press F10 again.")
+		_show_event_banner("REC FAILED: NO WINDOW")
 
 func _toggle_cinema_mode() -> void:
 	_cinema_mode = not _cinema_mode

@@ -88,6 +88,13 @@ writes its moov atom on a clean exit, and the recorder is stopped by killing the
 process; a hard-killed MP4 leaves nothing usable. MKV finalises as it goes. The
 recorder verifies the file exists and is non-empty before reporting success.
 
+**Recording requires a visible window.** FFmpeg captures with `gdigrab`, which
+finds the window by its title — taken from `application/config/name`, so
+renaming the app cannot silently break it. It cannot capture a headless,
+minimised or hidden window: FFmpeg aborts with `Can't find window` and exits
+immediately. When that happens the arena now says so and tells you to run
+windowed and visible, instead of claiming the clip was saved.
+
 ## Agent recovery
 
 **An agent disabled by HTTP 400 stays out for the session.** `agent.broken` is
