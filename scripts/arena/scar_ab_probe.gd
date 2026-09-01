@@ -143,7 +143,10 @@ func _load_roster() -> bool:
 	var abs := ProjectSettings.globalize_path("res://").path_join(ROSTER_PATH).simplify_path()
 	var f := FileAccess.open(abs, FileAccess.READ)
 	if f == null:
-		printerr("AB FATAL: roster not found")
+		printerr("AB FATAL: roster not found.")
+		printerr("  Expected %s" % ROSTER_PATH)
+		printerr("  Build one with:")
+		printerr("    godot --headless --path . --script tools/build_roster.gd")
 		return false
 	var parsed = JSON.parse_string(f.get_as_text())
 	f.close()

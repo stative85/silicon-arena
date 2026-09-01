@@ -67,16 +67,28 @@ var _done := false
 
 
 func _init() -> void:
+	# Every early exit here used to be a bare quit(N) with no message, so the
+	# tool produced ZERO output and looked like it had done nothing. Silence is
+	# the failure mode this project keeps being bitten by; say what stopped.
 	_parse_args()
 	if not _load_roster():
+		printerr("SCAR LADDER: roster not found.")
+		printerr("  Expected %s" % ROSTER_PATH)
+		printerr("  Build one with:")
+		printerr("    godot --headless --path . --script tools/build_roster.gd")
 		quit(3)
 		return
 	_policy = PolicyScript.new()
 	get_root().add_child(_policy)
 	if not _policy.load_catalog():
+		printerr("SCAR LADDER: model catalog unavailable — refusing to run.")
+		printerr("  Expected config/model-catalog.v1.json or the shipped example.")
 		quit(4)
 		return
-	if _policy.check(str(_runtime["model_key"])) != "":
+	var ladder_reason: String = _policy.check(str(_runtime["model_key"]))
+	if ladder_reason != "":
+		printerr("SCAR LADDER: roster model refused by the size law.")
+		printerr("  %s" % ladder_reason)
 		quit(5)
 		return
 	_client = ClientScript.new()
