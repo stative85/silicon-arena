@@ -133,16 +133,31 @@ def analyse(rec):
                     r"fallac|mistaken|incorrect|no,|nonsense|challenge|object)\b", re.I)
     chal = sum(1 for t in texts if CH.search(t))
 
-    # context retention: does a speech contain a content word introduced by a
-    # DIFFERENT speaker in the previous 3 speeches?
-    ret = 0
-    for i, s in enumerate(sp):
-        prior = set()
-        for j in range(max(0, i - 3), i):
-            if sp[j]["speaker"] != s["speaker"]:
-                prior.update(w for w in content_words(sp[j]["text"]))
-        if prior and len(prior & set(content_words(s["text"]))) >= 2:
-            ret += 1
+    # Uptake: does a speaker use a term the PREVIOUS speaker just introduced
+    # to the debate?
+    #
+    # The first version of this asked whether a speech shared two content words
+    # with any of the previous three turns. That scored 98.3% in all four
+    # conditions -- it measured that the debate was in English, not that anyone
+    # was listening. This asks something a condition can fail: a term must be
+    # NEW to the whole run when the previous speaker used it, and then be
+    # picked up by the next speaker.
+    docs = [set(content_words(t)) for t in texts]
+    seen = set()
+    uptake = 0
+    eligible = 0
+    for i in range(len(sp)):
+        if i == 0:
+            seen |= docs[0]
+            continue
+        introduced = docs[i - 1] - seen
+        if sp[i - 1]["speaker"] != sp[i]["speaker"] and introduced:
+            eligible += 1
+            if docs[i] & introduced:
+                uptake += 1
+        seen |= docs[i - 1]
+    ret = uptake
+    ret_base = eligible
 
     lat = sorted(s["latency_ms"] for s in sp) or [0]
     lens = [len(words(t)) for t in texts] or [0]
@@ -162,7 +177,8 @@ def analyse(rec):
         "ref_other_rate": refs / float(n) if n else 0,
         "challenge_rate": chal / float(n) if n else 0,
         "self_prefix_rate": selfpre / float(n) if n else 0,
-        "context_retention": ret / float(n) if n else 0,
+        "term_uptake": ret / float(ret_base) if ret_base else 0,
+        "uptake_n": ret_base,
         "mean_words": sum(lens) / float(len(lens)),
         "median_latency_ms": lat[len(lat) // 2],
         "p90_latency_ms": lat[int(len(lat) * 0.9)] if len(lat) > 1 else lat[0],
@@ -184,7 +200,8 @@ ROWS = [
     ("novelty", "content novelty", "{:.3f}", "high"),
     ("ref_other_rate", "refers to another agent", "{:.1%}", "high"),
     ("challenge_rate", "challenge / contradiction", "{:.1%}", "high"),
-    ("context_retention", "cross-agent retention", "{:.1%}", "high"),
+    ("term_uptake", "picks up new term", "{:.1%}", "high"),
+    ("uptake_n", "  (opportunities)", "{:d}", None),
     ("self_prefix_rate", "self-prefix leakage", "{:.1%}", "low"),
 ]
 

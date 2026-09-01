@@ -22,10 +22,19 @@ same harness, with VRAM emptied and memory cleared before each condition.
 | near-duplicate rate | 8.5% | 0% | 0% | 13.3% |
 | content novelty | 0.269 | 0.326 | 0.347 | 0.248 |
 | self-prefix leakage | 0% | 0% | 0% | 0% |
-| cross-agent retention | 98.3% | 98.3% | 98.3% | 98.3% |
+| picks up a term the previous speaker introduced | 47.1% | 37.5% | 46.6% | **50.9%** |
 
-Cross-agent retention is saturated at 98.3% in every condition. It does not
-discriminate and should not be read as a result.
+The uptake row replaces an earlier "cross-agent retention" measure that scored
+98.3% in all four conditions. That version asked whether a speech shared two
+content words with any of the previous three turns, which measures that the
+debate is in English, not that anyone is listening. The replacement asks
+something a condition can fail: a term must be new to the whole run when the
+previous speaker used it, and then be picked up by the next.
+
+It is worth reading next to the reference row. `--fast` names another agent
+**0%** of the time yet picks up their new terms 46.6% of the time — it engages
+with the content and never with the person. That distinction was invisible
+before.
 
 ## Blind judges
 
