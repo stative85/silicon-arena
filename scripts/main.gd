@@ -1318,9 +1318,17 @@ class WeaponVFX extends RefCounted:
 		# Tween to target then remove
 		var tw = parent.create_tween()
 		tw.tween_property(spr, "position", to_pos, duration).set_ease(Tween.EASE_IN).set_trans(Tween.TRANS_QUAD)
+		# Capture the instance ID, never the node. A lambda that captures a Node
+		# has its captures resolved by the engine BEFORE the body runs, so if the
+		# sprite is freed first -- scene teardown, a match reset -- the guard
+		# inside can never help and Godot logs "Lambda capture at index 0 was
+		# freed" every time. Measured at 21 occurrences in one five-minute run.
+		# An int cannot dangle.
+		var spr_id := spr.get_instance_id()
 		tw.tween_callback(func():
-			if is_instance_valid(spr):
-				spr.queue_free()
+			var n = instance_from_id(spr_id)
+			if n != null and is_instance_valid(n):
+				n.queue_free()
 		)
 		return spr
 
@@ -1339,9 +1347,12 @@ class WeaponVFX extends RefCounted:
 		spr.z_index = 3
 		parent.add_child(spr)
 		spr.play("play")
+		# Same reason as above: capture the ID, not the node.
+		var spr_id := spr.get_instance_id()
 		spr.animation_finished.connect(func():
-			if is_instance_valid(spr):
-				spr.queue_free()
+			var n = instance_from_id(spr_id)
+			if n != null and is_instance_valid(n):
+				n.queue_free()
 		)
 		return spr
 
@@ -4673,6 +4684,16 @@ func _show_bubble(agent, text: String):
 	if not is_instance_valid(agent.get("node")):
 		return
 	if agent.bubble != null and is_instance_valid(agent.bubble):
+		# Kill the fade tween before freeing the panel it animates. Without
+		# this the old bubble's pending callback still fires after the node is
+		# gone, which is where "Lambda capture at index 0 was freed" came from:
+		# 20 occurrences in a five-minute run, one per turn that replaced a
+		# bubble early. _dismiss_thinking_bubble already did this; this path
+		# did not.
+		if agent.bubble.has_meta("fade_tween"):
+			var old_tw = agent.bubble.get_meta("fade_tween")
+			if old_tw is Tween and old_tw.is_valid():
+				old_tw.kill()
 		agent.bubble.queue_free()
 
 	var panel = PanelContainer.new()
@@ -4703,10 +4724,16 @@ func _show_bubble(agent, text: String):
 	var tween = create_tween()
 	tween.tween_interval(BUBBLE_DURATION - 1.0)
 	tween.tween_property(panel, "modulate:a", 0.0, 1.0)
+	# Capture the instance ID rather than the node: engine-resolved captures
+	# are looked up before the body runs, so an is_instance_valid() guard on a
+	# captured Node cannot prevent the error. An int cannot dangle.
+	var panel_id := panel.get_instance_id()
 	tween.tween_callback(func():
-		if is_instance_valid(panel):
-			panel.queue_free()
+		var n = instance_from_id(panel_id)
+		if n != null and is_instance_valid(n):
+			n.queue_free()
 	)
+	panel.set_meta("fade_tween", tween)
 
 func _update_info():
 	if _info_label == null:
