@@ -114,11 +114,16 @@ func resolve_key(model_id: String) -> String:
 	if _by_key.has(lower):
 		return lower
 
-	# "<publisher>/<Repo-GGUF>/<file>.gguf" -> "repo"
+	# Two shapes occur in the wild:
+	#   "<publisher>/<Repo-GGUF>/<file>.gguf"  -> the repo is second-to-last
+	#   "<publisher>/<Repo-GGUF>"              -> the repo is LAST
+	# Taking second-to-last unconditionally yields the publisher ("microsoft")
+	# for the second shape, which then matches nothing and refuses a legal model.
 	var parts := lower.split("/", false)
 	var base := lower
 	if parts.size() >= 2:
-		base = parts[parts.size() - 2]
+		var last: String = parts[parts.size() - 1]
+		base = parts[parts.size() - 2] if last.ends_with(".gguf") else last
 	if base.ends_with("-gguf"):
 		base = base.substr(0, base.length() - 5)
 
@@ -146,16 +151,16 @@ func params_from_id(model_id: String) -> float:
 
 func check(model_key: String) -> String:
 	if not _loaded:
-		# No catalog. Do NOT refuse everything — that makes a fresh clone look
-		# broken. Fall back to reading the size out of the model id itself and
-		# refuse anything that is oversized or unreadable. Still closed for
-		# unknowns, just no longer closed for everything.
-		var guessed := params_from_id(model_key)
-		if guessed < 0.0:
-			return "no catalog (%s) and \"%s\" has no readable size — refusing" % [_load_error, model_key]
-		if guessed > MAX_PARAM_B:
-			return "no catalog; \"%s\" is %.1fB by name, above the %.0fB ceiling — refusing" % [model_key, guessed, MAX_PARAM_B]
-		return ""
+		# FAIL CLOSED. No catalog means no request, full stop.
+		#
+		# An earlier version fell back to parsing the size out of the model id
+		# here, so that a catalog-less clone would still run. That silently
+		# weakened the invariant: an unloaded policy started PERMITTING ids that
+		# merely looked small, and model_policy_selftest caught it. Fresh-clone
+		# usability is solved by SHIPPING config/model-catalog.example.json, not
+		# by loosening the law. Name-parsing remains a fallback only for a model
+		# missing from an otherwise-loaded catalog.
+		return "model catalog unavailable (%s) — refusing every request rather than risking a load" % _load_error
 
 	var raw := model_key.strip_edges()
 	if raw == "":

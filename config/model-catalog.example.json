@@ -1,6 +1,6 @@
 {
  "schema_version": "1.0",
- "generated_at": "EXAMPLE \u2014 regenerate with `lms ls --json`",
+ "generated_at": "EXAMPLE \u2014 regenerate with `lms ls --json`. Includes common public models so shipped presets validate on a fresh clone.",
  "source": "lms ls --json",
  "policy": {
   "max_param_b": 7,
@@ -1097,6 +1097,72 @@
    "quantization": "Q5_K_M",
    "eligible": false,
    "exclusionReason": "8B exceeds the 7B ceiling"
+  },
+  {
+   "modelKey": "microsoft/phi-3.5-mini-instruct",
+   "displayName": "Phi 3.5 Mini Instruct",
+   "paramsString": "3.8B",
+   "paramsB": 3.8,
+   "activeParamsB": null,
+   "isMoE": false,
+   "quantization": "Q4_K_M",
+   "eligible": true,
+   "exclusionReason": ""
+  },
+  {
+   "modelKey": "microsoft/phi-3-mini-4k-instruct",
+   "displayName": "Phi 3 Mini 4K Instruct",
+   "paramsString": "3.8B",
+   "paramsB": 3.8,
+   "activeParamsB": null,
+   "isMoE": false,
+   "quantization": "Q4_K_M",
+   "eligible": true,
+   "exclusionReason": ""
+  },
+  {
+   "modelKey": "lmstudio-community/granite-4.0-h-tiny",
+   "displayName": "Granite 4.0 H Tiny",
+   "paramsString": "7B",
+   "paramsB": 7,
+   "activeParamsB": 1,
+   "isMoE": true,
+   "quantization": "Q4_K_M",
+   "eligible": true,
+   "exclusionReason": ""
+  },
+  {
+   "modelKey": "h2oai/h2o-danube3-4b-it",
+   "displayName": "H2O Danube3 4B",
+   "paramsString": "4B",
+   "paramsB": 4,
+   "activeParamsB": null,
+   "isMoE": false,
+   "quantization": "Q4_K_M",
+   "eligible": true,
+   "exclusionReason": ""
+  },
+  {
+   "modelKey": "stabilityai/stablelm-zephyr-3b",
+   "displayName": "StableLM Zephyr 3B",
+   "paramsString": "3B",
+   "paramsB": 3,
+   "activeParamsB": null,
+   "isMoE": false,
+   "quantization": "Q4_K_M",
+   "eligible": true,
+   "exclusionReason": ""
+  },
+  {
+   "modelKey": "huggingfacetb/smollm2-1.7b-instruct",
+   "displayName": "SmolLM2 1.7B Instruct",
+   "paramsString": "1.7B",
+   "paramsB": 1.7,
+   "activeParamsB": null,
+   "isMoE": false,
+   "quantization": "Q4_K_M",
+   "eligible": true,
+   "exclusionReason": ""
   }
  ]
 }
