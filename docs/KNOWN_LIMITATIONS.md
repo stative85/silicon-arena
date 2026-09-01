@@ -142,3 +142,33 @@ There is no automatic reconnect or backoff: the arena simply keeps trying each
 agent's turn in order. That is deliberate — LM Studio coming back is usually
 seconds away, and a backoff would delay recovery — but it does mean a long
 outage produces a long run of failed turns rather than a pause.
+
+## Replies that open by naming the agent they answer
+
+Models frequently begin a turn with the previous speaker's name, either bare
+(`Deckard: you are wrong`) or attributed (`Deckard said: ...`). Measured across
+the four evaluation conditions:
+
+| roster | opens `OtherName:` | opens `OtherName said:` |
+|---|---:|---:|
+| default | 6.8% | 32.2% |
+| `--balanced` | 0.0% | 21.7% |
+| `--fast` | 0.0% | 0.0% |
+| AUTO / `--fit` | 8.3% | 25.0% |
+
+The arena already prints the speaker above the reply, so a line beginning
+`Deckard said:` under the heading `Granite 7B` can read at a glance as though
+Deckard is talking. It is a presentation problem, not a correctness one: the
+agent is addressing or citing someone, which is the arena working.
+
+**It is deliberately not rewritten.** `SpeechClean` removes a speaker's own
+label, and removes an attribution only when it is followed by a verbatim
+quotation of at least ten words from an earlier turn — that case carries no
+information and inflates the duplication rate. When the attribution is followed
+by the agent's *own* words it is left alone, because editing it away would
+delete the one piece of text saying who is being answered, and rewriting it
+into some other form would be the tool putting words in an agent's mouth.
+
+`--fast` scores 0% on both columns for the same reason it scores 0% on every
+reference measure: with one model behind five personas, agents do not address
+each other at all.
