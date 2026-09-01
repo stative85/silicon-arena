@@ -29,6 +29,13 @@ const SentimentScript := preload("res://scripts/sentiment.gd")
 const DriverScript := preload("res://scripts/arena/cinematic_live_driver.gd")
 const ScarScript := preload("res://scripts/arena/scar_lattice.gd")
 
+## Searched in order; the first readable file wins. The sibling-repo path is
+## kept last for the original monorepo layout, but a standalone clone must be
+## able to produce a roster with tools it actually has.
+const ROSTER_SEARCH := [
+	"res://config/arena-roster.v1.json",
+	"res://../extinct_os/config/arena-roster.v1.json",
+]
 const ROSTER_PATH := "../extinct_os/config/arena-roster.v1.json"
 const LOG_DIR := "user://live_matches"
 
@@ -189,11 +196,26 @@ func _parse_args() -> void:
 
 
 func _load_roster() -> bool:
-	var abs := ProjectSettings.globalize_path("res://").path_join(ROSTER_PATH).simplify_path()
+	var abs := ""
+	for cand in ROSTER_SEARCH:
+		var probe: String = cand
+		if cand.begins_with("res://../"):
+			probe = ProjectSettings.globalize_path("res://").path_join(cand.substr(6)).simplify_path()
+		if FileAccess.file_exists(probe):
+			abs = probe
+			break
+	if abs == "":
+		abs = ProjectSettings.globalize_path("res://").path_join(ROSTER_PATH).simplify_path()
 	var f := FileAccess.open(abs, FileAccess.READ)
 	if f == null:
-		printerr("LIVE_ARENA FATAL roster not found at %s" % abs)
-		printerr("  build it with:  npx tsx tools/buildModelCatalog.ts")
+		printerr("LIVE_ARENA FATAL roster not found.")
+		printerr("  searched:")
+		for cand in ROSTER_SEARCH:
+			printerr("    %s" % cand)
+		printerr("  build one with:")
+		printerr("    godot --headless --path . --script tools/build_roster.gd")
+		printerr("  (that writes user://presets.json from your installed models;")
+		printerr("   copy it to config/arena-roster.v1.json for the live path)")
 		return false
 	var parsed = JSON.parse_string(f.get_as_text())
 	f.close()

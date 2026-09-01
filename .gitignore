@@ -57,3 +57,6 @@ Desktop.ini
 # Generated proof artifacts — regenerate with tools/prove.gd
 docs/proof/latest/
 docs/proof/baseline/
+
+# Godot .import sidecars with no source file (staging dirs)
+assets/_incoming/
