@@ -229,16 +229,17 @@ Silicon Arena was built to look good on camera.
 
 ## System Requirements
 
-> **Clone tip:** the repository carries ~3,800 sprite PNGs. Measured on a real
-> clone: ~780 MB with full history, ~580 MB with `git clone --depth 1`. Both
-> work; the shallow clone passes the full verify suite.
+> **Size:** ~3,800 sprite PNGs make this a 587 MB clone (319 MB working tree,
+> 268 MB git). `--depth 1` saves only 4 MB — the weight is the current tree,
+> not history — so there is no shallow-clone trick worth bothering with.
+> Importing in Godot adds a further ~190 MB of `.godot/` cache.
 
 
 | Component | Minimum | Recommended |
 |-----------|---------|-------------|
 | GPU | GTX 1060 / 6GB VRAM | RTX 3060+ / 8GB+ VRAM |
 | RAM | 16 GB | 32 GB |
-| Storage | ~780 MB clone (~580 MB shallow), plus model sizes | Same |
+| Storage | 587 MB clone + ~190 MB import cache, plus model sizes | Same |
 | OS | Windows 10/11 | Windows 11 |
 | Software | Godot 4.6, LM Studio | Same |
 
