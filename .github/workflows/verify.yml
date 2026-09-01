@@ -97,6 +97,12 @@ jobs:
         # almost correctly and the command did not exist.
         run: python3 tools/lint_docs.py
 
+      - name: Private path lint
+        # Five scripts hardcoded ../extinct_os/ — a PRIVATE sibling checkout —
+        # as their only roster path, so they were dead on arrival in a public
+        # clone. The author cannot see this: the file is on their disk.
+        run: python3 tools/lint_private_paths.py
+
       - name: Silent-exit lint
         # Every silent failure in this project's history looked like success.
         # A non-zero exit must say why.

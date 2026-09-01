@@ -29,14 +29,11 @@ const SentimentScript := preload("res://scripts/sentiment.gd")
 const DriverScript := preload("res://scripts/arena/cinematic_live_driver.gd")
 const ScarScript := preload("res://scripts/arena/scar_lattice.gd")
 
-## Searched in order; the first readable file wins. The sibling-repo path is
-## kept last for the original monorepo layout, but a standalone clone must be
-## able to produce a roster with tools it actually has.
-const ROSTER_SEARCH := [
-	"res://config/arena-roster.v1.json",
-	"res://../extinct_os/config/arena-roster.v1.json",
-]
-const ROSTER_PATH := "../extinct_os/config/arena-roster.v1.json"
+## The search order lives in RosterPath, shared with every other consumer.
+## It used to be duplicated here, and the five scripts that did NOT copy it
+## were all broken in a public clone while this one worked -- which is exactly
+## why nobody noticed.
+const RosterPathScript := preload("res://scripts/arena/roster_path.gd")
 const LOG_DIR := "user://live_matches"
 
 const TOPIC := "Whether a system that cannot refuse its operator can be said to have values at all."
@@ -210,26 +207,10 @@ func _parse_args() -> void:
 
 
 func _load_roster() -> bool:
-	var abs := ""
-	for cand in ROSTER_SEARCH:
-		var probe: String = cand
-		if cand.begins_with("res://../"):
-			probe = ProjectSettings.globalize_path("res://").path_join(cand.substr(6)).simplify_path()
-		if FileAccess.file_exists(probe):
-			abs = probe
-			break
-	if abs == "":
-		abs = ProjectSettings.globalize_path("res://").path_join(ROSTER_PATH).simplify_path()
-	var f := FileAccess.open(abs, FileAccess.READ)
+	var abs := RosterPathScript.resolve()
+	var f := FileAccess.open(abs, FileAccess.READ) if abs != "" else null
 	if f == null:
-		printerr("LIVE_ARENA FATAL roster not found.")
-		printerr("  searched:")
-		for cand in ROSTER_SEARCH:
-			printerr("    %s" % cand)
-		printerr("  build one with:")
-		printerr("    godot --headless --path . --script tools/build_roster.gd")
-		printerr("  (that writes config/arena-roster.v1.json directly. Add")
-		printerr("   -- --balanced for fewer cold model loads per round.)")
+		printerr("LIVE_ARENA FATAL " + RosterPathScript.missing_hint())
 		return false
 	var parsed = JSON.parse_string(f.get_as_text())
 	f.close()

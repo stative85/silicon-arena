@@ -21,7 +21,9 @@ extends Node2D
 const ClientScript := preload("res://scripts/api/lm_studio_client.gd")
 const PolicyScript := preload("res://scripts/arena/model_policy.gd")
 
-const ROSTER_PATH := "../extinct_os/config/arena-roster.v1.json"
+## Resolved through the shared search order, not a hardcoded path: the private
+## ../extinct_os/ checkout does not exist in a public clone.
+const RosterPathScript := preload("res://scripts/arena/roster_path.gd")
 
 const W := 1920.0
 const H := 1080.0
@@ -494,7 +496,8 @@ func _start_model() -> void:
 	if _no_model:
 		_set_status("scripted dialogue (--no-model)")
 		return
-	var f := FileAccess.open(ROSTER_PATH, FileAccess.READ)
+	var abs := RosterPathScript.resolve()
+	var f := FileAccess.open(abs, FileAccess.READ) if abs != "" else null
 	if f == null:
 		_set_status("no roster - scripted dialogue")
 		return

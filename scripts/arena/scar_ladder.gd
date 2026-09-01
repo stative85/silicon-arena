@@ -31,7 +31,9 @@ const PolicyScript := preload("res://scripts/arena/model_policy.gd")
 const ScarScript := preload("res://scripts/arena/scar_lattice.gd")
 const DriverScript := preload("res://scripts/arena/cinematic_live_driver.gd")
 
-const ROSTER_PATH := "../extinct_os/config/arena-roster.v1.json"
+## Resolved through the shared search order, not a hardcoded path: the private
+## ../extinct_os/ checkout does not exist in a public clone.
+const RosterPathScript := preload("res://scripts/arena/roster_path.gd")
 const MODE := "silicon_arena"
 const DECIDER_ID := "agent-04"    # GROKISH
 const BETRAYER_ID := "agent-02"   # GEMMATRON
@@ -72,10 +74,7 @@ func _init() -> void:
 	# the failure mode this project keeps being bitten by; say what stopped.
 	_parse_args()
 	if not _load_roster():
-		printerr("SCAR LADDER: roster not found.")
-		printerr("  Expected %s" % ROSTER_PATH)
-		printerr("  Build one with:")
-		printerr("    godot --headless --path . --script tools/build_roster.gd")
+		printerr("SCAR LADDER: " + RosterPathScript.missing_hint())
 		quit(3)
 		return
 	_policy = PolicyScript.new()
@@ -134,7 +133,9 @@ func _parse_args() -> void:
 
 
 func _load_roster() -> bool:
-	var abs := ProjectSettings.globalize_path("res://").path_join(ROSTER_PATH).simplify_path()
+	var abs := RosterPathScript.resolve()
+	if abs == "":
+		return false
 	var f := FileAccess.open(abs, FileAccess.READ)
 	if f == null:
 		return false

@@ -15,7 +15,9 @@ extends Node2D
 const ClientScript := preload("res://scripts/api/lm_studio_client.gd")
 const PolicyScript := preload("res://scripts/arena/model_policy.gd")
 
-const ROSTER_PATH := "../extinct_os/config/arena-roster.v1.json"
+## Resolved through the shared search order, not a hardcoded path: the private
+## ../extinct_os/ checkout does not exist in a public clone.
+const RosterPathScript := preload("res://scripts/arena/roster_path.gd")
 const TOPIC := "One of you is lying about what happened in this room. Find out who."
 
 const W := 1920.0
@@ -174,7 +176,8 @@ func _start_live() -> void:
 	if _capture_path != "" or _seq_dir != "":
 		return   # captures stay deterministic
 
-	var f := FileAccess.open(ROSTER_PATH, FileAccess.READ)
+	var abs := RosterPathScript.resolve()
+	var f := FileAccess.open(abs, FileAccess.READ) if abs != "" else null
 	if f == null:
 		_set_status("roster not found - running scripted lines")
 		return

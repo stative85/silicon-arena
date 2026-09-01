@@ -1,5 +1,9 @@
 extends SceneTree
 
+## Resolved through the shared search order, not a hardcoded path: the private
+## ../extinct_os/ checkout does not exist in a public clone.
+const RosterPathScript := preload("res://scripts/arena/roster_path.gd")
+
 ## Rung 10 — the live proof, across a real process boundary.
 ##
 ##   --phase before   neutral state, alliance proposed, outcome recorded
@@ -315,7 +319,8 @@ func _emit_dialogue() -> void:
 
 ## The roster's model, checked against the ceiling before any request goes out.
 func _pick_model() -> String:
-	var f := FileAccess.open("../extinct_os/config/arena-roster.v1.json", FileAccess.READ)
+	var abs := RosterPathScript.resolve()
+	var f := FileAccess.open(abs, FileAccess.READ) if abs != "" else null
 	if f == null:
 		return ""
 	var parsed = JSON.parse_string(f.get_as_text())

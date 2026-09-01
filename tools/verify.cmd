@@ -74,6 +74,7 @@ call :check "tools/offline_selftest.gd"                   "offline behaviour"   
 REM ---- documentation and workflow linting ---------------------------------
 call :pycheck "tools/lint_docs.py"       "documentation lint"
 call :pycheck "tools/lint_workflows.py"  "workflow lint"
+call :pycheck "tools/lint_private_paths.py" "private path lint"
 call :pycheck "tools/lint_exits.py"       "silent failure exits"
 
 REM ---- JSON + preset legality ---------------------------------------------

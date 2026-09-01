@@ -104,6 +104,7 @@ const ALLOWED_DIVERGENCE := {
 	"coherence_engine": "visual app only",
 	"arena_builder_panel": "visual app UI only",
 	"splat_engine": "visual app rendering only",
+	"roster_path": "config/arena-roster.v1.json is the HEADLESS roster; the visual app loads user://presets.json instead, so it has no use for the resolver",
 }
 
 var _checks := 0

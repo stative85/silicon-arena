@@ -10,6 +10,23 @@
   (`A-Za-z0-9_-`), capped at 64 characters, with a source-level assertion that
   `_start_recording` actually calls the sanitiser.
 
+### Added
+
+- **`--balanced` roster mode.** The default roster (five models, five cold
+  loads per round) and `--fast` (one model, one load) were the two ends of one
+  dial with nothing between them. `--balanced` puts five agents on N models and
+  orders the roster so agents sharing a model are adjacent, which costs one
+  load per *model* rather than one per *agent*. Measured on an RTX 5060 8GB,
+  same build and same 260s window, zero failures in all three: **8 speeches
+  diverse, 33 balanced, 64 fast**. Balanced is 4.1x the default roster and
+  still has two architectures arguing.
+- **`scripts/arena/turn_order.gd`** holds the cost model — a round costs one
+  cold load per adjacent model *change*, counted circularly — with 19 checks
+  pinning the arithmetic and optimality.
+- **`tools/lint_private_paths.py`**, which fails the build if a script depends
+  on the private `../extinct_os/` checkout with no public path.
+- **`--no-wait`** for `live_match.gd`.
+
 ### Fixed
 
 - **HTTP 400 was reported as "model not available"**, sending users to download
@@ -20,6 +37,22 @@
   before the list is built.
 - **`live_match.gd` told users to run `npx tsx tools/buildModelCatalog.ts`**,
   which does not exist in this repository.
+- **Five scripts were dead on arrival in a public clone.** `alliance_proof`,
+  `scar_ab_probe`, `scar_ladder`, `scar_table` and `match_scene` hardcoded
+  `../extinct_os/config/arena-roster.v1.json` — a *private* sibling checkout —
+  as their only roster path. `live_match.gd` had its own two-entry search list
+  and worked, which is precisely why the breakage stayed invisible: the one
+  path anyone ran was fine. All six now share `RosterPath`, and a lint keeps
+  the class from returning.
+- **Nothing in the repository could produce `config/arena-roster.v1.json`.**
+  The advice was to copy `user://presets.json` there, which cannot work — the
+  two files have different schemas. `build_roster.gd` now writes both from one
+  selection, so they cannot drift apart either.
+- **Headless live runs hung forever waiting for a browser overlay.**
+  `_wait_for_client_sec` defaulted to `0.0` and the start-barrier fallback was
+  guarded by `> 0.0`, so the default meant "wait forever": 275 seconds produced
+  0 speeches and 0 errors, indistinguishable from a hang. The default is now a
+  bounded 45s.
 - **The LM Studio URL was hardcoded in five places**, so `SILICON_ARENA_LM_URL`
   was honoured by some paths and ignored by others.
 - **README, CLAUDE.md and CONTRIBUTING.md shipped `toolserify.cmd`** — a

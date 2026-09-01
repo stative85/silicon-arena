@@ -31,7 +31,9 @@ const PolicyScript := preload("res://scripts/arena/model_policy.gd")
 const ScarScript := preload("res://scripts/arena/scar_lattice.gd")
 const DriverScript := preload("res://scripts/arena/cinematic_live_driver.gd")
 
-const ROSTER_PATH := "../extinct_os/config/arena-roster.v1.json"
+## Resolved through the shared search order, not a hardcoded path: the private
+## ../extinct_os/ checkout does not exist in a public clone.
+const RosterPathScript := preload("res://scripts/arena/roster_path.gd")
 const MODE := "silicon_arena"
 
 ## The witness who makes the decision. GROKISH: "cross-examine every claim" —
@@ -140,13 +142,10 @@ func _parse_args() -> void:
 
 
 func _load_roster() -> bool:
-	var abs := ProjectSettings.globalize_path("res://").path_join(ROSTER_PATH).simplify_path()
-	var f := FileAccess.open(abs, FileAccess.READ)
+	var abs := RosterPathScript.resolve()
+	var f := FileAccess.open(abs, FileAccess.READ) if abs != "" else null
 	if f == null:
-		printerr("AB FATAL: roster not found.")
-		printerr("  Expected %s" % ROSTER_PATH)
-		printerr("  Build one with:")
-		printerr("    godot --headless --path . --script tools/build_roster.gd")
+		printerr("AB FATAL: " + RosterPathScript.missing_hint())
 		return false
 	var parsed = JSON.parse_string(f.get_as_text())
 	f.close()
