@@ -12,6 +12,16 @@
 
 ### Added
 
+- **`--fit` roster mode — the headline result.** Models that fit in VRAM
+  together are never evicted, so a heterogeneous roster stops swapping
+  entirely. Measured on an RTX 5060 8GB, same build, same 260s window, zero
+  failures: **8 speeches (5 models, thrashing), 33 (`--balanced`), 64
+  (`--fast`, one model), 90 (`--fit`, three models co-resident)**. `--fit`
+  beats the single-model roster *while running three architectures*. The
+  variety-versus-throughput trade is not a law; it is what happens when a
+  roster overcommits VRAM.
+- **`scripts/arena/vram.gd`** sizes models from catalog parameters and
+  quantisation, with a 16-check selftest pinned to measured behaviour.
 - **`--balanced` roster mode.** The default roster (five models, five cold
   loads per round) and `--fast` (one model, one load) were the two ends of one
   dial with nothing between them. `--balanced` puts five agents on N models and
@@ -28,6 +38,15 @@
 - **`--no-wait`** for `live_match.gd`.
 
 ### Fixed
+
+- **The candidate probe passed models that cannot speak in the arena.** It
+  asked "Say the word: ready" with `max_tokens` 16, which a reasoning-only
+  model answers directly. Given the arena's real shape — system role, debate
+  prompt, `max_tokens` 110 — the same model returns empty content and 559
+  characters of `reasoning_content`. `agentica-org_deepscaler-1.5b-preview`
+  passed the probe and then failed 35 turns of a live match with HTTP 200 and
+  nothing in it. The probe now sends an arena-shaped request, and a rejection
+  backfills instead of shrinking the roster.
 
 - **HTTP 400 was reported as "model not available"**, sending users to download
   a model that was already installed. The client now summarises the real cause
