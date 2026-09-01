@@ -29,6 +29,7 @@ func _run() -> void:
 	_preset_damage()
 	_compat_abuse()
 	_filename_abuse()
+	_endpoint_forms()
 	_report()
 
 
@@ -261,6 +262,37 @@ func _filename_abuse() -> void:
 
 ## Tests must not leave litter in the user directory. adv_bad_catalog.json and
 ## adv_forged.json were accumulating in user:// on every run.
+## The LM Studio URL used to be hardcoded in four files. Now one resolver, so
+## its normalisation has to accept what people actually type.
+func _endpoint_forms() -> void:
+	print("")
+	print("[endpoint] one resolver, forgiving input")
+	var cases: Array = [
+		["127.0.0.1:1234", "bare host:port"],
+		["http://127.0.0.1:1234", "no /v1"],
+		["http://127.0.0.1:1234/", "trailing slash"],
+		["http://127.0.0.1:1234/v1", "already complete"],
+		["http://127.0.0.1:1234/v1/", "complete with slash"],
+		["192.168.1.50:1234", "LAN host"],
+		["", "empty falls back to default"],
+	]
+	for pair in cases:
+		_checks += 1
+		var got: String = LMEndpoint.normalize(pair[0])
+		var ok := got.begins_with("http") and got.ends_with("/v1") and got.find("//v1") == -1
+		if ok:
+			print("   ok   %s -> %s" % [pair[1], got])
+		else:
+			_failures.append("endpoint: %s -> %s" % [pair[0], got])
+			print("   FAIL %s -> %s" % [pair[1], got])
+	_checks += 1
+	if LMEndpoint.normalize("") == LMEndpoint.DEFAULT_URL:
+		print("   ok   empty input yields the documented default")
+	else:
+		_failures.append("endpoint: empty did not yield default")
+		print("   FAIL empty did not yield the default")
+
+
 func _cleanup() -> void:
 	for f in ["user://adv_bad_catalog.json", "user://adv_forged.json", "user://adv_catalog.json"]:
 		if FileAccess.file_exists(f):

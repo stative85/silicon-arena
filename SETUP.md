@@ -130,6 +130,15 @@ Run `start_arena.cmd` in the Silicon Arena folder. It auto-detects Godot on your
 - Make sure LM Studio is running
 - Make sure the local server is started (check the Server tab)
 - Confirm the server URL is `http://127.0.0.1:1234` (default)
+- **Running LM Studio somewhere else?** Set `SILICON_ARENA_LM_URL` and every
+  tool follows it:
+
+```
+set SILICON_ARENA_LM_URL=192.168.1.50:1234
+tools\doctor.cmd
+```
+
+  A bare `host:port`, a full URL, and a URL with or without `/v1` all work.
 
 ### Agents show as "broken" (red indicator, skipped)
 - The console now names the actual reason. Read it before changing anything:

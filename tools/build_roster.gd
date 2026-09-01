@@ -17,7 +17,8 @@ extends SceneTree
 
 const PolicyScript := preload("res://scripts/arena/model_policy.gd")
 
-const LM_BASE := "http://127.0.0.1:1234/v1"
+## Single source of truth, overridable via SILICON_ARENA_LM_URL.
+var LM_BASE := LMEndpoint.base_url()
 const WANTED := 5
 
 ## FAST mode: every agent shares ONE model, so no turn ever swaps.

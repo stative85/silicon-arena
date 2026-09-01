@@ -1,7 +1,9 @@
 extends Node
 class_name LMStudioClient
 
-var base_url: String = "http://127.0.0.1:1234/v1"
+## Overridable at runtime; the default comes from the single shared resolver
+## so the endpoint is not written down in four different files.
+var base_url: String = LMEndpoint.base_url()
 var request_timeout_sec: float = 20.0
 const REQUEST_DEADLINE_BUFFER_SEC := 8.0
 const LM_TIMEOUT_HTTP_CODE := 408

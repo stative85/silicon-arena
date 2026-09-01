@@ -26,7 +26,8 @@ extends SceneTree
 const PolicyScript := preload("res://scripts/arena/model_policy.gd")
 const ClientScript := preload("res://scripts/api/lm_studio_client.gd")
 
-const LM_BASE := "http://127.0.0.1:1234/v1"
+## Single source of truth, overridable via SILICON_ARENA_LM_URL.
+var LM_BASE := LMEndpoint.base_url()
 const OUT_DIR := "res://docs/proof/latest"
 
 var _policy
