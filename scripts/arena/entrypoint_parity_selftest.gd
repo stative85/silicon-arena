@@ -52,6 +52,25 @@ const REQUIRED_ON_BOTH := [
 	},
 ]
 
+## Invariants that must hold inside a single entry point. Unlike the parity
+## checks above, these guard against a value being reintroduced from elsewhere:
+## a persisted config, a UI control, a copy-paste.
+const INVARIANTS := [
+	{
+		"file": "res://scripts/main.gd",
+		"pattern": "MIN_STALL_TIMEOUT_SEC[ \t]*:=[ \t]*COLD_LOAD_TIMEOUT_SEC",
+		"label": "stall floor is DERIVED from the cold-load allowance",
+		"why": "a saved arena_builder_config.json reintroduced a 40s watchdog and killed turns that were only loading",
+	},
+	{
+		"file": "res://scripts/main.gd",
+		"pattern": "MIN_STALL_TIMEOUT_SEC[)]",
+		"label": "persisted stall_timeout_sec is clamped on load",
+		"why": "without the clamp a stale config silently overrides the constant",
+	},
+]
+
+
 ## Differences that ARE intentional. Each needs a reason, in writing.
 ## An entry here is a decision; a missing entry is a bug.
 const ALLOWED_DIVERGENCE := {
@@ -78,6 +97,7 @@ func _init() -> void:
 		return
 
 	_check_required(main_src, live_src)
+	_check_invariants()
 	_check_drift(main_src, live_src)
 	_report()
 
@@ -101,6 +121,16 @@ func _check_required(main_src: String, live_src: String) -> void:
 		else:
 			var missing := "main.gd" if not in_main else "live_match.gd"
 			_fail("%s — not configured in %s. %s" % [item["label"], missing, item["why"]])
+
+
+func _check_invariants() -> void:
+	for item in INVARIANTS:
+		var src := _read(item["file"])
+		_checks += 1
+		if src != "" and _matches(src, item["pattern"]):
+			print("  OK        %s" % item["label"])
+		else:
+			_fail("%s — missing in %s. %s" % [item["label"], item["file"], item["why"]])
 
 
 ## Anything live_match.gd preloads that main.gd never mentions is drift unless
