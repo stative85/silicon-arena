@@ -170,6 +170,17 @@ selecting anything, ranks by chat-capability and size, spreads across model
 families, and writes an "Installed Models" roster to slot 0. It never touches
 the shipped presets.
 
+**If turns feel slow**, that is model swapping, not a hang: every turn changes
+model and pays an 18-38s cold load. For throughput instead of variety:
+
+```
+godot --headless --path . --script tools/build_roster.gd -- --fast
+```
+
+Measured over the same 280s window on an RTX 5060 8GB: **49 speeches instead of
+7**, 100% completion instead of 70%. You give up heterogeneity, which is the
+point of the project — so use it for long streams and testing, not for the demo.
+
 Check the result any time with:
 
 ```
