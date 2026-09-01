@@ -130,3 +130,15 @@ sanitisation as ordinary text because they contain only allowed characters.
 Since every clip name is suffixed with a Unix timestamp before the extension,
 the final filename is never a bare device name — `CON` becomes
 `CON_1788245123.mkv`, which Windows accepts.
+
+## LM Studio disappearing mid-match
+
+Tested by killing the LM Studio server 55 seconds into a running match. The
+arena does not crash. Requests fail with `result=2` (cannot connect), each
+failure is reported with a reason, turns keep advancing, and the match
+continues with no agent speaking until the server returns.
+
+There is no automatic reconnect or backoff: the arena simply keeps trying each
+agent's turn in order. That is deliberate — LM Studio coming back is usually
+seconds away, and a backoff would delay recovery — but it does mean a long
+outage produces a long run of failed turns rather than a pause.

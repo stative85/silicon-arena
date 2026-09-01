@@ -163,9 +163,24 @@ func _safe_call_models(callback: Callable, success: bool, models: Array) -> void
 	else:
 		print("[LMClient] WARNING: models callback was invalid — response lost")
 
+## Detach a deadline timer's callbacks before freeing anything it captured.
+##
+## The timeout lambda captures the HTTPRequest. Godot resolves lambda captures
+## BEFORE running the body, so the `completed[0]` guard inside never gets a
+## chance: if the timer fires after the request was freed, the engine reports
+##   Lambda capture at index 0 was freed. Passed "null" instead.
+## Disconnecting first makes that unreachable rather than merely guarded.
+func _detach_timer(t: Timer) -> void:
+	if not is_instance_valid(t):
+		return
+	t.stop()
+	for c in t.timeout.get_connections():
+		t.timeout.disconnect(c["callable"])
+
+
 func _finish_models(http: HTTPRequest, deadline_timer: Timer, callback: Callable, success: bool, models: Array) -> void:
+	_detach_timer(deadline_timer)
 	if is_instance_valid(deadline_timer):
-		deadline_timer.stop()
 		deadline_timer.queue_free()
 	if is_instance_valid(http):
 		http.queue_free()
@@ -173,8 +188,8 @@ func _finish_models(http: HTTPRequest, deadline_timer: Timer, callback: Callable
 	_safe_call_models(callback, success, models)
 
 func _finish_chat(http: HTTPRequest, deadline_timer: Timer, callback: Callable, success: bool, text: String, http_code: int = 0) -> void:
+	_detach_timer(deadline_timer)
 	if is_instance_valid(deadline_timer):
-		deadline_timer.stop()
 		deadline_timer.queue_free()
 	if is_instance_valid(http):
 		http.queue_free()
@@ -391,8 +406,12 @@ func _do_chat(agent_name: String, body: Dictionary, callback: Callable, timeout_
 				var retry_body: Dictionary = body.duplicate(true)
 				retry_body["messages"] = fold_system_into_user(retry_body["messages"])
 				retry_body["_compat_retry"] = true
+				# Start the retry on the NEXT frame. _finish_chat queue_frees the
+				# HTTPRequest whose completion lambda we are still inside, and
+				# issuing the follow-up request synchronously from here produced
+				# "Lambda capture at index 0 was freed. Passed null instead."
 				_finish_chat(http, deadline_timer, Callable(), false, "", response_code)
-				_do_chat(agent_name, retry_body, callback, effective_timeout_sec)
+				_do_chat.call_deferred(agent_name, retry_body, callback, effective_timeout_sec)
 				return
 			print("[LMClient] %s failed: result=%d code=%d body=%s" % [agent_name, result, response_code, error_body])
 			# On failure `text` is unused, so carry a short human reason up to
