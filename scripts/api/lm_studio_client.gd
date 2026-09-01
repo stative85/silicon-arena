@@ -89,6 +89,11 @@ func chat_completion(
 	var stop_seqs = options.get("stop", [])
 	if not stop_seqs.is_empty():
 		body["stop"] = stop_seqs
+	# Already proven to reject a system role this session: fold up front rather
+	# than paying a guaranteed 400 first.
+	if _no_system_role.has(model_id):
+		body["messages"] = fold_system_into_user(body["messages"])
+
 	_enqueue({
 		"type": "chat",
 		"agent_name": agent_name,
@@ -218,6 +223,85 @@ func _do_fetch_models(callback: Callable) -> void:
 		print("[LMClient] fetch_models request error: %d" % err)
 		_finish_models(http, deadline_timer, callback, false, [])
 
+
+## ── system-role compatibility ────────────────────────────────────────────
+##
+## Some GGUF chat templates only accept user/assistant and reject a system
+## message outright:
+##
+##   HTTP 400  "Error rendering prompt with jinja template:
+##              \"Only user and assistant roles are supported!\""
+##
+## Mistral-7B-Instruct-v0.3 does this. Without handling it the model is simply
+## unusable in a roster, which needlessly shrinks the eligible pool.
+
+const SYSTEM_ROLE_MARKERS := [
+	"only user and assistant roles are supported",
+	"conversation roles must alternate",
+	"system role not supported",
+]
+
+## Models proven to reject a system role. Populated at runtime so the retry is
+## paid ONCE per model per session, not on every turn.
+var _no_system_role := {}
+
+
+## True only for the specific template failure above. Deliberately narrow: a
+## blanket "retry any 400" would mask real request bugs.
+static func is_system_role_rejection(http_code: int, body: String) -> bool:
+	if http_code != 400:
+		return false
+	var low := body.to_lower()
+	for marker in SYSTEM_ROLE_MARKERS:
+		if low.find(marker) != -1:
+			return true
+	return false
+
+
+## Fold every system message into the front of the first user message.
+## Returns a NEW message array; the original is untouched. If there is no
+## system message the input is returned unchanged.
+static func fold_system_into_user(messages: Array) -> Array:
+	var system_parts: Array[String] = []
+	var rest: Array = []
+	for m in messages:
+		if typeof(m) == TYPE_DICTIONARY and str(m.get("role", "")) == "system":
+			var c := str(m.get("content", "")).strip_edges()
+			if c != "":
+				system_parts.append(c)
+		else:
+			rest.append(m)
+	if system_parts.is_empty():
+		return messages
+
+	var preamble := "
+
+".join(system_parts)
+	var out: Array = []
+	var folded := false
+	for m in rest:
+		if not folded and typeof(m) == TYPE_DICTIONARY and str(m.get("role", "")) == "user":
+			var copy := (m as Dictionary).duplicate(true)
+			copy["content"] = preamble + "
+
+" + str(copy.get("content", ""))
+			out.append(copy)
+			folded = true
+		else:
+			out.append(m)
+	# No user message to fold into: synthesise one so the instruction survives.
+	if not folded:
+		out.push_front({"role": "user", "content": preamble})
+	return out
+
+
+## Internal bookkeeping keys must never reach LM Studio.
+static func _wire_body(body: Dictionary) -> Dictionary:
+	var out: Dictionary = body.duplicate(true)
+	out.erase("_compat_retry")
+	return out
+
+
 func _do_chat(agent_name: String, body: Dictionary, callback: Callable, timeout_sec: float = -1.0) -> void:
 	var effective_timeout_sec := maxf(timeout_sec, 1.0) if timeout_sec > 0.0 else request_timeout_sec
 	var http = HTTPRequest.new()
@@ -276,6 +360,17 @@ func _do_chat(agent_name: String, body: Dictionary, callback: Callable, timeout_
 				print("[LMClient] %s got 200 but bad body: %s" % [agent_name, raw.substr(0, 300)])
 		else:
 			var error_body = response_body.get_string_from_utf8().substr(0, 500)
+			if is_system_role_rejection(response_code, error_body) and not body.get("_compat_retry", false):
+				# ONE retry, and only for this exact template failure.
+				var model_id_r := str(body.get("model", ""))
+				_no_system_role[model_id_r] = true
+				print("[compat] %s rejects system role — retrying user-only envelope" % agent_name)
+				var retry_body: Dictionary = body.duplicate(true)
+				retry_body["messages"] = fold_system_into_user(retry_body["messages"])
+				retry_body["_compat_retry"] = true
+				_finish_chat(http, deadline_timer, Callable(), false, "", response_code)
+				_do_chat(agent_name, retry_body, callback, effective_timeout_sec)
+				return
 			print("[LMClient] %s failed: result=%d code=%d body=%s" % [agent_name, result, response_code, error_body])
 		_finish_chat(http, deadline_timer, callback, success, text, response_code)
 	)
@@ -284,7 +379,7 @@ func _do_chat(agent_name: String, body: Dictionary, callback: Callable, timeout_
 		base_url + "/chat/completions",
 		headers_array,
 		HTTPClient.METHOD_POST,
-		JSON.stringify(body)
+		JSON.stringify(_wire_body(body))
 	)
 	if err != OK:
 		if completed[0]:

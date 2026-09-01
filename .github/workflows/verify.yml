@@ -76,6 +76,9 @@ jobs:
       - name: Self-test — scar lattice
         run: ~/godot/godot --headless --path . --script scripts/arena/scar_lattice_selftest.gd 2>&1 | tee out.log; grep -qE "0 failure" out.log
 
+      - name: Self-test — system-role compatibility
+        run: ~/godot/godot --headless --path . --script scripts/arena/compat_selftest.gd 2>&1 | tee out.log; grep -qE "0 failure" out.log
+
       - name: Configs, presets and required files
         run: ~/godot/godot --headless --path . --script tools/verify_configs.gd 2>&1 | tee cfg.log; grep -q "CONFIGS OK" cfg.log
 
