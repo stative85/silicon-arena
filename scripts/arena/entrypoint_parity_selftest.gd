@@ -63,6 +63,18 @@ const INVARIANTS := [
 		"why": "a saved arena_builder_config.json reintroduced a 40s watchdog and killed turns that were only loading",
 	},
 	{
+		"file": "res://scripts/api/lm_studio_client.gd",
+		"pattern": "_detach_timer[(]deadline_timer[)]",
+		"label": "deadline timers are detached before anything they captured is freed",
+		"why": "a timeout lambda captures the HTTPRequest and Godot resolves captures before the body, so a completed[0] guard cannot prevent 'Lambda capture was freed'",
+	},
+	{
+		"file": "res://scripts/api/lm_studio_client.gd",
+		"pattern": "_do_chat[.]call_deferred",
+		"label": "the compat retry is deferred, not issued from the freed callback",
+		"why": "starting the retry synchronously inside the completion lambda of a queue_freed HTTPRequest is a use-after-free",
+	},
+	{
 		"file": "res://scripts/main.gd",
 		"pattern": "MIN_STALL_TIMEOUT_SEC[)]",
 		"label": "persisted stall_timeout_sec is clamped on load",
