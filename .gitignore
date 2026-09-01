@@ -60,3 +60,11 @@ docs/proof/baseline/
 
 # Godot .import sidecars with no source file (staging dirs)
 assets/_incoming/
+
+# Vendor asset-bundle extras that a Godot project never uses
+*.unitypackage
+*.scml
+*.url
+**/Unity Package/
+**/*Preview*.gif
+assets/COUPON.pdf
