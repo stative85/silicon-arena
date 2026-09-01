@@ -57,13 +57,17 @@ if errorlevel 1 (
 )
 
 REM ---- deterministic self-tests -------------------------------------------
-call :run_selftest entrypoint_parity_selftest "entrypoint parity"
-call :run_selftest model_policy_selftest      "model policy"
-call :run_selftest coherence_selftest         "coherence"
-call :run_selftest cinematic_selftest         "cinematic bridge"
-call :run_selftest scar_lattice_selftest      "scar lattice"
-call :run_selftest compat_selftest            "system-role compat"
-call :run_selftest_tools adversarial          "adversarial pass"
+REM Each check demands POSITIVE evidence: a success token the test only prints
+REM when it actually ran. Passing on the mere ABSENCE of the word "failure"
+REM would let a test that printed nothing at all report green.
+REM   arg1 = script path, arg2 = label, arg3 = required success token
+call :check "scripts/arena/entrypoint_parity_selftest.gd" "entrypoint parity"   "PARITY OK"
+call :check "scripts/arena/model_policy_selftest.gd"      "model policy"        "0 failure"
+call :check "scripts/arena/coherence_selftest.gd"         "coherence"           "RESULT: SEPARATED"
+call :check "scripts/arena/cinematic_selftest.gd"         "cinematic bridge"    "0 failure"
+call :check "scripts/arena/scar_lattice_selftest.gd"      "scar lattice"        "0 failure"
+call :check "scripts/arena/compat_selftest.gd"            "system-role compat"  "0 failure"
+call :check "tools/adversarial.gd"                        "adversarial pass"    "ADVERSARIAL OK"
 
 REM ---- JSON + preset legality ---------------------------------------------
 "%GODOT%" --headless --path . --script tools/verify_configs.gd >"%TEMP%\sa_cfg.txt" 2>&1
@@ -85,32 +89,23 @@ if "%FAILED%"=="0" (
   exit /b 1
 )
 
-:run_selftest
-"%GODOT%" --headless --path . --script scripts/arena/%~1.gd >"%TEMP%\sa_%~1.txt" 2>&1
-findstr /R /C:"[1-9][0-9]* failure" "%TEMP%\sa_%~1.txt" >nul
+:check
+REM %~1 script  %~2 label  %~3 required success token
+set "OUT=%TEMP%\sa_check.txt"
+"%GODOT%" --headless --path . --script %~1 >"%OUT%" 2>&1
+findstr /C:"%~3" "%OUT%" >nul
 if errorlevel 1 (
-  findstr /C:"PARITY BROKEN" "%TEMP%\sa_%~1.txt" >nul
-  if errorlevel 1 (
-    echo [PASS] %~2
-  ) else (
-    echo [FAIL] %~2
-    set FAILED=1
-  )
-) else (
-  echo [FAIL] %~2
-  findstr /R /C:"FAIL" "%TEMP%\sa_%~1.txt"
+  echo [FAIL] %~2 - did not print "%~3"
+  findstr /R /C:"FAIL" "%OUT%"
   set FAILED=1
+  exit /b 0
 )
-exit /b 0
-
-:run_selftest_tools
-"%GODOT%" --headless --path . --script tools/%~1.gd >"%TEMP%\sa_%~1.txt" 2>&1
-findstr /R /C:"[1-9][0-9]* failure" "%TEMP%\sa_%~1.txt" >nul
-if errorlevel 1 (
-  echo [PASS] %~2
-) else (
-  echo [FAIL] %~2
-  findstr /R /C:"FAIL" "%TEMP%\sa_%~1.txt"
+findstr /R /C:"[1-9][0-9]* failure" "%OUT%" >nul
+if not errorlevel 1 (
+  echo [FAIL] %~2 - reported failures
+  findstr /R /C:"FAIL" "%OUT%"
   set FAILED=1
+  exit /b 0
 )
+echo [PASS] %~2
 exit /b 0

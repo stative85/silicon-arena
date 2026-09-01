@@ -65,19 +65,19 @@ jobs:
         run: ~/godot/godot --headless --path . --script scripts/arena/entrypoint_parity_selftest.gd 2>&1 | tee out.log; grep -q "PARITY OK" out.log
 
       - name: Self-test — model policy
-        run: ~/godot/godot --headless --path . --script scripts/arena/model_policy_selftest.gd 2>&1 | tee out.log; grep -qE "0 failure" out.log
+        run: ~/godot/godot --headless --path . --script scripts/arena/model_policy_selftest.gd 2>&1 | tee out.log; grep -qE "[0-9]+ checks" out.log && grep -qE "0 failure" out.log
 
       - name: Self-test — coherence
-        run: ~/godot/godot --headless --path . --script scripts/arena/coherence_selftest.gd 2>&1 | tee out.log; ! grep -qE "[1-9][0-9]* failure" out.log
+        run: ~/godot/godot --headless --path . --script scripts/arena/coherence_selftest.gd 2>&1 | tee out.log; grep -q "RESULT: SEPARATED" out.log && ! grep -qE "[1-9][0-9]* failure" out.log
 
       - name: Self-test — cinematic bridge
-        run: ~/godot/godot --headless --path . --script scripts/arena/cinematic_selftest.gd 2>&1 | tee out.log; grep -qE "0 failure" out.log
+        run: ~/godot/godot --headless --path . --script scripts/arena/cinematic_selftest.gd 2>&1 | tee out.log; grep -qE "[0-9]+ checks" out.log && grep -qE "0 failure" out.log
 
       - name: Self-test — scar lattice
-        run: ~/godot/godot --headless --path . --script scripts/arena/scar_lattice_selftest.gd 2>&1 | tee out.log; grep -qE "0 failure" out.log
+        run: ~/godot/godot --headless --path . --script scripts/arena/scar_lattice_selftest.gd 2>&1 | tee out.log; grep -qE "[0-9]+ checks" out.log && grep -qE "0 failure" out.log
 
       - name: Self-test — system-role compatibility
-        run: ~/godot/godot --headless --path . --script scripts/arena/compat_selftest.gd 2>&1 | tee out.log; grep -qE "0 failure" out.log
+        run: ~/godot/godot --headless --path . --script scripts/arena/compat_selftest.gd 2>&1 | tee out.log; grep -qE "[0-9]+ checks" out.log && grep -qE "0 failure" out.log
 
       - name: Adversarial pass
         run: ~/godot/godot --headless --path . --script tools/adversarial.gd 2>&1 | tee out.log; grep -q "ADVERSARIAL OK" out.log
