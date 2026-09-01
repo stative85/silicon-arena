@@ -89,7 +89,7 @@ def free_vram():
     invalidated by it: three of four conditions ran with 40%+ "failures" that
     were really load failures inherited from the previous condition.
     """
-    exe = os.path.expandvars(r"%USERPROFILE%\.lmstudioin\lms.exe")
+    exe = os.path.join(os.path.expanduser("~"), ".lmstudio", "bin", "lms.exe")
     if not os.path.exists(exe):
         return False
     try:

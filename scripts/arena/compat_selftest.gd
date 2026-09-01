@@ -153,6 +153,31 @@ func _test_error_summary() -> void:
 	_check("timeout/no-response is named",
 		ClientScript.summarize_error(0, "").find("no response") != -1)
 
+	# A model that could not be LOADED is not a model that is broken. LM Studio
+	# reports it as a bare HTTP 400, which used to be summarised as "LM Studio
+	# rejected the request" -- and the roster builder then recorded a verdict it
+	# had not earned and dropped a perfectly good model. The real text seen on
+	# an 8GB card with another model resident is below, verbatim.
+	var load_err := "{\"error\":{\"message\":\"Failed to load model \\\"elyza-7b\\\". Error: Operation canceled.\"}}"
+
+	_check("a failed load is recognised, not called a bad request",
+		ClientScript.is_load_failure(400, load_err))
+
+	_check("the failed-load summary blames VRAM, not the model",
+		ClientScript.summarize_error(400, load_err).to_lower().find("could not load") != -1)
+
+	_check("the failed-load summary tells the user how to fix it",
+		ClientScript.summarize_error(400, load_err).find("unload") != -1)
+
+	_check("a 500 'error loading model' is also a load failure",
+		ClientScript.is_load_failure(500, "Error loading model: out of space"))
+
+	_check("an ordinary 400 is NOT treated as a load failure",
+		not ClientScript.is_load_failure(400, "{\"error\":\"bad request\"}"))
+
+	_check("a 200 is never a load failure",
+		not ClientScript.is_load_failure(200, "Failed to load model"))
+
 	_check("unknown codes still produce something",
 		ClientScript.summarize_error(418, "teapot") != "")
 
