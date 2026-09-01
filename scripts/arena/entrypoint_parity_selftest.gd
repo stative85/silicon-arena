@@ -125,6 +125,7 @@ func _init() -> void:
 	_check_invariants()
 	_check_single_source()
 	_check_drift(main_src, live_src)
+	_canonical_text_invariant()
 	_report()
 
 
@@ -216,6 +217,15 @@ func _matches(src: String, pattern: String) -> bool:
 	return re.search(src) != null
 
 
+## Local assertion in this file's reporting style.
+func _expect(label: String, ok: bool, detail: String = "") -> void:
+	_checks += 1
+	if ok:
+		print("  OK        %s" % label)
+	else:
+		_fail("%s%s" % [label, ("  — " + detail) if detail != "" else ""])
+
+
 func _fail(msg: String) -> void:
 	_failures.append(msg)
 	print("  FAIL      %s" % msg)
@@ -231,3 +241,52 @@ func _report() -> void:
 		for f in _failures:
 			print("  - %s" % f)
 		quit(1)
+
+
+## ONE TRUTH: what the viewer reads, what the next agent reads, what the log
+## records and what the metrics score must all be the same string.
+##
+## The sanitisers rewrite a reply -- self-label removed, verbatim quotation of
+## an earlier turn removed, severed sentence trimmed. If any sink were fed the
+## RAW reply instead of the cleaned one, later agents would be answering words
+## the viewer never saw, and every measurement in tools/eval/ would be scored
+## against different text than the arena actually showed. That failure would be
+## invisible: both strings look like a plausible reply.
+##
+## Source-level, because the pipeline is a sequence of assignments inside a
+## reply handler rather than something a headless run can introspect.
+func _canonical_text_invariant() -> void:
+	var live := FileAccess.get_file_as_string(LIVE_PATH)
+	var main := FileAccess.get_file_as_string("res://scripts/main.gd")
+	if live == "" or main == "":
+		_fail("cannot read an entry point to audit the canonical text pipeline")
+		return
+
+	# live_match.gd: every sink must take `text`, the cleaned value, and the
+	# raw `content` must not reach any of them.
+	for sink in ["agent[\"last_message\"] = text",
+			"_history.append({\"speaker\": agent[\"display_name\"], \"text\": text})",
+			"\"text\": text,"]:
+		_expect("live path sink uses the cleaned text: %s" % sink.substr(0, 46),
+			live.find(sink) != -1)
+
+	_expect("the live path trims before publishing, not after",
+		live.find("trim_to_last_sentence(text)") < live.find("agent[\"last_message\"] = text"),
+		"a sink would receive untrimmed text")
+
+	_expect("the raw reply is not appended to live history",
+		live.find("_history.append({\"speaker\": agent[\"display_name\"], \"text\": content})") == -1)
+
+	# main.gd: history takes the sanitised `content`; the bubble takes a
+	# DERIVED display string. Derived is fine -- a bubble cannot hold a
+	# paragraph -- but it must be derived FROM content and used nowhere else.
+	_expect("visual path history takes the sanitised content",
+		main.find("_history.append(agent.name + \" [\" + topic + \"]: \" + content)") != -1)
+
+	_expect("the display string is derived from the sanitised content",
+		main.find("var display_content := _trim_to_sentence_boundary(content,") != -1,
+		"display must be a projection of the canonical text, not a parallel value")
+
+	_expect("the display string never feeds memory or history",
+		main.find("_history.append(agent.name + \" [\" + topic + \"]: \" + display_content)") == -1
+		and main.find("agent.memory.append({\"content\": display_content") == -1)
