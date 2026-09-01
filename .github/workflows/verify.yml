@@ -85,6 +85,9 @@ jobs:
       - name: Self-test — turn order and swap cost
         run: ~/godot/godot --headless --path . --script scripts/arena/turn_order_selftest.gd 2>&1 | tee out.log; grep -q "TURN ORDER OK" out.log
 
+      - name: Self-test — VRAM estimate
+        run: ~/godot/godot --headless --path . --script scripts/arena/vram_selftest.gd 2>&1 | tee out.log; grep -q "VRAM OK" out.log
+
       - name: Adversarial pass
         run: ~/godot/godot --headless --path . --script tools/adversarial.gd 2>&1 | tee out.log; grep -q "ADVERSARIAL OK" out.log
 

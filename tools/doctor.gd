@@ -14,6 +14,7 @@ extends SceneTree
 
 const PolicyScript := preload("res://scripts/arena/model_policy.gd")
 const TurnOrderScript := preload("res://scripts/arena/turn_order.gd")
+const VramScript := preload("res://scripts/arena/vram.gd")
 
 ## Single source of truth, overridable via SILICON_ARENA_LM_URL.
 var LM_BASE := LMEndpoint.base_url()
@@ -212,13 +213,45 @@ func _check_policy_and_roster() -> void:
 		if distinct <= 1:
 			_ok("Expected pace", "one resident model, no swaps — seconds per turn")
 		else:
-			# ~30s median cold swap on an 8GB card (docs/BENCHMARK_8GB.md).
-			_ok("Expected pace",
-				"%d models, %d cold load(s) per round — roughly %ds of loading"
-				% [distinct, swaps, swaps * 30])
+			# Whether these models FIT TOGETHER decides whether any of those
+			# loads actually happen. Reporting cold loads for a roster that
+			# stays resident would contradict what the arena does.
+			var seen := {}
+			var total_gb := 0.0
+			var unknown := false
+			for a in ordered:
+				var mk := str(a.get("model", ""))
+				if seen.has(mk):
+					continue
+				seen[mk] = true
+				var e = policy.catalog_entry(mk)
+				var quant := str(e.get("quantization", "")) if e is Dictionary else ""
+				var gb: float = VramScript.estimate_gb(policy.params_from_id(mk), quant)
+				if VramScript.is_unknown(gb):
+					unknown = true
+				else:
+					total_gb += gb
+			if not unknown and total_gb <= VramScript.DEFAULT_BUDGET_GB:
+				_ok("Expected pace",
+					"%d models, ~%.1f GB — small enough to stay resident together,"
+					% [distinct, total_gb])
+				print("%-18s       so turns should cost inference only, not loading" % "")
+			else:
+				# ~30s median cold swap on an 8GB card (docs/BENCHMARK_8GB.md).
+				_ok("Expected pace",
+					"%d models, %d cold load(s) per round — roughly %ds of loading"
+					% [distinct, swaps, swaps * 30])
+				if not unknown:
+					print("%-18s       ~%.1f GB estimated, over the %.1f GB budget, so models" % ["", total_gb, VramScript.DEFAULT_BUDGET_GB])
+					print("%-18s       evict each other. build_roster.gd -- --fit picks a set" % "")
+					print("%-18s       that fits and stops the swapping entirely." % "")
 			var best: int = TurnOrderScript.swaps_per_round(
 				TurnOrderScript.group_by_model(ordered))
-			if best < swaps:
+			if not unknown and total_gb <= VramScript.DEFAULT_BUDGET_GB:
+				# Nothing is swapping, so advice about reducing swaps would
+				# contradict the line printed just above.
+				pass
+			elif best < swaps:
 				print("%-18s       this roster interleaves models; grouping them would" % "")
 				print("%-18s       cost %d load(s) instead of %d. Rebuild with:" % ["", best, swaps])
 				print("%-18s         build_roster.gd -- --balanced" % "")

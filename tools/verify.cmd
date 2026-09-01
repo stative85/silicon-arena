@@ -68,6 +68,7 @@ call :check "scripts/arena/cinematic_selftest.gd"         "cinematic bridge"    
 call :check "scripts/arena/scar_lattice_selftest.gd"      "scar lattice"        "0 failure"
 call :check "scripts/arena/compat_selftest.gd"            "system-role compat"  "0 failure"
 call :check "scripts/arena/turn_order_selftest.gd"        "turn order / swaps"  "TURN ORDER OK"
+call :check "scripts/arena/vram_selftest.gd"              "vram estimate"       "VRAM OK"
 call :check "tools/adversarial.gd"                        "adversarial pass"    "ADVERSARIAL OK"
 call :check "tools/offline_selftest.gd"                   "offline behaviour"   "OFFLINE OK"
 

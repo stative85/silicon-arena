@@ -20,6 +20,7 @@ const PolicyScript := preload("res://scripts/arena/model_policy.gd")
 ## registered by an editor import, so a headless tool run from a fresh clone
 ## would not see it. This repo has already shipped that bug once.
 const TurnOrderScript := preload("res://scripts/arena/turn_order.gd")
+const VramScript := preload("res://scripts/arena/vram.gd")
 const ClientScript := preload("res://scripts/api/lm_studio_client.gd")
 
 ## Single source of truth, overridable via SILICON_ARENA_LM_URL.
@@ -79,7 +80,7 @@ var _fit := 0.0
 
 ## Usable VRAM to plan against, in GB. Below the card's actual size because
 ## the context window, KV cache and desktop compositor all want some.
-const DEFAULT_FIT_GB := 6.0
+const DEFAULT_FIT_GB := VramScript.DEFAULT_BUDGET_GB
 
 ## Probe candidates before putting them in the roster.
 ##
@@ -633,37 +634,15 @@ func _write_live_roster(roster: Array) -> void:
 		% [ProjectSettings.globalize_path(path), agents.size()])
 
 
-## Estimated VRAM for a model, in GB.
-##
-## params * bytes-per-weight + a fixed allowance for context and KV cache.
-## It is an ESTIMATE from catalog metadata, not a measurement: the catalog has
-## no file sizes. It is deliberately generous, because overcommitting VRAM is
-## what causes the thrashing this mode exists to avoid, and a roster that is
-## one model smaller than it could be merely loses variety.
+## Estimated VRAM for a model, in GB. The arithmetic lives in Vram so that
+## doctor reports the same number from the same table.
 func _vram_gb(id: String) -> float:
 	var params: float = _policy.params_from_id(id)
-	if params <= 0.0:
-		return 999.0   # unknown size cannot be planned around; never pick it
-	var bpw := 0.6     # Q4_K_M and friends, the common case
-	var entry = _policy.catalog_entry(id)
 	var quant := ""
+	var entry = _policy.catalog_entry(id)
 	if entry is Dictionary:
-		quant = str(entry.get("quantization", "")).to_upper()
-	if quant.begins_with("F32"):
-		bpw = 4.2
-	elif quant.begins_with("F16") or quant.begins_with("BF16"):
-		bpw = 2.1
-	elif quant.find("Q8") != -1:
-		bpw = 1.1
-	elif quant.find("Q6") != -1:
-		bpw = 0.85
-	elif quant.find("Q5") != -1:
-		bpw = 0.72
-	elif quant.find("Q3") != -1:
-		bpw = 0.48
-	elif quant.find("Q2") != -1:
-		bpw = 0.36
-	return params * bpw + 0.35
+		quant = str(entry.get("quantization", ""))
+	return VramScript.estimate_gb(params, quant)
 
 
 ## The most DISTINCT models that fit the budget together, best-ranked first.
