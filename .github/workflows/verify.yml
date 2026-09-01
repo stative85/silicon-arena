@@ -82,6 +82,9 @@ jobs:
       - name: Self-test — system-role compatibility
         run: ~/godot/godot --headless --path . --script scripts/arena/compat_selftest.gd 2>&1 | tee out.log; grep -qE "[0-9]+ checks" out.log && grep -qE "0 failure" out.log
 
+      - name: Self-test — turn order and swap cost
+        run: ~/godot/godot --headless --path . --script scripts/arena/turn_order_selftest.gd 2>&1 | tee out.log; grep -q "TURN ORDER OK" out.log
+
       - name: Adversarial pass
         run: ~/godot/godot --headless --path . --script tools/adversarial.gd 2>&1 | tee out.log; grep -q "ADVERSARIAL OK" out.log
 
