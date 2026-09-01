@@ -108,6 +108,8 @@ def main():
     ap.add_argument("--reply-words", dest="reply_words", default="",
                     help="MIN-MAX passed to live_match; the only variable in "
                          "the compression experiment")
+    ap.add_argument("--no-trim", dest="no_trim", action="store_true",
+                    help="disable sentence trimming for an A/B arm")
     ap.add_argument("--reset", action="store_true",
                     help="clear memory and VRAM without rebuilding the roster")
     a = ap.parse_args()
@@ -168,6 +170,8 @@ def main():
     rec = json.load(open(path, encoding="utf-8"))
     before = newest_log()
     extra = ["--reply-words", a.reply_words] if a.reply_words else []
+    if a.no_trim:
+        extra.append("--no-trim")
     p = subprocess.run([g, "--headless", "--path", ROOT, "--script",
                         "scripts/arena/live_match.gd", "--",
                         "--turns", str(a.turns), "--no-wait",

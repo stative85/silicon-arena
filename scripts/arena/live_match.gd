@@ -73,6 +73,10 @@ var _exit_on_complete := false
 
 ## Requested reply length. 0 means "unset", which keeps the historical wording.
 ## Set from the roster's `debate` block or --reply-words MIN-MAX.
+## Trim replies at the last complete sentence. On by default; --no-trim exists
+## so the trim can be A/B tested against itself rather than by editing code.
+var _trim_sentences := true
+
 var _reply_words_min := 0
 var _reply_words_max := 0
 var _request_timeout_sec := 90.0
@@ -210,6 +214,8 @@ func _parse_args() -> void:
 					else:
 						_reply_words_max = int(parts[0])
 					i += 1
+			"--no-trim":
+				_trim_sentences = false
 			"--exit-on-complete":
 				# Leave as soon as the turn cap is reached, even if an overlay
 				# is attached. Scripts that drive the arena need this.
@@ -638,7 +644,8 @@ func _on_reply(agent: Dictionary, ok: bool, content: String, http_code: int, sta
 	# ceiling and the models write until they hit it, so 58% of replies ended
 	# mid-clause; the viewer saw an unfinished thought more often than a
 	# finished one.
-	text = SpeechCleanScript.trim_to_last_sentence(text)
+	if _trim_sentences:
+		text = SpeechCleanScript.trim_to_last_sentence(text)
 	agent["state"] = "speaking"
 	agent["last_message"] = text
 	agent["last_message_at_ms"] = Time.get_ticks_msec()
