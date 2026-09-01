@@ -55,7 +55,11 @@ func _test_parity_with_typescript(bridge) -> void:
 
 	var ts := _read_sibling(SCHEMA_TS)
 	if ts == "":
-		_fail("parity", "cannot read %s — contract is UNVERIFIED" % SCHEMA_TS)
+		# The TypeScript contract lives in a sibling repository that is not part
+		# of a standalone Silicon Arena clone. Absent sibling = UNVERIFIABLE,
+		# which is not the same as BROKEN. Report it and skip, so a fresh clone
+		# does not see a red failure for a file it was never shipped.
+		_skip("parity", "%s not present (standalone clone) — cross-repo contract not verified here" % SCHEMA_TS)
 		return
 
 	var ts_version := _match_one(ts, "EVENT_SCHEMA_VERSION\\s*=\\s*\"([^\"]+)\"")
@@ -214,6 +218,16 @@ func _check(label: String, ok: bool, detail: String = "") -> void:
 		print("   ok   " + label)
 	else:
 		_fail(label, detail)
+
+
+var _skips: Array[String] = []
+
+
+## Not a pass and not a failure: the evidence needed is not present in this
+## checkout. Recorded loudly so it can never be mistaken for verification.
+func _skip(name: String, why: String) -> void:
+	_skips.append("%s  %s" % [name, why])
+	print("   SKIP %s  %s" % [name, why])
 
 
 func _fail(label: String, detail: String) -> void:

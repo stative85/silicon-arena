@@ -427,7 +427,12 @@ func _phase_unit() -> void:
 
 	# Parity with the TypeScript consumer.
 	var ts := _read_sibling(SCHEMA_TS)
-	_check("TypeScript schema is readable", ts != "", SCHEMA_TS)
+	if ts == "":
+		# Sibling repo absent in a standalone clone. Unverifiable, not broken.
+		# Skip ONLY the cross-repo parity block; every other check below still
+		# runs. An early return here would silently reduce this suite to zero
+		# checks and report green.
+		print("   SKIP TypeScript schema parity  %s not present (standalone clone)" % SCHEMA_TS)
 	if ts != "":
 		_check("SCHEMA_VERSION matches TS",
 			_match_one(ts, "SCAR_LATTICE_VERSION\\s*=\\s*\"([^\"]+)\"") == s.SCHEMA_VERSION)
