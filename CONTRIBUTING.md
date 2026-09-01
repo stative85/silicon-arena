@@ -84,7 +84,7 @@ Then map model families to your character in `MODEL_CHAR_MAP`:
 Run the whole deterministic suite. It needs no LM Studio and no GPU:
 
 ```
-toolserify.cmd
+tools\verify.cmd
 ```
 
 ```

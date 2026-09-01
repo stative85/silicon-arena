@@ -88,6 +88,12 @@ jobs:
       - name: Offline behaviour (LM Studio absent)
         run: ~/godot/godot --headless --path . --script tools/offline_selftest.gd 2>&1 | tee out.log; grep -q "OFFLINE OK" out.log
 
+      - name: Documentation lint
+        # README.md once shipped a command reading "toolserify.cmd" — a vertical
+        # tab had replaced a backslash during a scripted edit. It rendered
+        # almost correctly and the command did not exist.
+        run: python3 tools/lint_docs.py
+
       - name: Workflow YAML lint
         # A workflow that does not parse never runs, so CI cannot catch this
         # class itself. It was broken once by an unquoted "RESULT: SEPARATED".

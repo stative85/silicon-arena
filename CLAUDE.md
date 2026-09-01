@@ -182,7 +182,7 @@ Toggle that turns the arena into a stylish AFK screen for streamers:
 There IS a test suite. Run it before changing anything:
 
 ```
-toolserify.cmd     # everything below, offline, exits non-zero on failure
+tools\verify.cmd     # everything below, offline, exits non-zero on failure
 tools\doctor.cmd     # what is wrong with this machine, with fixes
 ```
 
