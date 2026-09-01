@@ -32,15 +32,22 @@ arm is a flag rather than an edit.
 | U2_untrimmed | 53.3% | 60.0% | 69.8 | 46.7% | 10.0% |
 | **mean** | **48.3%** | **50.0%** | **72.8** | **56.1%** | **8.9%** |
 
-Effect of trimming, in units of the larger arm's standard deviation:
+Effect of trimming, expressed as a **signal-to-noise ratio**: the change
+divided by the noisier arm's run-to-run standard deviation.
 
-| measure | change | significance |
+| measure | change | change / sd |
 |---|---:|---|
-| truncated mid-thought | −53.3 pts | **7.6 sd** |
-| replies <= 40 words | +12.8 pts | **8.1 sd** |
-| mean words | −12.9 | **5.7 sd** |
-| challenge rate | −10.0 pts | 0.7 sd — not measurable |
-| addresses someone | −12.8 pts | 1.2 sd — not measurable |
+| truncated mid-thought | −53.3 pts | **7.6** |
+| replies <= 40 words | +12.8 pts | **8.1** |
+| mean words | −12.9 | **5.7** |
+| challenge rate | −10.0 pts | 0.7 — inside the noise |
+| addresses someone | −12.8 pts | 1.2 — inside the noise |
+
+**These are not significance values.** Three runs per arm is enough to see that
+one effect is many times the noise and another is smaller than it; it is not
+enough to support a formal test, and none is claimed. The ratio is used here
+the way an engineer uses SNR — to decide what is worth acting on — not the way
+a statistician uses a p-value.
 
 ## Both questions answered
 
@@ -60,15 +67,16 @@ increased addressing" reading is withdrawn.
 
 **Trimming makes the arena roughly five times less noisy.**
 
-| measure | untrimmed sd | trimmed sd |
+| measure | untrimmed sd (n=3) | trimmed sd (n=3) |
 |---|---:|---:|
 | challenge rate | 13.4 | **2.5** |
 | addresses someone | 10.8 | **1.6** |
 | mean words | 2.3 | 0.6 |
 
 At the untrimmed noise level, an intervention would need to move challenge rate
-by roughly 27 points before it could be told from chance at 60 speeches. At the
-trimmed level, 5 points is detectable. Every experiment from here is far
+by roughly 27 points (2 sd) before it stood clear of run-to-run spread at 60
+speeches. At the trimmed level, about 5 points does. Both figures are rules of
+thumb from three replicates, not power calculations. Every experiment from here is far
 cheaper because the instrument stopped shaking.
 
 The likely mechanism is that a severed sentence is a coin flip for the next

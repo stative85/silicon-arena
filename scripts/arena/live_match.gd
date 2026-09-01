@@ -77,6 +77,11 @@ var _exit_on_complete := false
 ## so the trim can be A/B tested against itself rather than by editing code.
 var _trim_sentences := true
 
+## Hard ceiling on generated tokens. 0 means "use the roster's inference block".
+## This is the real length control: the models ignore word-count instructions
+## entirely (docs/EXPERIMENT_COMPRESSION.md) but cannot exceed a token budget.
+var _max_tokens_override := 0
+
 var _reply_words_min := 0
 var _reply_words_max := 0
 var _request_timeout_sec := 90.0
@@ -214,6 +219,8 @@ func _parse_args() -> void:
 					else:
 						_reply_words_max = int(parts[0])
 					i += 1
+			"--max-tokens":
+				if v != "": _max_tokens_override = maxi(int(v), 8); i += 1
 			"--no-trim":
 				_trim_sentences = false
 			"--exit-on-complete":
@@ -458,7 +465,7 @@ func _run_turn() -> void:
 			_on_reply(captured, ok, content, http_code, started_ms),
 		{
 			"temperature": float(_inference.get("temperature", 0.85)),
-			"max_tokens": int(_inference.get("max_tokens", 110)),
+			"max_tokens": _effective_max_tokens(),
 			"timeout_sec": float(_inference.get("timeout_sec", _request_timeout_sec)),
 			"top_p": float(_inference.get("top_p", 0.95)),
 			"repeat_penalty": float(_inference.get("repeat_penalty", 1.1)),
@@ -496,6 +503,13 @@ func _on_human_said(text: String) -> void:
 ##
 ## Returns the original wording when nothing is configured, so an existing
 ## roster behaves exactly as before.
+## The token ceiling actually sent, honouring a CLI override over the roster.
+func _effective_max_tokens() -> int:
+	if _max_tokens_override > 0:
+		return _max_tokens_override
+	return int(_inference.get("max_tokens", 110))
+
+
 func _length_rule() -> String:
 	if _reply_words_max <= 0:
 		return "two sentences maximum"
