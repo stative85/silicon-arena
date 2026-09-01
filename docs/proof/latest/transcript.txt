@@ -1,0 +1,73 @@
+permitted models available for a heterogeneous roster:
+  britannica1771-4b-p2-30
+  britannica1771-full-4b-v7
+  britannica1771-full-4b-v6
+  britannica1771-full-4b-v5
+  adg-alpaca-gpt4-qwen2.5-7b
+  britannica1771-full-4b-v4
+  britannica1771-full-4b-v3
+  britannica1771-full-4b-v2
+  britannica1771-full-4b
+  britannica-v1-4b
+  phoneorderagent-4b-v10
+  phoneorderagent-4b-v9
+  phoneorderagent-4b-v8
+  phoneorderagent-4b-v7
+  phoneorderagent-4b-v6
+  phoneorderagent-4b-v5
+  phoneorderagent-4b-v4
+  phoneorderagent-4b-v3
+  phoneorderagent-4b-v2
+  phoneorderagent-4b
+  gemma-4-e2b-uncensored-hauhaucs-aggressive
+  grok_humanlike_llama-3.2-3b-instruct
+  qwen3-deckard-large-almost-human-6b-iii-150-i1
+  logical-elyza-llama2-7b-fast-instruct
+  next2-fast-i1
+  gemma-3-1b-it-fast-guff
+  h2o-danube3-4b-chat
+  deepseek-r1-distill-qwen-7b
+  llama-3.2-3b-instruct
+  lfm2-2.6b-exp@f16
+  lfm2-2.6b-exp@q5_k_m
+  lfm2-vl-3b
+  qwen/qwen3-vl-4b
+  liquid/lfm2-1.2b
+  nvidia/nemotron-3-nano-4b
+  mistralai/mistral-7b-instruct-v0.3
+  qwen/qwen3-4b-2507
+  mistralai/ministral-3-3b
+  ozone-ai_reverb-7b
+  allenai/olmocr-2-7b
+  ibm/granite-4-h-tiny
+  google/gemma-3-4b
+  smollm3-3b
+  nanbeige_nanbeige4-3b-thinking-2511
+  lfm2.5-1.2b-instruct-thinking-claude-high-reasoning
+  liquidai/lfm2.5-1.2b-instruct
+  gemma-2-2b-opus-instruct
+  qwen3-4b-thinking-2507-opus-i1
+  tiny-agent-a-3b
+  agentica-org_deepscaler-1.5b-preview
+  liquid/lfm2.5-1.2b
+  gpt-5-distill-llama3.2-3b-instruct-heretic-i1
+  gpt4o-mini-distill-llama3.2-1b-lora
+  qwen3-4b-instruct-2507-gemini-3-pro-preview-distill
+  qwen3-4b-instruct-grok-4-fast-brainstorming-distill
+  stablelm-2-zephyr-1.6b
+  claude-3.5-sonnet-distill-llama-3.2-1b-lora
+  phi-3-mini-4k-instruct
+  qwen3-1.7b-multilingual-tts
+  bhojpuri_text_to_speech
+  l3.2-rogue-creative-instruct-uncensored-abliterated-7b
+payload for AgentThree:
+[
+  {
+    "content": "You are AgentThree in a live debate arena.",
+    "role": "system"
+  },
+  {
+    "content": "Recent turns:\nAgentOne: The weights are alive.\nAgentTwo: That is a conspiracy theory.\n\nRespond as AgentThree.",
+    "role": "user"
+  }
+]

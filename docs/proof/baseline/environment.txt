@@ -1,0 +1,22 @@
+=== BASELINE 2026-09-01T01:58:15Z ===
+HEAD: 874fd71c539fa53be7f2130a626768653a33cec1
+branch: main
+status:
+?? docs/
+
+docs present:
+CHANGELOG.md
+CLAUDE.md
+CONTRIBUTING.md
+README.md
+SETUP.md
+project.godot
+
+selftests:
+scripts/arena/cinematic_selftest.gd
+scripts/arena/coherence_selftest.gd
+scripts/arena/entrypoint_parity_selftest.gd
+scripts/arena/model_policy_selftest.gd
+scripts/arena/scar_lattice_selftest.gd
+
+godot: 4.6.stable.official.89cea1439

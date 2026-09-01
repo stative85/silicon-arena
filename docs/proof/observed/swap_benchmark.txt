@@ -1,0 +1,12 @@
+
+model                                                     cold median    warm median   swap cost  fails
+--------------------------------------------------------------------------------------------------------
+ozone-ai_reverb-7b                                             37.71s          0.10s     37.61s      0
+ibm/granite-4-h-tiny                                           31.32s          0.25s     31.07s      0
+qwen3-deckard-large-almost-human-6b-iii-150-i1                 26.37s          0.16s     26.21s      0
+llama-3.2-3b-instruct                                          18.75s          0.08s     18.67s      0
+mistralai/mistral-7b-instruct-v0.3                             30.55s          0.06s     30.49s      0
+--------------------------------------------------------------------------------------------------------
+median swap cost across models: 30.49s
+max swap cost observed:         37.61s
+requests: 30   failures: 0 (0.0%)

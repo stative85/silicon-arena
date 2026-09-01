@@ -1,0 +1,5 @@
+timestamp_utc : 2026-09-01T02:43:35
+godot         : 4.6-stable (official)
+os            : Windows 10.0.26200
+cpu           : Intel(R) Core(TM) Ultra 5 225F (10 threads)
+lm_studio     : http://127.0.0.1:1234/v1
