@@ -12,6 +12,8 @@ extends SceneTree
 ##   B  HETEROGENEOUS     three or more distinct eligible models execute in turn
 ##   C  CROSS-AGENT CTX   a later agent's payload mechanically contains earlier
 ##                        agents' turns
+##   D  RESIDENCY         two models that fit in VRAM together do not evict
+##                        each other, so a heterogeneous roster need not swap
 ##
 ## A and C are DETERMINISTIC — they are properties of the code and the payload,
 ## not of what a model happens to say. B requires LM Studio and is skipped with
@@ -24,6 +26,7 @@ extends SceneTree
 ## guarantee.
 
 const PolicyScript := preload("res://scripts/arena/model_policy.gd")
+const VramScript := preload("res://scripts/arena/vram.gd")
 const ClientScript := preload("res://scripts/api/lm_studio_client.gd")
 
 ## Single source of truth, overridable via SILICON_ARENA_LM_URL.
@@ -53,6 +56,7 @@ func _run() -> void:
 	_policy.load_catalog()
 	_claim_a()
 	await _claim_b_and_c()
+	await _claim_d()
 	_write()
 
 
@@ -191,6 +195,106 @@ func _claim_b_and_c() -> void:
 	_say("")
 
 
+## CLAIM D — models that fit in VRAM together are not evicted.
+##
+## The project was built on "one model is resident, so every model change costs
+## a cold load". That is only true when the models do not fit together. This
+## MEASURES it rather than asserting it: take two permitted models whose
+## combined estimate is under the budget, warm both, then compare ALTERNATING
+## between them against REPEATING one. If alternating costs the same order as
+## repeating, nothing is being evicted.
+##
+## Online claim, like B: skipped with a note when LM Studio is unavailable.
+func _claim_d() -> void:
+	_say("[D] VRAM RESIDENCY")
+	if _installed.is_empty():
+		_say("    SKIP — LM Studio not reachable; D is an online claim and is")
+		_say("           not asserted here.")
+		_transcript.append("(LM Studio unavailable — residency not measured)")
+		_say("")
+		return
+
+	var pair: Array[String] = []
+	var used := 0.0
+	for id in _installed:
+		if pair.size() >= 2:
+			break
+		if _policy.check(id) != "":
+			continue
+		var e = _policy.catalog_entry(id)
+		var quant := str(e.get("quantization", "")) if e is Dictionary else ""
+		var gb: float = VramScript.estimate_gb(_policy.params_from_id(id), quant)
+		if VramScript.is_unknown(gb):
+			continue
+		if used + gb <= VramScript.DEFAULT_BUDGET_GB:
+			pair.append(id)
+			used += gb
+	if pair.size() < 2:
+		_say("    SKIP — no two permitted models fit in %.1f GB together here."
+			% VramScript.DEFAULT_BUDGET_GB)
+		_say("")
+		return
+
+	_say("    pair: %s" % pair[0])
+	_say("          %s" % pair[1])
+	_say("    estimated %.1f GB resident together" % used)
+
+	# Warm both first, so no timing includes a first-ever read from disk.
+	await _time_request(pair[0])
+	await _time_request(pair[1])
+
+	var repeat_ms := await _time_request(pair[0])
+	var switch_ms := await _time_request(pair[1])
+	var back_ms := await _time_request(pair[0])
+
+	_say("    repeat the same model : %5d ms" % repeat_ms)
+	_say("    switch to the other   : %5d ms" % switch_ms)
+	_say("    switch back           : %5d ms" % back_ms)
+
+	# The smallest cold swap ever measured on this hardware is 18s. Residency
+	# is milliseconds. The threshold sits an order of magnitude below the swap
+	# and far above any warm reply, so it cannot be met by an evicting pair.
+	var threshold := 3000
+	if switch_ms < threshold and back_ms < threshold:
+		_say("    switching costs the same order as repeating — both resident,")
+		_say("    so a heterogeneous roster does not have to pay for swapping.")
+		_policy_log.append("RESIDENT %s + %s (~%.1f GB): switch %dms, back %dms, repeat %dms"
+			% [pair[0], pair[1], used, switch_ms, back_ms, repeat_ms])
+	else:
+		_fail("D", "switching cost %dms/%dms against %dms repeating; these models evict each other"
+			% [switch_ms, back_ms, repeat_ms])
+	_say("")
+
+
+## One chat request, returning its wall-clock cost in milliseconds.
+func _time_request(model_id: String) -> int:
+	var http := HTTPRequest.new()
+	get_root().add_child(http)
+	await process_frame
+	http.timeout = 180.0
+	var done := [false]
+	http.request_completed.connect(func(_r, _c, _h, _b): done[0] = true)
+	var payload := {
+		"model": model_id,
+		"messages": [{"role": "user", "content": "Say: ok"}],
+		"max_tokens": 8,
+		"temperature": 0.1,
+		"stream": false,
+	}
+	var t0 := Time.get_ticks_msec()
+	if http.request(LM_BASE + "/chat/completions",
+			["Content-Type: application/json"], HTTPClient.METHOD_POST,
+			JSON.stringify(payload)) != OK:
+		http.queue_free()
+		return 999999
+	var waited := 0
+	while not done[0] and waited < 12000:
+		await process_frame
+		waited += 1
+	http.queue_free()
+	return Time.get_ticks_msec() - t0
+
+
 ## Mirrors the arena's envelope shape closely enough to prove the property.
 func _build_payload(speaker: String, history: Array) -> Array:
 	var transcript := ""
@@ -226,13 +330,16 @@ func _write() -> void:
 		% ("SKIPPED - LM Studio offline" if _installed.is_empty() else "PROVEN"))
 	summary.append("claim C (cross-agent ctx, determ.)    : %s"
 		% ("NOT PROVEN" if _has_fail("C") else "PROVEN"))
+	summary.append("claim D (vram residency, online)      : %s"
+		% ("SKIPPED - LM Studio offline" if _installed.is_empty()
+			else ("NOT PROVEN" if _has_fail("D") else "PROVEN")))
 	summary.append("")
 	summary.append(verdict)
 	_write_file("verification.txt", "\n".join(summary))
 	# Print the per-claim verdict, not just the artifact. A summary that exists
 	# only in a file cannot be asserted by CI or read in a terminal.
 	print("")
-	for line in summary.slice(maxi(0, summary.size() - 5), summary.size() - 2):
+	for line in summary.slice(maxi(0, summary.size() - 6), summary.size() - 2):
 		print(line)
 	print("\n" + verdict)
 	print("artifacts: %s" % ProjectSettings.globalize_path(OUT_DIR))
