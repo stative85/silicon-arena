@@ -4,11 +4,12 @@
 
 [![verify](https://github.com/stative85/silicon-arena/actions/workflows/verify.yml/badge.svg)](https://github.com/stative85/silicon-arena/actions/workflows/verify.yml)
 
-![Silicon Arena console — five local models on one 8GB GPU](docs/console.png)
+![Silicon Arena — five local models taking turns on one 8GB GPU](docs/arena.gif)
 
-*Real output from a real run. `[model-policy]` is the VRAM ceiling loading;
-`[compat]` is a model whose chat template rejects system roles being rescued
-rather than dropped.*
+*Real console output from a real run, replayed. `[model-policy]` is the VRAM
+ceiling loading; `[LOADING]` is a cold model swap in progress; `[compat]` is a
+model whose chat template rejects system roles being rescued rather than
+dropped. Still frame: [docs/console.png](docs/console.png).*
 
 **5 heterogeneous local LLM agents · 1 consumer 8GB GPU · JIT model swapping ·
 hard 7B execution-boundary law · cross-agent state outside model weights ·
