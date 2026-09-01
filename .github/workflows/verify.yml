@@ -1,0 +1,112 @@
+name: verify
+
+# Deterministic verification only. No LM Studio, no GPU, no network model
+# downloads — everything here must pass on a bare CI runner.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+env:
+  GODOT_VERSION: "4.6"
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cache Godot binary
+        id: godot-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/godot
+          key: godot-${{ env.GODOT_VERSION }}-linux
+
+      - name: Download Godot ${{ env.GODOT_VERSION }} (headless-capable)
+        if: steps.godot-cache.outputs.cache-hit != 'true'
+        run: |
+          set -euxo pipefail
+          mkdir -p ~/godot && cd ~/godot
+          BASE="https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}-stable"
+          FILE="Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip"
+          curl -fL --retry 3 -o godot.zip "$BASE/$FILE"
+          unzip -q godot.zip
+          mv Godot_v${GODOT_VERSION}-stable_linux.x86_64 godot
+          chmod +x godot
+
+      - name: Godot version
+        run: ~/godot/godot --version
+
+      - name: Import project (builds the global class registry)
+        # A fresh clone has no .godot/ cache, so class_name types are not
+        # registered and every script referencing them fails to parse. This is
+        # the same step the README tells a human to run once.
+        run: |
+          set -euo pipefail
+          ~/godot/godot --headless --editor --quit --path . 2>&1 | tail -5
+          test -f .godot/global_script_class_cache.cfg
+
+      - name: Project parses
+        run: |
+          set -euo pipefail
+          ~/godot/godot --headless --path . --quit 2>&1 | tee parse.log || true
+          if grep -q "Parse Error" parse.log; then
+            echo "::error::Parse errors present"
+            grep "Parse Error" parse.log
+            exit 1
+          fi
+
+      - name: Self-test — entrypoint parity
+        run: ~/godot/godot --headless --path . --script scripts/arena/entrypoint_parity_selftest.gd 2>&1 | tee out.log; grep -q "PARITY OK" out.log
+
+      - name: Self-test — model policy
+        run: ~/godot/godot --headless --path . --script scripts/arena/model_policy_selftest.gd 2>&1 | tee out.log; grep -qE "0 failure" out.log
+
+      - name: Self-test — coherence
+        run: ~/godot/godot --headless --path . --script scripts/arena/coherence_selftest.gd 2>&1 | tee out.log; ! grep -qE "[1-9][0-9]* failure" out.log
+
+      - name: Self-test — cinematic bridge
+        run: ~/godot/godot --headless --path . --script scripts/arena/cinematic_selftest.gd 2>&1 | tee out.log; grep -qE "0 failure" out.log
+
+      - name: Self-test — scar lattice
+        run: ~/godot/godot --headless --path . --script scripts/arena/scar_lattice_selftest.gd 2>&1 | tee out.log; grep -qE "0 failure" out.log
+
+      - name: Configs, presets and required files
+        run: ~/godot/godot --headless --path . --script tools/verify_configs.gd 2>&1 | tee cfg.log; grep -q "CONFIGS OK" cfg.log
+
+      - name: Preset legality is enforced (negative control)
+        # Proves the config check can actually fail. A suite that only ever
+        # passes is not evidence.
+        run: |
+          set -euo pipefail
+          cp presets.json presets.bak
+          python3 - <<'PY'
+          import json
+          d = json.load(open("presets.json"))
+          d[0][0] = {"color":"ff0000","name":"NEGATIVE 9B",
+                     "model":"lmstudio-community/Qwen3.5-9B-GGUF/Qwen3.5-9B-Q4_K_M.gguf"}
+          json.dump(d, open("presets.json","w"), indent=1)
+          PY
+          if ~/godot/godot --headless --path . --script tools/verify_configs.gd 2>&1 | grep -q "CONFIGS OK"; then
+            echo "::error::validator passed a 9B preset — the ceiling is not enforced"
+            mv presets.bak presets.json
+            exit 1
+          fi
+          mv presets.bak presets.json
+          echo "negative control OK: a 9B preset is rejected"
+
+      - name: Upload logs on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: verify-logs
+          path: |
+            parse.log
+            out.log
+            cfg.log
+          retention-days: 7

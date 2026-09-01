@@ -2,7 +2,7 @@ extends SceneTree
 
 ## Proves the size law is enforced on the Godot request path.
 ##
-##   Godot_v4.6-stable_win64_console.exe --headless --path . \
+##   godot --headless --path . \
 ##       --script scripts/arena/model_policy_selftest.gd
 ##
 ## The TypeScript suite proves the policy maths. This proves the thing that

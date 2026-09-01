@@ -1,7 +1,7 @@
 extends SceneTree
 
 # Headless harness for CoherenceEngine.self_test().
-# Run:  Godot_v4.6-stable_win64_console.exe --headless --script scripts/arena/coherence_selftest.gd
+# Run:  godot --headless --script scripts/arena/coherence_selftest.gd
 #
 # Exits 0 only if the engine separates a synthetic echo chamber from a
 # synthetic real argument. Exit 2 means the detector measures nothing and

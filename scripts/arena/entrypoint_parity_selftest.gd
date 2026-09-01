@@ -2,7 +2,7 @@ extends SceneTree
 
 ## Proves the two entry points configure the same load-bearing runtime.
 ##
-##   Godot_v4.6-stable_win64_console.exe --headless --path . \
+##   godot --headless --path . \
 ##       --script scripts/arena/entrypoint_parity_selftest.gd
 ##
 ## WHY THIS EXISTS

@@ -3,7 +3,7 @@ extends SceneTree
 ## Headless proof that the Godot half of the cinematic contract matches the
 ## TypeScript half, and that nothing the arena can do to it makes it throw.
 ##
-##   Godot_v4.6-stable_win64_console.exe --headless --path . \
+##   godot --headless --path . \
 ##       --script scripts/arena/cinematic_selftest.gd
 ##
 ## Exits 2 on any failure. The test that matters most is PARITY: it reads
