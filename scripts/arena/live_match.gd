@@ -67,6 +67,9 @@ var _elapsed := 0.0
 ## The default is now bounded: an overlay still gets a generous window, and an
 ## unattended run always starts on its own. Use --no-wait to start immediately.
 var _wait_for_client_sec := 45.0
+
+## Quit once the turn cap is reached instead of lingering for an overlay.
+var _exit_on_complete := false
 var _request_timeout_sec := 90.0
 ## What a human last said, and when. Kept for a few turns only.
 var _human_line := ""
@@ -192,6 +195,10 @@ func _parse_args() -> void:
 				if v != "": _max_turns = maxi(int(v), 1); i += 1
 			"--wait-sec":
 				if v != "": _wait_for_client_sec = maxf(float(v), 0.0); i += 1
+			"--exit-on-complete":
+				# Leave as soon as the turn cap is reached, even if an overlay
+				# is attached. Scripts that drive the arena need this.
+				_exit_on_complete = true
 			"--no-wait":
 				# Explicit "start now". 0 cannot mean this: it is already
 				# spoken for as "wait forever".
@@ -793,8 +800,29 @@ func _end_match() -> void:
 	})
 	print("LIVE_ARENA COMPLETE turns=%d crown=%s" % [_turn, _crown])
 	print("LIVE_ARENA LOG %s" % ProjectSettings.globalize_path(_log_path))
+
+	# Lingering is right when an overlay is watching and wrong when nothing is.
+	# A bounded run -- "play 70 turns" -- previously never exited: it printed
+	# COMPLETE and then sat forever, so any script driving the arena had to
+	# kill it on a timer and could not tell "finished" from "hung". That made
+	# automated evaluation impossible and hid this defect, because every run
+	# anyone had done was killed externally.
+	#
+	# Exit when nobody is attached, or when asked to.
+	var watching: bool = _state.has_client() or not _cine._peers.is_empty()
+	if _exit_on_complete or not watching:
+		print("LIVE_ARENA EXIT no overlay attached, quitting")
+		_quit_soon.call_deferred()
+		return
 	# Stay up so the overlay keeps showing the finished match.
 	_next_turn_at = _elapsed + 600.0
+
+
+## Give the log and the final state a frame to flush before leaving.
+func _quit_soon() -> void:
+	await process_frame
+	await process_frame
+	quit(0)
 
 # ── Scar Lattice write path ────────────────────────────────────────────────
 #
