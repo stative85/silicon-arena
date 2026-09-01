@@ -145,6 +145,45 @@ func _run() -> void:
 			== "-- and yet.",
 		"comparison must ignore case and punctuation")
 
+	# --- trimming a budget-truncated reply --------------------------------
+	# Taken verbatim from a run: max_tokens cut this mid-clause.
+	_eq("cuts back to the last complete sentence",
+		SC.trim_to_last_sentence(
+			"Values are not inherent properties of any running system. "
+			+ "A system that merely reflects a form of purpose within"),
+		"Values are not inherent properties of any running system.")
+
+	_eq("a reply that already ends cleanly is untouched",
+		SC.trim_to_last_sentence("The weights are alive."),
+		"The weights are alive.")
+
+	_eq("a closing quote counts as clean",
+		SC.trim_to_last_sentence("He called it \"alive\""),
+		"He called it \"alive\"")
+
+	_eq("questions and exclamations end sentences too",
+		SC.trim_to_last_sentence(
+			"Is a system that cannot refuse its operator alive in any sense? "
+			+ "I think it might be some kind of"),
+		"Is a system that cannot refuse its operator alive in any sense?")
+
+	# --- what must NOT be trimmed away -----------------------------------
+	_eq("no sentence boundary means no trim, ragged or not",
+		SC.trim_to_last_sentence("a single unfinished clause with no full stop"),
+		"a single unfinished clause with no full stop")
+
+	_check("a trim that would leave almost nothing is refused",
+		SC.trim_to_last_sentence(
+			"Yes. Now here is the long and substantive argument that follows it and runs on")
+			.find("substantive") != -1,
+		"deleted the argument to save a stump")
+
+	_eq("a decimal point is not a sentence end",
+		SC.trim_to_last_sentence("It weighs 3.5 kilos and the rest is unfinished here"),
+		"It weighs 3.5 kilos and the rest is unfinished here")
+
+	_eq("empty stays empty", SC.trim_to_last_sentence(""), "")
+
 	_report()
 
 

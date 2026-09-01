@@ -634,6 +634,11 @@ func _on_reply(agent: Dictionary, ok: bool, content: String, http_code: int, sta
 		if last != "":
 			recent.append(last)
 	text = SpeechCleanScript.strip_quoted_prefix(text, recent)
+	# Last, so it trims whatever the earlier steps leave. max_tokens is a hard
+	# ceiling and the models write until they hit it, so 58% of replies ended
+	# mid-clause; the viewer saw an unfinished thought more often than a
+	# finished one.
+	text = SpeechCleanScript.trim_to_last_sentence(text)
 	agent["state"] = "speaking"
 	agent["last_message"] = text
 	agent["last_message_at_ms"] = Time.get_ticks_msec()

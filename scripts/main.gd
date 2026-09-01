@@ -4403,6 +4403,7 @@ func _on_reply(agent, ok: bool, content: String, topic: String, gen: int = -1, h
 	# Remove a verbatim restatement of an earlier turn. _history holds the last
 	# 12 lines as "Name [topic]: text", which is what the models are echoing.
 	content = SpeechCleanScript.strip_quoted_prefix(content, _history)
+	content = SpeechCleanScript.trim_to_last_sentence(content)
 
 	# Memory-politics: split the MEMORY_CANDIDATE footer from the in-character
 	# reply BEFORE any downstream consumer sees it. The footer is structured

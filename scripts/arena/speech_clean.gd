@@ -171,3 +171,60 @@ static func _norm_words(s: String) -> String:
 			out += " "
 			last_space = true
 	return out.strip_edges()
+
+
+## Smallest reply worth keeping after trimming, in words. Below this the trim
+## has removed the substance rather than a ragged edge.
+const MIN_TRIMMED_WORDS := 8
+
+
+## Cut a reply back to its last complete sentence.
+##
+## THE DEFECT. `max_tokens` is a hard ceiling and the models write until they
+## hit it, so most replies stop mid-word or mid-clause:
+##
+##   "...functions and processes according to its programming reflects a form
+##    of value or purpose within"
+##
+## Measured across the roster conditions: 50-58% of replies, and 58-78% once a
+## brevity instruction was added. The viewer sees an unfinished thought more
+## often than a finished one, which is the most visible flaw in the arena after
+## the duplicated speaker labels.
+##
+## Trimming is the honest repair: the sentence the model did not finish was
+## never going to be finished, and showing its stump adds nothing.
+##
+## WHAT IS PROTECTED. A reply is returned unchanged when it already ends
+## cleanly, when there is no sentence boundary to cut back to, or when trimming
+## would leave less than MIN_TRIMMED_WORDS. Better a ragged ending than a
+## deleted argument -- and a reply that is ALL stump is evidence of a budget
+## problem that should stay visible rather than being tidied away.
+static func trim_to_last_sentence(text: String) -> String:
+	var body := text.strip_edges()
+	if body == "":
+		return body
+	if _ends_cleanly(body):
+		return body
+
+	var cut := -1
+	for i in range(body.length() - 1, -1, -1):
+		var c := body[i]
+		if c == "." or c == "!" or c == "?":
+			# Not a decimal point or an abbreviation mid-word.
+			if i + 1 < body.length() and body[i + 1] != " " and body[i + 1] != "\n":
+				continue
+			cut = i
+			break
+	if cut < 0:
+		return body
+
+	var trimmed := body.substr(0, cut + 1).strip_edges()
+	if trimmed.split(" ", false).size() < MIN_TRIMMED_WORDS:
+		return body
+	return trimmed
+
+
+static func _ends_cleanly(s: String) -> bool:
+	var last := s.substr(s.length() - 1, 1)
+	return last == "." or last == "!" or last == "?" or last == "\"" \
+		or last == "'" or last == ")" or last == "]"
