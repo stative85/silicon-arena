@@ -16,6 +16,10 @@ extends SceneTree
 ## It never touches res://presets.json — the public defaults stay portable.
 
 const PolicyScript := preload("res://scripts/arena/model_policy.gd")
+## preload, not the `TurnOrder` global class name: global classes are only
+## registered by an editor import, so a headless tool run from a fresh clone
+## would not see it. This repo has already shipped that bug once.
+const TurnOrderScript := preload("res://scripts/arena/turn_order.gd")
 const ClientScript := preload("res://scripts/api/lm_studio_client.gd")
 
 ## Single source of truth, overridable via SILICON_ARENA_LM_URL.
@@ -31,6 +35,27 @@ const WANTED := 5
 ##
 ##   godot --headless --path . --script tools/build_roster.gd -- --fast
 var _fast := false
+
+## BALANCED mode: N agents over M distinct models, grouped so each model is
+## loaded once per round.
+##
+## The diverse roster and --fast are the two ends of one dial and nothing sat
+## between them. Cost per round is dominated by cold loads (18-38s) rather than
+## inference (0.06-0.26s), and TurnOrder shows a grouped roster pays exactly
+## one load per DISTINCT model per round. So swaps scale with the number of
+## models, not the number of agents:
+##
+##   5 agents,  5 models  ->  5 loads/round   ~150s   (diverse: max variety)
+##   5 agents,  2 models  ->  2 loads/round    ~60s   (balanced: 2.5x faster)
+##   5 agents,  1 model   ->  1 load/round     ~30s   (--fast: no variety)
+##
+## Balanced keeps genuinely different architectures arguing while cutting most
+## of the waiting. Two models is the default because it is the smallest roster
+## that is still heterogeneous.
+##
+##   godot --headless --path . --script tools/build_roster.gd -- --balanced
+##   godot --headless --path . --script tools/build_roster.gd -- --balanced=3
+var _balanced := 0
 
 ## Probe candidates before putting them in the roster.
 ##
@@ -61,6 +86,12 @@ func _run() -> void:
 			_fast = true
 		elif a == "--no-probe":
 			_probe = false
+		elif a == "--balanced":
+			_balanced = 2
+		elif a.begins_with("--balanced="):
+			# Clamp rather than trust: 1 is --fast and WANTED is the diverse
+			# roster, so anything outside that range is a typo, not a request.
+			_balanced = clampi(int(a.get_slice("=", 1)), 1, WANTED)
 	print("\n=== build roster from installed models ===\n")
 	_policy = PolicyScript.new()
 	get_root().add_child(_policy)
@@ -113,22 +144,26 @@ func _on_models(result: int, code: int, _h: PackedStringArray, body: PackedByteA
 		return
 
 	var picked: Array[String] = []
+	# How many DISTINCT models this roster should use. That number, not the
+	# agent count, is what a round costs in cold loads (see TurnOrder).
+	var want_distinct := WANTED
+	if _fast:
+		want_distinct = 1
+	elif _balanced > 0:
+		want_distinct = _balanced
+
 	if _probe:
-		picked = await _probe_pick(legal, 1 if _fast else WANTED)
-		if _fast and not picked.is_empty():
-			var one := picked[0]
-			picked = []
-			for i in WANTED:
-				picked.append(one)
-	elif _fast:
-		# One model, five agents. Personas differ; weights never move.
-		var best := _pick_diverse(legal, 1)
+		picked = await _probe_pick(legal, want_distinct)
+		if want_distinct < WANTED and not picked.is_empty():
+			picked = _spread(picked, WANTED)
+	elif want_distinct < WANTED:
+		# Fewer models than agents. Personas differ; weights move rarely.
+		var best := _pick_diverse(legal, want_distinct)
 		if best.is_empty():
 			printerr("no usable model found")
 			quit(1)
 			return
-		for i in WANTED:
-			picked.append(best[0])
+		picked = _spread(best, WANTED)
 	else:
 		picked = _pick_diverse(legal, WANTED)
 
@@ -137,30 +172,76 @@ func _on_models(result: int, code: int, _h: PackedStringArray, body: PackedByteA
 		print("Building a %d-agent roster instead of failing. Download more small models" % picked.size())
 		print("to fill the roster out.")
 
-	var roster: Array = []
+	# Group before naming, so the numbering a viewer reads runs 1,2,3 down the
+	# roster instead of jumping around after the reorder.
+	var pre: Array = []
 	for i in picked.size():
-		var nm := _display_name(picked[i])
-		if _fast:
+		pre.append({"model": picked[i]})
+	var before_swaps := TurnOrderScript.swaps_per_round(pre)
+	pre = TurnOrderScript.group_by_model(pre)
+
+	# Number only models that actually repeat. A roster of distinct models
+	# should not gain meaningless "#1" suffixes.
+	var counts := {}
+	for a in pre:
+		counts[a["model"]] = int(counts.get(a["model"], 0)) + 1
+	var seen := {}
+	var roster: Array = []
+	for i in pre.size():
+		var id: String = pre[i]["model"]
+		var nm := _display_name(id)
+		if int(counts[id]) > 1:
+			seen[id] = int(seen.get(id, 0)) + 1
 			# Distinct identities so the arena still reads as five agents.
-			nm = "%s #%d" % [nm, i + 1]
+			nm = "%s #%d" % [nm, int(seen[id])]
 		roster.append({
 			"color": COLORS[i % COLORS.size()],
-			"model": picked[i],
+			"model": id,
 			"name": nm,
 		})
 
-	print("\nroster:")
+	print("
+roster:")
 	for a in roster:
 		print("   %-18s %s" % [a["name"], a["model"]])
 
+	var swaps := TurnOrderScript.swaps_per_round(roster)
+	var distinct := TurnOrderScript.distinct_models(roster)
+	print("
+%d agents, %d distinct model(s), %d cold load(s) per round."
+		% [roster.size(), distinct, swaps])
+	if before_swaps > swaps:
+		print("Ordering saved %d cold load(s) per round (%d -> %d) by grouping"
+			% [before_swaps - swaps, before_swaps, swaps])
+		print("agents that share a model. Same agents, same models, cheaper cycle.")
+	# ~30s median cold swap, ~0.2s warm inference (docs/BENCHMARK_8GB.md).
+	print("At the measured ~30s median swap that is roughly %ds of loading per round."
+		% (swaps * 30))
+
 	if _fast:
 		print("
-FAST: all %d agents share one resident model — no turn swaps." % roster.size())
+FAST: all %d agents share one resident model - no turn swaps." % roster.size())
+		print("One architecture wearing %d hats. Use --balanced to keep real variety." % roster.size())
+	elif _balanced > 0:
+		print("
+BALANCED: %d architectures across %d agents." % [distinct, roster.size()])
+		if swaps >= WANTED:
+			# Asking for as many models as agents IS the diverse roster. Say so
+			# rather than dressing it up as a saving of 1.0x.
+			print("That is one model per agent, which is the default roster with no")
+			print("saving at all. Ask for fewer models than agents to buy anything.")
+		else:
+			print("Roughly %.1fx fewer cold loads per round than a %d-model roster,"
+				% [float(WANTED) / float(maxi(swaps, 1)), WANTED])
+			print("while still being a genuinely heterogeneous debate.")
 	else:
 		print("
 Every turn changes model, so every turn pays a cold swap (18-38s).")
-		print("Run with  -- --fast  for one resident model and far more turns.")
+		print("Run with  -- --balanced  to keep several architectures at a fraction")
+		print("of the loading, or  -- --fast  for one resident model and the most turns.")
+
 	_write_user_preset(roster)
+	_write_live_roster(roster)
 	quit(0)
 
 
@@ -367,3 +448,78 @@ func _write_user_preset(roster: Array) -> void:
 	print("\nwrote %s (slot 0 = Installed Models, %d agents)"
 		% [ProjectSettings.globalize_path(path), roster.size()])
 	print("Launch the arena; it loads slot 0 automatically.")
+
+
+## Fill `count` agent slots from a smaller set of models, as evenly as
+## possible. Round-robin rather than blocking (A B A B A, not A A A B B) so the
+## remainder lands on the earliest — that is, the highest-ranked — models. The
+## caller groups afterwards, so the interleaving here costs nothing and keeps
+## the extra agent on the better model.
+func _spread(models: Array[String], count: int) -> Array[String]:
+	var out: Array[String] = []
+	if models.is_empty():
+		return out
+	for i in count:
+		out.append(models[i % models.size()])
+	return out
+
+
+## Also write the roster the HEADLESS live path reads.
+##
+## live_match.gd, scar_ladder.gd, scar_ab_probe.gd, scar_table.gd and
+## match_scene.gd all read config/arena-roster.v1.json. Nothing in this
+## repository produced it: the file was absent and the only other search path
+## pointed into a PRIVATE sibling checkout (../extinct_os/), so on a clean
+## clone every headless live tool failed with "roster not found". The old
+## advice was to "copy user://presets.json" there, which cannot work — the two
+## files have different schemas.
+##
+## Writing both from one selection also keeps them from disagreeing, which is
+## the duplicated-truth failure this project has already shipped three times.
+func _write_live_roster(roster: Array) -> void:
+	if roster.is_empty():
+		return
+	var agents: Array = []
+	for i in roster.size():
+		var a: Dictionary = roster[i]
+		agents.append({
+			"agent_id": "agent-%02d" % (i + 1),
+			"display_name": a["name"],
+			"model_key": a["model"],
+			"runtime_id": "runtime-01",
+			"color": "#" + str(a["color"]),
+			"persona": "",
+		})
+	# runtimes[0] is the default any agent without its own model_key inherits.
+	# Every agent above carries an explicit key, so a heterogeneous roster
+	# survives the round trip rather than collapsing onto one model.
+	var first: Dictionary = roster[0]
+	var doc := {
+		"version": 1,
+		"generated_by": "tools/build_roster.gd",
+		"runtimes": [{
+			"runtime_id": "runtime-01",
+			"endpoint": LM_BASE,
+			"model_key": first["model"],
+			"display_name": first["name"],
+			"params_b": _policy.params_from_id(first["model"]) if _policy.has_method("params_from_id") else null,
+			"quantization": "",
+			"inference": {
+				"temperature": 0.8,
+				"max_tokens": 110,
+				"notes": "generated defaults; tune per model family",
+			},
+		}],
+		"agents": agents,
+	}
+	var dir := ProjectSettings.globalize_path("res://config")
+	DirAccess.make_dir_recursive_absolute(dir)
+	var path := "res://config/arena-roster.v1.json"
+	var w := FileAccess.open(path, FileAccess.WRITE)
+	if w == null:
+		printerr("cannot write %s" % path)
+		return
+	w.store_string(JSON.stringify(doc, "\t"))
+	w.close()
+	print("wrote %s (%d agents) for the headless live path"
+		% [ProjectSettings.globalize_path(path), agents.size()])

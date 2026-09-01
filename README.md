@@ -173,15 +173,27 @@ families, and writes an "Installed Models" roster to slot 0. It never touches
 the shipped presets.
 
 **If turns feel slow**, that is model swapping, not a hang: every turn changes
-model and pays an 18-38s cold load. For throughput instead of variety:
+model and pays an 18-38s cold load. A round costs one cold load per *distinct
+model*, so the fix is fewer models, not fewer agents:
 
 ```
+godot --headless --path . --script tools/build_roster.gd -- --balanced
 godot --headless --path . --script tools/build_roster.gd -- --fast
 ```
 
-Measured over the same 280s window on an RTX 5060 8GB: **49 speeches instead of
-7**, 100% completion instead of 70%. You give up heterogeneity, which is the
-point of the project — so use it for long streams and testing, not for the demo.
+Same build, same 260s window, same harness, RTX 5060 8GB, zero failures in all
+three:
+
+| roster | distinct models | agents spoke |
+|---|---:|---:|
+| default | 5 | 8 |
+| `--balanced` | 2 | **33** |
+| `--fast` | 1 | 64 |
+
+`--balanced` is the one to reach for: **4x the turns of the default roster**
+while two genuinely different architectures are still arguing. `--fast` is
+faster still but collapses to one model wearing five hats, so it is for long
+unattended streams and testing, not for the demo.
 
 Check the result any time with:
 
@@ -250,7 +262,8 @@ roster of five means a cold load on every turn.
 That cost is measured, not hand-waved: **18–38s per swap** against 0.06–0.26s
 once a model is resident, on an RTX 5060 8GB. See
 [docs/BENCHMARK_8GB.md](docs/BENCHMARK_8GB.md), and use
-`build_roster.gd -- --fast` if you want throughput over variety.
+`build_roster.gd -- --balanced` to cut most of that cost while keeping several
+architectures, or `-- --fast` to give up variety entirely for maximum turns.
 
 ---
 

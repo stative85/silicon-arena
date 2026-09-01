@@ -136,6 +136,42 @@ you want conversation throughput — long unattended streams, testing template
 behaviour, or filling a BRB overlay — where waiting 40 seconds per line is the
 dominant cost.
 
+## BALANCED mode: the middle of the dial
+
+The diverse roster and `--fast` are the two ends of one trade, and nothing sat
+between them. `--balanced` puts N agents on M distinct models and orders the
+roster so agents sharing a model are adjacent, which makes a round cost one
+cold load per *model* instead of one per *agent*.
+
+All three measured on the same build, same 260-second window, same headless
+harness, no overlay attached, back to back:
+
+| roster | distinct models | cold loads/round | agents spoke | failures |
+|---|---:|---:|---:|---:|
+| diverse (default) | 5 | 5 | 8 | 0 |
+| `--balanced` | 2 | 2 | **33** | 0 |
+| `--fast` | 1 | 1 | 64 | 0 |
+
+**Balanced is 4.1x the diverse roster and keeps roughly half of `--fast`'s
+throughput while still being a genuinely heterogeneous debate.** Two
+architectures argue instead of one wearing five hats.
+
+```
+godot --headless --path . --script tools/build_roster.gd -- --balanced
+godot --headless --path . --script tools/build_roster.gd -- --balanced=3
+```
+
+Why ordering matters at all: turns are taken strictly round-robin, so a cold
+load is paid on every adjacent model *change*, counted circularly. Interleaved,
+five agents on two models cost four loads per round; grouped, they cost two.
+Same agents, same models, half the waiting. `scripts/arena/turn_order.gd` holds
+the cost model and `turn_order_selftest.gd` pins the arithmetic.
+
+Limits: one machine, one session, one topic, and throughput depends on which
+models the builder happens to pick — the balanced run drew two 7Bs while the
+diverse run included a 1.6B and a 4B that load faster. Treat the ratio as the
+result, not the absolute counts.
+
 ## Sustained operation
 
 A 400-second unattended run, three logical agents sharing one resident model:

@@ -68,3 +68,7 @@ assets/_incoming/
 **/Unity Package/
 **/*Preview*.gif
 assets/COUPON.pdf
+
+# Generated from the models actually installed on THIS machine.
+# Machine-specific: model ids differ per user, so it is built, not shipped.
+config/arena-roster.v1.json
