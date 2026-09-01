@@ -70,6 +70,11 @@ var _wait_for_client_sec := 45.0
 
 ## Quit once the turn cap is reached instead of lingering for an overlay.
 var _exit_on_complete := false
+
+## Requested reply length. 0 means "unset", which keeps the historical wording.
+## Set from the roster's `debate` block or --reply-words MIN-MAX.
+var _reply_words_min := 0
+var _reply_words_max := 0
 var _request_timeout_sec := 90.0
 ## What a human last said, and when. Kept for a few turns only.
 var _human_line := ""
@@ -195,6 +200,16 @@ func _parse_args() -> void:
 				if v != "": _max_turns = maxi(int(v), 1); i += 1
 			"--wait-sec":
 				if v != "": _wait_for_client_sec = maxf(float(v), 0.0); i += 1
+			"--reply-words":
+				# "30-40" or a bare "40". Experiments vary this and nothing else.
+				if v != "":
+					var parts := v.split("-", false)
+					if parts.size() == 2:
+						_reply_words_min = int(parts[0])
+						_reply_words_max = int(parts[1])
+					else:
+						_reply_words_max = int(parts[0])
+					i += 1
 			"--exit-on-complete":
 				# Leave as soon as the turn cap is reached, even if an overlay
 				# is attached. Scripts that drive the arena need this.
@@ -225,6 +240,15 @@ func _load_roster() -> bool:
 	if not (parsed is Dictionary) or not parsed.has("agents") or not parsed.has("runtimes"):
 		printerr("LIVE_ARENA FATAL roster malformed")
 		return false
+
+	# Optional `debate` block: presentation and pacing as DATA, so an
+	# experiment (and later DEMO mode) is a different roster file rather than a
+	# different runtime. A CLI override still wins, for A/B runs.
+	if parsed.get("debate", null) is Dictionary:
+		var deb: Dictionary = parsed["debate"]
+		if _reply_words_max <= 0:
+			_reply_words_min = int(deb.get("reply_words_min", 0))
+			_reply_words_max = int(deb.get("reply_words_max", 0))
 
 	var rt: Dictionary = parsed["runtimes"][0]
 	# Per-model inference preferences from the roster config. Each model family
@@ -458,6 +482,23 @@ func _on_human_said(text: String) -> void:
 	# is the non-frozen channel and the right place for new information.
 
 
+## How the reply-length instruction is worded.
+##
+## Configuration, not a code path: the length lives in the roster's `debate`
+## block or a CLI override, so an experiment is a different roster file rather
+## than a different build. DEMO mode will use the same door.
+##
+## Returns the original wording when nothing is configured, so an existing
+## roster behaves exactly as before.
+func _length_rule() -> String:
+	if _reply_words_max <= 0:
+		return "two sentences maximum"
+	if _reply_words_min > 0:
+		return ("between %d and %d words - no more, and do not pad to reach it"
+			% [_reply_words_min, _reply_words_max])
+	return "at most %d words" % _reply_words_max
+
+
 func _build_messages(agent: Dictionary) -> Array:
 	var others := []
 	for a in _agents:
@@ -468,7 +509,7 @@ func _build_messages(agent: Dictionary) -> Array:
 	sys += "Your character: %s\n" % agent["_persona"]
 	sys += "The others in the room: %s.\n" % ", ".join(others)
 	sys += "TOPIC: %s\n" % TOPIC
-	sys += "Rules: speak in your own voice, two sentences maximum. "
+	sys += "Rules: speak in your own voice, %s. " % _length_rule()
 	# Anti-parrot. Small models fed a rolling transcript will continue the last
 	# speaker almost verbatim; turns 3-5 of an earlier run were near-copies of
 	# turn 2. This is a pre-existing quality problem, not a memory one.

@@ -102,16 +102,48 @@ def main():
     ap.add_argument("--cond", required=True, choices=sorted(CONDITIONS))
     ap.add_argument("--turns", type=int, default=15)
     ap.add_argument("--build", action="store_true")
+    ap.add_argument("--label", default="",
+                    help="write results under this name instead of --cond, so "
+                         "several conditions can share one roster")
+    ap.add_argument("--reply-words", dest="reply_words", default="",
+                    help="MIN-MAX passed to live_match; the only variable in "
+                         "the compression experiment")
+    ap.add_argument("--reset", action="store_true",
+                    help="clear memory and VRAM without rebuilding the roster")
     a = ap.parse_args()
     os.makedirs(OUT, exist_ok=True)
     g = godot()
     flags = CONDITIONS[a.cond]
-    path = os.path.join(OUT, a.cond + ".json")
+    name = a.label or a.cond
+    path = os.path.join(OUT, name + ".json")
+
+    if a.reset:
+        # Same clean slate as --build, but keeps the roster on disk so several
+        # conditions are measured against an identical set of models.
+        print("freeing VRAM: %s" % ("ok" if lms_unload() else "lms unavailable"))
+        p = os.path.join(USERDATA, "scar_lattice")
+        if os.path.isdir(p):
+            shutil.rmtree(p, ignore_errors=True)
+        roster = json.load(open(os.path.join(ROOT, "config",
+                                             "arena-roster.v1.json"), encoding="utf-8"))
+        models = [ag["model_key"] for ag in roster["agents"]]
+        rec = {"condition": name, "flags": flags, "roster": roster,
+               "models": [], "distinct_models": len(set(models)),
+               "roster_models": sorted(set(models)),
+               "reply_words": a.reply_words or "(baseline)",
+               "wall_sec": 0.0, "build_sec": 0.0, "chunks": 0,
+               "timed_out": False, "speeches": [], "failures": []}
+        json.dump(rec, open(path, "w", encoding="utf-8"), indent=1)
+        print("reset %s against the existing roster (%d distinct models), reply_words=%s"
+              % (name, len(set(models)), rec["reply_words"]))
+        return
 
     if a.build:
         print("freeing VRAM: %s" % ("ok" if lms_unload() else "lms unavailable"))
-        for name in ("scar_lattice", "live_matches"):
-            p = os.path.join(USERDATA, name)
+        # NB: not `name` -- that is the condition label and shadowing it here
+        # made --build report "built live_matches".
+        for sub in ("scar_lattice", "live_matches"):
+            p = os.path.join(USERDATA, sub)
             if os.path.isdir(p):
                 shutil.rmtree(p, ignore_errors=True)
         t0 = time.time()
@@ -122,23 +154,24 @@ def main():
         roster = json.load(open(os.path.join(ROOT, "config",
                                              "arena-roster.v1.json"), encoding="utf-8"))
         models = [ag["model_key"] for ag in roster["agents"]]
-        rec = {"condition": a.cond, "flags": flags, "roster": roster,
+        rec = {"condition": name, "flags": flags, "roster": roster,
                "models": [], "distinct_models": len(set(models)),
                "roster_models": sorted(set(models)),
                "wall_sec": 0.0, "build_sec": time.time() - t0,
                "chunks": 0, "timed_out": False, "speeches": [], "failures": []}
         json.dump(rec, open(path, "w", encoding="utf-8"), indent=1)
         print("built %s: %d agents, %d distinct model(s) in %.0fs"
-              % (a.cond, len(models), len(set(models)), rec["build_sec"]))
+              % (name, len(models), len(set(models)), rec["build_sec"]))
         print("  " + ", ".join(sorted(set(models))))
         return
 
     rec = json.load(open(path, encoding="utf-8"))
     before = newest_log()
+    extra = ["--reply-words", a.reply_words] if a.reply_words else []
     p = subprocess.run([g, "--headless", "--path", ROOT, "--script",
                         "scripts/arena/live_match.gd", "--",
                         "--turns", str(a.turns), "--no-wait",
-                        "--exit-on-complete", "--timeout-sec", "120"],
+                        "--exit-on-complete", "--timeout-sec", "120"] + extra,
                        capture_output=True, text=True, encoding="utf-8",
                        errors="ignore", timeout=3000)
     log = (p.stdout or "") + (p.stderr or "")
@@ -161,7 +194,7 @@ def main():
     rec["chunks"] += 1
     json.dump(rec, open(path, "w", encoding="utf-8"), indent=1)
     print("%s chunk %d: +%d speeches (%d total), +%d failures, %.0fs (%.0fs total)"
-          % (a.cond, rec["chunks"], len(sp), len(rec["speeches"]),
+          % (name, rec["chunks"], len(sp), len(rec["speeches"]),
              len(fails), wall, rec["wall_sec"]))
 
 

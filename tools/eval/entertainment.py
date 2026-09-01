@@ -93,6 +93,16 @@ def analyse(rec):
     last = set(content(" ".join(texts[-3:])))
     drift = 1.0 - (len(first & last) / float(len(first | last))) if (first | last) else 0.0
 
+    # Truncation: a reply that ends without terminal punctuation was almost
+    # certainly cut off by the token budget mid-thought. This is the guard on
+    # the compression experiment -- squeezing word count until sentences break
+    # would otherwise look like a win.
+    cut = 0
+    for t in texts:
+        stripped = t.rstrip()
+        if stripped and stripped[-1] not in ".!?\"')]":
+            cut += 1
+
     # --- dead air: seconds a viewer waits with nothing happening ---------
     lat = sorted(s["latency_ms"] for s in sp)
     slow = sum(1 for s in sp if s["latency_ms"] >= 10000)
@@ -111,6 +121,7 @@ def analyse(rec):
         "long_replies": long_ / float(n),
         "mean_words": sum(lens) / float(n),
         "topic_drift": drift,
+        "truncation_rate": cut / float(n),
         "median_latency_ms": lat[len(lat) // 2],
         "waits_over_10s": slow / float(n),
     }
@@ -128,6 +139,7 @@ ROWS = [
     ("short_replies", "replies <= 40 words", "{:.1%}", "high"),
     ("long_replies", "replies >= 90 words", "{:.1%}", "low"),
     ("mean_words", "mean words", "{:.1f}", None),
+    ("truncation_rate", "truncated mid-thought", "{:.1%}", "low"),
     ("topic_drift", "topic drift", "{:.2f}", None),
     ("median_latency_ms", "median latency (ms)", "{:.0f}", "low"),
     ("waits_over_10s", "waits over 10s", "{:.1%}", "low"),
