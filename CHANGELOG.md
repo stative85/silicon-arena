@@ -23,7 +23,7 @@
 - **The LM Studio URL was hardcoded in five places**, so `SILICON_ARENA_LM_URL`
   was honoured by some paths and ignored by others.
 - **README, CLAUDE.md and CONTRIBUTING.md shipped `toolserify.cmd`** — a
-  vertical tab had replaced a backslash in `toolserify.cmd` during a scripted
+  vertical tab had replaced a backslash in `tools\verify.cmd` during a scripted
   edit. The command rendered almost correctly and did not exist.
 - **SETUP.md contradicted the code**: it said HTTP 400 meant "model not found"
   and recommended 12B models that the ceiling refuses.
