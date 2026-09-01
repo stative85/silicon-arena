@@ -70,6 +70,10 @@ call :check "scripts/arena/compat_selftest.gd"            "system-role compat"  
 call :check "tools/adversarial.gd"                        "adversarial pass"    "ADVERSARIAL OK"
 call :check "tools/offline_selftest.gd"                   "offline behaviour"   "OFFLINE OK"
 
+REM ---- documentation and workflow linting ---------------------------------
+call :pycheck "tools/lint_docs.py"       "documentation lint"
+call :pycheck "tools/lint_workflows.py"  "workflow lint"
+
 REM ---- JSON + preset legality ---------------------------------------------
 "%GODOT%" --headless --path . --script tools/verify_configs.gd >"%TEMP%\sa_cfg.txt" 2>&1
 findstr /C:"CONFIGS OK" "%TEMP%\sa_cfg.txt" >nul
@@ -109,4 +113,21 @@ if not errorlevel 1 (
   exit /b 0
 )
 echo [PASS] %~2
+exit /b 0
+
+:pycheck
+REM %~1 python script  %~2 label
+where python >nul 2>&1
+if errorlevel 1 (
+  echo [SKIP] %~2 - python not on PATH
+  exit /b 0
+)
+python %~1 >"%TEMP%\sa_py.txt" 2>&1
+if errorlevel 1 (
+  echo [FAIL] %~2
+  findstr /C:"FAIL" "%TEMP%\sa_py.txt"
+  set FAILED=1
+) else (
+  echo [PASS] %~2
+)
 exit /b 0
