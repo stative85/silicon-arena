@@ -136,6 +136,28 @@ Respond as Deckard."
 const PROMPT_ECHO_MARKERS := ["recent turns:", "respond as ", "assistant responds",
 	"assistant:", "you are a debater"]
 
+## Distinct characters, so two agents on the SAME model are not the same agent.
+##
+## build_roster wrote "persona": "" for every agent, and live_match.gd builds
+## its system prompt as `Your character: %s`. With an empty persona, agents
+## sharing a model received byte-identical prompts differing only in a display
+## name -- and duly produced near-identical text, opening with the same stock
+## "As an AI language model..." line.
+##
+## The blinded evaluation measured the consequence: the fitting roster, which
+## deliberately repeats models, scored LOWEST on distinctiveness with both
+## judges (2.70 and 3.70) while every other condition scored higher.
+##
+## Deliberately about ARGUMENTATIVE STANCE rather than costume. A stance
+## changes what an agent says next; a costume only changes its adjectives.
+const PERSONAS := [
+	"a systems engineer who wants mechanisms and refuses abstraction",
+	"a moral philosopher who tests every claim against a hard edge case",
+	"a sceptic who assumes the other speakers are smuggling in assumptions",
+	"a pragmatist who only cares what would actually change in practice",
+	"a historian who answers new claims with how the old ones failed",
+]
+
 const COLORS := ["c471ed", "3db1ff", "00d2ff", "5ad78c", "ff6b6b"]
 
 var _policy
@@ -365,6 +387,8 @@ AUTO: nothing verified fits the budget.")
 			"color": COLORS[i % COLORS.size()],
 			"model": id,
 			"name": nm,
+			# Index by position, so agents sharing a model never share a stance.
+			"persona": PERSONAS[i % PERSONAS.size()],
 		})
 
 	print("
@@ -724,7 +748,7 @@ func _write_live_roster(roster: Array) -> void:
 			"model_key": a["model"],
 			"runtime_id": "runtime-01",
 			"color": "#" + str(a["color"]),
-			"persona": "",
+			"persona": str(a.get("persona", "")),
 		})
 	# runtimes[0] is the default any agent without its own model_key inherits.
 	# Every agent above carries an explicit key, so a heterogeneous roster

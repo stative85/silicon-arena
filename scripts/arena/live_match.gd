@@ -583,6 +583,16 @@ func _on_reply(agent: Dictionary, ok: bool, content: String, http_code: int, sta
 	# all, which is the entry-point drift this project keeps rediscovering.
 	var text := SpeechCleanScript.strip_self_prefix(
 		content.strip_edges(), str(agent["display_name"]))
+	# Agents open by restating the previous speaker verbatim, sometimes nested
+	# two deep, before adding anything of their own. Measured at 13.3%
+	# near-duplicate speeches on the roster that became the default, and every
+	# one of them was this rather than a model repeating itself.
+	var recent: Array = []
+	for other in _agents:
+		var last := str(other.get("last_message", ""))
+		if last != "":
+			recent.append(last)
+	text = SpeechCleanScript.strip_quoted_prefix(text, recent)
 	agent["state"] = "speaking"
 	agent["last_message"] = text
 	agent["last_message_at_ms"] = Time.get_ticks_msec()

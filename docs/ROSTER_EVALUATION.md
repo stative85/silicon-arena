@@ -108,6 +108,62 @@ actually do:
 
 `--diverse` still gives the historical one-model-per-agent roster.
 
+## Follow-up: the repetition had a cause, and it was fixable
+
+`--fit`'s one clear measured weakness was repetition — 13.3% near-duplicate
+speeches. Inspecting the pairs showed it was **not** models repeating
+themselves. Every one was an agent restating the previous speaker verbatim
+before adding anything, sometimes nested two deep:
+
+```
+"Stablelm #1 said: H2o Danube #1 raises a valid point about how AI systems
+ can learn from their experiences and adapt their..."
+```
+
+And the reason agents sharing a model produced near-identical text was blunter:
+`build_roster.gd` wrote `"persona": ""` for every agent, while `live_match.gd`
+builds its prompt as `Your character: %s`. Agents on the same model were
+receiving byte-identical prompts that differed only in a display name. That is
+also the most likely reason `--fit` scored **lowest on distinctiveness** with
+both judges.
+
+Two fixes: a deterministic stripper for verbatim quotation of an earlier turn,
+and five distinct argumentative stances assigned so that agents sharing a model
+never share one.
+
+Re-measured on the same roster and window:
+
+| metric | before | after |
+|---|---:|---:|
+| near-duplicate rate | 13.3% | **3.3%** |
+| mean max similarity | 0.161 | **0.086** |
+| content novelty | 0.248 | 0.264 |
+| challenge / contradiction | 55.0% | **61.7%** |
+| refers to another agent | 65.0% | 53.3% |
+| speeches / min | 14.53 | 14.07 |
+
+Duplication is now lower than the historical default's 8.5%, and the challenge
+rate is the highest of any condition, at essentially unchanged throughput.
+
+The drop in "refers to another agent" is a consequence of the fix rather than a
+regression: those references were largely inside the quoted restatements that
+are now removed. The metric was counting quotation as engagement.
+
+Re-judged blind, the two judges disagree about the change:
+
+| | J1 before | J1 after | J2 before | J2 after |
+|---|---:|---:|---:|---:|
+| distinctiveness | 2.70 | 2.80 | 3.70 | **4.30** |
+| responsiveness | 3.00 | 3.00 | 3.40 | 3.80 |
+| coherence | 3.60 | **3.20** | 4.00 | 4.00 |
+| overall | 3.05 | 3.00 | 3.70 | **3.92** |
+
+J2 rates it clearly better and now ranks `--fit` above the historical default.
+J1 rates it marginally worse, driven by a coherence drop. Agreement between the
+judges is as weak as before (overall r=0.324), so this is recorded as a split
+rather than resolved. The mechanical improvements are unambiguous; the judged
+effect is not.
+
 ## Limits
 
 One machine, one session, one topic, ~60 speeches per condition. Each condition

@@ -101,6 +101,50 @@ func _run() -> void:
 		).begins_with("A very long opening"),
 		"cut a colon beyond the label limit")
 
+	# --- quoting the previous speaker ---------------------------------
+	# Taken from the transcript that made this necessary.
+	var prev := ["As an AI language model, I would like to reiterate my initial "
+		+ "stance on the matter and explain exactly why it holds."]
+
+	_eq("strips a verbatim quotation of the previous turn",
+		SC.strip_quoted_prefix(
+			"As an AI language model, I would like to reiterate my initial "
+			+ "stance on the matter and explain exactly why it holds. But I disagree.",
+			prev),
+		"But I disagree.")
+
+	_eq("strips an attributed verbatim quotation",
+		SC.strip_quoted_prefix(
+			"Deckard said: As an AI language model, I would like to reiterate my "
+			+ "initial stance on the matter and explain exactly why it holds. Wrong.",
+			prev),
+		"Wrong.")
+
+	# --- what must survive --------------------------------------------
+	_check("KEEPS an attribution followed by the speaker's own words",
+		SC.strip_quoted_prefix("Deckard said: that is nonsense and here is why.",
+			prev).find("nonsense") != -1,
+		"removed original content")
+
+	_eq("KEEPS a short coincidental overlap",
+		SC.strip_quoted_prefix("As an AI language model, I refuse.", prev),
+		"As an AI language model, I refuse.")
+
+	_eq("KEEPS everything when there is no history",
+		SC.strip_quoted_prefix("Anything at all here.", []),
+		"Anything at all here.")
+
+	_check("a turn that is ONLY a quotation is left intact, not blanked",
+		SC.strip_quoted_prefix(prev[0], prev) == prev[0],
+		"deleting the whole reply would hide the problem")
+
+	_check("punctuation and spacing differences do not defeat it",
+		SC.strip_quoted_prefix(
+			"as an ai language model i would like to reiterate my initial stance "
+			+ "on the matter and explain exactly why it holds -- and yet.", prev)
+			== "-- and yet.",
+		"comparison must ignore case and punctuation")
+
 	_report()
 
 
