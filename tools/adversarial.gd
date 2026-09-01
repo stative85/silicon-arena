@@ -28,6 +28,7 @@ func _run() -> void:
 	_catalog_damage()
 	_preset_damage()
 	_compat_abuse()
+	_filename_abuse()
 	_report()
 
 
@@ -201,6 +202,61 @@ func _compat_abuse() -> void:
 	else:
 		_failures.append("compat: fold crashed on malformed input")
 		print("   FAIL fold did not survive malformed input")
+
+
+## Clip filenames are built from agent names, which come from editable preset
+## JSON. Sanitising by replacing spaces is not sanitising.
+func _filename_abuse() -> void:
+	print("")
+	print("[filenames] agent names cannot escape the clips directory")
+	var BSLASH := char(92)   # avoid any backslash escape in this source
+	var MainScript = load("res://scripts/main.gd")
+	var cases: Array = [
+		["../../evil", "path traversal (unix)"],
+		[".." + BSLASH + ".." + BSLASH + "evil", "path traversal (windows)"],
+		["a/b/c", "nested path"],
+		["CON", "reserved device name"],
+		["nul.mkv", "reserved device name with extension"],
+		["name with spaces", "spaces"],
+		["colon:star*question?", "characters Windows forbids"],
+		["", "empty"],
+		["...", "dots only"],
+	]
+	for pair in cases:
+		var raw: String = pair[0]
+		var label: String = pair[1]
+		_checks += 1
+		var got: String = MainScript._sanitize_filename(raw)
+		var bad := got.find("/") != -1 or got.find(BSLASH) != -1 or got.find("..") != -1 or got == ""
+		if bad:
+			_failures.append("filename: %s -> %s" % [raw, got])
+			print("   FAIL %s -> %s" % [label, got])
+		else:
+			print("   ok   %s -> %s" % [label, got])
+	# WIRING, not just the helper. Proving _sanitize_filename works says nothing
+	# about whether _start_recording calls it — the same "constructing is not
+	# configuring" trap that let an earlier parity test pass the bug it guarded.
+	_checks += 1
+	var src := ""
+	var f := FileAccess.open("res://scripts/main.gd", FileAccess.READ)
+	if f != null:
+		src = f.get_as_text()
+		f.close()
+	var re := RegEx.new()
+	re.compile("safe_name[ 	]*:?=[ 	]*_sanitize_filename")
+	if re.search(src) != null:
+		print("   ok   _start_recording actually uses the sanitiser")
+	else:
+		_failures.append("filename: sanitiser exists but _start_recording does not call it")
+		print("   FAIL sanitiser is not wired into _start_recording")
+
+	_checks += 1
+	var long_name: String = MainScript._sanitize_filename("x".repeat(500))
+	if long_name.length() <= 64:
+		print("   ok   500-char name capped to %d" % long_name.length())
+	else:
+		_failures.append("filename: length not capped")
+		print("   FAIL length not capped (%d)" % long_name.length())
 
 
 func _report() -> void:

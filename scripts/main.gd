@@ -2366,6 +2366,25 @@ func _toggle_recording() -> void:
 	else:
 		_start_recording(0.0)  # 0 = manual stop (F10 again)
 
+## Reduce arbitrary text to a filename that cannot escape its directory.
+## Allowlist only: letters, digits, underscore, hyphen. Everything else becomes
+## an underscore, runs are collapsed, and the result is length-capped.
+static func _sanitize_filename(raw: String, fallback: String = "arena_clip") -> String:
+	var out := ""
+	for i in raw.length():
+		var c := raw[i]
+		if (c >= "a" and c <= "z") or (c >= "A" and c <= "Z") 				or (c >= "0" and c <= "9") or c == "_" or c == "-":
+			out += c
+		else:
+			out += "_"
+	while out.find("__") != -1:
+		out = out.replace("__", "_")
+	out = out.lstrip("_-.").rstrip("_-.")
+	if out.length() > 64:
+		out = out.substr(0, 64)
+	return out if out != "" else fallback
+
+
 func _start_recording(auto_stop_seconds: float = 0.0, clip_name: String = "") -> void:
 	if _recording:
 		return
@@ -2379,7 +2398,11 @@ func _start_recording(auto_stop_seconds: float = 0.0, clip_name: String = "") ->
 		DirAccess.make_dir_recursive_absolute(CLIP_DIR)
 
 	var ts = int(Time.get_unix_time_from_system())
-	var safe_name = clip_name.replace(" ", "_") if not clip_name.is_empty() else "arena_clip"
+	# Clip names are built from AGENT NAMES, which come from user-editable
+	# preset JSON. Replacing spaces is not sanitising: "../../x" would escape
+	# CLIP_DIR entirely, and characters Windows forbids in a filename would
+	# make FFmpeg fail silently. Allowlist, do not blocklist.
+	var safe_name := _sanitize_filename(clip_name)
 	# Matroska, not MP4. MP4 only becomes playable when ffmpeg writes the moov
 	# atom on a clean exit; a hard kill leaves nothing usable. MKV finalizes as
 	# it goes, so a clip survives being killed mid-write.

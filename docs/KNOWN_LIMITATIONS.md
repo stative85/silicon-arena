@@ -102,3 +102,17 @@ Recover by changing that agent's model (F6) or regenerating the roster.
 `AGENT_FAILURE_STREAK_LIMIT` consecutive failures the agent pauses for a
 cooldown and then rejoins. That path is for transient problems; the 400 path is
 for a request the model will never accept.
+
+## Filenames
+
+Clip filenames are derived from agent names, which come from editable preset
+JSON. They are reduced to an allowlist of `A-Za-z0-9_-`, runs of underscores are
+collapsed, leading/trailing separators are trimmed and the result is capped at
+64 characters. `../../evil` becomes `evil`; an empty or all-punctuation name
+becomes `arena_clip`.
+
+Reserved Windows device names (`CON`, `NUL`, `PRN`, `AUX`, `COM1`…) survive
+sanitisation as ordinary text because they contain only allowed characters.
+Since every clip name is suffixed with a Unix timestamp before the extension,
+the final filename is never a bare device name — `CON` becomes
+`CON_1788245123.mkv`, which Windows accepts.
