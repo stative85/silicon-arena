@@ -1,0 +1,9 @@
+* text=auto
+*.gd text eol=lf
+*.md text eol=lf
+*.json text eol=lf
+*.import text eol=lf
+*.png binary
+*.wav binary
+*.mp3 binary
+*.ogg binary

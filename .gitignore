@@ -50,3 +50,6 @@ Desktop.ini
 # Editor/script backups
 *.bak
 *.bak.*
+
+# local launch notes, not part of the project
+.launch/
