@@ -192,11 +192,16 @@ harness, RTX 5060 8GB, zero failures in all four:
 | **`--fit`** | **3** | **yes** | **90** |
 
 **`--fit` beat the single-model roster while running three architectures**, with
-turns split evenly and no failures. The "variety costs throughput" trade is not
-a law — it is what happens when a roster overcommits VRAM. (Its models are also
-smaller, so some of the win is cheaper inference, not residency alone; the
-method and the honest caveats are in
-[docs/BENCHMARK_8GB.md](docs/BENCHMARK_8GB.md).)
+turns split evenly and no failures.
+
+Measured attribution, because the table invites an overstatement: of the ~5.0s
+per turn `--fit` saves, roughly **2.8s is cheaper inference (its models are
+smaller) and at most ~2.2s is avoided swapping**. Residency is real and
+`tools/prove.gd` measures it directly, but smaller models are the larger half
+of the gap. Method in [docs/BENCHMARK_8GB.md](docs/BENCHMARK_8GB.md).
+
+The useful conclusion is narrower than "residency wins" and still worth having:
+the variety-versus-throughput trade is escapable rather than fundamental.
 
 `--balanced` still exists for when you want specific larger models and will
 accept some swapping; `--fast` puts every agent on one model.

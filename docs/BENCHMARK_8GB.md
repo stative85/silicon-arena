@@ -209,12 +209,39 @@ All four modes, same build, same 260-second window, same headless harness:
 `--fit` beat single-model `--fast` while running three architectures, with
 turns spread perfectly evenly (18 each) and no failures.
 
-Read that honestly: a fitting roster wins on two counts at once, and only one
-of them is residency. Its models are also *smaller* — 1.6B, 3B and 1B — so each
-reply is quicker to generate as well as free of loading. The claim this run
-supports is "no swapping **and** cheaper inference", not "residency alone is
-worth 26 speeches". What it does establish is that the trade-off the rest of
-this document describes is escapable rather than fundamental.
+### How much of that is residency, and how much is just smaller models?
+
+Both, and mostly the models. Measuring warm inference alone for each roster's
+models — same model repeated, arena-shaped request, 110 tokens — and
+subtracting it from the observed per-turn cost:
+
+| roster | observed/turn | warm inference | residual |
+|---|---:|---:|---:|
+| `--fit` (1.6B/3B/1B) | 2.89s | 0.35s | 2.54s |
+| `--balanced` (two 7Bs) | 7.88s | 3.18s | 4.70s |
+
+The residual is swapping *plus* fixed arena overhead, and the two cannot be
+separated directly. But `--fit`'s models are co-resident, so its 2.54s residual
+is very close to pure overhead — which bounds the swapping in the `--balanced`
+row at about 2.16s per turn.
+
+So of the ~5.0s per turn that `--fit` saves, roughly **2.8s is cheaper
+inference and at most ~2.2s is avoided swapping**. Smaller models are the
+larger half of the story, not residency.
+
+That is worth stating plainly because the table above invites the opposite
+reading. Residency is real — claim D in `tools/prove.gd` measures it directly,
+and alternating between co-resident models is indistinguishable from repeating
+one — but it is not what most of the 90-vs-64 gap is made of.
+
+One caveat on the `--balanced` row: `logical-elyza-llama2-7b-fast-instruct`
+takes 5.05s of warm inference against mistral's 1.31s, so that roster is
+carrying one unusually slow model and its inference figure is not
+representative of 7Bs generally.
+
+What the whole set does establish is narrower than "residency wins" and still
+useful: the variety-versus-throughput trade is escapable rather than
+fundamental, and the cheapest way to escape it is to stop overcommitting VRAM.
 
 The budget defaults to 6.0 GB of an 8 GB card, leaving room for context, KV
 cache and the desktop. Sizes are ESTIMATED from catalog parameter counts and
