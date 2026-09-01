@@ -160,8 +160,15 @@ func _check_policy_and_roster() -> void:
 		_ok("Eligible <=%.0fB" % policy.MAX_PARAM_B, "%d of %d installed models permitted" % [legal.size(), _models.size()])
 
 	# Does the default roster actually resolve on THIS machine?
+	# Check the preset the arena will ACTUALLY load. user:// wins when present,
+	# which is exactly what build_roster.gd writes. Reading res:// here reported
+	# "Roster 1/5" immediately after a good roster had been generated — a
+	# diagnostic that lies is worse than no diagnostic.
 	var raw := ""
-	var f := FileAccess.open("res://presets.json", FileAccess.READ)
+	var source := "res://presets.json"
+	if FileAccess.file_exists("user://presets.json"):
+		source = "user://presets.json"
+	var f := FileAccess.open(source, FileAccess.READ)
 	if f != null:
 		raw = f.get_as_text()
 		f.close()
@@ -187,10 +194,10 @@ func _check_policy_and_roster() -> void:
 		else:
 			good += 1
 	if good == total and total > 0:
-		_ok("Roster", "%d/%d valid" % [good, total])
+		_ok("Roster", "%d/%d valid (%s)" % [good, total, source])
 	else:
-		_warned("Roster", "%d/%d usable in preset 0" % [good, total],
-			"press F6 in the arena to pick installed models, or download the missing ones")
+		_warned("Roster", "%d/%d usable in preset 0 of %s" % [good, total, source],
+			"run: godot --headless --path . --script tools/build_roster.gd")
 		for p in problems:
 			print("%-18s       - %s" % ["", p])
 
