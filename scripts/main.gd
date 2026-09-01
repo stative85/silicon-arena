@@ -3041,11 +3041,24 @@ func _request_loaded_models() -> void:
 		_builder_panel.set_status("Refreshing LM Studio model cache...")
 	_lm_client.fetch_models(func(ok: bool, models: Array):
 		if ok:
-			_loaded_model_ids = models.duplicate()
-			_set_model_status("Cached %d loaded LM Studio models." % _loaded_model_ids.size())
+			# THE LAW BEFORE THE PICKER. Offering a model the policy will refuse
+			# is a trap: the user selects it, the request is blocked, and the
+			# agent looks broken for a reason the UI already knew about.
+			var permitted: Array = []
+			var refused := 0
+			for id in models:
+				if _model_policy == null or _model_policy.check(str(id)) == "":
+					permitted.append(id)
+				else:
+					refused += 1
+			_loaded_model_ids = permitted
+			var msg := "%d models usable" % permitted.size()
+			if refused > 0:
+				msg += "  (%d hidden — above the %.0fB ceiling)" % [refused, _model_policy.MAX_PARAM_B]
+			_set_model_status(msg)
 			if _builder_panel:
 				_builder_panel.set_loaded_models(_loaded_model_ids)
-				_builder_panel.set_status("Cached %d loaded LM Studio models." % _loaded_model_ids.size())
+				_builder_panel.set_status(msg)
 		else:
 			_loaded_model_ids.clear()
 			_set_model_status("LM Studio model refresh failed.", false)

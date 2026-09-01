@@ -87,3 +87,18 @@ Clips are written as `.mkv`, not `.mp4`. MP4 only becomes playable when FFmpeg
 writes its moov atom on a clean exit, and the recorder is stopped by killing the
 process; a hard-killed MP4 leaves nothing usable. MKV finalises as it goes. The
 recorder verifies the file exists and is non-empty before reporting success.
+
+## Agent recovery
+
+**An agent disabled by HTTP 400 stays out for the session.** `agent.broken` is
+set once and only cleared when the roster is rebuilt. The message now names the
+real reason and points at F6 or `tools/build_roster.gd`, but there is no
+automatic retry — a request the server rejected outright will usually keep
+being rejected, and retrying it every turn would just fill the log.
+
+Recover by changing that agent's model (F6) or regenerating the roster.
+
+**Repeated no-response failures cool down rather than disable.** After
+`AGENT_FAILURE_STREAK_LIMIT` consecutive failures the agent pauses for a
+cooldown and then rejoins. That path is for transient problems; the 400 path is
+for a request the model will never accept.
