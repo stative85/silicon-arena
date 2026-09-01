@@ -94,6 +94,11 @@ jobs:
         # almost correctly and the command did not exist.
         run: python3 tools/lint_docs.py
 
+      - name: Silent-exit lint
+        # Every silent failure in this project's history looked like success.
+        # A non-zero exit must say why.
+        run: python3 tools/lint_exits.py
+
       - name: Workflow YAML lint
         # A workflow that does not parse never runs, so CI cannot catch this
         # class itself. It was broken once by an unquoted "RESULT: SEPARATED".

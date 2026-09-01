@@ -73,6 +73,7 @@ call :check "tools/offline_selftest.gd"                   "offline behaviour"   
 REM ---- documentation and workflow linting ---------------------------------
 call :pycheck "tools/lint_docs.py"       "documentation lint"
 call :pycheck "tools/lint_workflows.py"  "workflow lint"
+call :pycheck "tools/lint_exits.py"       "silent failure exits"
 
 REM ---- JSON + preset legality ---------------------------------------------
 "%GODOT%" --headless --path . --script tools/verify_configs.gd >"%TEMP%\sa_cfg.txt" 2>&1

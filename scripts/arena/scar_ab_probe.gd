@@ -69,7 +69,7 @@ var _elapsed := 0.0
 func _init() -> void:
 	_parse_args()
 	if not _load_roster():
-		quit(3)
+		quit(3)  # reason printed by _load_roster()
 		return
 
 	_policy = PolicyScript.new()
