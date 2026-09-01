@@ -75,3 +75,4 @@ config/arena-roster.v1.json
 
 # Evaluation working files: machine-specific transcripts and locks.
 tools/eval/runs/
+tools/eval/runs_roster/
