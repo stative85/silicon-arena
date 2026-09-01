@@ -1,5 +1,63 @@
 # Changelog
 
+## Unreleased (since v0.1.0-rc2)
+
+### Security
+
+- **Clip filenames could escape the clips directory.** Names are built from
+  agent names, which come from editable preset JSON; only spaces were
+  sanitised, so `../../evil` wrote outside `CLIP_DIR`. Now an allowlist
+  (`A-Za-z0-9_-`), capped at 64 characters, with a source-level assertion that
+  `_start_recording` actually calls the sanitiser.
+
+### Fixed
+
+- **HTTP 400 was reported as "model not available"**, sending users to download
+  a model that was already installed. The client now summarises the real cause
+  and the arena prints it with a remedy.
+- **The F6 model picker listed models the policy refuses** — 8B through 32B —
+  while failure messages told users to pick from it. The ceiling is now applied
+  before the list is built.
+- **`live_match.gd` told users to run `npx tsx tools/buildModelCatalog.ts`**,
+  which does not exist in this repository.
+- **The LM Studio URL was hardcoded in five places**, so `SILICON_ARENA_LM_URL`
+  was honoured by some paths and ignored by others.
+- **README, CLAUDE.md and CONTRIBUTING.md shipped `toolserify.cmd`** — a
+  vertical tab had replaced a backslash in `toolserify.cmd` during a scripted
+  edit. The command rendered almost correctly and did not exist.
+- **SETUP.md contradicted the code**: it said HTTP 400 meant "model not found"
+  and recommended 12B models that the ceiling refuses.
+- 68 orphan `.import` files and 38 vendor-bundle extras (Unity packages,
+  Spriter sources, a CraftPix marketing coupon) removed from tracking.
+
+### Added
+
+- `SILICON_ARENA_LM_URL` / `LM_STUDIO_URL` override, resolved once in
+  `scripts/api/lm_endpoint.gd` and honoured by every tool and the launcher.
+  Accepts bare `host:port`, with or without scheme or `/v1`.
+- `--fast` roster mode: one resident model across five logical agents. Measured
+  over the same 280s window, **49 speeches instead of 7**, 100% completion
+  instead of 70%. Trades heterogeneity for throughput; documented as such.
+- `[LOADING]` heartbeat every 10s during a cold model load, so an 18-38s swap
+  is visibly progressing rather than looking like a hang.
+- `tools/offline_selftest.gd` — proves the arena degrades cleanly with no LM
+  Studio (callback fires, honest reason, queue not wedged).
+- `tools/lint_docs.py` and `tools/lint_workflows.py`, both in CI and
+  `verify.cmd`.
+- CI now covers `doctor`, `build_roster` and `prove` in the no-LM-Studio state
+  a first-time user is actually in.
+
+### Testing
+
+- `verify.cmd` demands a **positive success token** from each suite. The old
+  harness passed on the absence of the word "failure", so a test printing
+  nothing would have reported green.
+- Parity self-test gained `SINGLE_SOURCE`: facts that must be written down
+  exactly once. It caught `live_match.gd` still hardcoding the endpoint after
+  the refactor fixed the other four call sites.
+- Suite counts: parity 12, adversarial 41, compat 27, offline 6, configs 46.
+
+
 ## v0.1.0-rc1 — 2026-09-01
 
 First release candidate. The arena went from "will not parse" to a verified,
