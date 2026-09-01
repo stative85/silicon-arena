@@ -1341,7 +1341,10 @@ const CoherenceEngineScript = preload("res://scripts/arena/coherence_engine.gd")
 const CinematicBridgeScript = preload("res://scripts/arena/cinematic_bridge.gd")
 
 const TURN_INTERVAL_SEC := 5.0
-const TURN_STALL_TIMEOUT_SEC := 30.0
+## Must exceed COLD_LOAD_TIMEOUT_SEC. The watchdog used to fire at 30s while
+## the client was still allowed 120s for a cold model load, so a model that
+## was merely loading got skipped as unresponsive.
+const TURN_STALL_TIMEOUT_SEC := 150.0
 const DOOM_CASCADE_TIMEOUT_SEC := 12.0
 const AGENT_FAILURE_STREAK_LIMIT := 2
 const AGENT_FAILURE_COOLDOWN_SEC := 10.0
