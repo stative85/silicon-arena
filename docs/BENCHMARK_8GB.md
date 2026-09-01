@@ -98,3 +98,30 @@ tail. Do not lower these based on a faster run.
   does not reach per-model. Treat the maximum as the planning number.
 - Not measured: concurrent requests, long-context loads, quantisations other
   than those installed here, or any GPU other than this one.
+
+## FAST mode: what sharing one model actually buys
+
+Same machine, same 280-second window, same five logical agents.
+
+| roster | turns started | agents spoke | cold-load heartbeats |
+|---|---:|---:|---:|
+| 5 distinct models | 10 | **7** | 21 |
+| 1 shared model (`--fast`) | 49 | **49** | 3 |
+
+**7x more speeches, and a 100% completion rate against 70%.** The three
+heartbeats in FAST mode are the single initial load; after that the model stays
+resident and every turn runs on the warm path.
+
+```
+godot --headless --path . --script tools/build_roster.gd -- --fast
+```
+
+The trade is real and it is not free: FAST gives up the heterogeneity that is
+the whole point of the project. Five agents share one set of weights and differ
+only by persona and memory, so "three architectures arguing" becomes "one
+architecture wearing five hats".
+
+Use the diverse roster to demonstrate what the project *is*. Use `--fast` when
+you want conversation throughput — long unattended streams, testing template
+behaviour, or filling a BRB overlay — where waiting 40 seconds per line is the
+dominant cost.

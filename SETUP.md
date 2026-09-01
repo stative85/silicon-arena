@@ -69,6 +69,17 @@ The 7B ceiling is applied *before* selection, so an oversized model cannot
 enter the roster. Models are ranked by chat-capability and spread across
 families.
 
+**If turns feel slow**, every turn is changing model and paying an 18-38s cold
+load. Build a single-model roster instead:
+
+```
+godot --headless --path . --script tools/build_roster.gd -- --fast
+```
+
+Measured on an RTX 5060 8GB over the same 280s window: 49 speeches instead of
+7. You trade architectural variety for throughput — see
+`docs/BENCHMARK_8GB.md`.
+
 ## Step 5: Check the machine before launching
 
 ```

@@ -19,6 +19,16 @@ const PolicyScript := preload("res://scripts/arena/model_policy.gd")
 
 const LM_BASE := "http://127.0.0.1:1234/v1"
 const WANTED := 5
+
+## FAST mode: every agent shares ONE model, so no turn ever swaps.
+##
+## Measured on an RTX 5060 8GB, five distinct models: 7 speeches in 280s, about
+## one every 40s, almost all of it weight loading (docs/BENCHMARK_8GB.md puts a
+## cold swap at 18-38s and warm inference at 0.06-0.26s). Sharing one model
+## trades architectural variety for roughly an order of magnitude more turns.
+##
+##   godot --headless --path . --script tools/build_roster.gd -- --fast
+var _fast := false
 const COLORS := ["c471ed", "3db1ff", "00d2ff", "5ad78c", "ff6b6b"]
 
 var _policy
@@ -29,6 +39,9 @@ func _init() -> void:
 
 
 func _run() -> void:
+	for a in OS.get_cmdline_user_args():
+		if a == "--fast":
+			_fast = true
 	print("\n=== build roster from installed models ===\n")
 	_policy = PolicyScript.new()
 	get_root().add_child(_policy)
@@ -80,7 +93,18 @@ func _on_models(result: int, code: int, _h: PackedStringArray, body: PackedByteA
 		quit(1)
 		return
 
-	var picked := _pick_diverse(legal, WANTED)
+	var picked: Array[String] = []
+	if _fast:
+		# One model, five agents. Personas differ; weights never move.
+		var best := _pick_diverse(legal, 1)
+		if best.is_empty():
+			printerr("no usable model found")
+			quit(1)
+			return
+		for i in WANTED:
+			picked.append(best[0])
+	else:
+		picked = _pick_diverse(legal, WANTED)
 
 	if picked.size() < WANTED:
 		print("\nOnly %d eligible model(s) available; the arena wants %d." % [picked.size(), WANTED])
@@ -89,16 +113,27 @@ func _on_models(result: int, code: int, _h: PackedStringArray, body: PackedByteA
 
 	var roster: Array = []
 	for i in picked.size():
+		var nm := _display_name(picked[i])
+		if _fast:
+			# Distinct identities so the arena still reads as five agents.
+			nm = "%s #%d" % [nm, i + 1]
 		roster.append({
 			"color": COLORS[i % COLORS.size()],
 			"model": picked[i],
-			"name": _display_name(picked[i]),
+			"name": nm,
 		})
 
 	print("\nroster:")
 	for a in roster:
 		print("   %-18s %s" % [a["name"], a["model"]])
 
+	if _fast:
+		print("
+FAST: all %d agents share one resident model — no turn swaps." % roster.size())
+	else:
+		print("
+Every turn changes model, so every turn pays a cold swap (18-38s).")
+		print("Run with  -- --fast  for one resident model and far more turns.")
 	_write_user_preset(roster)
 	quit(0)
 
