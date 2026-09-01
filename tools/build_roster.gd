@@ -810,35 +810,27 @@ func _vram_gb(id: String) -> float:
 ## the first K that works. Falls back to the best single model that fits, so
 ## this always returns something runnable.
 func _pick_fitting(ranked: Array[String], budget_gb: float, want: int) -> Array[String]:
-	for k in range(want, 1, -1):
-		var share := budget_gb / float(k)
-		var chosen: Array[String] = []
-		var used := 0.0
-		for id in ranked:
-			if chosen.size() >= k:
-				break
-			var cost := _vram_gb(id)
-			if cost > share:
-				continue
-			if used + cost <= budget_gb:
-				chosen.append(id)
-				used += cost
-		if chosen.size() == k:
-			print("   %d models fit in %.1f GB together:" % [k, budget_gb])
-			for id in chosen:
-				print("      %-50s %4.1f GB" % [id, _vram_gb(id)])
-			print("      %-50s %4.1f GB total" % ["", used])
-			return chosen
-		if k == want:
-			print("   %d models will not fit together; trying fewer" % k)
-
+	# The planning arithmetic lives in Vram.plan_fit so it can be tested
+	# without a GPU, a catalog or LM Studio. This maps ids to sizes and back.
+	var costs: Array = []
 	for id in ranked:
-		var cost := _vram_gb(id)
-		if cost <= budget_gb:
-			print("   only one model fits in %.1f GB: %s (%.1f GB)" % [budget_gb, id, cost])
-			print("   raise it with --fit=N to get a second architecture resident")
-			return [id] as Array[String]
-	return [] as Array[String]
+		costs.append(_vram_gb(id))
+	var idx := VramScript.plan_fit(costs, budget_gb, want)
+	var chosen: Array[String] = []
+	var used := 0.0
+	for i in idx:
+		chosen.append(ranked[i])
+		used += float(costs[i])
+	if chosen.size() >= 2:
+		print("   %d models fit in %.1f GB together:" % [chosen.size(), budget_gb])
+		for id in chosen:
+			print("      %-50s %4.1f GB" % [id, _vram_gb(id)])
+		print("      %-50s %4.1f GB total" % ["", used])
+	elif chosen.size() == 1:
+		print("   only one model fits in %.1f GB: %s (%.1f GB)"
+			% [budget_gb, chosen[0], used])
+		print("   raise it with --fit=N to get a second architecture resident")
+	return chosen
 
 
 ## True when a reply reproduces the prompt's scaffolding rather than answering.

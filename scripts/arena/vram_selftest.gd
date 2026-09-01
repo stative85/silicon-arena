@@ -91,7 +91,46 @@ func _run() -> void:
 
 	_check("total of nothing is nothing", is_equal_approx(V.total_gb([]), 0.0))
 
+	# --- co-residency planning ------------------------------------------
+	# The case the old per-model share rule got wrong: budget/3 = 2.0 would
+	# have refused the 2.8 entirely, even though 2.8+1.5+1.5 = 5.8 fits.
+	var plan := V.plan_fit([2.8, 1.5, 1.5, 1.5], 6.0, 5)
+	_check("a model larger than budget/k is still reachable",
+		plan.size() == 3 and plan.has(0),
+		"got %s" % str(plan))
+
+	_check("planning prefers MORE architectures over better-ranked ones",
+		V.plan_fit([5.5, 1.5, 1.5, 1.5], 6.0, 5).size() == 3,
+		"got %s" % str(V.plan_fit([5.5, 1.5, 1.5, 1.5], 6.0, 5)))
+
+	_check("the chosen set actually fits the budget",
+		_total([2.8, 1.5, 1.5, 1.5], V.plan_fit([2.8, 1.5, 1.5, 1.5], 6.0, 5)) <= 6.0)
+
+	_check("it never returns more than asked for",
+		V.plan_fit([1.0, 1.0, 1.0, 1.0, 1.0, 1.0], 100.0, 3).size() == 3)
+
+	_check("when nothing pairs up it returns the one model that fits",
+		V.plan_fit([5.5, 5.5, 5.5], 6.0, 5) == [0],
+		"got %s" % str(V.plan_fit([5.5, 5.5, 5.5], 6.0, 5)))
+
+	_check("an impossible budget returns nothing at all",
+		V.plan_fit([9.0, 9.0], 6.0, 5).is_empty())
+
+	_check("unknown sizes are never planned around",
+		not V.plan_fit([V.UNKNOWN, 1.5, 1.5], 6.0, 5).has(0),
+		"an unsized model must not enter a co-residency plan")
+
+	_check("an empty catalogue plans nothing",
+		V.plan_fit([], 6.0, 5).is_empty())
+
 	_report()
+
+
+func _total(costs: Array, idx: Array) -> float:
+	var t := 0.0
+	for i in idx:
+		t += float(costs[i])
+	return t
 
 
 func _report() -> void:
