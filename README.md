@@ -155,10 +155,34 @@ Godot_v4.6-stable_win64.exe --headless --editor --quit --path .
 
 Or just open it in the editor and let it finish importing. Once only.
 
-### 4. Run Silicon Arena
+### 4. Build a roster from YOUR models  ← do this, it is the difference between working and not
+
+The shipped presets name portable public models so the repository is not tied
+to one machine. That means on *your* machine most of them are probably not
+downloaded, and the arena will sit there requesting models you do not have.
+
+```
+godot --headless --path . --script tools/build_roster.gd
+```
+
+This asks LM Studio what you actually have, applies the 7B ceiling **before**
+selecting anything, ranks by chat-capability and size, spreads across model
+families, and writes an "Installed Models" roster to slot 0. It never touches
+the shipped presets.
+
+Check the result any time with:
+
+```
+tools\doctor.cmd
+```
+
+which reports `Roster  5/5 valid` when you are ready, and names each missing or
+refused model when you are not.
+
+### 5. Run Silicon Arena
 Double-click `start_arena.cmd`, or open the project in Godot and press Play.
 
-### 5. (Optional) Generate your own model catalog
+### 6. (Optional) Generate your own model catalog
 
 The arena ships with `config/model-catalog.example.json` so it runs out of the
 box. To enforce the size law against *your* installed models, generate

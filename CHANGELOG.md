@@ -1,5 +1,66 @@
 # Changelog
 
+## v0.1.0-rc1 — 2026-09-01
+
+First release candidate. The arena went from "will not parse" to a verified,
+CI-tested, benchmarked project in one hardening pass.
+
+### Fixed — the configuration-drift class
+
+Three production bugs turned out to be one cause: `live_match.gd` carried a
+runtime fact and `main.gd` inherited a default.
+
+- **The 7B size law was never installed on the main arena path.** `model_policy`
+  was documented as "injected by Main" and Main never injected it, so every
+  guard was dead code on the scene that actually runs. A saved preset walked a
+  9B model into an 8GB card.
+- **`request_timeout_sec` stayed at 20s on main.** Measured cold swaps are
+  18-38s, so every model change read as a timeout instead of a load.
+- **`stall_timeout_sec` had a third source of truth** in a persisted user
+  config, which reintroduced a 40s watchdog after the constant was fixed. Now
+  derived from the cold-load allowance and clamped on load.
+
+`entrypoint_parity_selftest.gd` fails the build if a load-bearing setting is
+configured on one entry point and defaulted on the other, or if a derived
+invariant is hardcoded.
+
+### Fixed — a fresh clone could not run
+
+- The model catalog lived outside the repository; a clean clone failed closed
+  and refused every request. `config/model-catalog.example.json` now ships.
+- Godot's global class registry is built during import and `.godot/` is
+  correctly ignored, so a clean clone hit a wall of parse errors. Documented.
+- `resolve_key()` mishandled two-segment model ids and refused legal models.
+- Two shipped presets named models that exist only on the development machine.
+- The clip recorder wrote nothing and reported "CLIP SAVED" — `taskkill`
+  without `/F` never reached a windowless FFmpeg, and a hard-killed MP4 has no
+  moov atom. Now MKV, `OS.kill`, and the file is verified before success.
+
+### Added
+
+- `tools/verify.cmd` — whole deterministic suite offline, non-zero on failure
+- `tools/doctor.gd` — diagnose this machine, every line with a fix
+- `tools/prove.gd` — reproducible proof of the three headline claims
+- `tools/build_roster.gd` — legal roster from installed models, law applied first
+- `tools/bench_swap.py` — measure real swap cost
+- `tools/adversarial.gd` — 22 deliberate attacks
+- `scripts/arena/compat_selftest.gd` — system-role compatibility, 19 checks
+- GitHub Actions CI on Linux, with a permanent negative control
+- `docs/BENCHMARK_8GB.md`, `docs/KNOWN_LIMITATIONS.md`, `docs/proof/`
+
+### Added — model compatibility
+
+Models whose chat template rejects a system role (`"Only user and assistant
+roles are supported!"`) are detected narrowly, retried **once** with the system
+instruction folded into the first user message, and remembered for the session.
+Proven live against `mistral-7b-instruct-v0.3`.
+
+### Known limitations
+
+See `docs/KNOWN_LIMITATIONS.md`. Notably: reasoning-only models cannot
+participate, unknown ids are size-checked by name, and swaps cost 18-38s.
+
+
 All notable changes to Silicon Arena are documented here.
 
 ---
