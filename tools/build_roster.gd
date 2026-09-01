@@ -16,6 +16,7 @@ extends SceneTree
 ## It never touches res://presets.json — the public defaults stay portable.
 
 const PolicyScript := preload("res://scripts/arena/model_policy.gd")
+const ClientScript := preload("res://scripts/api/lm_studio_client.gd")
 
 ## Single source of truth, overridable via SILICON_ARENA_LM_URL.
 var LM_BASE := LMEndpoint.base_url()
@@ -30,6 +31,21 @@ const WANTED := 5
 ##
 ##   godot --headless --path . --script tools/build_roster.gd -- --fast
 var _fast := false
+
+## Probe candidates before putting them in the roster.
+##
+## The catalog cannot tell a reasoning-only model from a normal one:
+## chatCapable is null for all 17 reasoning-marked models installed here, and
+## name heuristics ("thinking", "-r1", "distill") both over- and under-match.
+##
+## A build with no probe once selected
+## qwen3-4b-instruct-grok-4-fast-brainstorming-distill, which returns HTTP 200
+## with empty content and its whole answer in reasoning_content — structurally
+## unable to speak in the arena. Measuring beats guessing, at the cost of one
+## cold load per candidate.
+##
+##   --no-probe   skip it and accept the ranked order unverified
+var _probe := true
 const COLORS := ["c471ed", "3db1ff", "00d2ff", "5ad78c", "ff6b6b"]
 
 var _policy
@@ -43,6 +59,8 @@ func _run() -> void:
 	for a in OS.get_cmdline_user_args():
 		if a == "--fast":
 			_fast = true
+		elif a == "--no-probe":
+			_probe = false
 	print("\n=== build roster from installed models ===\n")
 	_policy = PolicyScript.new()
 	get_root().add_child(_policy)
@@ -95,7 +113,14 @@ func _on_models(result: int, code: int, _h: PackedStringArray, body: PackedByteA
 		return
 
 	var picked: Array[String] = []
-	if _fast:
+	if _probe:
+		picked = await _probe_pick(legal, 1 if _fast else WANTED)
+		if _fast and not picked.is_empty():
+			var one := picked[0]
+			picked = []
+			for i in WANTED:
+				picked.append(one)
+	elif _fast:
 		# One model, five agents. Personas differ; weights never move.
 		var best := _pick_diverse(legal, 1)
 		if best.is_empty():
@@ -148,6 +173,84 @@ Every turn changes model, so every turn pays a cold swap (18-38s).")
 ## text-to-speech model and two base (non-instruct) checkpoints, all of which
 ## are legal under the ceiling and useless in a debate. Ranking uses the
 ## catalog's own evidence rather than the id string where possible.
+
+## Rank, then VERIFY. Each candidate gets one tiny request; only models that
+## return actual text are accepted. Costs a cold load per candidate, which is
+## why it happens once at setup rather than during a match.
+func _probe_pick(legal: Array[String], want: int) -> Array[String]:
+	var ranked := _pick_diverse(legal, legal.size())
+	var accepted: Array[String] = []
+	var rejected := 0
+
+	print("probing candidates (one cold load each, this is the slow part)...")
+	for id in ranked:
+		if accepted.size() >= want:
+			break
+		var verdict := await _probe_one(id)
+		if verdict == "":
+			accepted.append(id)
+			print("   speaks   %s" % id)
+		else:
+			rejected += 1
+			print("   rejected %s — %s" % [id, verdict])
+
+	if rejected > 0:
+		print("%d candidate(s) rejected because they never produced text." % rejected)
+	return accepted
+
+
+## "" when the model produced usable text, otherwise the reason it did not.
+func _probe_one(model_id: String) -> String:
+	var http := HTTPRequest.new()
+	get_root().add_child(http)
+	await process_frame
+	http.timeout = 180.0
+
+	var done := [false]
+	var reason := ["probe did not complete"]
+	http.request_completed.connect(func(r: int, code: int, _h, body: PackedByteArray):
+		var raw := body.get_string_from_utf8()
+		if r != HTTPRequest.RESULT_SUCCESS or code != 200:
+			reason[0] = ClientScript.summarize_error(code, raw)
+		else:
+			var parsed = JSON.parse_string(raw)
+			if typeof(parsed) != TYPE_DICTIONARY or not parsed.has("choices"):
+				reason[0] = "unparseable response"
+			else:
+				var msg = parsed["choices"][0]["message"]
+				var text := str(msg.get("content", "")).strip_edges()
+				if text != "":
+					reason[0] = ""
+				elif str(msg.get("reasoning_content", "")).strip_edges() != "":
+					reason[0] = "reasoning-only (empty content)"
+				elif msg.has("tool_calls"):
+					reason[0] = "emits tool calls instead of text"
+				else:
+					reason[0] = "returned an empty reply"
+		done[0] = true)
+
+	var payload := {
+		"model": model_id,
+		"messages": [{"role": "user", "content": "Say the word: ready"}],
+		"max_tokens": 16,
+		"temperature": 0.1,
+		"stream": false,
+	}
+	var err := http.request(LM_BASE + "/chat/completions",
+		["Content-Type: application/json"], HTTPClient.METHOD_POST,
+		JSON.stringify(payload))
+	if err != OK:
+		http.queue_free()
+		return "could not issue request"
+
+	var waited := 0
+	while not done[0] and waited < 12000:
+		await process_frame
+		waited += 1
+	http.queue_free()
+	return str(reason[0])
+
+
 func _pick_diverse(legal: Array[String], want: int) -> Array[String]:
 	var scored: Array = []
 	for id in legal:

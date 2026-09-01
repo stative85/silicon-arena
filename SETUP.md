@@ -67,7 +67,19 @@ godot --headless --path . --script tools/build_roster.gd
 
 The 7B ceiling is applied *before* selection, so an oversized model cannot
 enter the roster. Models are ranked by chat-capability and spread across
-families.
+families, and then each candidate is **probed** with one tiny request — only
+models that actually return text are accepted:
+
+```
+probing candidates (one cold load each, this is the slow part)...
+   speaks   mistralai/mistral-7b-instruct-v0.3
+   rejected qwen3-4b-instruct-...-distill — reasoning-only (empty content)
+   speaks   l3.2-rogue-creative-instruct-uncensored-abliterated-7b
+```
+
+That step is slow — one cold model load per candidate — but it runs once, and
+it is the difference between a roster that looks right and one that works. Add
+`-- --no-probe` to skip it.
 
 **If turns feel slow**, every turn is changing model and paying an 18-38s cold
 load. Build a single-model roster instead:
