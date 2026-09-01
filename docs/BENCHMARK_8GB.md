@@ -125,3 +125,18 @@ Use the diverse roster to demonstrate what the project *is*. Use `--fast` when
 you want conversation throughput — long unattended streams, testing template
 behaviour, or filling a BRB overlay — where waiting 40 seconds per line is the
 dominant cost.
+
+## Sustained operation
+
+A 400-second unattended run, three logical agents sharing one resident model:
+
+```
+78 speeches / 400s   ≈ 5.1s per speech
+```
+
+No crashes, no context overflow, no degradation over the run. Context cannot
+grow without bound by construction: each agent keeps a rolling window of 12
+messages (`MEMORY_WINDOW`) and the shared display log is capped at 12 entries.
+
+That matters for the streamer case, where the arena is expected to run for
+hours unattended behind a BRB overlay.
