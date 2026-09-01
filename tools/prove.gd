@@ -228,6 +228,11 @@ func _write() -> void:
 	summary.append("")
 	summary.append(verdict)
 	_write_file("verification.txt", "\n".join(summary))
+	# Print the per-claim verdict, not just the artifact. A summary that exists
+	# only in a file cannot be asserted by CI or read in a terminal.
+	print("")
+	for line in summary.slice(maxi(0, summary.size() - 5), summary.size() - 2):
+		print(line)
 	print("\n" + verdict)
 	print("artifacts: %s" % ProjectSettings.globalize_path(OUT_DIR))
 	quit(0 if _failures.is_empty() else 1)

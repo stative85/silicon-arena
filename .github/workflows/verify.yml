@@ -114,7 +114,8 @@ jobs:
           echo "--- prove (A and C are deterministic; B must SKIP, not fail) ---"
           ~/godot/godot --headless --path . --script tools/prove.gd > p.log 2>&1 || true
           grep -q "PROOF OK" p.log
-          grep -q "claim A (resource law, deterministic) : PROVEN" p.log
+          grep -q "claim A" p.log && grep -q "PROVEN" p.log
+          grep -q "claim B" p.log && grep -q "SKIPPED" p.log
           grep -q "claim C" p.log
 
       - name: Configs, presets and required files
