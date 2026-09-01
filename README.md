@@ -40,14 +40,14 @@ Inspired by [Stanford's Generative Agents](https://arxiv.org/abs/2304.03442) pap
 ## Verify it yourself
 
 ```
-toolserify.cmd          # whole deterministic suite, offline, no LM Studio
+tools\verify.cmd          # whole deterministic suite, offline, no LM Studio
 tools\doctor.cmd          # what is wrong with THIS machine, with fixes
 godot --headless --path . --script tools/prove.gd        # proof artifacts
 godot --headless --path . --script tools/build_roster.gd # roster from installed models
 python tools/bench_swap.py                               # measure swap cost here
 ```
 
-`verify.cmd` runs six self-tests plus config and preset validation and exits
+`verify.cmd` runs eight self-tests plus config and preset validation and exits
 non-zero on failure — the same suite CI runs on every push:
 
 ```

@@ -64,8 +64,13 @@ exit /b 1
 echo [Silicon Arena] Found Godot: %GODOT_EXE%
 
 :: ── Check LM Studio API ─────────────────────────────────
-echo [Silicon Arena] Checking LM Studio API (127.0.0.1:1234)...
-powershell -NoProfile -Command "try { $null = Invoke-RestMethod -Uri 'http://127.0.0.1:1234/v1/models' -Method Get -TimeoutSec 3; Write-Host '  LM Studio API OK' } catch { Write-Host '  WARNING: LM Studio API not reachable at 127.0.0.1:1234'; Write-Host '  Start LM Studio and load a model before launching.' }"
+:: Honour the same override every other tool uses, so the launcher cannot
+:: report a different server than the arena actually talks to.
+set "LM_URL=%SILICON_ARENA_LM_URL%"
+if not defined LM_URL set "LM_URL=%LM_STUDIO_URL%"
+if not defined LM_URL set "LM_URL=http://127.0.0.1:1234/v1"
+echo [Silicon Arena] Checking LM Studio API (%LM_URL%)...
+powershell -NoProfile -Command "$u='%LM_URL%'; if ($u -notmatch '^http') { $u = 'http://' + $u }; $u = $u.TrimEnd('/'); if ($u -notmatch '/v1$') { $u = $u + '/v1' }; try { $null = Invoke-RestMethod -Uri ($u + '/models') -Method Get -TimeoutSec 3; Write-Host '  LM Studio API OK' } catch { Write-Host ('  WARNING: LM Studio API not reachable at ' + $u); Write-Host '  Start LM Studio and load a model before launching.' }"
 
 :: ── Launch ───────────────────────────────────────────────
 echo.
