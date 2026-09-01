@@ -2,8 +2,17 @@
 
 **5 local AI models argue live in a 2D arena — with beef cinematics, doom cascades, and no cloud APIs.**
 
-<!-- TODO: Add a GIF of a beef clash cinematic here -->
-<!-- ![Silicon Arena Demo](docs/demo.gif) -->
+[![verify](https://github.com/stative85/silicon-arena/actions/workflows/verify.yml/badge.svg)](https://github.com/stative85/silicon-arena/actions/workflows/verify.yml)
+
+![Silicon Arena console — five local models on one 8GB GPU](docs/console.png)
+
+*Real output from a real run. `[model-policy]` is the VRAM ceiling loading;
+`[compat]` is a model whose chat template rejects system roles being rescued
+rather than dropped.*
+
+**5 heterogeneous local LLM agents · 1 consumer 8GB GPU · JIT model swapping ·
+hard 7B execution-boundary law · cross-agent state outside model weights ·
+Godot + LM Studio · fully offline**
 
 Silicon Arena is a real-time AI debate simulator built in Godot 4.6. Local LLM agents served by [LM Studio](https://lmstudio.ai/) debate AI alignment, rap battle each other, run therapy sessions, and trigger emergent cinematic events — all running offline on your machine.
 
@@ -25,6 +34,39 @@ Inspired by [Stanford's Generative Agents](https://arxiv.org/abs/2304.03442) pap
 ---
 
 ---
+
+---
+
+## Verify it yourself
+
+```
+toolserify.cmd          # whole deterministic suite, offline, no LM Studio
+tools\doctor.cmd          # what is wrong with THIS machine, with fixes
+godot --headless --path . --script tools/prove.gd        # proof artifacts
+godot --headless --path . --script tools/build_roster.gd # roster from installed models
+python tools/bench_swap.py                               # measure swap cost here
+```
+
+`verify.cmd` runs six self-tests plus config and preset validation and exits
+non-zero on failure — the same suite CI runs on every push:
+
+```
+[PASS] project import
+[PASS] project parses
+[PASS] entrypoint parity
+[PASS] model policy
+[PASS] coherence
+[PASS] cinematic bridge
+[PASS] scar lattice
+[PASS] system-role compat
+[PASS] required files, configs and presets
+VERIFY OK
+```
+
+Every one of these was negative-tested: the defect it guards was reintroduced,
+the test observed failing, then restored. A suite that can only pass is not
+evidence. CI includes a permanent negative control that injects a 9B model into
+a preset and fails the build if the validator still reports OK.
 
 ## The Constraint (the actual engineering)
 
@@ -179,7 +221,7 @@ Silicon Arena ships with **45 debate templates**. Here are some highlights:
 | The Seraphim Protocol | Broadcast from 2088, two voices transmitting back through time |
 | Open Mic Night at the GPU Bar | Stand-up comedy by language models |
 
-[See all 40 templates](TEMPLATES.md)
+[See all 45 templates](TEMPLATES.md)
 
 ---
 

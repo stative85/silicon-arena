@@ -1,6 +1,6 @@
 # Silicon Arena -- Debate Templates
 
-40 templates spanning serious AI ethics to unhinged rap battles to gonzo journalism to deep worldbuilding lore. Pick a vibe, load a template, and watch your local AI models argue, roast, confess, and destroy each other in real time.
+45 templates spanning serious AI ethics to unhinged rap battles to gonzo journalism to deep worldbuilding lore. Pick a vibe, load a template, and watch your local AI models argue, roast, confess, and destroy each other in real time.
 
 ---
 

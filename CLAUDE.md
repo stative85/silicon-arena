@@ -176,7 +176,46 @@ Toggle that turns the arena into a stylish AFK screen for streamers:
 - Shows key bindings (F6/F7/F8/ESC) with pulsing "Press any key" hint
 - Dismisses on any key or click, fades out
 
-### Debate Templates (40 total)
+
+## Verification (added after the drift bugs)
+
+There IS a test suite. Run it before changing anything:
+
+```
+toolserify.cmd     # everything below, offline, exits non-zero on failure
+tools\doctor.cmd     # what is wrong with this machine, with fixes
+```
+
+| script | proves |
+|---|---|
+| `scripts/arena/entrypoint_parity_selftest.gd` | main.gd and live_match.gd configure the same load-bearing runtime, and the stall floor stays derived from the cold-load allowance |
+| `scripts/arena/model_policy_selftest.gd` | the 7B ceiling is enforced on the request path and fails closed |
+| `scripts/arena/compat_selftest.gd` | system-role rejection is detected narrowly and the fold is lossless |
+| `scripts/arena/coherence_selftest.gd` | the echo/argument detector separates the two |
+| `scripts/arena/cinematic_selftest.gd` | event schema parity and JSONL validity |
+| `scripts/arena/scar_lattice_selftest.gd` | memory containment and provenance |
+| `tools/verify_configs.gd` | required files, JSON validity, and every shipped preset legal under the ceiling |
+| `tools/prove.gd` | the three headline claims, with artifacts in docs/proof/latest |
+
+CI runs all of it on Linux on every push, including a negative control that
+injects a 9B model into a preset and fails if the validator still passes.
+
+### The rule that produced these
+
+Three separate production bugs had one cause: `live_match.gd` carried a runtime
+fact and `main.gd` inherited a default.
+
+- `model_policy` was injected on one path only, so the 7B ceiling was dead code
+  on the scene that actually runs
+- `request_timeout_sec` stayed at 20s on main, so every cold model swap read as
+  a timeout — measured swaps are 18-38s (docs/BENCHMARK_8GB.md)
+- `stall_timeout_sec` had a THIRD source of truth in a persisted user config,
+  which reintroduced a 40s watchdog after the constant was fixed
+
+If you add a load-bearing runtime setting, add it to `REQUIRED_ON_BOTH` in the
+parity self-test. If you derive one value from another, add it to `INVARIANTS`.
+
+### Debate Templates (45 total)
 Located in `TemplateManager.TEMPLATES` (inner class in main.gd). Each template has: id, label, description, global_script, rules, topics, angles. Current lineup:
 1. Cyber-Ethics Tribunal — AI rights debate
 2. Singularity Panic — AGI existential dread
