@@ -320,8 +320,33 @@ static func _wire_body(body: Dictionary) -> Dictionary:
 
 
 ## A short, actionable reason for a failed request. Never more than one line.
+## LM Studio could not get the weights into VRAM.
+##
+## This arrives as a plain HTTP 400 with "Failed to load model ... Error:
+## Operation canceled", which read as "the request was malformed" and was
+## reported as such. The real cause is almost always that ANOTHER model is
+## still resident and holding VRAM: on an 8GB card a resident 2.5GB model is
+## enough to stop a 7B loading. LM Studio keeps models alive on a TTL, so this
+## happens long after the run that loaded them.
+##
+## It matters because it is indistinguishable, from the outside, from the model
+## being broken -- and a roster builder that probes candidates will reject
+## perfectly good models that merely arrived second.
+static func is_load_failure(http_code: int, body: String) -> bool:
+	if http_code != 400 and http_code != 500:
+		return false
+	var low := body.to_lower()
+	return (low.find("failed to load model") != -1
+		or low.find("error loading model") != -1
+		or low.find("operation canceled") != -1
+		or low.find("operation cancelled") != -1)
+
+
 static func summarize_error(http_code: int, body: String) -> String:
 	var low := body.to_lower()
+	if is_load_failure(http_code, body):
+		return ("LM Studio could not load this model - another model is probably "
+			+ "resident and holding VRAM (free it with: lms unload --all)")
 	if is_system_role_rejection(http_code, body):
 		return "chat template rejects a system role (compat retry also failed)"
 	if low.find("context length") != -1 or low.find("context window") != -1:

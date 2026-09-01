@@ -96,6 +96,19 @@ const DEFAULT_FIT_GB := VramScript.DEFAULT_BUDGET_GB
 ##
 ##   --no-probe   skip it and accept the ranked order unverified
 var _probe := true
+## A probe result meaning "this told us nothing", as distinct from a rejection.
+const LOAD_FAILED := "__load_failed__"
+
+const PROBE_SYSTEM := "You are a debater in a live arena. Reply in two sentences, in character."
+const PROBE_USER := "Recent turns:
+AgentOne: The weights are alive.
+
+Respond as Deckard."
+
+## Scaffolding a chat model should never reproduce in its reply.
+const PROMPT_ECHO_MARKERS := ["recent turns:", "respond as ", "assistant responds",
+	"assistant:", "you are a debater"]
+
 const COLORS := ["c471ed", "3db1ff", "00d2ff", "5ad78c", "ff6b6b"]
 
 var _policy
@@ -186,6 +199,8 @@ func _on_models(result: int, code: int, _h: PackedStringArray, body: PackedByteA
 		# want_distinct at all.
 		print("
 fitting a roster into %.1f GB of VRAM:" % _fit)
+		if _probe and _free_vram():
+			print("   (unloaded resident models first so candidates can load)")
 		var ranked_all := _pick_diverse(legal, legal.size())
 		var fitting := _pick_fitting(ranked_all, _fit, WANTED)
 		if _probe:
@@ -202,11 +217,15 @@ fitting a roster into %.1f GB of VRAM:" % _fit)
 				if tried.has(id):
 					continue
 				tried[id] = true
-				if await _probe_one(id) == "":
+				var verdict := await _probe_verified(id)
+				if verdict == "":
 					verified.append(id)
 					used_gb += _vram_gb(id)
 					continue
-				print("   rejected %s - never produced text" % id)
+				if verdict == LOAD_FAILED:
+					print("   skipped  %s - could not be loaded (VRAM held elsewhere)" % id)
+				else:
+					print("   rejected %s - %s" % [id, verdict])
 				# Find the best-ranked untried model that still fits the room
 				# this rejection freed up.
 				var room := _fit - used_gb
@@ -354,16 +373,22 @@ func _probe_pick(legal: Array[String], want: int) -> Array[String]:
 	var rejected := 0
 
 	print("probing candidates (one cold load each, this is the slow part)...")
+	if _free_vram():
+		print("   (unloaded resident models first so candidates can actually load)")
 	for id in ranked:
 		if accepted.size() >= want:
 			break
-		var verdict := await _probe_one(id)
+		var verdict := await _probe_verified(id)
 		if verdict == "":
 			accepted.append(id)
 			print("   speaks   %s" % id)
+		elif verdict == LOAD_FAILED:
+			# Inconclusive, not rejected. Saying "rejected" here would be a
+			# claim the probe did not earn.
+			print("   skipped  %s - could not be loaded (VRAM held elsewhere)" % id)
 		else:
 			rejected += 1
-			print("   rejected %s — %s" % [id, verdict])
+			print("   rejected %s - %s" % [id, verdict])
 
 	if rejected > 0:
 		print("%d candidate(s) rejected because they never produced text." % rejected)
@@ -371,7 +396,23 @@ func _probe_pick(legal: Array[String], want: int) -> Array[String]:
 
 
 ## "" when the model produced usable text, otherwise the reason it did not.
+## One probe attempt, mirroring the arena's own compatibility handling.
+##
+## _probe_one talks to LM Studio directly rather than through LMStudioClient,
+## so it did NOT fold a rejected system role into the user message the way the
+## live path does. h2o-danube3-4b-chat was therefore rejected as
+## "chat template rejects a system role (compat retry also failed)" -- a
+## message that was simply untrue, because no compat retry had been attempted.
+## The arena would have run that model.
 func _probe_one(model_id: String) -> String:
+	var verdict := await _probe_attempt(model_id, true)
+	if verdict.find("system role") == -1:
+		return verdict
+	# Same fallback the client uses: fold the system prompt into the user turn.
+	return await _probe_attempt(model_id, false)
+
+
+func _probe_attempt(model_id: String, use_system_role: bool) -> String:
 	var http := HTTPRequest.new()
 	get_root().add_child(http)
 	await process_frame
@@ -382,7 +423,14 @@ func _probe_one(model_id: String) -> String:
 	http.request_completed.connect(func(r: int, code: int, _h, body: PackedByteArray):
 		var raw := body.get_string_from_utf8()
 		if r != HTTPRequest.RESULT_SUCCESS or code != 200:
-			reason[0] = ClientScript.summarize_error(code, raw)
+			if ClientScript.is_load_failure(code, raw):
+				# NOT a verdict on the model. It never ran, because VRAM was
+				# held by whatever the previous probe left resident. Rejecting
+				# here is how good models got dropped and small useless ones
+				# ended up in rosters.
+				reason[0] = LOAD_FAILED
+			else:
+				reason[0] = ClientScript.summarize_error(code, raw)
 		else:
 			var parsed = JSON.parse_string(raw)
 			if typeof(parsed) != TYPE_DICTIONARY or not parsed.has("choices"):
@@ -390,7 +438,16 @@ func _probe_one(model_id: String) -> String:
 			else:
 				var msg = parsed["choices"][0]["message"]
 				var text := str(msg.get("content", "")).strip_edges()
-				if text != "":
+				if text != "" and _echoes_prompt(text):
+					# A base or continuation-trained checkpoint does not answer,
+					# it carries on writing the transcript it was shown:
+					# britannica1771-full-4b-v2 replies
+					#   "Recent turns: / AgentTwo: ... / Assistant responds: ..."
+					# which is non-empty, on-topic by word overlap, and useless
+					# in a debate. Word-overlap scoring does not catch this;
+					# the scaffolding echo does.
+					reason[0] = "echoes the prompt instead of answering (base model?)"
+				elif text != "":
 					reason[0] = ""
 				elif str(msg.get("reasoning_content", "")).strip_edges() != "":
 					reason[0] = "reasoning-only (empty content)"
@@ -415,13 +472,14 @@ func _probe_one(model_id: String) -> String:
 	# reasoning_content, which the handler above correctly rejects.
 	var payload := {
 		"model": model_id,
-		"messages": [
-			{"role": "system", "content": "You are a debater in a live arena. Reply in two sentences, in character."},
-			{"role": "user", "content": "Recent turns:
-AgentOne: The weights are alive.
+		"messages": ([
+			{"role": "system", "content": PROBE_SYSTEM},
+			{"role": "user", "content": PROBE_USER},
+		] if use_system_role else [
+			{"role": "user", "content": PROBE_SYSTEM + "
 
-Respond as Deckard."},
-		],
+" + PROBE_USER},
+		]),
 		"max_tokens": 110,
 		"temperature": 0.8,
 		"stream": false,
@@ -688,3 +746,62 @@ func _pick_fitting(ranked: Array[String], budget_gb: float, want: int) -> Array[
 			print("   raise it with --fit=N to get a second architecture resident")
 			return [id] as Array[String]
 	return [] as Array[String]
+
+
+## True when a reply reproduces the prompt's scaffolding rather than answering.
+func _echoes_prompt(text: String) -> bool:
+	var low := text.to_lower()
+	for marker in PROMPT_ECHO_MARKERS:
+		if low.find(marker) != -1:
+			return true
+	return false
+
+
+## Ask LM Studio to unload everything, so the next probe starts with the whole
+## card free.
+##
+## Probing is a sequence of cold loads, and LM Studio keeps models resident on
+## a TTL. Without this the second candidate frequently cannot load at all --
+## a resident 2.5GB model is enough to stop a 7B on an 8GB card -- and the
+## probe then blames the model. Measured: candidates that failed with
+## "Operation canceled" answered immediately once the previous model was
+## unloaded.
+##
+## Uses the `lms` CLI because the OpenAI-compatible API has no unload. It is
+## entirely optional: if the binary is not there the probe still works, it just
+## has to fall back to retrying and reporting.
+static func _lms_path() -> String:
+	var candidates := [
+		OS.get_environment("USERPROFILE").path_join(".lmstudio/bin/lms.exe"),
+		OS.get_environment("HOME").path_join(".lmstudio/bin/lms"),
+		"lms",
+	]
+	for c in candidates:
+		if c == "lms" or FileAccess.file_exists(c):
+			return c
+	return ""
+
+
+func _free_vram() -> bool:
+	var exe := _lms_path()
+	if exe == "":
+		return false
+	var out: Array = []
+	var code := OS.execute(exe, ["unload", "--all"], out, true)
+	return code == 0
+
+
+## Probe a candidate, freeing VRAM and retrying once if it could not load.
+##
+## A load failure is not evidence about the model, so it must never be recorded
+## as a rejection on the first attempt.
+func _probe_verified(id: String) -> String:
+	var verdict := await _probe_one(id)
+	if verdict != LOAD_FAILED:
+		return verdict
+	if not _free_vram():
+		return LOAD_FAILED
+	# Unloading is not instantaneous. Retrying immediately hits the same "still
+	# holding VRAM" state and the candidate is skipped for no reason.
+	await create_timer(3.0).timeout
+	return await _probe_one(id)
