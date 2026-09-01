@@ -194,6 +194,22 @@ func _check_policy_and_roster() -> void:
 			problems.append("%s: %s is legal but NOT installed" % [str(agent.get("name", "?")), model])
 		else:
 			good += 1
+	# Tell the user what pace to expect. Every turn that changes model pays a
+	# cold load, measured at 18-38s on this class of hardware, so a roster of
+	# distinct models is roughly an order of magnitude slower than one that
+	# shares. Users discovered this by watching an apparently frozen arena.
+	var distinct := {}
+	for agent in presets[0]:
+		if typeof(agent) == TYPE_DICTIONARY:
+			distinct[str(agent.get("model", ""))] = true
+	if total > 0:
+		if distinct.size() <= 1:
+			_ok("Expected pace", "one resident model, no swaps — seconds per turn")
+		else:
+			_ok("Expected pace",
+				"%d distinct models: a swap every turn, tens of seconds each" % distinct.size())
+			print("%-18s       for throughput instead: build_roster.gd -- --fast" % "")
+
 	if good == total and total > 0:
 		_ok("Roster", "%d/%d valid (%s)" % [good, total, source])
 	else:

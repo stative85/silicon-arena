@@ -112,6 +112,16 @@ Same machine, same 280-second window, same five logical agents.
 heartbeats in FAST mode are the single initial load; after that the model stays
 resident and every turn runs on the warm path.
 
+Replicated on a later build, 260-second window:
+
+| roster | agents spoke |
+|---|---:|
+| 5 distinct models | 6 |
+| 1 shared model (`--fast`) | 49 |
+
+Same ratio from an independent run after roughly twenty commits of changes, so
+the effect is the swapping itself rather than a quirk of one build.
+
 ```
 godot --headless --path . --script tools/build_roster.gd -- --fast
 ```
