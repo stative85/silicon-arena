@@ -28,6 +28,7 @@ const StateScript := preload("res://scripts/arena/arena_state_bridge.gd")
 const SentimentScript := preload("res://scripts/sentiment.gd")
 const DriverScript := preload("res://scripts/arena/cinematic_live_driver.gd")
 const ScarScript := preload("res://scripts/arena/scar_lattice.gd")
+const TopicArcScript := preload("res://scripts/arena/topic_arc.gd")
 
 ## The search order lives in RosterPath, shared with every other consumer.
 ## It used to be duplicated here, and the five scripts that did NOT copy it
@@ -151,6 +152,10 @@ const DISPUTE_MAX_EXCHANGES := 3
 ##
 ## Bounds exist from the first line, not as a later safety pass: the obvious
 ## failure is five agents re-litigating one sentence forever.
+## Give the debate an arc: positions, development, one pivot, an ending.
+var _arc_enabled := false
+var _arc_pivot_fired := false
+
 var _contention_enabled := false
 var _contentions: Array[Dictionary] = []
 var _contention_seq := 0
@@ -382,6 +387,8 @@ func _parse_args() -> void:
 				_pipeline = true
 			"--no-pipeline":
 				_pipeline = false
+			"--arc":
+				_arc_enabled = true
 			"--contention":
 				_contention_enabled = true
 			"--target-every":
@@ -733,6 +740,21 @@ func _build_messages(agent: Dictionary) -> Array:
 	sys += "say something they have not said. Never prefix your reply with another agent's name. "
 	sys += "Never hedge, never say you are an AI language model, never narrate stage directions. "
 	sys += "Address the room or a specific rival by name. Do not write anyone else's turn."
+	if _arc_enabled:
+		var phase: int = TopicArcScript.phase_for(_turn, _max_turns)
+		var task: String = TopicArcScript.task_for(phase)
+		if task != "":
+			sys += "
+
+THIS PHASE OF THE DEBATE: %s
+" % task
+		if phase == TopicArcScript.Phase.TURN and not _arc_pivot_fired:
+			_arc_pivot_fired = true
+			_arena_facts.append(TopicArcScript.pivot_constraint())
+			print("LIVE_ARENA ARC pivot at turn %d" % _turn)
+			_write_log({"kind": "arc_pivot", "match_id": _match_id,
+				"turn": _turn, "constraint": TopicArcScript.pivot_constraint(),
+				"timestamp": Time.get_datetime_string_from_system(true)})
 	var contention_note := _contention_note(str(agent["display_name"]))
 	if contention_note != "":
 		sys += contention_note + "
