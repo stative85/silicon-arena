@@ -25,7 +25,19 @@ the runtime does not belong here and should not have been run.
 
 | **C1** | Does claim-scoped decaying contention memory create callbacks without obsession? | `a4dcacb` | re-engagement 10.7% → 21.4% (+10.7, bar +16); top-pair share *fell*; 0 outlived TTL | **REJECTED** — largest effect of the family, still short |
 
-**Shipped: 4. Rejected: 8.**
+| **PR1** | Does uneven presentation rhythm work without costing throughput? | `5f9c54d` | 25 distinct dwells vs 1, applied mean exactly 1.000, 30 turns vs 29 baseline | **SHIPPED** — watchability itself needs a human |
+| **T1** | Does a four-phase topic arc give the debate trajectory? | `ca67213` | pivot shifted vocabulary +0.013 (bar 0.10); CLOSE resolution fell 26.9% → 17.8%; opener uniqueness 0.80 → 0.64 | **REJECTED** — cosmetic, and instructing a conclusion made conclusions worse |
+
+**Shipped: 5. Rejected: 9.**
+
+### The pattern across everything rejected
+
+Nine rejections, and the successful changes have a shape the failures do not.
+**Sentence trimming and the presentation director both changed what the arena
+DOES with model output. Every rejected intervention tried to change what the
+models were ASKED to produce** — argue harder, be shorter, take a position,
+follow a phase. Instructions do not survive contact with these models; handling
+their output does.
 
 ### What the three conflict experiments establish together
 

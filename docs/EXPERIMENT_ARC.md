@@ -80,3 +80,70 @@ PROOF       topic_arc_selftest.gd — 24 checks
 ## Not part of the decision
 
 Judge scores.
+
+
+---
+
+# Result: the arc is cosmetic, and the ending got worse. T1 rejected.
+
+4 runs per arm, 60 speeches, pivot at turn 33.
+
+| | T0 | T1 | delta |
+|---|---:|---:|---:|
+| post-pivot vocabulary shift | 0.759 | 0.772 | **+0.013** |
+| CLOSE resolution rate | **26.9%** | **17.8%** | **−9.1** |
+| opener uniqueness | 0.80 | **0.64** | −0.16 |
+| speeches/min | 17.67 | 16.57 | −1.10 |
+
+| pre-registered check | value | verdict |
+|---|---|---|
+| post-pivot shift beats T0 by >= 0.10 | +0.013 | **FAIL** |
+| CLOSE resolution >= 40% | 17.8% | **FAIL** |
+| opener uniqueness >= T0 − 0.15 | 0.64 vs 0.80 | **FAIL** |
+| exactly 1 pivot per run | 1.0 | OK |
+| all other guards | — | OK |
+
+**Rejected on three counts.**
+
+## The pivot changed nothing
+
+A vocabulary shift of +0.013 against a bar of 0.10 means the constraint did not
+redirect the discussion. Both arms shift about 0.76 across the same window,
+which is what a debate does anyway as it wanders. The pivot was injected,
+acknowledged in the moment, and had no downstream effect — the definition of
+cosmetic.
+
+## Instructing a conclusion made conclusions worse
+
+This is the interesting result. **T0 resolved 26.9% of its closing turns with no
+instruction at all. T1, explicitly told to name a position and what would change
+its mind, resolved 17.8%.**
+
+Asking for resolution reduced resolution by a third. The most likely reading is
+that the added task competes for a fixed token budget with the content that
+would have constituted an actual position — the models spend words
+acknowledging the instruction. This run cannot separate that from other
+explanations and the claim is not made, but the direction is clear and it
+matches the compression result: these models do not gain from being told how to
+write, only from being given room.
+
+## And the phases made everyone sound alike
+
+Opener uniqueness fell 0.80 to 0.64. Handing every agent the same phase task
+makes them open the same way — the formulaic collapse that the guard exists to
+catch, showing up for the third time.
+
+## What this rules out
+
+Structural framing imposed by prompt. That is the same family as the four
+conflict interventions: instructions about how to conduct the debate, whoever
+they are addressed to, do not survive contact with these models.
+
+Five pre-registered attempts have now failed in the same shape. The two changes
+that shipped — sentence trimming and the presentation director — both worked by
+changing what the arena DOES with output rather than what it asks models to
+produce.
+
+## Status
+
+`--arc` stays off by default. The 24 invariant checks stay in the gate.
