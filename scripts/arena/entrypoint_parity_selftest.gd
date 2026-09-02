@@ -105,6 +105,7 @@ const ALLOWED_DIVERGENCE := {
 	"arena_builder_panel": "visual app UI only",
 	"splat_engine": "visual app rendering only",
 	"roster_path": "config/arena-roster.v1.json is the HEADLESS roster; the visual app loads user://presets.json instead, so it has no use for the resolver",
+	"gonzo_recall": "unmeasured experiment (docs/EXPERIMENT_RECALL.md): layered recall is off by default and under test on the headless path only. It must not reach the visual app before Q0/QS/Q1 returns a verdict",
 	"topic_arc": "rejected experiment (docs/EXPERIMENT_ARC.md): the arc is cosmetic and its ending is worse. Kept off by default on the headless path only, so the visual app has no reason to carry it",
 }
 

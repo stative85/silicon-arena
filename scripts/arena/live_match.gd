@@ -29,6 +29,7 @@ const SentimentScript := preload("res://scripts/sentiment.gd")
 const DriverScript := preload("res://scripts/arena/cinematic_live_driver.gd")
 const ScarScript := preload("res://scripts/arena/scar_lattice.gd")
 const TopicArcScript := preload("res://scripts/arena/topic_arc.gd")
+const GonzoScript := preload("res://scripts/arena/gonzo_recall.gd")
 
 ## The search order lives in RosterPath, shared with every other consumer.
 ## It used to be duplicated here, and the five scripts that did NOT copy it
@@ -152,6 +153,17 @@ const DISPUTE_MAX_EXCHANGES := 3
 ##
 ## Bounds exist from the first line, not as a later safety pass: the obvious
 ## failure is five agents re-litigating one sentence forever.
+## Layered recall. "off" | "sham" | "real".
+##
+## sham is the control: the same amount and format of injected canonical text,
+## chosen to be NON-resonant. Without it, a Q1-vs-Q0 difference cannot separate
+## "old relevant history matters" from "another paragraph in the prompt changes
+## behaviour".
+var _recall_mode := "off"
+var _scars: Array[Dictionary] = []
+var _recall_log: Array[Dictionary] = []
+const MAX_SCARS := 12
+
 ## Give the debate an arc: positions, development, one pivot, an ending.
 var _arc_enabled := false
 var _arc_pivot_fired := false
@@ -387,6 +399,8 @@ func _parse_args() -> void:
 				_pipeline = true
 			"--no-pipeline":
 				_pipeline = false
+			"--recall":
+				if v != "": _recall_mode = v; i += 1
 			"--arc":
 				_arc_enabled = true
 			"--contention":
@@ -755,6 +769,11 @@ THIS PHASE OF THE DEBATE: %s
 			_write_log({"kind": "arc_pivot", "match_id": _match_id,
 				"turn": _turn, "constraint": TopicArcScript.pivot_constraint(),
 				"timestamp": Time.get_datetime_string_from_system(true)})
+	if _recall_mode != "off":
+		var named: Array = []
+		for a in _agents:
+			named.append(str(a["display_name"]))
+		sys += _recall_block(str(agent["display_name"]), named)
 	var contention_note := _contention_note(str(agent["display_name"]))
 	if contention_note != "":
 		sys += contention_note + "
@@ -1001,6 +1020,7 @@ func _reveal(agent: Dictionary, text: String, latency: int) -> void:
 	_maybe_dispute()
 	_sweep_contentions()
 	_note_contention(str(agent["display_name"]), text)
+	_note_scar(str(agent["display_name"]), text)
 	# Brief settle so the overlay shows SPEAKING before the next THINKING.
 	_next_turn_at = _elapsed + 1.2
 	_reveal_at = _next_turn_at
@@ -1571,6 +1591,22 @@ static func extract_claim(text: String) -> String:
 				return head
 	if body.length() <= CLAIM_MAX_CHARS and body.split(" ", false).size() >= CLAIM_MIN_WORDS:
 		return body
+	# No sentence end inside the limit. Take the longest whole-word prefix that
+	# fits: still a verbatim substring of the canonical turn, so provenance is
+	# unaffected.
+	#
+	# Without this the function returned "" for any turn whose first sentence
+	# ran past 180 characters, which after sentence-trimming is most of them.
+	# That is why contention memory fired only 0.75 times per match -- the
+	# mechanism was starved by a claim extractor that almost never succeeded,
+	# not by the arena lacking disagreements.
+	if body.length() > CLAIM_MAX_CHARS:
+		var cut := body.substr(0, CLAIM_MAX_CHARS)
+		var last_space := cut.rfind(" ")
+		if last_space > 40:
+			var prefix := cut.substr(0, last_space).strip_edges()
+			if prefix.split(" ", false).size() >= CLAIM_MIN_WORDS:
+				return prefix
 	return ""
 
 
@@ -1918,3 +1954,118 @@ func _note_contention(speaker: String, text: String) -> void:
 		"id": _contention_seq, "agent_a": speaker, "agent_b": target,
 		"source_turn": src, "claim": claim,
 		"timestamp": Time.get_datetime_string_from_system(true)})
+
+## ── Layered recall wiring ──────────────────────────────────────────────────
+
+
+## A turn earns a scar when it takes a position against someone. Sparse by
+## construction: bounded, and only shapes that mattered.
+func _note_scar(speaker: String, text: String) -> void:
+	if _recall_mode == "off" or _scars.size() >= MAX_SCARS:
+		return
+	var shape: String = GonzoScript.shape_of(text)
+	if shape == "assert":
+		return
+	var other := ""
+	var low := text.to_lower()
+	for a in _agents:
+		var nm := str(a["display_name"])
+		if nm != speaker and low.find(nm.to_lower()) != -1:
+			other = nm
+			break
+	var excerpt: String = extract_claim(text)
+	if excerpt == "":
+		return
+	# Take the turn number from the history entry itself. _note_scar runs after
+	# _turn has been incremented, so using _turn here produced a scar pointing
+	# one turn past its own source -- provenance then refused every recall,
+	# silently and correctly, for a bug that was mine.
+	var src := -1
+	if not _history.is_empty():
+		var last: Dictionary = _history[_history.size() - 1]
+		if str(last.get("speaker", "")) == speaker:
+			src = int(last.get("turn", -1))
+	if src < 0:
+		return
+	_scars.append({
+		"excerpt": excerpt, "source_turn": src, "source_speaker": speaker,
+		"other_speaker": other, "shape": shape, "intensity": 0.8,
+		"last_reinforced_turn": src, "last_recalled_turn": -999,
+		"recall_count": 0,
+	})
+	print("LIVE_ARENA SCAR %d from turn %d (%s, %s)"
+		% [_scars.size(), src, speaker, shape])
+
+
+## Choose what to inject. Real mode takes the highest-resonance eligible scars;
+## sham takes the LOWEST-scoring provenance-valid ones, so the prompt carries
+## the same weight of canonical text with none of the relevance.
+func _select_recalls(now_speaker: String, named_now: Array) -> Array:
+	if _recall_mode == "off" or _scars.is_empty():
+		return []
+	var recent := ""
+	for i in range(_history.size() - 1, maxi(_history.size() - 3, -1), -1):
+		recent += " " + str(_history[i].get("text", ""))
+
+	var scored: Array = []
+	for idx in _scars.size():
+		var sc: Dictionary = _scars[idx]
+		if not GonzoScript.provenance_holds(sc, _history):
+			continue
+		if _turn - int(sc.get("last_recalled_turn", -999)) < GonzoScript.RECALL_COOLDOWN_TURNS:
+			continue
+		if _turn - int(sc.get("source_turn", _turn)) < GonzoScript.MIN_RECALL_DISTANCE:
+			continue
+		var v: float = GonzoScript.score(sc, recent, now_speaker, named_now, _turn)
+		scored.append({"i": idx, "score": v})
+	if scored.is_empty():
+		return []
+	scored.sort_custom(func(a, b): return float(a["score"]) > float(b["score"]))
+
+	var picked: Array = []
+	if _recall_mode == "real":
+		for e in scored:
+			if float(e["score"]) < GonzoScript.MIN_ELIGIBLE_SCORE:
+				break
+			picked.append(int(e["i"]))
+			if picked.size() >= GonzoScript.MAX_RECALLS_PER_PROMPT:
+				break
+	else:
+		# sham: the least resonant material that still resolves.
+		for j in range(scored.size() - 1, -1, -1):
+			picked.append(int(scored[j]["i"]))
+			if picked.size() >= GonzoScript.MAX_RECALLS_PER_PROMPT:
+				break
+	return picked
+
+
+## Render the chosen memories, re-checking provenance AT THE SINK.
+##
+## TEETH: a scar that cannot resolve its source here is omitted entirely. It is
+## never replaced by a nearby turn, a reconstructed quote, or a best guess --
+## the arena shows a real excerpt or it shows nothing.
+func _recall_block(now_speaker: String, named_now: Array) -> String:
+	var picked := _select_recalls(now_speaker, named_now)
+	if picked.is_empty():
+		return ""
+	var out := ""
+	for idx in picked:
+		var sc: Dictionary = _scars[idx]
+		if not GonzoScript.provenance_holds(sc, _history):
+			print("LIVE_ARENA RECALL OMITTED turn %d: source unresolvable" % _turn)
+			continue
+		out += "
+
+" + GonzoScript.render(sc)
+		# Recall never reinforces and never resets decay.
+		_scars[idx] = GonzoScript.on_recall(sc, _turn)
+		_recall_log.append({"turn": _turn, "source_turn": int(sc["source_turn"]),
+			"source_speaker": str(sc["source_speaker"]),
+			"excerpt": str(sc["excerpt"]), "to": now_speaker})
+		_write_log({"kind": "recall", "match_id": _match_id, "turn": _turn,
+			"mode": _recall_mode, "source_turn": int(sc["source_turn"]),
+			"source_speaker": str(sc["source_speaker"]),
+			"excerpt": str(sc["excerpt"]), "to": now_speaker,
+			"distance": _turn - int(sc["source_turn"]),
+			"timestamp": Time.get_datetime_string_from_system(true)})
+	return out

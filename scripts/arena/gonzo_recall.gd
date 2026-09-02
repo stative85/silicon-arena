@@ -24,6 +24,14 @@ class_name GonzoRecall
 
 const MAX_RECALLS_PER_PROMPT := 2
 const RECALL_COOLDOWN_TURNS := 4
+
+## A memory must be OLDER than the visible transcript to be worth recalling.
+##
+## The agent already sees the recent turns. Surfacing something from two turns
+## ago adds nothing and merely spends prompt budget re-showing what is on
+## screen. Measured before this bound existed: mean recall distance 2.5 turns,
+## which is not memory, it is duplication.
+const MIN_RECALL_DISTANCE := 10
 const DECAY_HALF_LIFE_TURNS := 15.0
 const MIN_ELIGIBLE_SCORE := 0.20
 
@@ -70,10 +78,12 @@ static func _has_any(text: String, words: Array) -> bool:
 ## Coarse shape of a turn. Structural resonance is shape-matching: a
 ## contradiction rhymes with a contradiction even when the subject differs.
 static func shape_of(text: String) -> String:
-	if _has_any(text, CONCEDE_WORDS):
-		return "concede"
+	# Challenge first: "disagree" contains "agree", so checking concessions
+	# first classified every disagreement as a concession.
 	if _has_any(text, CHALLENGE_WORDS):
 		return "challenge"
+	if _has_any(text, CONCEDE_WORDS):
+		return "concede"
 	return "assert"
 
 
@@ -161,6 +171,8 @@ static func eligible(scar: Dictionary, history: Array, turn: int,
 	if not provenance_holds(scar, history):
 		return false
 	if turn - int(scar.get("last_recalled_turn", -999)) < RECALL_COOLDOWN_TURNS:
+		return false
+	if turn - int(scar.get("source_turn", turn)) < MIN_RECALL_DISTANCE:
 		return false
 	return score(scar, now_text, now_speaker, named_now, turn) >= MIN_ELIGIBLE_SCORE
 

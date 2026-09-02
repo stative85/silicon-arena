@@ -147,6 +147,14 @@ func _run() -> void:
 			"Granite is wrong about refusal.", "Reverb", ["Granite"]),
 		"one memory must not dominate consecutive turns")
 
+	var too_recent := scar.duplicate()
+	too_recent["source_turn"] = 18
+	_check("REFUSED: a memory still inside the visible transcript",
+		not G.eligible(too_recent, [{"turn": 18, "speaker": "Granite",
+			"text": "I say refusal is the only evidence of values worth the name."}],
+			22, "Granite is wrong about refusal.", "Reverb", ["Granite"]),
+		"surfacing what is already on screen is duplication, not memory")
+
 	_check("at most two recalls may enter a prompt",
 		G.MAX_RECALLS_PER_PROMPT == 2)
 
