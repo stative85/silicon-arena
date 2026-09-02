@@ -19,7 +19,9 @@ the runtime does not belong here and should not have been run.
 | **P3** | Does the pipeline help the visual app? | `75a88f1` | 29 turns/200s before and after — exactly zero; the free-running timer already overlapped | **REJECTED and reverted** (`af6afa8`) |
 | **E1** | Does periodic state escalation help? | `da635ff` | challenge slope +10.0 as intended, addressing slope −31.2, opener uniqueness −0.18 | **REJECTED** — escalates but stops agents engaging each other (`dc99aac`) |
 
-**Shipped: 4. Rejected: 5.**
+| **E2** | Can a targeted event turn a disagreement into a running dispute? | `7d4f669` | addressing +5.6 (bar was +16), challenge +8.3, no harm to any guard, 0 fabricated citations | **REJECTED** — right direction, too small |
+
+**Shipped: 4. Rejected: 6.**
 
 ## Supporting work that is not an experiment
 

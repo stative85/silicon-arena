@@ -114,6 +114,8 @@ def main():
                     help="one-turn-deep pipeline arm (now the default)")
     ap.add_argument("--no-pipeline", dest="no_pipeline", action="store_true",
                     help="baseline arm: sequential dispatch")
+    ap.add_argument("--target-every", dest="target", default="",
+                    help="targeted engagement event every N turns")
     ap.add_argument("--escalate-every", dest="escalate", default="",
                     help="inject a state event every N turns")
     ap.add_argument("--no-trim", dest="no_trim", action="store_true",
@@ -188,6 +190,8 @@ def main():
         extra.append("--no-pipeline")
     if a.escalate:
         extra += ["--escalate-every", a.escalate]
+    if a.target:
+        extra += ["--target-every", a.target]
     p = subprocess.run([g, "--headless", "--path", ROOT, "--script",
                         "scripts/arena/live_match.gd", "--",
                         "--turns", str(a.turns), "--no-wait",
@@ -205,7 +209,8 @@ def main():
 
     for line in log.splitlines():
         if (line.startswith("LIVE_ARENA PIPELINE") or line.startswith("LIVE_ARENA DWELL")
-                or line.startswith("LIVE_ARENA ESCALATION")):
+                or line.startswith("LIVE_ARENA ESCALATION")
+                or line.startswith("LIVE_ARENA TARGET")):
             rec.setdefault("guards", []).append(line.strip())
     base = len(rec["speeches"])
     for s in sp:

@@ -265,7 +265,7 @@ func _canonical_text_invariant() -> void:
 	# live_match.gd: every sink must take `text`, the cleaned value, and the
 	# raw `content` must not reach any of them.
 	for sink in ["agent[\"last_message\"] = text",
-			"_history.append({\"speaker\": agent[\"display_name\"], \"text\": text})",
+			"_history.append({\"speaker\": agent[\"display_name\"], \"text\": text",
 			"\"text\": text,"]:
 		_expect("live path sink uses the cleaned text: %s" % sink.substr(0, 46),
 			live.find(sink) != -1)
@@ -275,7 +275,7 @@ func _canonical_text_invariant() -> void:
 		"a sink would receive untrimmed text")
 
 	_expect("the raw reply is not appended to live history",
-		live.find("_history.append({\"speaker\": agent[\"display_name\"], \"text\": content})") == -1)
+		live.find("_history.append({\"speaker\": agent[\"display_name\"], \"text\": content") == -1)
 
 	# main.gd: history takes the sanitised `content`; the bubble takes a
 	# DERIVED display string. Derived is fine -- a bubble cannot hold a

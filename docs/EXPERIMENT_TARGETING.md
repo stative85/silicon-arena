@@ -87,3 +87,76 @@ events than expected explains itself rather than looking like a bug.
 ## Not part of the decision
 
 Judge scores.
+
+
+---
+
+# Result: the harm is fixed, the benefit is too small. E2 rejected.
+
+4 runs per arm, 60 speeches, events every 15 turns. Event turn and forced reply
+excluded; the window is the 3rd/4th/5th turn after each event, taken at the
+same positions in both arms.
+
+| post-event window | T0 | T2 | delta |
+|---|---:|---:|---:|
+| cross-agent addressing | 47.2% | 52.8% | **+5.6** |
+| challenge rate | 33.3% | 41.7% | +8.3 |
+
+| guard | T0 | T2 | |
+|---|---:|---:|---|
+| near-duplicate | 8.8% | 9.2% | OK |
+| opener uniqueness | 0.80 | 0.75 | OK |
+| truncation | 3.4% | 2.1% | OK |
+| failure rate | 0.4% | 0.0% | OK |
+| fabricated citations | — | **0** | OK |
+
+| pre-registered check | value | verdict |
+|---|---|---|
+| addressing beats T0 by >= 16 | +5.6 | **FAIL** |
+| challenge not below T0 by >10 | +8.3 | OK |
+| exactly 3 events per run | 4.0 | **FAIL** (spec error, see below) |
+| all other guards | — | OK |
+
+**Rejected.**
+
+## What changed, compared with the world-events
+
+The redesign fixed the damage. Periodic world-events drove addressing *down* by
+31.2 points; targeted engagement moves it *up* by 5.6. Making the event
+relational rather than declarative was the right diagnosis.
+
+It is simply not a large enough effect. +5.6 points across 36 windowed speeches
+per arm does not clear a bar set at 2 standard errors, and a threshold is not
+lowered after seeing the number it failed.
+
+The honest reading is that one nudge every fifteen turns does not create a
+persistent rivalry. The two named agents exchange their forced turns and the
+debate returns to its previous shape within three turns.
+
+## My specification error, again
+
+The event-count guard said "exactly 3 per run". At 60 turns with an event every
+15, four fire — at 15, 30, 45 and 60. The fourth lands on the final turn and can
+have no effect. The arena behaved correctly; the guard was written from a
+half-remembered arithmetic.
+
+That is the third guard I have mis-specified (dwell by 8ms, near-duplicate
+inside its noise floor, and now this). All three were arithmetic or resolution
+errors in the *threshold*, never in the measurement, which suggests thresholds
+deserve the same review as code.
+
+## What this points at
+
+Not timing, and not content — **duration**. The mechanism works while it is
+running and stops when it stops. A dispute that must persist needs something
+that keeps it alive: the pair given several exchanges rather than one, or a
+standing grudge in agent state that survives the event, rather than a fact
+appended to a briefing.
+
+That is a different intervention and gets its own pre-registration.
+
+## Status
+
+`--target-every` stays, off by default. The provenance machinery stays and is
+in the verify gate regardless of whether the feature ships: an arena that can
+quote agents back at each other must never be able to invent the quote.
