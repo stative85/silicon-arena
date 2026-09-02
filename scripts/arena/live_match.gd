@@ -96,6 +96,28 @@ var _max_tokens_override := 0
 ## all; a state-triggered version (fire only when the debate has gone flat)
 ## is the product feature, and is not built until this says the mechanism works.
 var _escalate_every := 0
+
+## Targeted engagement: instead of changing the world, point one agent at
+## another agent's ACTUAL earlier claim and require the two to trade turns.
+##
+## Periodic world-events raised conflict and destroyed engagement
+## (docs/EXPERIMENT_ESCALATION.md): agents made declarations at the room. This
+## makes the event relational by construction -- which is exactly why the event
+## turn itself is excluded from the measurement, since it would otherwise
+## guarantee the result it is being judged on.
+var _target_every := 0
+var _targets_fired := 0
+
+## Agents that must speak next, in order, because an event paired them.
+var _forced_next: Array[String] = []
+
+## Refusals to fire, because no claim could be resolved to canonical text.
+var _target_refusals := 0
+
+## How often each agent has been handed the challenger role, so the same one is
+## not picked every time. Left to itself the selector always chose the first
+## eligible agent in the roster.
+var _challenge_counts: Dictionary = {}
 var _escalations_fired := 0
 
 ## Changes to the situation, in order. Written against this match's TOPIC.
@@ -316,6 +338,8 @@ func _parse_args() -> void:
 				_pipeline = true
 			"--no-pipeline":
 				_pipeline = false
+			"--target-every":
+				if v != "": _target_every = maxi(int(v), 0); i += 1
 			"--escalate-every":
 				if v != "": _escalate_every = maxi(int(v), 0); i += 1
 			"--no-trim":
@@ -536,6 +560,18 @@ func _all_agent_patch(patch: Dictionary) -> Dictionary:
 
 func _run_turn() -> void:
 	var agent: Dictionary = _agents[_turn % _agents.size()]
+	# A targeted-engagement event pairs two agents and they speak next, in
+	# order. Anything not in that queue waits its normal turn.
+	while not _forced_next.is_empty():
+		var want: String = _forced_next.pop_front()
+		var found := false
+		for a in _agents:
+			if str(a["display_name"]) == want and not a.get("eliminated", false):
+				agent = a
+				found = true
+				break
+		if found:
+			break
 	if agent["eliminated"]:
 		_turn += 1
 		return
@@ -826,7 +862,10 @@ func _reveal(agent: Dictionary, text: String, latency: int) -> void:
 	# invented. Short hedged replies score low.
 	agent["confidence"] = _derive_confidence(text)
 
-	_history.append({"speaker": agent["display_name"], "text": text})
+	# The turn number travels with the entry. A targeted-engagement event cites
+	# a specific earlier turn, and a citation that cannot be resolved back to
+	# canonical text must be refused rather than invented.
+	_history.append({"speaker": agent["display_name"], "text": text, "turn": _turn})
 	if _history.size() > 24:
 		_history.pop_front()
 
@@ -881,6 +920,7 @@ func _reveal(agent: Dictionary, text: String, latency: int) -> void:
 
 	_turn += 1
 	_maybe_escalate()
+	_maybe_target()
 	# Brief settle so the overlay shows SPEAKING before the next THINKING.
 	_next_turn_at = _elapsed + 1.2
 	_reveal_at = _next_turn_at
@@ -1419,3 +1459,114 @@ func _maybe_escalate() -> void:
 		"timestamp": Time.get_datetime_string_from_system(true),
 	})
 	_state.publish_delta({"last_action": "the situation changed"}, {})
+
+
+## ── Targeted engagement ────────────────────────────────────────────────────
+##
+## INVARIANT   a cited claim exists verbatim in the canonical transcript.
+## DETECTION   the citation carries a turn number; the text is re-checked
+##             against the history entry for that turn.
+## TEETH       an unresolvable citation refuses the event outright. The arena
+##             never attributes a claim to an agent that the agent did not make.
+## RECOVERY    try the next eligible claim; if none resolve, skip this event and
+##             continue the match unchanged.
+## PROOF       scripts/arena/targeting_selftest.gd corrupts the stored turn
+##             number and the source text, and both must refuse.
+
+
+## A claim is worth challenging if it is long enough to be a position rather
+## than an aside, and short enough to quote back without becoming a speech.
+const CLAIM_MIN_WORDS := 8
+const CLAIM_MAX_CHARS := 180
+
+
+## First substantial sentence of a turn, or "" when there is none.
+static func extract_claim(text: String) -> String:
+	var body := text.strip_edges()
+	for sep in [". ", "? ", "! "]:
+		var i := body.find(sep)
+		if i > 0 and i < CLAIM_MAX_CHARS:
+			var head := body.substr(0, i + 1).strip_edges()
+			if head.split(" ", false).size() >= CLAIM_MIN_WORDS:
+				return head
+	if body.length() <= CLAIM_MAX_CHARS and body.split(" ", false).size() >= CLAIM_MIN_WORDS:
+		return body
+	return ""
+
+
+## Verify a citation against canonical history. Returns true only when the
+## named turn exists, was spoken by the named agent, and contains the claim.
+static func citation_holds(history: Array, turn_no: int, speaker: String,
+		claim: String) -> bool:
+	if claim.strip_edges() == "":
+		return false
+	for h in history:
+		if int(h.get("turn", -1)) != turn_no:
+			continue
+		if str(h.get("speaker", "")) != speaker:
+			return false
+		return str(h.get("text", "")).find(claim) != -1
+	return false
+
+
+## Choose a claim to challenge and the pair who will trade turns over it.
+## Returns {} when nothing can be cited safely.
+func _pick_dispute() -> Dictionary:
+	# Most recent first: a live disagreement beats an old one.
+	for i in range(_history.size() - 1, -1, -1):
+		var h: Dictionary = _history[i]
+		var claim := extract_claim(str(h.get("text", "")))
+		if claim == "":
+			continue
+		var target := str(h.get("speaker", ""))
+		var turn_no := int(h.get("turn", -1))
+		if not citation_holds(_history, turn_no, target, claim):
+			continue
+		# Someone other than the speaker has to do the challenging, and it
+		# should not be the same agent every time.
+		var best := ""
+		var best_count := 1 << 30
+		for a in _agents:
+			var name := str(a["display_name"])
+			if name == target or a.get("eliminated", false):
+				continue
+			var used := int(_challenge_counts.get(name, 0))
+			if used < best_count:
+				best_count = used
+				best = name
+		if best != "":
+			_challenge_counts[best] = best_count + 1
+			return {"claim": claim, "target": target, "turn": turn_no,
+				"challenger": best}
+	return {}
+
+
+func _maybe_target() -> void:
+	if _target_every <= 0 or _turn <= 0 or _turn % _target_every != 0:
+		return
+	var d := _pick_dispute()
+	if d.is_empty():
+		# TEETH. No verifiable claim, so no event. Inventing a paraphrase and
+		# attributing it to an agent would be the arena lying about its own
+		# transcript.
+		_target_refusals += 1
+		print("LIVE_ARENA TARGET REFUSED at turn %d: no claim resolved to canonical text" % _turn)
+		_write_log({"kind": "target_refused", "match_id": _match_id, "turn": _turn,
+			"reason": "no citation could be verified",
+			"timestamp": Time.get_datetime_string_from_system(true)})
+		return
+
+	_targets_fired += 1
+	var fact := ("DIRECT CHALLENGE: %s said in turn %d, \"%s\" — %s, take that exact "
+		+ "claim apart. %s answers next.") % [d["target"], d["turn"], d["claim"],
+		d["challenger"], d["target"]]
+	_arena_facts.append(fact)
+	_forced_next = [str(d["challenger"]), str(d["target"])]
+	print("LIVE_ARENA TARGET %d at turn %d: %s -> %s (claim from turn %d)"
+		% [_targets_fired, _turn, d["challenger"], d["target"], d["turn"]])
+	_write_log({
+		"kind": "target", "match_id": _match_id, "turn": _turn,
+		"index": _targets_fired, "challenger": d["challenger"],
+		"target": d["target"], "source_turn": d["turn"], "claim": d["claim"],
+		"timestamp": Time.get_datetime_string_from_system(true),
+	})

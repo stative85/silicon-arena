@@ -91,6 +91,11 @@ jobs:
       - name: Self-test — speech cleaning
         run: ~/godot/godot --headless --path . --script scripts/arena/speech_clean_selftest.gd 2>&1 | tee out.log; grep -q "SPEECH CLEAN OK" out.log
 
+      - name: Self-test — claim provenance
+        # A targeted event quotes one agent back at another. If the quote
+        # is not in the transcript, the arena has fabricated evidence.
+        run: ~/godot/godot --headless --path . --script scripts/arena/targeting_selftest.gd 2>&1 | tee out.log; grep -q "TARGETING OK" out.log
+
       - name: Adversarial pass
         run: ~/godot/godot --headless --path . --script tools/adversarial.gd 2>&1 | tee out.log; grep -q "ADVERSARIAL OK" out.log
 
