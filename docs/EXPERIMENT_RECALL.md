@@ -15,6 +15,13 @@ behaviour *because of the history itself*.
 | QS | **sham**: the same amount and format of injected canonical text, chosen to be the LEAST resonant available |
 | Q1 | real resonance-selected recall |
 
+**The sham is matched to the real arm on everything except relevance:** same
+number of injected memories, same formatting, same injection position, same
+cooldown and minimum-distance rules, and the same *count* of eligible
+candidates — it takes the least-resonant members of the very same pool the real
+arm draws from. Otherwise a Q1 win could be explained by Q1 happening to
+receive older, shorter or fewer memories.
+
 Q1 differs from Q0 in two ways at once — it receives an older *relevant*
 memory, and it receives extra prompt text at all. QS isolates the second, so a
 Q1 win means old relevant history mattered rather than that another paragraph
@@ -38,6 +45,20 @@ Without clause 3 the arena could score 100% by becoming a photocopier.
 
 Provenance-valid, **non-verbatim** callback rate in Q1, against QS at the same
 turn positions. Acceptance requires beating **QS** — not merely Q0.
+
+## Conversion, not just count
+
+Raw callback count can rise simply because Q1 recalls more often. The measure
+that answers "is the memory useful when surfaced" is:
+
+```
+successful non-verbatim callbacks
+---------------------------------
+eligible recalls actually injected
+```
+
+Reported for both Q1 and QS. A high count with low conversion means the arena
+is surfacing memories that do nothing.
 
 ## Secondary, reported
 

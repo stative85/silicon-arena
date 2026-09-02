@@ -23,7 +23,7 @@ the runtime does not belong here and should not have been run.
 
 | **D3** | Does a bounded 3-turn dispute outlive its scaffold? | `4178a06` | addressing +3.3 (bar +16), no guard harmed, 0 fabricated citations, top-pair share flat | **REJECTED** — scaffolded conflict does not self-sustain |
 
-| **C1** | Does claim-scoped decaying contention memory create callbacks without obsession? | `a4dcacb` | re-engagement 10.7% → 21.4% (+10.7, bar +16); top-pair share *fell*; 0 outlived TTL | **REJECTED** — largest effect of the family, still short |
+| **C1** | Does claim-scoped decaying contention memory create callbacks without obsession? | `a4dcacb` | re-engagement 10.7% → 21.4% (+10.7, bar +16); top-pair share *fell*; 0 outlived TTL | **IMPLEMENTATION REJECTED; hypothesis unresolved** — a later audit ([AUDIT_EXTRACTOR](AUDIT_EXTRACTOR.md)) found the treatment fired 0.75×/run because a broken claim extractor failed on 59.6% of turns. The bar was missed and stands; the mechanism barely ran, so this is **not** evidence that contention memory fails. Does **not** reopen the conflict axis. |
 
 | **PR1** | Does uneven presentation rhythm work without costing throughput? | `5f9c54d` | 25 distinct dwells vs 1, applied mean exactly 1.000, 30 turns vs 29 baseline | **SHIPPED** — watchability itself needs a human |
 | **T1** | Does a four-phase topic arc give the debate trajectory? | `ca67213` | pivot shifted vocabulary +0.013 (bar 0.10); CLOSE resolution fell 26.9% → 17.8%; opener uniqueness 0.80 → 0.64 | **REJECTED** — cosmetic, and instructing a conclusion made conclusions worse |
@@ -46,11 +46,13 @@ their output does.
 | E1 | world events | −31.2 |
 | E2 | one targeted challenge | +5.6 |
 | D3 | three-turn bounded episode | +3.3 |
-| C1 | claim-scoped contention memory | re-engagement +10.7 |
+| C1 | claim-scoped contention memory | re-engagement +10.7 (treatment under-activated — see audit) |
 
 Prompt scaffolding does not produce durable rivalry on these models, and state
 that survives the event does better but still not enough. Four interventions,
-four rejections: **conflict persistence is not cheaply reachable here.** Per the
+four rejections. E1, E2 and D3 tested the hypothesis fairly; C1 did not, because
+its treatment was starved by a broken extractor. **Scaffolding does not create
+durable rivalry** is established. **Memory does not** is not. Per the
 C1 pre-registration, the next entertainment lever should be something other than
 a fifth way of making agents argue.
 

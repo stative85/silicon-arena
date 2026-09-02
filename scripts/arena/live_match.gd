@@ -2031,11 +2031,25 @@ func _select_recalls(now_speaker: String, named_now: Array) -> Array:
 			if picked.size() >= GonzoScript.MAX_RECALLS_PER_PROMPT:
 				break
 	else:
-		# sham: the least resonant material that still resolves.
-		for j in range(scored.size() - 1, -1, -1):
-			picked.append(int(scored[j]["i"]))
-			if picked.size() >= GonzoScript.MAX_RECALLS_PER_PROMPT:
+		# SHAM. Matched to the real arm on everything except relevance:
+		# same count, same formatting, same injection position, same cooldown
+		# and distance rules (both applied above), and the same eligibility
+		# COUNT -- it takes the least-resonant members of the very same
+		# candidate pool the real arm draws from.
+		#
+		# Without that matching, a Q1 win could be explained by Q1 happening to
+		# receive older, shorter or fewer memories rather than by resonance.
+		var want := 0
+		for e in scored:
+			if float(e["score"]) < GonzoScript.MIN_ELIGIBLE_SCORE:
 				break
+			want += 1
+			if want >= GonzoScript.MAX_RECALLS_PER_PROMPT:
+				break
+		for j in range(scored.size() - 1, -1, -1):
+			if picked.size() >= want:
+				break
+			picked.append(int(scored[j]["i"]))
 	return picked
 
 
