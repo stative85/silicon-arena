@@ -92,3 +92,78 @@ The product feature is **not** periodic. It is state-triggered: fire an event
 only when the arena has been structurally flat for N turns. Periodic is the
 causal probe — it establishes whether the mechanism moves anything at all
 before anything more complicated is built.
+
+
+---
+
+# Result: the mechanism works and breaks the debate. E1 rejected.
+
+4 runs per arm, 60 speeches each, single matches, events at turns 15/30/45.
+
+| slope (late third − early third) | E0 | E1 | E1−E0 |
+|---|---:|---:|---:|
+| **challenge** | +11.2 | **+21.2** | **+10.0** |
+| commit | −11.2 | +16.2 | +27.5 |
+| **addresses** | +12.5 | **−18.8** | **−31.2** |
+| opener uniqueness | +0.00 | **−0.18** | **−0.18** |
+| formulaic | −5.0 | −1.2 | +3.8 |
+| uptake | +5.3 | +3.9 | −1.3 |
+
+| guard | E0 | E1 | |
+|---|---:|---:|---|
+| failure rate | 0.0% | 0.0% | OK |
+| truncation | 3.3% | 3.3% | OK |
+| near-duplicate | 12.9% | 8.3% | OK |
+| dead air (>10s) | 0.0% | 0.0% | OK |
+| escalation records | 0 | 3.0 per run | OK |
+
+| pre-registered check | value | verdict |
+|---|---|---|
+| challenge slope beats E0 by >= 10 | +10.0 | OK |
+| addresses slope not worse than −16 | **−31.2** | **FAIL** |
+| opener uniqueness >= E0 − 0.15 | **−0.18** | **FAIL** |
+| all other guards | — | OK |
+
+**Rejected.**
+
+## The mechanism works. That is not the same as helping.
+
+Changing the situation *does* escalate: challenge slope rises from +11.2 to
++21.2 and commitment language from −11.2 to +16.2. Agents take harder positions
+in the late third, exactly as intended.
+
+They stop taking them *at each other*. Addressing slope goes from +12.5 to
+−18.8, and the effect is consistent across runs: E0 gives −5, +30, +20, +5 and
+E1 gives +5, −15, −15, −50. With four runs averaged the standard error is about
+8.2, so a −31.2 gap is roughly 3.8 SE — outside noise, unlike the single-run
+2sd of 32.8 that would have made it look borderline.
+
+Opener uniqueness falls 0.18 over the run: the late third starts sounding the
+same.
+
+Read together, the intervention converts a debate into a **round of position
+statements**. The forced-choice event invites "I would shut down, because…"
+from every agent in turn, which is more adversarial and less of an argument.
+That is precisely the failure the guards were written for, and it was caught by
+opener uniqueness rather than by the formulaic-opener regex — the openings were
+varied enough in wording to slip the pattern while converging in structure.
+
+## What this rules out and what it points at
+
+Ruled out: **periodic escalation as written**. Not the timing — the content.
+Two of the three events ask each agent to declare something, and a declaration
+is naturally addressed to the room rather than to a rival.
+
+Pointed at: events that force *engagement* rather than *position*. Something
+closer to "name which agent you now think is most wrong, and why" changes the
+situation and requires a target. That is a different intervention and needs its
+own pre-registration; it is not folded into this one after the fact.
+
+The state-triggered version is **not** the fix here. Firing these same events
+only when the arena goes flat would produce the same collapse, later.
+
+## Status
+
+`--escalate-every` stays in the codebase, off by default, because it is the
+probe that will be needed to test the redesigned events. It is not enabled
+anywhere and does not affect the shipped arena.
