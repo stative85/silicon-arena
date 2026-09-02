@@ -99,3 +99,72 @@ variation on making agents argue.
 ## Not part of the decision
 
 Judge scores.
+
+
+---
+
+# Result: the closest yet, still short. C1 rejected. Stop digging.
+
+4 runs per arm, 60 speeches. Window is turns 4–10 after a contention opens,
+evaluated at the same turn positions in C0.
+
+| | C0 | C1 | delta |
+|---|---:|---:|---:|
+| same-pair organic re-engagement | 10.7% | **21.4%** | **+10.7** |
+
+| guard | C0 | C1 | |
+|---|---:|---:|---|
+| top-pair interaction share | 28.2% | **26.7%** | OK |
+| contentions outliving TTL | — | **0** | OK |
+| near-duplicate | 9.2% | 9.2% | OK |
+| opener uniqueness | 0.69 | 0.75 | OK |
+| truncation | 0.8% | 2.1% | OK |
+| failure rate | 0.0% | 0.0% | OK |
+| fabricated citations | — | **0** | OK |
+
+**Rejected:** +10.7 against a bar of +16.
+
+## What actually happened
+
+Re-engagement **doubled**. This is the largest effect any of the four conflict
+interventions produced, and the first with no cost anywhere: the anti-obsession
+guard went the *right* way — top-pair share fell from 28.2% to 26.7% — and
+opener uniqueness improved. Nothing was traded for it.
+
+It is still below the threshold that was frozen before the run, so it is
+rejected. A bar is not moved after seeing the number that missed it.
+
+## The limitation this test had, stated plainly
+
+**Contentions opened 0.75 times per run.** Three across four runs. The organic
+detector requires a challenge word *and* another agent named in the same turn,
+and that combination is rare. The effect is therefore measured over very few
+windows, and the +10.7 is a noisy estimate of something that barely happened.
+
+That is a fact about this test, not an argument for another round. The
+pre-registration said that if this failed, the conclusion is to stop digging,
+and a low trigger count is exactly the kind of post-hoc reason one reaches for
+to justify one more attempt. Whether a looser trigger deserves a fifth
+experiment is a decision for the operator, not a discovery in this data.
+
+## Where the family stands
+
+| | intervention | effect |
+|---|---|---:|
+| E1 | world events | addressing −31.2 |
+| E2 | one targeted challenge | addressing +5.6 |
+| D3 | three-turn bounded episode | addressing +3.3 |
+| C1 | claim-scoped contention memory | re-engagement +10.7 |
+
+Four interventions, four rejections. Scaffolding does not persist; state
+persists better than scaffolding and still not enough. **Conflict persistence
+is not cheaply reachable in this arena**, and per the pre-registration the next
+entertainment lever should be something other than a fifth way of making agents
+argue.
+
+## Status
+
+`--contention` stays off by default. The 15 bounds checks stay in the verify
+gate: the arena can hold a memory of who disagreed with whom about what, and it
+must never be able to invent the disagreement, keep it forever, or let one pair
+own the room.

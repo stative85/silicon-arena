@@ -23,7 +23,9 @@ the runtime does not belong here and should not have been run.
 
 | **D3** | Does a bounded 3-turn dispute outlive its scaffold? | `4178a06` | addressing +3.3 (bar +16), no guard harmed, 0 fabricated citations, top-pair share flat | **REJECTED** — scaffolded conflict does not self-sustain |
 
-**Shipped: 4. Rejected: 7.**
+| **C1** | Does claim-scoped decaying contention memory create callbacks without obsession? | `a4dcacb` | re-engagement 10.7% → 21.4% (+10.7, bar +16); top-pair share *fell*; 0 outlived TTL | **REJECTED** — largest effect of the family, still short |
+
+**Shipped: 4. Rejected: 8.**
 
 ### What the three conflict experiments establish together
 
@@ -32,10 +34,13 @@ the runtime does not belong here and should not have been run.
 | E1 | world events | −31.2 |
 | E2 | one targeted challenge | +5.6 |
 | D3 | three-turn bounded episode | +3.3 |
+| C1 | claim-scoped contention memory | re-engagement +10.7 |
 
-Prompt scaffolding does not produce durable rivalry on these models. Tripling
-the scaffold slightly *reduced* the after-effect. Persistence would have to live
-in agent state that keeps shaping prompts, which is not built.
+Prompt scaffolding does not produce durable rivalry on these models, and state
+that survives the event does better but still not enough. Four interventions,
+four rejections: **conflict persistence is not cheaply reachable here.** Per the
+C1 pre-registration, the next entertainment lever should be something other than
+a fifth way of making agents argue.
 
 ## Supporting work that is not an experiment
 
