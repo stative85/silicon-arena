@@ -92,3 +92,74 @@ PROOF       dispute_selftest.gd — 13 checks; removing the horizon check turns
 ## Not part of the decision
 
 Judge scores.
+
+
+---
+
+# Result: scaffolded conflict does not outlive its scaffold. D3 rejected.
+
+4 runs per arm, 60 speeches. Episodes at turns 15/30/45, expiring at 18/33/48.
+Forced exchanges excluded; window is the 5 ordinary turns after expiry.
+
+| post-episode window | D0 | D3 | delta |
+|---|---:|---:|---:|
+| cross-agent addressing | 38.3% | 41.7% | **+3.3** |
+| challenge rate | 41.7% | 43.3% | +1.7 |
+
+| guard | D0 | D3 | |
+|---|---:|---:|---|
+| top-pair share | 23.2% | 25.2% | OK |
+| near-duplicate | 7.5% | 7.9% | OK |
+| opener uniqueness | 0.79 | 0.72 | OK |
+| truncation | 4.2% | 3.8% | OK |
+| failure rate | 0.0% | 0.0% | OK |
+| fabricated citations | — | **0** | OK |
+| episodes over their exchange limit | — | **0** | OK |
+| events fired without follow-up room | — | **0** | OK |
+
+**Rejected.** +3.3 against a bar of +16.
+
+## The three experiments together
+
+| | intervention | post-effect on addressing |
+|---|---|---:|
+| E1 | world events every 15 turns | **−31.2** |
+| E2 | one targeted challenge | +5.6 |
+| D3 | three-turn bounded episode | **+3.3** |
+
+Tripling the scaffold did not increase persistence. It slightly reduced it.
+
+That is the finding worth keeping: **forced conflict does not become
+self-sustaining in this arena.** The debate returns to its baseline shape as
+soon as the instruction stops, and a longer instruction does not change the
+shape of what follows it. E2 and D3 differ by 2.3 points, which is nothing.
+
+The couples-therapy failure mode did not occur either — top-pair share moved
+23.2% to 25.2%. Nothing was harmed. Nothing persisted.
+
+## What this rules out
+
+Prompt scaffolding as a route to durable rivalry. Three shapes have now been
+tried — change the world, point one agent at another, force a bounded exchange
+— and the post-scaffold effect is at best a third of the threshold.
+
+## What remains, and what it would cost
+
+Persistence would have to live in **agent state that keeps shaping prompts**
+after the event: a standing grudge that decays over many turns rather than a
+fact appended to a briefing. The scar lattice already stores per-agent memory
+with provenance, so the machinery exists.
+
+That is deliberately **not** built here. Three rejections establish that the
+cheap version does not work, which is the precondition for considering the
+expensive one — not a mandate for it. A grudge that survives is also the
+mechanism most likely to produce five agents re-litigating one sentence
+forever, and it should be entered into with a pre-registration and a decay
+bound, not enthusiasm.
+
+## Status
+
+`--target-every` stays off by default. The dispute machinery and its 13
+invariant checks stay in the verify gate: the arena can quote agents back at
+each other, and it must never be able to invent the quote or start an episode
+it cannot observe.

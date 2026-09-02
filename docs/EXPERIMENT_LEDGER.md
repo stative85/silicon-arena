@@ -21,7 +21,21 @@ the runtime does not belong here and should not have been run.
 
 | **E2** | Can a targeted event turn a disagreement into a running dispute? | `7d4f669` | addressing +5.6 (bar was +16), challenge +8.3, no harm to any guard, 0 fabricated citations | **REJECTED** — right direction, too small |
 
-**Shipped: 4. Rejected: 6.**
+| **D3** | Does a bounded 3-turn dispute outlive its scaffold? | `4178a06` | addressing +3.3 (bar +16), no guard harmed, 0 fabricated citations, top-pair share flat | **REJECTED** — scaffolded conflict does not self-sustain |
+
+**Shipped: 4. Rejected: 7.**
+
+### What the three conflict experiments establish together
+
+| | intervention | post-effect on addressing |
+|---|---|---:|
+| E1 | world events | −31.2 |
+| E2 | one targeted challenge | +5.6 |
+| D3 | three-turn bounded episode | +3.3 |
+
+Prompt scaffolding does not produce durable rivalry on these models. Tripling
+the scaffold slightly *reduced* the after-effect. Persistence would have to live
+in agent state that keeps shaping prompts, which is not built.
 
 ## Supporting work that is not an experiment
 
