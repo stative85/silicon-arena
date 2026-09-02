@@ -151,3 +151,61 @@ reply cannot appear early, that cinematic and event processing use the committed
 previous turn, that a preset or template change invalidates a reply in flight,
 and that pause/BRB interactions never reveal prefetched text. The model may
 think one turn ahead; the viewer must never be able to tell.
+
+
+---
+
+# Visual port: attempted, measured, reverted
+
+The headless win did not transfer, and the port was removed rather than kept
+"for later".
+
+## Measurement
+
+Same 200-second window, visual app (`main.gd`) headless:
+
+| build | turns | per turn | speeches/min |
+|---|---:|---:|---:|
+| before the port | 29 | 6.90s | 8.7 |
+| with the one-deep pipeline | 29 | 6.90s | 8.7 |
+
+Identical. Instrumenting the turn tick showed why:
+
+```
+[TICK] t=5687  pending=true  waiting=true
+[TICK] t=10828 pending=true  waiting=true
+[TICK] t=16002 pending=true  waiting=true
+[TICK] t=41414 pending=false waiting=true
+```
+
+Ticks fire every ~5.0s and a reply is already in hand at almost all of them.
+
+## Why the headless gain does not exist here
+
+The two entry points schedule differently, and only one had the defect the
+pipeline fixes.
+
+`live_match.gd` scheduled the next turn **relative to the previous reply**
+(`_next_turn_at = _elapsed + 1.2`), so the pause and the generation were
+strictly sequential and added up.
+
+`main.gd` uses a **free-running repeating timer**. The reply lands somewhere
+inside the 5-second interval and the next dispatch happens on the next tick
+regardless, so generation was already overlapping the pause. Prefetching moves
+*when the text is displayed*, not *how often turns happen*.
+
+The visual app was pipelined by accident of its timer design.
+
+## Decision
+
+Reverted. It added a hold-and-reveal path, an epoch re-check and three counters
+to the largest and most load-bearing file in the project, in exchange for a
+measured zero. Keeping it behind a flag would have been the same complexity
+with an added branch.
+
+The rate in the visual app is set by `TURN_INTERVAL_SEC = 5.0`, which is the
+reading pause. Changing it is a product decision about how long a viewer needs
+to read a bubble, not a scheduling one, and it is not made here.
+
+The headless pipeline stays: that path had the sequential defect and the +37.2%
+is real.
