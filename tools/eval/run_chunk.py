@@ -206,6 +206,10 @@ def main():
     rec["failures"].extend(fails)
     rec["models"].extend(s["model"] for s in sp)
     rec["wall_sec"] += wall
+    # Per-block wall time, because a block's throughput cannot be recovered by
+    # dividing the total evenly: the first block after a VRAM reset pays cold
+    # model loads and the rest do not.
+    rec.setdefault("chunk_walls", []).append(wall)
     rec["chunks"] += 1
     json.dump(rec, open(path, "w", encoding="utf-8"), indent=1)
     print("%s chunk %d: +%d speeches (%d total), +%d failures, %.0fs (%.0fs total)"
