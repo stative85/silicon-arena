@@ -114,6 +114,7 @@ def main():
                     help="one-turn-deep pipeline arm (now the default)")
     ap.add_argument("--no-pipeline", dest="no_pipeline", action="store_true",
                     help="baseline arm: sequential dispatch")
+    ap.add_argument("--recall", default="", help="off | sham | real")
     ap.add_argument("--arc", action="store_true",
                     help="four-phase topic arc")
     ap.add_argument("--contention", action="store_true",
@@ -200,6 +201,8 @@ def main():
         extra.append("--contention")
     if a.arc:
         extra.append("--arc")
+    if a.recall:
+        extra += ["--recall", a.recall]
     p = subprocess.run([g, "--headless", "--path", ROOT, "--script",
                         "scripts/arena/live_match.gd", "--",
                         "--turns", str(a.turns), "--no-wait",
@@ -220,7 +223,9 @@ def main():
                 or line.startswith("LIVE_ARENA ESCALATION")
                 or line.startswith("LIVE_ARENA TARGET")
                 or line.startswith("LIVE_ARENA CONTENTION")
-                or line.startswith("LIVE_ARENA ARC")):
+                or line.startswith("LIVE_ARENA ARC")
+                or line.startswith("LIVE_ARENA SCAR")
+                or line.startswith("LIVE_ARENA RECALL")):
             rec.setdefault("guards", []).append(line.strip())
     base = len(rec["speeches"])
     for s in sp:

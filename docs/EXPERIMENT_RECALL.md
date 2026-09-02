@@ -111,3 +111,89 @@ short of disagreements.
 ## Not part of the decision
 
 Judge scores.
+
+
+---
+
+# Result: memory works. Resonance does not. Q1 rejected.
+
+4 runs per arm, 60 speeches, frozen at `f937c74`.
+
+| arm | injected | callbacks | **conversion** | distance | unsupported |
+|---|---:|---:|---:|---:|---:|
+| Q0 none | 0 | 0 | — | — | 0 |
+| **QS sham** | 12.75 | 9.50 | **75.7%** | 16.6 | **0** |
+| **Q1 resonant** | 8.25 | 5.00 | **58.9%** | 11.7 | **0** |
+
+Per-run conversion — QS 67 / 64 / 80 / 92, Q1 56 / 43 / 80 / 57. The sham is
+higher in three of four.
+
+| check | value | verdict |
+|---|---|---|
+| Q1 conversion beats QS | **−16.8** | **FAIL** |
+| unsupported attribution == 0 | 0.00 | OK |
+| fixation <= Q0 + 15 | 1.7 vs 0.0 | OK |
+| near-duplicate <= Q0 + 8.1 | 12.5 vs 11.2 | OK |
+| opener uniqueness >= Q0 − 0.15 | 0.79 vs 0.73 | OK |
+| throughput >= Q0 − 1.40 | 17.50 vs 17.67 | OK |
+| failure rate <= 2% | 0.0% | OK |
+
+**Rejected.**
+
+## What the sham control bought
+
+Without QS, this would have read as a triumph: Q1 produced 5 provenance-valid,
+non-verbatim callbacks per run to material a mean of 11.7 turns old, against
+zero for Q0, with no fixation and no throughput cost.
+
+The sham did it **better**. Selecting the *least* resonant eligible memory
+converted at 75.7% against resonance-selection's 58.9%.
+
+So the effect is real and the explanation is wrong. Surfacing an old, sparse,
+provenance-valid excerpt that has fallen out of the visible transcript does
+change the response. **The four-dimensional resonance scoring is not why**, and
+on this evidence it actively hurt.
+
+## Two confounds, stated rather than buried
+
+The sham was matched on formatting, position, cooldown and minimum distance,
+and on the *count of eligible candidates* — but the arms still differ on two
+axes that could carry the result:
+
+* **QS injected more** (12.75 vs 8.25 per run). Conversion is a rate, so this
+  is largely controlled, but more injections means more chances for an easy one.
+* **QS reached further back** (16.6 vs 11.7 turns). Older material is less
+  similar to the present, which may make non-verbatim engagement *easier* — the
+  measure could be rewarding distance rather than quality.
+
+The second is the more serious. It means the honest claim is not "resonance is
+worse than random" but "resonance selection is unsupported, and the sham
+matched or beat it under a comparison that may favour the sham". Either way Q1
+did not earn its place.
+
+## What is established
+
+**Sparse provenance-valid recall of genuinely old canonical material produces
+non-verbatim callbacks** — 59% to 76% conversion at 12–17 turns of distance,
+with zero fabricated attributions across roughly 84 injections. The provenance
+teeth held completely.
+
+**The resonance machinery earned nothing.** A far cheaper retrieval — pick an
+old eligible scar, prefer distance, skip the scoring — performs at least as
+well.
+
+## Consequence
+
+L2 motifs and L4 shadows do not get an experiment. They were staged behind
+"if resonance works", and it did not.
+
+`--recall` stays off by default. The 25 invariant checks stay in the gate:
+whatever eventually surfaces a memory, it must never be able to invent one.
+
+## A note on the analysis
+
+The first evaluation of these runs reported nonsense — Q0, which has recall
+disabled, appeared to have 5.5 injections. The reader was matching match-logs
+to runs by turn count, and every run is 60 turns. Fixed by keying on the exact
+text of each run's first turn. **No threshold, definition, treatment or run was
+changed**; the data was always intact and only the reader was wrong.
