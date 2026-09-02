@@ -2007,6 +2007,8 @@ func _select_recalls(now_speaker: String, named_now: Array) -> Array:
 	for i in range(_history.size() - 1, maxi(_history.size() - 3, -1), -1):
 		recent += " " + str(_history[i].get("text", ""))
 
+	# Shared eligible pool, identical for every mode: provenance-valid,
+	# past cooldown, and older than the visible window.
 	var scored: Array = []
 	for idx in _scars.size():
 		var sc: Dictionary = _scars[idx]
@@ -2021,6 +2023,25 @@ func _select_recalls(now_speaker: String, named_now: Array) -> Array:
 	if scored.is_empty():
 		return []
 	scored.sort_custom(func(a, b): return float(a["score"]) > float(b["score"]))
+
+	# DISTANCE and RESONANCE arms share a shortlist: the CANDIDATE_SHORTLIST
+	# most distant eligible scars. One takes the furthest of them, the other the
+	# most resonant OF THE SAME SET, so injection count and source-distance
+	# profile are matched by construction rather than by hope.
+	if _recall_mode == "distance" or _recall_mode == "resonance":
+		var pool: Array = scored.duplicate()
+		pool.sort_custom(func(a, b):
+			return int(_scars[int(a["i"])]["source_turn"]) < int(_scars[int(b["i"])]["source_turn"]))
+		var shortlist: Array = pool.slice(0, mini(GonzoScript.CANDIDATE_SHORTLIST, pool.size()))
+		if shortlist.is_empty():
+			return []
+		var want_n := mini(GonzoScript.MAX_RECALLS_PER_PROMPT, shortlist.size())
+		if _recall_mode == "resonance":
+			shortlist.sort_custom(func(a, b): return float(a["score"]) > float(b["score"]))
+		var out: Array = []
+		for k in want_n:
+			out.append(int(shortlist[k]["i"]))
+		return out
 
 	var picked: Array = []
 	if _recall_mode == "real":

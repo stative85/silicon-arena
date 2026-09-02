@@ -32,6 +32,14 @@ const RECALL_COOLDOWN_TURNS := 4
 ## screen. Measured before this bound existed: mean recall distance 2.5 turns,
 ## which is not memory, it is duplication.
 const MIN_RECALL_DISTANCE := 10
+
+## Both arms of the distance-vs-resonance test draw from the SAME shortlist:
+## the N most distant eligible scars. G1 then takes the furthest of them and G2
+## the most resonant of them. Matching the pool by construction is the only way
+## to remove the two confounds the first experiment had -- the arms differed in
+## injection count and in how far back they reached, either of which could have
+## carried the result.
+const CANDIDATE_SHORTLIST := 4
 const DECAY_HALF_LIFE_TURNS := 15.0
 const MIN_ELIGIBLE_SCORE := 0.20
 
