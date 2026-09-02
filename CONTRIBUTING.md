@@ -103,7 +103,7 @@ VERIFY OK
 
 CI runs the same thing on Linux for every push and pull request.
 
-### Two rules that are not negotiable
+### Three rules that are not negotiable
 
 **1. A new test must be shown to fail.** Reintroduce the defect it guards,
 watch it go red, restore, watch it go green. A suite that can only pass is not
@@ -111,7 +111,17 @@ evidence. This is not hypothetical: an early version of the parity self-test
 matched `model_policy =`, which the *broken* code also satisfied, so it passed
 the exact bug it existed to catch.
 
-**2. If you add a load-bearing runtime setting, add it to the parity test.**
+**2. You cannot set a useful threshold for a metric whose noise floor you have
+not measured.** A guard tighter than its metric's run-to-run spread fires at
+random, and it will eventually fire on a change that was fine. This is not
+hypothetical either: the pipelining experiment was rejected on a
+near-duplicate guard set at +3.0 points, and that metric's block-level standard
+deviation turned out to be 7.9 — the guard was inside the noise before it was
+ever used. Measure the spread first, in the same batch, then set the bound.
+Corollary: run a baseline-against-itself calibration before trusting any A/B
+protocol, because the protocol manufactures some apparent effect on its own.
+
+**3. If you add a load-bearing runtime setting, add it to the parity test.**
 Three separate production bugs had one cause — `live_match.gd` carried a
 runtime fact and `main.gd` inherited a default. Put required settings in
 `REQUIRED_ON_BOTH`, and put derived values in `INVARIANTS`, in
