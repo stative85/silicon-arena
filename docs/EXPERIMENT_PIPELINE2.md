@@ -92,3 +92,62 @@ larger blocks than this experiment runs.
 
 **Acceptance.** Throughput ≥20% and above envelope, every hard correctness
 guard passes, dwell guard passes, no interaction metric outside its envelope.
+
+
+---
+
+# Result: P1 accepted. The pipeline is the default in the headless path.
+
+Interleaved `P0-P1-P1-P0-P0-P1-P1-P0`, 20 speeches per block, 4 paired blocks
+per arm, one session.
+
+Paired block deltas (P1 − P0):
+
+| metric | pair 1 | pair 2 | pair 3 | pair 4 | mean | sd |
+|---|---:|---:|---:|---:|---:|---:|
+| **speeches/min** | +5.0 | +5.5 | +5.2 | +6.2 | **+5.50** | 0.45 |
+| challenge | +15.0 | 0.0 | +10.0 | 0.0 | +6.25 | 6.50 |
+| addresses | −25.0 | 0.0 | +5.0 | 0.0 | −5.00 | 11.73 |
+| near-duplicate | 0.0 | +10.0 | −15.0 | −10.0 | −3.75 | 9.60 |
+| mean words | −4.0 | +1.1 | −1.9 | −5.5 | −2.58 | 2.45 |
+
+Arm throughput: 14.79 → 20.28 speeches/min, **+37.2%**.
+
+| check (frozen before the run) | value | verdict |
+|---|---|---|
+| throughput >= +20% | +37.2% | OK |
+| paired spm delta above envelope 1.40 | +5.50 | OK |
+| stale replies accepted == 0 | 0 | OK |
+| outstanding requests <= 1 | 1 | OK |
+| out-of-order reveals == 0 | 0 by construction | OK |
+| failure-rate increase <= 2 pts | 0.0 → 0.0 | OK |
+| dwell undershoot <= 24ms | 14ms | OK |
+| challenge delta >= −53.7 | +6.2 | OK |
+| addresses delta >= −29.2 | −5.0 | OK |
+| near-duplicate delta <= +8.1 | −3.8 | OK |
+
+**Accepted.** The throughput effect is the only one that clears its noise
+envelope, and it clears it by 12 standard deviations: the paired deltas are
++5.0, +5.5, +5.2, +6.2, which is about as consistent as this arena produces.
+
+## What is deliberately not claimed
+
+The interaction guards all passed, and that is close to meaningless — they were
+set at a noise floor wide enough to pass almost anything. Challenge rate came
+out **+6.2** and addressing **−5.0**, both well inside a protocol that produces
+±25 point swings with nothing changed. This experiment does not show that the
+pipeline preserves debate quality. It shows that it did not cause a
+catastrophe, and that the correctness properties hold exactly.
+
+## Scope
+
+On by default in the headless path only. `--no-pipeline` restores sequential
+dispatch.
+
+**Not ported to the visual app.** Headless acceptance proves scheduling
+correctness. Presentation correctness is a separate question and needs its own
+verification: that a bubble stays readable for its full dwell, that a prefetched
+reply cannot appear early, that cinematic and event processing use the committed
+previous turn, that a preset or template change invalidates a reply in flight,
+and that pause/BRB interactions never reveal prefetched text. The model may
+think one turn ahead; the viewer must never be able to tell.

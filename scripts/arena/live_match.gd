@@ -123,7 +123,16 @@ var _turn_cycle_started_ms := 0
 ## structurally impossible. Deeper speculation is deliberately not built: a
 ## template switch or a human line invalidates queued turns, and several stale
 ## branches is a lifecycle system nobody asked for.
-var _pipeline := false
+## ON by default in the headless path, accepted under docs/EXPERIMENT_PIPELINE2.md:
+## +37.2% throughput, paired delta +5.50 speeches/min against a calibrated noise
+## envelope of 1.40, with zero stale replies accepted, never more than one
+## request outstanding and a 14ms dwell undershoot against a 24ms tolerance.
+##
+## NOT ported to the visual app yet. Headless acceptance proves scheduling
+## correctness; it says nothing about presentation correctness, which needs its
+## own checks (bubble readability, no early reveal, preset changes invalidating
+## a prefetched reply, BRB/pause interactions).
+var _pipeline := true
 
 ## Bumped by anything that invalidates a reply already in flight. A held reply
 ## whose epoch no longer matches is discarded rather than shown.
@@ -273,6 +282,8 @@ func _parse_args() -> void:
 				if v != "": _max_tokens_override = maxi(int(v), 8); i += 1
 			"--pipeline":
 				_pipeline = true
+			"--no-pipeline":
+				_pipeline = false
 			"--no-trim":
 				_trim_sentences = false
 			"--exit-on-complete":

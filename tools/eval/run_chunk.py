@@ -111,7 +111,9 @@ def main():
     ap.add_argument("--max-tokens", dest="max_tokens", default="",
                     help="token ceiling passed to live_match")
     ap.add_argument("--pipeline", action="store_true",
-                    help="one-turn-deep pipeline arm")
+                    help="one-turn-deep pipeline arm (now the default)")
+    ap.add_argument("--no-pipeline", dest="no_pipeline", action="store_true",
+                    help="baseline arm: sequential dispatch")
     ap.add_argument("--no-trim", dest="no_trim", action="store_true",
                     help="disable sentence trimming for an A/B arm")
     ap.add_argument("--reset", action="store_true",
@@ -180,6 +182,8 @@ def main():
         extra += ["--max-tokens", a.max_tokens]
     if a.pipeline:
         extra.append("--pipeline")
+    if a.no_pipeline:
+        extra.append("--no-pipeline")
     p = subprocess.run([g, "--headless", "--path", ROOT, "--script",
                         "scripts/arena/live_match.gd", "--",
                         "--turns", str(a.turns), "--no-wait",
