@@ -96,6 +96,9 @@ jobs:
         # is not in the transcript, the arena has fabricated evidence.
         run: ~/godot/godot --headless --path . --script scripts/arena/targeting_selftest.gd 2>&1 | tee out.log; grep -q "TARGETING OK" out.log
 
+      - name: Self-test — dispute episode invariants
+        run: ~/godot/godot --headless --path . --script scripts/arena/dispute_selftest.gd 2>&1 | tee out.log; grep -q "DISPUTE OK" out.log
+
       - name: Adversarial pass
         run: ~/godot/godot --headless --path . --script tools/adversarial.gd 2>&1 | tee out.log; grep -q "ADVERSARIAL OK" out.log
 

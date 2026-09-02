@@ -71,6 +71,7 @@ call :check "scripts/arena/turn_order_selftest.gd"        "turn order / swaps"  
 call :check "scripts/arena/vram_selftest.gd"              "vram estimate"       "VRAM OK"
 call :check "scripts/arena/speech_clean_selftest.gd"      "speech cleaning"     "SPEECH CLEAN OK"
 call :check "scripts/arena/targeting_selftest.gd"         "claim provenance"    "TARGETING OK"
+call :check "scripts/arena/dispute_selftest.gd"           "dispute episode"     "DISPUTE OK"
 call :check "tools/adversarial.gd"                        "adversarial pass"    "ADVERSARIAL OK"
 call :check "tools/offline_selftest.gd"                   "offline behaviour"   "OFFLINE OK"
 

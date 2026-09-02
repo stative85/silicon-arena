@@ -118,6 +118,28 @@ var _target_refusals := 0
 ## not picked every time. Left to itself the selector always chose the first
 ## eligible agent in the roster.
 var _challenge_counts: Dictionary = {}
+
+## ── Bounded dispute episode ───────────────────────────────────────────────
+##
+## A targeted challenge that lasts three turns instead of one: A challenges B's
+## actual claim, B answers, A rebuts once, then the scaffold is REMOVED.
+##
+## The question this exists to answer is what happens after it disappears. A
+## forced exchange trivially has high addressing and challenge rates; those
+## turns are excluded from measurement. If the disagreement continues on its
+## own afterwards, the arena can sustain conflict. If it stops the moment the
+## instruction stops, it cannot.
+##
+## Bounded on purpose. A permanent grudge would let one pair re-litigate the
+## same sentence forever, which is not an arena.
+var _dispute: Dictionary = {}
+var _dispute_history: Array[Dictionary] = []
+
+## Turns of ordinary play needed after an episode ends for its effect to be
+## observable. An event with no room left to measure it is not a cheap event,
+## it is an unmeasurable one.
+const DISPUTE_FOLLOWUP_TURNS := 5
+const DISPUTE_MAX_EXCHANGES := 3
 var _escalations_fired := 0
 
 ## Changes to the situation, in order. Written against this match's TOPIC.
@@ -687,6 +709,12 @@ func _build_messages(agent: Dictionary) -> Array:
 	sys += "say something they have not said. Never prefix your reply with another agent's name. "
 	sys += "Never hedge, never say you are an AI language model, never narrate stage directions. "
 	sys += "Address the room or a specific rival by name. Do not write anyone else's turn."
+	var open_dispute := _dispute_fact()
+	if open_dispute != "":
+		sys += "
+
+" + open_dispute + "
+"
 	if not _arena_facts.is_empty():
 		# Facts, not orders. The agent is told what changed and left to decide
 		# what that means -- the same discipline as the human-line block below.
@@ -920,7 +948,7 @@ func _reveal(agent: Dictionary, text: String, latency: int) -> void:
 
 	_turn += 1
 	_maybe_escalate()
-	_maybe_target()
+	_maybe_dispute()
 	# Brief settle so the overlay shows SPEAKING before the next THINKING.
 	_next_turn_at = _elapsed + 1.2
 	_reveal_at = _next_turn_at
@@ -1568,5 +1596,122 @@ func _maybe_target() -> void:
 		"kind": "target", "match_id": _match_id, "turn": _turn,
 		"index": _targets_fired, "challenger": d["challenger"],
 		"target": d["target"], "source_turn": d["turn"], "claim": d["claim"],
+		"timestamp": Time.get_datetime_string_from_system(true),
+	})
+
+
+## ── Dispute episode: invariants ────────────────────────────────────────────
+##
+## INVARIANT   a dispute cites a claim that exists in canonical history;
+##             challenger != target; both are active; the exchange count is
+##             finite; an expired dispute cannot influence any prompt; only one
+##             dispute is active at a time; no event fires without enough turns
+##             left to observe its effect.
+## DETECTION   dispute_eligible() and citation_holds() check each of these.
+## TEETH       an ineligible dispute is refused and logged, never injected.
+## RECOVERY    the next eligible claim is tried; otherwise play continues.
+## PROOF       dispute_selftest.gd sabotages each invariant in turn.
+
+
+## Is there room left in the match to observe what an episode does?
+static func has_followup_room(turn: int, max_turns: int, exchanges: int,
+		followup: int) -> bool:
+	return turn + exchanges + followup <= max_turns
+
+
+## Every condition a dispute must satisfy before it may be injected.
+static func dispute_eligible(d: Dictionary, history: Array, active: Array,
+		turn: int, max_turns: int, current: Dictionary) -> bool:
+	if not current.is_empty():
+		return false                                   # one at a time
+	if d.is_empty():
+		return false
+	var challenger := str(d.get("challenger", ""))
+	var target := str(d.get("target", ""))
+	if challenger == "" or target == "" or challenger == target:
+		return false
+	if not active.has(challenger) or not active.has(target):
+		return false
+	if int(d.get("max_exchanges", 0)) <= 0:
+		return false
+	if not has_followup_room(turn, max_turns, int(d.get("max_exchanges", 0)),
+			DISPUTE_FOLLOWUP_TURNS):
+		return false
+	return citation_holds(history, int(d.get("turn", -1)), target,
+		str(d.get("claim", "")))
+
+
+## The prompt fragment for an ACTIVE dispute. An expired one contributes
+## nothing: the scaffold is removed, not merely ignored.
+func _dispute_fact() -> String:
+	if _dispute.is_empty() or str(_dispute.get("status", "")) != "active":
+		return ""
+	return ("OPEN DISPUTE: %s said in turn %d, \"%s\". %s is challenging that "
+		+ "exact claim. Settle it between you.") % [
+		_dispute["target"], _dispute["claim_turn"], _dispute["claim"],
+		_dispute["challenger"]]
+
+
+func _expire_dispute(reason: String) -> void:
+	if _dispute.is_empty():
+		return
+	_dispute["status"] = "expired"
+	_dispute["ended_turn"] = _turn
+	_dispute_history.append(_dispute.duplicate())
+	print("LIVE_ARENA DISPUTE ended at turn %d (%s)" % [_turn, reason])
+	_write_log({"kind": "dispute_end", "match_id": _match_id, "turn": _turn,
+		"reason": reason, "exchanges": int(_dispute.get("exchange_count", 0)),
+		"timestamp": Time.get_datetime_string_from_system(true)})
+	_dispute = {}
+
+
+func _maybe_dispute() -> void:
+	if _target_every <= 0 or _turn <= 0:
+		return
+	# Count the forced exchanges as they happen and retire the episode.
+	if not _dispute.is_empty():
+		_dispute["exchange_count"] = int(_dispute.get("exchange_count", 0)) + 1
+		if int(_dispute["exchange_count"]) >= int(_dispute["max_exchanges"]):
+			_expire_dispute("exchanges complete")
+		return
+	if _turn % _target_every != 0:
+		return
+
+	var d := _pick_dispute()
+	var active: Array = []
+	for a in _agents:
+		if not a.get("eliminated", false):
+			active.append(str(a["display_name"]))
+	if not d.is_empty():
+		d["max_exchanges"] = DISPUTE_MAX_EXCHANGES
+	if not dispute_eligible(d, _history, active, _turn, _max_turns, _dispute):
+		_target_refusals += 1
+		var why := "no verifiable claim"
+		if not d.is_empty() and not has_followup_room(_turn, _max_turns,
+				DISPUTE_MAX_EXCHANGES, DISPUTE_FOLLOWUP_TURNS):
+			why = "not enough turns left to observe the effect"
+		print("LIVE_ARENA DISPUTE REFUSED at turn %d: %s" % [_turn, why])
+		_write_log({"kind": "dispute_refused", "match_id": _match_id,
+			"turn": _turn, "reason": why,
+			"timestamp": Time.get_datetime_string_from_system(true)})
+		return
+
+	_targets_fired += 1
+	_dispute = {
+		"claim": d["claim"], "claim_turn": int(d["turn"]),
+		"claim_speaker": str(d["target"]), "challenger": str(d["challenger"]),
+		"target": str(d["target"]), "started_turn": _turn,
+		"exchange_count": 0, "max_exchanges": DISPUTE_MAX_EXCHANGES,
+		"expires_turn": _turn + DISPUTE_MAX_EXCHANGES, "status": "active",
+	}
+	# A challenges, B answers, A rebuts once.
+	_forced_next = [str(d["challenger"]), str(d["target"]), str(d["challenger"])]
+	print("LIVE_ARENA DISPUTE %d at turn %d: %s vs %s over turn %d"
+		% [_targets_fired, _turn, d["challenger"], d["target"], int(d["turn"])])
+	_write_log({
+		"kind": "dispute_start", "match_id": _match_id, "turn": _turn,
+		"index": _targets_fired, "challenger": d["challenger"],
+		"target": d["target"], "source_turn": int(d["turn"]),
+		"claim": d["claim"], "max_exchanges": DISPUTE_MAX_EXCHANGES,
 		"timestamp": Time.get_datetime_string_from_system(true),
 	})
