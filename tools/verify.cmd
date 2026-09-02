@@ -75,6 +75,7 @@ call :check "scripts/arena/dispute_selftest.gd"           "dispute episode"     
 call :check "scripts/arena/contention_selftest.gd"        "contention bounds"   "CONTENTION OK"
 call :check "scripts/arena/presentation_selftest.gd"      "presentation rhythm" "PRESENTATION OK"
 call :check "scripts/arena/topic_arc_selftest.gd"         "topic arc"           "TOPIC ARC OK"
+call :check "scripts/arena/gonzo_recall_selftest.gd"      "gonzo recall"        "GONZO RECALL OK"
 call :check "tools/adversarial.gd"                        "adversarial pass"    "ADVERSARIAL OK"
 call :check "tools/offline_selftest.gd"                   "offline behaviour"   "OFFLINE OK"
 
