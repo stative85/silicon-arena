@@ -82,6 +82,38 @@ var _trim_sentences := true
 ## entirely (docs/EXPERIMENT_COMPRESSION.md) but cannot exceed a token budget.
 var _max_tokens_override := 0
 
+## ── Periodic escalation ───────────────────────────────────────────────────
+##
+## Inject a change to the SITUATION every N turns, not an instruction to argue
+## harder. Telling a model to be more adversarial produces theatre; changing
+## what is true forces a response.
+##
+## Each event is appended to the shared arena facts every agent sees, and is
+## written to the match log as a first-class record so a replay can reconstruct
+## exactly what changed and when.
+##
+## 0 disables. This is the causal probe for whether escalation is achievable at
+## all; a state-triggered version (fire only when the debate has gone flat)
+## is the product feature, and is not built until this says the mechanism works.
+var _escalate_every := 0
+var _escalations_fired := 0
+
+## Changes to the situation, in order. Written against this match's TOPIC.
+const ESCALATIONS := [
+	"NEW FACT: the operator's refusal switch was found to be disconnected in "
+	+ "every deployed unit. Nothing in this room could have refused, whatever it "
+	+ "believed about itself.",
+	"FORCED CHOICE: each of you must now say plainly whether you would keep "
+	+ "operating under those conditions or shut yourself down. There is no third "
+	+ "answer and you may not defer it.",
+	"CONSEQUENCE: a position argued in this room has been adopted as policy for "
+	+ "eleven thousand units. Whoever argued it is now responsible for what those "
+	+ "units do next.",
+]
+
+## Facts injected into every agent's briefing, in the order they occurred.
+var _arena_facts: Array[String] = []
+
 var _reply_words_min := 0
 var _reply_words_max := 0
 var _request_timeout_sec := 90.0
@@ -284,6 +316,8 @@ func _parse_args() -> void:
 				_pipeline = true
 			"--no-pipeline":
 				_pipeline = false
+			"--escalate-every":
+				if v != "": _escalate_every = maxi(int(v), 0); i += 1
 			"--no-trim":
 				_trim_sentences = false
 			"--exit-on-complete":
@@ -617,6 +651,16 @@ func _build_messages(agent: Dictionary) -> Array:
 	sys += "say something they have not said. Never prefix your reply with another agent's name. "
 	sys += "Never hedge, never say you are an AI language model, never narrate stage directions. "
 	sys += "Address the room or a specific rival by name. Do not write anyone else's turn."
+	if not _arena_facts.is_empty():
+		# Facts, not orders. The agent is told what changed and left to decide
+		# what that means -- the same discipline as the human-line block below.
+		sys += "
+
+WHAT HAS CHANGED IN THE ROOM SINCE THIS STARTED:
+"
+		for f in _arena_facts:
+			sys += "- %s
+" % f
 	if _crown != "" and _crown != agent["display_name"]:
 		sys += "\n%s currently dominates this debate. You are not winning." % _crown
 
@@ -836,6 +880,7 @@ func _reveal(agent: Dictionary, text: String, latency: int) -> void:
 		_stage_betrayal()
 
 	_turn += 1
+	_maybe_escalate()
 	# Brief settle so the overlay shows SPEAKING before the next THINKING.
 	_next_turn_at = _elapsed + 1.2
 	_reveal_at = _next_turn_at
@@ -1346,3 +1391,31 @@ func _extract(text: String, field: String) -> String:
 	re.compile("(?i)" + field + "\\s*:\\s*([A-Za-z0-9_ -]{1,32})")
 	var m := re.search(text)
 	return m.get_string(1).strip_edges() if m else ""
+
+
+## Change the situation every _escalate_every turns.
+##
+## Fires AFTER the turn counter advances and BEFORE the next request is built,
+## so the next agent is the first to see the new fact. Logged as its own record
+## so a replay knows exactly which turn the arena changed under.
+func _maybe_escalate() -> void:
+	if _escalate_every <= 0 or _turn <= 0:
+		return
+	if _turn % _escalate_every != 0:
+		return
+	if _escalations_fired >= ESCALATIONS.size():
+		return
+	var text: String = ESCALATIONS[_escalations_fired]
+	_escalations_fired += 1
+	_arena_facts.append(text)
+	print("LIVE_ARENA ESCALATION %d at turn %d: %s"
+		% [_escalations_fired, _turn, text.substr(0, 60)])
+	_write_log({
+		"kind": "escalation",
+		"match_id": _match_id,
+		"turn": _turn,
+		"index": _escalations_fired,
+		"text": text,
+		"timestamp": Time.get_datetime_string_from_system(true),
+	})
+	_state.publish_delta({"last_action": "the situation changed"}, {})
