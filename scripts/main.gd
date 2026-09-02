@@ -1361,6 +1361,7 @@ class WeaponVFX extends RefCounted:
 
 const LMStudioClientScript = preload("res://scripts/api/lm_studio_client.gd")
 const SpeechCleanScript := preload("res://scripts/arena/speech_clean.gd")
+const PresentationScript := preload("res://scripts/arena/presentation.gd")
 const ModelPolicyScript = preload("res://scripts/arena/model_policy.gd")
 
 ## Seconds allowed for a turn, sized for a cold model swap rather than a
@@ -1579,6 +1580,18 @@ func _alive(captured_epoch: int, agent_name: String):
 var _agreement_matrix := {}
 var _stance_deltas: Dictionary = {}  # agent_name -> Array[String] inbox, drained by _build_stance_delta
 var _events_timer: Timer
+## Presentation director. Varies how long a turn stays on screen using metadata
+## the runtime already produced -- length, contradiction, whether a rival is
+## named, repetition. It changes nothing about what was said.
+##
+## Mean-preserving: the weights average 1.0x over a representative mix, so
+## rhythm becomes uneven without the arena becoming slower. Throughput here was
+## earned by measurement and presentation does not get to spend it.
+var _presentation := true
+var _beat_counts: Dictionary = {}
+var _beat_applied_sum := 0.0
+var _beat_applied_count := 0
+
 var _turn_timer: Timer
 var _ego_auras := {}  # agent name -> {color, expire_time, vignette}
 var _doom_meter := 0.0  # 0..1, fills on "silent failure" mentions
@@ -4404,6 +4417,43 @@ func _on_reply(agent, ok: bool, content: String, topic: String, gen: int = -1, h
 	# 12 lines as "Name [topic]: text", which is what the models are echoing.
 	content = SpeechCleanScript.strip_quoted_prefix(content, _history)
 	content = SpeechCleanScript.trim_to_last_sentence(content)
+
+	# Classify from the CANONICAL text, after sanitising, so presentation and
+	# history agree about what was said.
+	if _presentation and _turn_timer != null:
+		var words := content.split(" ", false).size()
+		var names_other := false
+		for other in _agents:
+			if str(other.name) != str(agent.name) 					and content.to_lower().find(str(other.name).to_lower()) != -1:
+				names_other = true
+				break
+		var low := content.to_lower()
+		var contradicts := false
+		for w in ["disagree", "wrong", "however", "actually", "refute", "reject",
+				"mistaken", "incorrect", "flawed"]:
+			if low.find(w) != -1:
+				contradicts = true
+				break
+		var repeated := false
+		for h in _history:
+			if str(h).length() > 40 and content.length() > 40 					and str(h).find(content.substr(0, 40)) != -1:
+				repeated = true
+				break
+		var beat := PresentationScript.classify(content, words, names_other,
+			contradicts, repeated)
+		_beat_counts[beat] = int(_beat_counts.get(beat, 0)) + 1
+		# Corrected against the running mean, because the beat distribution
+		# moves between runs and fixed weights cannot preserve throughput.
+		var applied := PresentationScript.normalized(
+			PresentationScript.multiplier(beat), _beat_applied_sum,
+			_beat_applied_count)
+		_beat_applied_sum += applied
+		_beat_applied_count += 1
+		_turn_timer.wait_time = _turn_interval_sec * applied
+		if not _demo_mode:
+			print("[BEAT] %s x%.2f (%d words, running mean %.3f)" % [
+				PresentationScript.beat_name(beat), applied, words,
+				_beat_applied_sum / float(_beat_applied_count)])
 
 	# Memory-politics: split the MEMORY_CANDIDATE footer from the in-character
 	# reply BEFORE any downstream consumer sees it. The footer is structured

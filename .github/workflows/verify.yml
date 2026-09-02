@@ -102,6 +102,11 @@ jobs:
       - name: Self-test — contention memory bounds
         run: ~/godot/godot --headless --path . --script scripts/arena/contention_selftest.gd 2>&1 | tee out.log; grep -q "CONTENTION OK" out.log
 
+      - name: Self-test — presentation rhythm
+        # The dangerous failure is a mean that drifts upward while every
+        # individual dwell looks reasonable and the arena gets slower.
+        run: ~/godot/godot --headless --path . --script scripts/arena/presentation_selftest.gd 2>&1 | tee out.log; grep -q "PRESENTATION OK" out.log
+
       - name: Adversarial pass
         run: ~/godot/godot --headless --path . --script tools/adversarial.gd 2>&1 | tee out.log; grep -q "ADVERSARIAL OK" out.log
 
