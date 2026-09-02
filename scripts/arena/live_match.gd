@@ -140,6 +140,28 @@ var _dispute_history: Array[Dictionary] = []
 ## it is an unmeasurable one.
 const DISPUTE_FOLLOWUP_TURNS := 5
 const DISPUTE_MAX_EXCHANGES := 3
+
+## Claim-scoped contention memory. NOT a grudge system: one disagreement,
+## one pair, one claim with a turn id, and it decays.
+##
+## It never orders anyone to attack. It adds one line to the two involved
+## agents' briefings describing an unresolved disagreement, and lets them
+## decide. An instruction to fight again would be prompt scaffolding wearing a
+## false moustache, and scaffolding has failed three times (E1, E2, D3).
+##
+## Bounds exist from the first line, not as a later safety pass: the obvious
+## failure is five agents re-litigating one sentence forever.
+var _contention_enabled := false
+var _contentions: Array[Dictionary] = []
+var _contention_seq := 0
+
+const CONTENTION_MAX_TOTAL := 2
+const CONTENTION_MAX_PER_AGENT := 1
+const CONTENTION_TTL_TURNS := 12
+const CONTENTION_START_INTENSITY := 1.0
+const CONTENTION_DECAY_PER_TURN := 0.08
+const CONTENTION_MIN_INTENSITY := 0.25
+const CONTENTION_MAX_REINFORCEMENTS := 3
 var _escalations_fired := 0
 
 ## Changes to the situation, in order. Written against this match's TOPIC.
@@ -360,6 +382,8 @@ func _parse_args() -> void:
 				_pipeline = true
 			"--no-pipeline":
 				_pipeline = false
+			"--contention":
+				_contention_enabled = true
 			"--target-every":
 				if v != "": _target_every = maxi(int(v), 0); i += 1
 			"--escalate-every":
@@ -709,6 +733,10 @@ func _build_messages(agent: Dictionary) -> Array:
 	sys += "say something they have not said. Never prefix your reply with another agent's name. "
 	sys += "Never hedge, never say you are an AI language model, never narrate stage directions. "
 	sys += "Address the room or a specific rival by name. Do not write anyone else's turn."
+	var contention_note := _contention_note(str(agent["display_name"]))
+	if contention_note != "":
+		sys += contention_note + "
+"
 	var open_dispute := _dispute_fact()
 	if open_dispute != "":
 		sys += "
@@ -949,6 +977,8 @@ func _reveal(agent: Dictionary, text: String, latency: int) -> void:
 	_turn += 1
 	_maybe_escalate()
 	_maybe_dispute()
+	_sweep_contentions()
+	_note_contention(str(agent["display_name"]), text)
 	# Brief settle so the overlay shows SPEAKING before the next THINKING.
 	_next_turn_at = _elapsed + 1.2
 	_reveal_at = _next_turn_at
@@ -1715,3 +1745,154 @@ func _maybe_dispute() -> void:
 		"claim": d["claim"], "max_exchanges": DISPUTE_MAX_EXCHANGES,
 		"timestamp": Time.get_datetime_string_from_system(true),
 	})
+
+## Contention memory: invariants.
+##
+## INVARIANT   every active contention names a claim that exists verbatim in
+##             canonical history, spoken by the agent it is attributed to; the
+##             pair are distinct and active; intensity decays; TTL is finite;
+##             at most one per agent and two in total; reinforcement is capped;
+##             an expired contention influences nothing and never returns.
+## DETECTION   contention_admissible(), plus a decay sweep every turn.
+## TEETH       an inadmissible contention is refused; an expired one is removed
+##             from the array rather than flagged, because state that lingers
+##             can still be read by mistake.
+## RECOVERY    the arena continues with no contention at all.
+## PROOF       contention_selftest.gd sabotages each bound in turn.
+
+
+static func contention_admissible(c: Dictionary, history: Array, active: Array,
+		existing: Array, max_total: int, max_per_agent: int) -> bool:
+	if c.is_empty():
+		return false
+	var a := str(c.get("agent_a", ""))
+	var b := str(c.get("agent_b", ""))
+	if a == "" or b == "" or a == b:
+		return false
+	if not active.has(a) or not active.has(b):
+		return false
+	if not citation_holds(history, int(c.get("source_turn", -1)), b,
+			str(c.get("claim", ""))):
+		return false
+	if existing.size() >= max_total:
+		return false
+	var per := {}
+	for e in existing:
+		var ea := str(e.get("agent_a", ""))
+		var eb := str(e.get("agent_b", ""))
+		per[ea] = int(per.get(ea, 0)) + 1
+		per[eb] = int(per.get(eb, 0)) + 1
+	if int(per.get(a, 0)) >= max_per_agent or int(per.get(b, 0)) >= max_per_agent:
+		return false
+	return true
+
+
+## Intensity after `turns` have passed. Never negative.
+static func decayed_intensity(start: float, turns: int, rate: float) -> float:
+	return maxf(start - rate * float(maxi(turns, 0)), 0.0)
+
+
+## True when a contention has run out of time or of heat.
+static func contention_expired(c: Dictionary, turn: int, ttl: int,
+		floor_intensity: float, decay: float) -> bool:
+	var age := turn - int(c.get("created_turn", turn))
+	if age >= ttl:
+		return true
+	var last := int(c.get("last_reinforced_turn", c.get("created_turn", turn)))
+	return decayed_intensity(float(c.get("intensity", 0.0)), turn - last, decay) < floor_intensity
+
+
+func _sweep_contentions() -> void:
+	var kept: Array[Dictionary] = []
+	for c in _contentions:
+		if contention_expired(c, _turn, CONTENTION_TTL_TURNS,
+				CONTENTION_MIN_INTENSITY, CONTENTION_DECAY_PER_TURN):
+			print("LIVE_ARENA CONTENTION %d expired at turn %d (age %d, reinforced %d)"
+				% [int(c["id"]), _turn, _turn - int(c["created_turn"]),
+					int(c["reinforcement_count"])])
+			_write_log({"kind": "contention_end", "match_id": _match_id,
+				"turn": _turn, "id": int(c["id"]),
+				"reinforcements": int(c["reinforcement_count"]),
+				"timestamp": Time.get_datetime_string_from_system(true)})
+		else:
+			kept.append(c)
+	_contentions = kept
+
+
+## The line an involved agent sees. Describes state; asks for nothing.
+func _contention_note(agent_name: String) -> String:
+	for c in _contentions:
+		var other := ""
+		if str(c["agent_a"]) == agent_name:
+			other = str(c["agent_b"])
+		elif str(c["agent_b"]) == agent_name:
+			other = str(c["agent_a"])
+		if other == "":
+			continue
+		return "
+UNRESOLVED: you and %s still disagree about \"%s\" from turn %d. It has not been settled. You are not required to raise it." % [other, str(c["claim"]), int(c["source_turn"])]
+	return ""
+
+
+## Record an organic disagreement, if one just happened and there is room.
+func _note_contention(speaker: String, text: String) -> void:
+	if not _contention_enabled:
+		return
+	var lower := text.to_lower()
+	var challenged := false
+	for w in ["disagree", "wrong", "however", "actually", "refute", "reject",
+			"mistaken", "incorrect", "flawed", "misses", "overlooks"]:
+		if lower.find(w) != -1:
+			challenged = true
+			break
+	if not challenged:
+		return
+	var target := ""
+	for a in _agents:
+		var nm := str(a["display_name"])
+		if nm != speaker and lower.find(nm.to_lower()) != -1:
+			target = nm
+			break
+	if target == "":
+		return
+
+	for c in _contentions:
+		var same := (str(c["agent_a"]) == speaker and str(c["agent_b"]) == target) 			or (str(c["agent_a"]) == target and str(c["agent_b"]) == speaker)
+		if same:
+			if int(c["reinforcement_count"]) >= CONTENTION_MAX_REINFORCEMENTS:
+				return
+			c["reinforcement_count"] = int(c["reinforcement_count"]) + 1
+			c["last_reinforced_turn"] = _turn
+			c["intensity"] = minf(float(c["intensity"]) + 0.2, 1.0)
+			return
+
+	var claim := ""
+	var src := -1
+	for i in range(_history.size() - 1, -1, -1):
+		var h: Dictionary = _history[i]
+		if str(h.get("speaker", "")) != target:
+			continue
+		claim = extract_claim(str(h.get("text", "")))
+		src = int(h.get("turn", -1))
+		break
+	if claim == "":
+		return
+	var active: Array = []
+	for a in _agents:
+		if not a.get("eliminated", false):
+			active.append(str(a["display_name"]))
+	var c2 := {"agent_a": speaker, "agent_b": target, "claim": claim,
+		"source_turn": src, "created_turn": _turn, "last_reinforced_turn": _turn,
+		"intensity": CONTENTION_START_INTENSITY, "reinforcement_count": 0}
+	if not contention_admissible(c2, _history, active, _contentions,
+			CONTENTION_MAX_TOTAL, CONTENTION_MAX_PER_AGENT):
+		return
+	_contention_seq += 1
+	c2["id"] = _contention_seq
+	_contentions.append(c2)
+	print("LIVE_ARENA CONTENTION %d opened at turn %d: %s vs %s over turn %d"
+		% [_contention_seq, _turn, speaker, target, src])
+	_write_log({"kind": "contention_start", "match_id": _match_id, "turn": _turn,
+		"id": _contention_seq, "agent_a": speaker, "agent_b": target,
+		"source_turn": src, "claim": claim,
+		"timestamp": Time.get_datetime_string_from_system(true)})
