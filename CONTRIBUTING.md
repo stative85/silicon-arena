@@ -103,7 +103,7 @@ VERIFY OK
 
 CI runs the same thing on Linux for every push and pull request.
 
-### Three rules that are not negotiable
+### Four rules that are not negotiable
 
 **1. A new test must be shown to fail.** Reintroduce the defect it guards,
 watch it go red, restore, watch it go green. A suite that can only pass is not
@@ -121,7 +121,15 @@ ever used. Measure the spread first, in the same batch, then set the bound.
 Corollary: run a baseline-against-itself calibration before trusting any A/B
 protocol, because the protocol manufactures some apparent effect on its own.
 
-**3. If you add a load-bearing runtime setting, add it to the parity test.**
+**3. The conflict axis is closed.** No entertainment intervention may primarily
+optimise challenge rate, cross-agent addressing, or rivalry. Four
+pre-registered experiments explored that family — world events, a targeted
+challenge, a bounded dispute episode, and claim-scoped contention memory — and
+all four were rejected (`docs/EXPERIMENT_LEDGER.md`). Making the agents argue
+harder is a solved question with a negative answer. Reopening it needs new
+evidence, not a new variation.
+
+**4. If you add a load-bearing runtime setting, add it to the parity test.**
 Three separate production bugs had one cause — `live_match.gd` carried a
 runtime fact and `main.gd` inherited a default. Put required settings in
 `REQUIRED_ON_BOTH`, and put derived values in `INVARIANTS`, in
