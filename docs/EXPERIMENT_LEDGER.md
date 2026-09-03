@@ -34,7 +34,27 @@ the runtime does not belong here and should not have been run.
 
 | **T1** | Does resonance earn ~120 lines, given identical moment and pool? | `2955612` | 127 paired counterfactual trials: distance 69.3% vs resonance 65.4%, R−D = −3.9; 0 unsupported attribution | **RESONANCE DELETED** — R−D swung +5.0 → +7.4 → −3.9 as the sample grew; only the pre-fixed target made the answer defensible |
 
-**Shipped: 5. Rejected: 11. Undecided: 0.**
+| **E0/E1** | Does nomic-embed-text-v1.5 beat the distance policy enough to justify an embedding subsystem? | `68b5b19` | 182 paired opportunities: E0 70.9% vs E1 75.3%, +4.4 (bar +10); E1 won 1 of 4 batches and declined monotonically; 0 unsupported attribution; latency 137 ms vs a 100 ms bound | **REJECTED** — and a placebo arm showed both arms score *below* a no-memory control, so `_is_callback` does not measure engagement ([EXPERIMENT_EMBEDDING](EXPERIMENT_EMBEDDING.md)) |
+
+**Shipped: 5. Rejected: 12. Undecided: 0.**
+
+## Open, and blocking further recall work
+
+`_is_callback` is not a valid measure of memory engagement. A reply generated
+with **no memory injected** scores 78.0% on it, above both memory arms. The
+suspected cause is its own verbatim-repetition exclusion: a model that genuinely
+engages a memory tends to echo a phrase of it and gets disqualified, while a
+free-running reply sharing topical vocabulary passes.
+
+Paired arm-versus-arm results survive this — both arms are scored by the same
+instrument at the same moments, and the E0/E1 null control measured a bias of
+exactly +0.0 points. Absolute conversion rates do not survive it and should not
+be quoted as engagement rates.
+
+Repairing this needs a **sham-controlled** placebo (same injected volume and
+format, non-resonant content), which this project already built for Q0/QS/Q1,
+rather than the bare no-memory placebo used here. Until then, no new recall
+experiment can produce a trustworthy absolute number.
 
 ### The pattern across everything rejected
 

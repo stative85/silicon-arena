@@ -2,7 +2,7 @@ extends SceneTree
 
 ## Can the embedding cache be made to lie?
 ##
-##   godot --headless --path . --script scripts/arena/gonzo_embed_selftest.gd
+##   godot --headless --path . --script tools/embed_router_selftest.gd
 ##
 ## The pathology this file exists to prevent: a vector from one embedding space
 ## is compared against a vector from another and returns a confident number.
@@ -15,7 +15,7 @@ extends SceneTree
 ##
 ## Deterministic: pure functions over synthetic vectors, no LM Studio.
 
-const E := preload("res://scripts/arena/gonzo_embed.gd")
+const E := preload("res://tools/embed_router.gd")
 
 var _checks := 0
 var _failures: Array[String] = []

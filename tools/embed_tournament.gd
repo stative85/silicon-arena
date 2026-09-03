@@ -28,7 +28,7 @@ extends SceneTree
 ## discriminative power rather than expensive agreement.
 
 const G := preload("res://scripts/arena/gonzo_recall.gd")
-const E := preload("res://scripts/arena/gonzo_embed.gd")
+const E := preload("res://tools/embed_router.gd")
 const LM := preload("res://scripts/arena/live_match.gd")
 
 var LM_BASE := LMEndpoint.base_url()

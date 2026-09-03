@@ -377,3 +377,127 @@ points" without anticipating a placebo. The faithful reading is that the frozen
 metric is contaminated and the placebo-corrected delta is that same metric with
 its false-positive floor removed, so the rule is applied to the corrected
 number. Both are reported, so the choice is visible rather than convenient.
+
+---
+
+# Result: REJECT, at 182 paired opportunities
+
+```
+--- 182 paired opportunities ---
+  selection divergence: 160 of 182 (87.9%)
+
+  OVERALL
+    E0 distance  70.9%    E1 nomic  75.3%    E1-E0 = +4.4 points
+
+  PLACEBO (reply generated with NO memory injected)
+    scored against E0 pick  78.0%    against E1 pick  76.9%
+    TRUE EFFECT  E0 -7.1    E1 -1.6
+    honest delta: +5.5 points
+
+  NULL CONTROL (22 opportunities where both rules agreed)
+    same scar both arms: E0  95.5%  E1  95.5%  gap +0.0 points
+
+  WHERE THEY DISAGREED (160 opportunities)
+    E0  67.5%    E1  72.5%    delta +5.0 points
+
+  mean source distance: E0 35.2  E1 29.4
+  unsupported attribution: 0
+  fail-open events: 0
+  embed latency: median 137 ms  p90 158 ms
+
+  batch 1  E0 46.7%  E1 88.9%  E1
+  batch 2  E0 86.7%  E1 77.8%  E0
+  batch 3  E0 77.8%  E1 75.6%  E0
+  batch 4  E0 75.6%  E1 60.0%  E0
+  E1 wins 1 of 4 batches
+```
+
+**REJECT.** The frozen rule rejects below 5 points; the overall delta is +4.4.
+It fails independently on the batch condition, which required 3 of 4 and got 1,
+and the trend runs the wrong way: E1's only win is the first batch and it
+declines monotonically after it.
+
+Guard 6 also fails on latency. The measured cost is **137 ms median per
+opportunity** against a frozen bound of 100 ms. The earlier 16 ms figure was a
+short probe string; a real query embeds roughly three turns of context and costs
+about ten times more. The VRAM line was met, the latency line was not.
+
+## Why fixing N in advance mattered, again
+
+```
+ 46 opportunities   +30.4   "spectacular"
+182 opportunities    +4.4   "reject"
+```
+
+The same experiment, a factor of seven apart, differing only in when it was
+read. This is the second time in two experiments that an early read told a
+completely different story, and the second time the pre-registered target was
+the only thing standing between a wrong ship and a right rejection.
+
+## The null control came back clean
+
+22 opportunities where both rules chose the same scar: E0 95.5%, E1 95.5%, gap
+**+0.0 points**. Two independent generations on an identical prompt scored
+identically. So the measurement path adds no detectable bias of its own, and the
++4.4 is a real if unimpressive difference rather than an artifact of the harness.
+
+That is worth noting because it is the one number here that came out perfect.
+
+## The finding that outlives this experiment
+
+**Both memory arms score BELOW the no-memory placebo.**
+
+```
+placebo, no memory injected   78.0%
+E0 distance                   70.9%   (-7.1)
+E1 nomic                      75.3%   (-1.6)
+```
+
+A reply generated with no memory at all registers as a "callback" more often
+than a reply that was actually given the memory. Read literally, injecting
+memory makes callbacks *less* likely, which is not a credible description of
+what memory does.
+
+The likely mechanism is in the metric's own exclusion clause. `_is_callback`
+disqualifies a reply that shares a six-word run with the excerpt, to stop
+verbatim repetition counting as engagement. But a model that has been handed a
+memory and engages with it will often echo a phrase of it — so genuine
+engagement trips the verbatim guard, while a free-running reply that merely
+shares topical vocabulary sails through. The metric penalises the behaviour it
+exists to detect.
+
+**So `_is_callback` does not measure memory engagement.** Every callback
+conversion rate this project has published rests on it.
+
+What survives: paired arm-versus-arm comparisons, because both arms are scored
+by the same broken instrument on the same moments, and the null control shows
+the harness itself is unbiased. The resonance deletion and this rejection both
+stand.
+
+What does not survive: any absolute claim of the form "recall produces callbacks
+in N% of opportunities." A no-memory control scores 78%. That number was never
+an engagement rate.
+
+## Limitation of this placebo, and the honest next step
+
+The placebo differs from the arms in **two** ways, not one: no memory content,
+and a shorter prompt. So it cannot separate "the memory was irrelevant" from
+"the extra prompt text changed the output".
+
+This project already built the right instrument for that and used it elsewhere:
+the **sham control** from the Q0/QS/Q1 design, which injects the same volume and
+format of text with non-resonant content. A sham-controlled rerun would isolate
+memory content from prompt volume.
+
+That is a metric-repair question, not an embedding question. The embedding
+question is closed.
+
+## Disposition
+
+The router never entered the runtime, so there was nothing to unship. Its code
+has been moved out of the product tree to `tools/embed_router.gd` and
+`tools/embed_router_selftest.gd`, alongside the harness, because the placebo
+instrument is now the only thing that can re-validate the recall program's prior
+claims. Nothing in `scripts/arena/` references an embedding router.
+
+The nomic model stays on disk. Models are not deleted here.
