@@ -116,7 +116,10 @@ miscounted as results.
 
 ## Rules these produced
 
-Both are in [CONTRIBUTING.md](../CONTRIBUTING.md) as non-negotiable:
+These are in [CONTRIBUTING.md](../CONTRIBUTING.md) as non-negotiable, where
+they are numbered alongside two rules that came from production bugs rather
+than from experiments. This said "Both" above a list of three, in the document
+that exists because casual counts drift:
 
 1. A new test must be shown to fail.
 2. You cannot set a useful threshold for a metric whose noise floor you have
@@ -125,3 +128,9 @@ Both are in [CONTRIBUTING.md](../CONTRIBUTING.md) as non-negotiable:
    often it fires when the thing it detects is absent. The embedding router
    measured +50.0 points until a no-memory placebo "called back" to its own
    pick 91.3% of the time.
+4. A positive control must be able to detect its own failure. MP2-A's ceiling
+   arm instructed the model to build on a recalled memory; it copied nothing
+   from that memory in 60 opportunities and scored what the uninstructed arm
+   scored. The gate read "measure is blind" and could not tell that apart from
+   "the ceiling never rose". Do not build a control out of a mechanism this
+   ledger already rejected.

@@ -103,7 +103,7 @@ VERIFY OK
 
 CI runs the same thing on Linux for every push and pull request.
 
-### Five rules that are not negotiable
+### Six rules that are not negotiable
 
 **1. A new test must be shown to fail.** Reintroduce the defect it guards,
 watch it go red, restore, watch it go green. A suite that can only pass is not
@@ -148,6 +148,28 @@ An unmeasured false-positive floor does not add noise, it adds *bias*, and bias
 points the same direction every time you look. Rule 2 protects you from
 believing an accident. This rule protects you from believing an artifact you
 built yourself.
+
+**6. A positive control must be able to detect its own failure.** Rule 4 says
+a detection metric needs a placebo floor: how often does it fire when the thing
+is absent? This is the mirror. When you build a ceiling arm to prove your
+measure can see the effect at all, ask how you would know if the ceiling never
+rose. If the answer is "I would see a small number and conclude the measure is
+blind", the control is not a control -- a null from it is indistinguishable
+from a null from the treatment.
+
+Not hypothetical. MP2-A's ceiling instructed the model to build explicitly on a
+recalled memory. It reproduced a six-word run from that memory **zero times in
+60 opportunities** and scored 0.50 mean uptake against the uninstructed arm's
+0.52. The instruction did nothing, the gate reported the measure blind, and
+nothing in the harness could tell the two explanations apart. The replacement
+ceiling is checked against its own definition -- a paraphrase that copies, or
+comes back stub-short, is discarded, and too many discards report VOID rather
+than BLIND.
+
+Corollary, and this project has now paid for it twice: **do not build a control
+out of a mechanism the ledger already rejected.** Nine rejections say
+instructions do not survive contact with these models. That finding applies to
+your instruments, not only to your features.
 
 **5. If you add a load-bearing runtime setting, add it to the parity test.**
 Three separate production bugs had one cause — `live_match.gd` carried a
