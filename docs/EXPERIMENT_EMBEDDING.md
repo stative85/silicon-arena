@@ -197,3 +197,98 @@ document exists so that distinction cannot be blurred later.
 The decision belongs to the operator: either the VRAM line is amended to a
 measured allowance before the run, or the embedding router is rejected on
 budget without spending the compute.
+
+---
+
+# True zero, found — and what it actually costs
+
+The operator declined to amend the budget and asked for a real zero first. There
+is one, it was already installed, and finding it also turned up an LM Studio
+defect worth writing down.
+
+## Where the 299 MiB was coming from
+
+Not the weights. `nvidia-smi --query-compute-apps` cannot attribute per-process
+memory under Windows WDDM, but the process list does: loading the embedder
+spawns a **fourth LM Studio worker process**, which disappears on unload. About
+299 MiB is a CUDA context plus cuBLAS kernels.
+
+`--gpu off` sets the offload ratio to zero layers. It does not stop the selected
+runtime from initialising CUDA. With a CUDA runtime selected, **every** model
+process pays for a CUDA context whether or not it uses the GPU.
+
+## The fix: a runtime that has no CUDA in it
+
+`llama.cpp-win-x86_64-avx2` — already installed, no download, not a new
+dependency.
+
+```
+lms runtime select llama.cpp-win-x86_64-avx2@2.12.0
+lms load --exact nomic-ai/.../nomic-embed-text-v1.5.Q4_K_M.gguf \
+         --gpu off --identifier gonzo-embed
+lms runtime select llama.cpp-win-x86_64-nvidia-cuda12-avx2@2.9.0
+```
+
+| | CUDA runtime | **CPU-only runtime** |
+|---|---:|---:|
+| VRAM | +299 MiB | **0 MiB** |
+| dimension | 768 | 768 |
+| cosine, related | 0.781 | 0.765 |
+| cosine, unrelated | 0.387 | 0.389 |
+| median embed latency | 18 ms | **16 ms** |
+| p90 latency | — | 32 ms |
+
+Delta measured as load-minus-unload twice, both times exactly **0 MiB**. The
+embedder is not slower for being on the CPU; it is marginally faster, because it
+is no longer paying to talk to a device it never uses.
+
+Guard 6's VRAM line is met as written.
+
+## The ritual is not free, and one part of it is a leak
+
+Three costs, all found by control measurements rather than assumed:
+
+**1. Runtime selection is global to GGUF, not per-model.** There is no
+per-model runtime flag on `lms load`. So the embedder must be loaded while the
+CPU runtime is selected, and the runtime switched back before any debater loads.
+Ordering is now load-bearing.
+
+**2. Switching the runtime evicts resident models.** Measured: 4691 MiB → 1898
+MiB, a resident 4B debater dropped on the floor by a runtime change. The ritual
+is therefore **startup-only**. Reloading the embedder mid-match would nuke the
+roster.
+
+**3. Switching leaks 111 MiB of VRAM, permanently.** Control with no embedder
+and no models loaded, four switch cycles:
+
+```
+2120 -> 2231 -> 2342 -> 2453 -> 2564 MiB
+```
+
+Exactly +111 each time, perfectly linear, never reclaimed. This is an LM Studio
+defect in runtime switching, unrelated to the embedder — it reproduces with
+nothing loaded at all. It is bounded only by restarting LM Studio.
+
+## Ruled out: a standalone CPU server
+
+`extensions/backends/llama.cpp-win-x86_64-avx2-2.12.0` ships DLLs
+(`llama.dll`, `ggml-cpu.dll`, `llm_engine.dll`), no `llama-server.exe`. LM
+Studio loads them into its own worker. Getting a standalone CPU server means
+fetching llama.cpp separately, which is the external dependency the
+pre-registration counted as baggage. Not done.
+
+## Decision on guard 6
+
+**Guard 6 is SATISFIED.** The embedder costs zero VRAM, measured twice, with
+equal-or-better latency and preserved discrimination. No budget line was
+amended, and no outcome data was seen before this was settled.
+
+The 111 MiB is charged honestly to the *switch*, not to memory: it is paid once
+per LM Studio session, does not scale with scars, recalls, or match length, and
+reproduces with no embedder present. The eviction and ordering constraints are
+real and are now documented as startup requirements.
+
+This does not weaken the "never evict a debater" principle. It satisfies it:
+the embedder now genuinely takes nothing from the card.
+
+The tournament proceeds.
