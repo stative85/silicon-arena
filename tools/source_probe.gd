@@ -59,6 +59,16 @@ var _mode := "b"
 var _temp := 0.8
 var _runs := 8
 var _skip := 0
+
+## Walk the corpus and count, generating nothing.
+##
+## The pre-registration quotes a 0.7% discard rate and 100% sham availability,
+## and those numbers came from a separate Python implementation of the same
+## rules. Two implementations of one rule set is exactly the duplicated truth
+## this project keeps getting bitten by, so this mode exists to check that the
+## harness that actually runs agrees with the document that constrains it.
+var _dry := false
+var _dry_opportunities := 0
 var _rows: Array[Dictionary] = []
 var _http: HTTPRequest
 var _results := RESULTS_B
@@ -69,6 +79,16 @@ var _sham_pool: Array = []
 var _sham_cursor := 0
 var _discarded_empty := 0
 var _discarded_no_sham := 0
+
+## A run whose every generation failed used to walk every transcript, record
+## nothing, and exit 0 with a tidy report of zero. That is the silent-failure
+## shape tools/lint_exits.py exists for -- the clip recorder printing CLIP SAVED
+## with no file. It is caught in two places now: consecutively, so a dead
+## endpoint stops the run in seconds instead of an hour, and at the end, so an
+## empty result can never be mistaken for a completed one.
+const MAX_CONSECUTIVE_FAILURES := 12
+var _gen_failures := 0
+var _consecutive_failures := 0
 
 
 func _init() -> void:
@@ -87,6 +107,8 @@ func _run() -> void:
 			_runs = int(args[i + 1])
 		if a == "--skip" and i + 1 < args.size():
 			_skip = int(args[i + 1])
+		if a == "--dry":
+			_dry = true
 
 	if _mode == "a":
 		_arms = ["N", "P", "R"]
@@ -106,7 +128,7 @@ func _run() -> void:
 	await process_frame
 	_http.timeout = 180.0
 
-	if not await _model_available():
+	if not _dry and not await _model_available():
 		printerr("model not available from LM Studio: %s" % MODEL)
 		quit(2)
 		return
@@ -176,6 +198,11 @@ func _ask(system: String, user: String) -> String:
 		"messages": [{"role": "user", "content": system + "\n\n" + user}],
 		"max_tokens": MAX_TOKENS, "temperature": _temp, "stream": false,
 	}
+	# Cancel anything still in flight. Without this, one request that outlived
+	# its wait leaves HTTPRequest busy, every subsequent request returns
+	# ERR_BUSY instantly, and the run silently walks every transcript recording
+	# nothing -- which is exactly how the first attempt at this probe ended.
+	_http.cancel_request()
 	if _http.request(LM_BASE + "/chat/completions",
 			["Content-Type: application/json"], HTTPClient.METHOD_POST,
 			JSON.stringify(payload)) != OK:
@@ -352,6 +379,10 @@ func _walk(turns: Array) -> void:
 			_discarded_empty += 1
 			continue
 
+		if _dry:
+			_dry_opportunities += 1
+			continue
+
 		var sys := ("You are %s in a live debate arena. Reply in two sentences, "
 			+ "in character.") % str(t["speaker"])
 		var user := "Recent turns:\n" + recent + "\n\nRespond as %s." % str(t["speaker"])
@@ -363,7 +394,15 @@ func _walk(turns: Array) -> void:
 				break
 			replies[arm] = out
 		if replies.size() != _arms.size():
+			_gen_failures += 1
+			_consecutive_failures += 1
+			if _consecutive_failures >= MAX_CONSECUTIVE_FAILURES:
+				printerr("%d consecutive generation failures - is %s loaded in LM Studio?"
+					% [_consecutive_failures, MODEL])
+				_save_results()
+				quit(2)
 			continue
+		_consecutive_failures = 0
 
 		var scored := {}
 		var copy := {}
@@ -405,6 +444,8 @@ func _block(arm: String, real: Dictionary, sham: Dictionary) -> String:
 # ----------------------------------------------------------------- reporting
 
 func _load_results() -> void:
+	if _dry:
+		return
 	var fh := FileAccess.open(_results, FileAccess.READ)
 	if fh == null:
 		return
@@ -418,6 +459,10 @@ func _load_results() -> void:
 
 
 func _save_results() -> void:
+	# A dry walk records nothing, so writing here would truncate a real run's
+	# results to an empty file. It generates no data and it owns no data.
+	if _dry:
+		return
 	var fh := FileAccess.open(_results, FileAccess.WRITE)
 	if fh == null:
 		return
@@ -442,6 +487,32 @@ func _report() -> void:
 	var n := _rows.size()
 	print("\ndiscarded before generation: %d empty distinctive set, %d no matched sham"
 		% [_discarded_empty, _discarded_no_sham])
+	if _gen_failures > 0:
+		print("generation failures: %d opportunities lost" % _gen_failures)
+
+	if _dry:
+		var offered := _dry_opportunities + _discarded_empty + _discarded_no_sham
+		if offered == 0:
+			printerr("dry walk found no eligible opportunities at all")
+			quit(2)
+			return
+		print("\n--- dry walk, no generation ---")
+		print("  eligible opportunities offered   %d" % offered)
+		print("  usable                           %d" % _dry_opportunities)
+		print("  discarded, empty distinctive set %d = %.1f%%"
+			% [_discarded_empty, 100.0 * float(_discarded_empty) / float(offered)])
+		print("  discarded, no matched sham       %d = %.1f%%"
+			% [_discarded_no_sham, 100.0 * float(_discarded_no_sham) / float(offered)])
+		print("\n  pre-registered: 0.7% discard, 100% sham availability")
+		quit(0)
+		return
+
+	if n == 0:
+		printerr("no opportunities recorded - %d generation failures, %d discarded."
+			% [_gen_failures, _discarded_empty + _discarded_no_sham])
+		printerr("an empty run is a failed run, not a result of zero.")
+		quit(2)
+		return
 
 	# THE TEETH. No flag reaches past this. Three consecutive experiments told
 	# different stories early and late, and MP1 warned against early reads in
