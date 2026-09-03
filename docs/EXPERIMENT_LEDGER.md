@@ -36,7 +36,9 @@ the runtime does not belong here and should not have been run.
 
 | **E0/E1** | Does nomic-embed-text-v1.5 beat the distance policy enough to justify an embedding subsystem? | `68b5b19` | 182 paired opportunities: E0 70.9% vs E1 75.3%, +4.4 (bar +10); E1 won 1 of 4 batches and declined monotonically; 0 unsupported attribution; latency 137 ms vs a 100 ms bound | **REJECTED** — and a placebo arm showed both arms score *below* a no-memory control, so `_is_callback` does not measure engagement ([EXPERIMENT_EMBEDDING](EXPERIMENT_EMBEDDING.md)) |
 
-**Shipped: 5. Rejected: 12. Undecided: 0.**
+| **MP1** | Is `_is_callback` measuring memory engagement at all? | `bbf4a4f` | 144 opportunities, S0 none / S1 sham / S2 real: verbatim-rejection gap +7.6 (bands were <5 sound, >=10 broken); real vs sham **-6.3** shipped and **+0.0** with the verbatim clause removed | **INCONCLUSIVE** — metric stays suspect; no absolute conversion number may be published ([EXPERIMENT_METRIC](EXPERIMENT_METRIC.md)) |
+
+**Shipped: 5. Rejected: 12. Inconclusive: 1. Undecided: 0.**
 
 ## Open, and blocking further recall work
 
@@ -51,10 +53,22 @@ instrument at the same moments, and the E0/E1 null control measured a bias of
 exactly +0.0 points. Absolute conversion rates do not survive it and should not
 be quoted as engagement rates.
 
-Repairing this needs a **sham-controlled** placebo (same injected volume and
-format, non-resonant content), which this project already built for Q0/QS/Q1,
-rather than the bare no-memory placebo used here. Until then, no new recall
-experiment can produce a trustworthy absolute number.
+The sham-controlled rerun was pre-registered (`bbf4a4f`) and run (MP1). It came
+back **inconclusive on the metric question** — the verbatim-rejection gap landed
+at +7.6, inside the 5-to-10 band — but it settled a different one:
+
+**Real memory does not outperform a sham.** -6.3 points on the shipped metric,
+and +0.0 with the verbatim exclusion removed (80.6% against 80.6%). A block of
+unrelated text from another match does what the recalled memory does.
+
+So the standing constraint is unchanged and now better evidenced: **no absolute
+callback conversion number may be published**, and recall may not be described
+as producing callbacks. Recall stays shipped — an inconclusive result unships
+nothing — but its justification is not established.
+
+Settling the verbatim question requires a NEW pre-registration with a target
+fixed in advance and powered for the observed effect. Running past 144 until
++7.6 crosses 10 is the exact sin that would have shipped resonance at 81 pairs.
 
 ### The pattern across everything rejected
 
