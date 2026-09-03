@@ -103,7 +103,7 @@ VERIFY OK
 
 CI runs the same thing on Linux for every push and pull request.
 
-### Six rules that are not negotiable
+### Seven rules that are not negotiable
 
 **1. A new test must be shown to fail.** Reintroduce the defect it guards,
 watch it go red, restore, watch it go green. A suite that can only pass is not
@@ -176,6 +176,23 @@ Three separate production bugs had one cause — `live_match.gd` carried a
 runtime fact and `main.gd` inherited a default. Put required settings in
 `REQUIRED_ON_BOTH`, and put derived values in `INVARIANTS`, in
 `scripts/arena/entrypoint_parity_selftest.gd`.
+
+**7. Experiment corpora are quarantined by provenance.** Arena experiments are
+scored on arena transcripts and nothing else. There is a 453 MB personal
+archive on this machine -- 1,976 conversations, 137,841 messages, 45,429 of
+them written by the author, spanning 900 days -- and it is a legitimate corpus
+for Ghost personalization work. It is not admissible here.
+
+The failure mode is quiet. Let that archive reach scar priors, topic weighting,
+model selection or callback scoring, and the experiment stops measuring the
+treatment and starts measuring "author prior + treatment", with no line in any
+log saying so. Every margin in the ledger would silently become a different
+quantity.
+
+So: an experiment names its corpus, the corpus is arena-generated, and any
+outside data enters only through a pre-registration that says which data, why,
+and what it could confound. Personalization research lives in its own tree with
+its own conclusions and does not lend evidence across the line.
 
 Never weaken these without evidence:
 
