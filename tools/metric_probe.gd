@@ -275,6 +275,10 @@ func _walk(turns: Array) -> void:
 		})
 		if _rows.size() % 10 == 0:
 			print("   %d opportunities" % _rows.size())
+			# Persist mid-transcript. A first version only saved after a whole
+			# transcript finished, so a run killed 20 opportunities in lost all
+			# 20 -- an hour of generation with nothing to resume from.
+			_save_results()
 
 
 ## The frozen callback definition, decomposed. Same order, same thresholds, same
