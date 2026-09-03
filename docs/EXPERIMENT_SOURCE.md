@@ -440,3 +440,57 @@ that failure would and would not mean, so the reading cannot drift afterwards.
 An arena reply that genuinely draws on a memory has no incentive to avoid its
 vocabulary, and would plausibly score higher than a restatement that is trying
 to avoid it. That intuition is not evidence and does not soften the bar.
+
+---
+
+# Result: MP2-A2 ceiling CLEARED at 60 opportunities — the measure is not blind
+
+```
+                     vs A (real)   vs B (sham)
+  reply N (none)          1.7%          1.7%
+  reply P2 (paraphrase)  55.0%          1.7%
+  reply R (real scar)    20.0%          1.7%
+
+  U(P2,A) - U(N,A) = +53.3 points      gate was +25.0
+  paraphrases rejected: 7 of 67 offered = 10.4%   (void above 25%)
+```
+
+**MEASURE CAN SEE SOURCE-SPECIFIC USE. MP2-B proceeds under its frozen bars.**
+
+The ceiling rose, and it rose past twice its bar. When the reply genuinely
+derives from the excerpt, the measure fires 55% of the time. When it derives
+from nothing, 1.7%.
+
+## The sham column is the part worth staring at
+
+```
+  vs B (sham):   N 1.7%   P2 1.7%   R 1.7%
+```
+
+Identical to the decimal across all three branches, including the branch whose
+entire content is a restatement of source A. The measure does not merely detect
+"this reply overlaps some old text" — it discriminates *which* old text, which
+is the one thing MP1's metric could not do and the whole reason MP2 exists.
+
+That is also the false-positive floor behaving exactly as rule 4 demands, and it
+is far tighter than the offline estimate of 7.4% predicted. The offline floor
+was measured against full arena replies; these are shorter, which plausibly
+explains the gap.
+
+## The caveat written before this ran held up, and cut the right way
+
+The note above predicted the paraphrase ceiling would be conservative, because a
+paraphrase replaces the source's words on purpose. It cleared +25 anyway, by a
+factor of two. Under the pre-registered reading that makes this **strong**
+evidence rather than weak: the measure detects source-derived material even when
+the wording was deliberately changed to avoid it.
+
+## What this does NOT establish
+
+R sits at 20.0% against A. **That is not a result and it is not the MP2-B
+estimator.** It is 60 opportunities on a gate run whose purpose was to validate
+the instrument, the arms here are N/P2/R rather than N/S/R, and there is no sham
+*branch* in this run at all — only a sham *source* to score against. Reading a
+verdict off it would be the fourth early read in four experiments.
+
+MP2-B runs to 240 with the S branch present, and its bars are untouched.
