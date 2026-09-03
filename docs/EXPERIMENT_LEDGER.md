@@ -70,6 +70,13 @@ Settling the verbatim question requires a NEW pre-registration with a target
 fixed in advance and powered for the observed effect. Running past 144 until
 +7.6 crosses 10 is the exact sin that would have shipped resonance at 81 pairs.
 
+**MP2 is that pre-registration** ([EXPERIMENT_SOURCE](EXPERIMENT_SOURCE.md)),
+and it asks a different question rather than powering up the same one: does the
+*content* of the recalled scar change the reply in a way traceable to its
+source? Absolute conversion is abandoned as a quantity. The measure is a paired
+crossover scoring every reply against both the real and the sham source, so the
+placebo floor is subtracted rather than assumed.
+
 ### The pattern across everything rejected
 
 Nine rejections, and the successful changes have a shape the failures do not.
