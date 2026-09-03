@@ -752,3 +752,73 @@ ceiling and a calibrated null now exists**, and under it a real recalled scar
 shows +17.9 points of source-traceable influence over its own placebo floor.
 That is not a verdict on the feature. It is the instrument the project did not
 have this morning.
+
+---
+
+# Addendum: the deterministic replication, and what it splits apart
+
+Pre-registered as reported-only. It cannot change the verdict and does not.
+
+**One deviation, declared rather than absorbed:** the pre-registration specified
+the first 80 opportunities and the harness ran all 240. Both are reported below;
+the 80-prefix is the pre-registered quantity.
+
+```
+  temperature 0.00, branches differ by the memory block and nothing else
+
+                       first 80 (prereg)     full 240
+    lift(R) primary          +12.5             +17.5
+    lift(R) unquoted          +5.0              +4.2
+    lift(S)                  +28.8             +29.2
+    copying  R                 8.8%             14.6%
+    copying  S                20.0%             23.3%
+```
+
+## The primary effect replicates. Its character does not.
+
+```
+                    void MP2-B    MP2-B2 (0.8)   deterministic (0.0)
+    lift(R)            +17.5         +17.9            +17.5
+    lift(R) unquoted   +11.2         +12.1             +4.2
+```
+
+Three runs across two transcript slices and two decoding settings put `lift(R)`
+within 0.4 points of itself. That is the most stable number this project has
+produced.
+
+**The quotation-excluded lift is not stable at all, and that is the finding.**
+At the shipped temperature of 0.8 the effect survives removing every copied
+span — +12.1, comfortably past the frozen "at least half the primary lift"
+condition. At temperature 0 it collapses to +4.2, less than a quarter, and
+copying nearly doubles on both memory arms.
+
+So: **greedy decoding makes the model quote the memory. Sampling makes it use
+the memory.** The source-specific effect is real in both, but it is a different
+behaviour in each, and only one of them is what the feature is for.
+
+The runtime ships at 0.8. The pre-registration put the primary run there for
+external validity and that choice turns out to matter more than expected — a
+deterministic-only experiment would have measured mostly transcription and
+called it influence.
+
+## Zero fabricated citations from real memory, in 480 replies
+
+```
+                     MP2-B2 (0.8)    deterministic (0.0)
+    N none                0/240              0/240
+    S sham                1/240              2/240
+    R real memory         0/240              0/240
+```
+
+Across both runs the real-memory arm produced **no unsupported attribution in
+480 replies**. All three came from the sham, where the injected block carries
+provenance from another match.
+
+The zero-attribution condition failed both runs, and both failures were the
+control arm. The pattern is now replicated rather than incidental: **canonical
+provenance does not induce fabrication and foreign provenance does.** That is
+consistent with the design intent of `provenance_holds` and it is the strongest
+thing either run establishes cleanly.
+
+It still does not rescope the frozen condition. It is an argument for a future
+pre-registration, made where it can be checked.
