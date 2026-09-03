@@ -310,3 +310,108 @@ this time rather than editorial:
 Judge scores. Throughput. Latency. Embeddings — that question is closed.
 Whether the reply is any *good*. This measures traceability to a source and
 nothing about quality.
+
+---
+
+# Result: MP2-A gate FIRED at 60 opportunities — the control arm was invalid
+
+```
+                    vs A (real)   vs B (sham)
+  reply N (none)         1.7%          5.0%
+  reply P (instructed)   8.3%          3.3%
+  reply R (real scar)   11.7%          1.7%
+
+  U(P,A) - U(N,A) = +6.7 points      gate was +25.0
+```
+
+**MEASURE IS BLIND, per the frozen rule. MP2-B is not run.**
+
+The pre-registered consequence stands and is not being negotiated. What
+follows is the diagnosis the rule demands before a redesign, not an appeal.
+
+## The instructed arm never engaged the memory at all
+
+```
+                copies a 6-word run    mean distinctive hits vs A
+  N none                     0.0%                    0.22
+  P instructed               0.0%                    0.50
+  R real scar                1.7%                    0.52
+```
+
+Told in plain words to "build on that prior moment explicitly", the model
+reproduced a six-word run from it **zero times in 60 opportunities**, and its
+distinctive-term uptake was indistinguishable from the arm that was told
+nothing at all — 0.50 against 0.52. The instruction did nothing.
+
+So the gate cannot mean what it was written to mean. It was meant to separate
+"the measure cannot see uptake" from "there is no uptake to see". It instead
+demonstrated a third thing: **the ceiling arm never produced the uptake it was
+supposed to guarantee.** A ceiling that does not rise is not a ceiling.
+
+## This was foreseeable, and the ledger says so
+
+The pattern across nine rejections is stated in EXPERIMENT_LEDGER: everything
+that tried to change what the models were ASKED to produce failed, and only
+changes to what the arena DOES with output survived. C1 asked for 15-25 words
+and got a median of 81 at 5% compliance.
+
+The calibration ceiling was built out of the one material this project has
+already proven does not work on these models. That is a design error, it was
+avoidable by reading a document that was read, and the run cost is the answer.
+
+## What the run does establish
+
+Not a verdict — 60 opportunities, and three experiments in a row reversed
+between an early read and their pre-registered target. But two things are worth
+recording because they bear on the redesign:
+
+* **The measure is not obviously blind.** Both memory arms roughly double the
+  no-memory arm's mean uptake against the real source, 0.50 and 0.52 against
+  0.22, while the sham-source column stays flat across every arm, 0.22 to 0.27.
+  Something moves when a memory is present, and the floor behaves as designed.
+* **The floor behaves as designed.** N scores 1.7% against the real source and
+  5.0% against the sham. A raw real-versus-sham comparison would have read that
+  asymmetry as a result; the crossover subtracts it.
+
+**The MP2-B estimator is computable from these 60 rows and is deliberately not
+computed here.** Reading it would be the fourth early read in four experiments,
+and this document already contains a warning that failed to prevent the third.
+The rows are on disk. They are not evidence until MP2-B runs to its target.
+
+---
+
+# Amendment: MP2-A2, a ceiling that does not require compliance
+
+**Written and committed before MP2-A2 was run.** The MP2-B bars, targets,
+uptake definition, threshold, discard rule and sham matching are untouched. The
+only thing replaced is the invalid ceiling arm.
+
+**Branch P2**: the model is asked to **restate the scar's excerpt in its own
+words**, and that paraphrase is scored as the reply.
+
+A paraphrase of the source is source-specific use by construction — it is
+derived from that excerpt and from nothing else — and producing one is a
+transformation task rather than a behavioural instruction. Every intervention
+this project has seen fail asked the model to *behave* differently: be shorter,
+argue harder, take a position, follow a phase. Rewriting supplied text is the
+kind of thing a 4B model does do, and if it does not, that failure is visible
+directly as an empty or unchanged output rather than being silently confounded
+with the thing under test.
+
+**Gate, unchanged at 60 opportunities:**
+
+```
+  U(P2,A) - U(N,A) >= +25 points  ->  the measure can see source-specific use.
+                                      MP2-B proceeds under its frozen bars.
+  < +25 points                    ->  the measure is BLIND for real. MP2-B is
+                                      not run, and the uptake definition itself
+                                      is what needs replacing.
+```
+
+**A guard on the ceiling itself, so this cannot fail silently twice.** The
+paraphrase must actually be a paraphrase: it is discarded, and the opportunity
+with it, if it reproduces a 6-word run from the excerpt (that is copying, not
+paraphrase) or if it is shorter than half the excerpt's word count. The discard
+rate is reported. **If more than 25% of paraphrases are discarded, the ceiling
+is again not a ceiling and the gate is void rather than failed** — a distinction
+MP2-A had no way to draw about itself.

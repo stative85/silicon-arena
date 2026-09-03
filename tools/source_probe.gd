@@ -46,12 +46,25 @@ const SHAM_LEN_BAND := 40
 
 const TARGET_A := 60    ## MP2-A, the metric validation gate
 const TARGET_B := 240   ## MP2-B, the verdict
-const GATE_A := 25.0    ## instructed uptake must clear this or the measure is blind
+const GATE_A := 25.0    ## ceiling uptake must clear this or the measure is blind
+
+## MP2-A ran and its ceiling arm never rose: instructed to build on the memory,
+## the model copied a six-word run from it ZERO times in 60 opportunities and
+## its uptake matched the uninstructed arm at 0.50 against 0.52. The ledger says
+## why -- nine rejections agree that instructions do not survive contact with
+## these models -- so A2 replaces the instruction with a transformation the
+## model will actually perform: restate the excerpt in its own words.
+##
+## A paraphrase of the source is source-specific use by construction. If the
+## measure cannot see one, it is blind for real.
+const PARAPHRASE_MIN_RATIO := 0.5   ## a paraphrase shorter than this is not one
+const PARAPHRASE_MAX_DISCARD := 25.0  ## above this the ceiling is void, not failed
 const SCRAMBLE_BOUND := 5.0
 const SCRAMBLE_SEED := 20260903
 const SCRAMBLE_REPS := 200
 
 const RESULTS_A := "user://source_probe_a.json"
+const RESULTS_A2 := "user://source_probe_a2.json"
 const RESULTS_B := "user://source_probe_b.json"
 const RESULTS_B_DET := "user://source_probe_b_det.json"
 
@@ -88,6 +101,7 @@ var _discarded_no_sham := 0
 ## empty result can never be mistaken for a completed one.
 const MAX_CONSECUTIVE_FAILURES := 12
 var _gen_failures := 0
+var _para_discarded := 0
 var _consecutive_failures := 0
 
 
@@ -114,6 +128,10 @@ func _run() -> void:
 		_arms = ["N", "P", "R"]
 		_target = TARGET_A
 		_results = RESULTS_A
+	elif _mode == "a2":
+		_arms = ["N", "P2", "R"]
+		_target = TARGET_A
+		_results = RESULTS_A2
 	else:
 		_arms = ["N", "S", "R"]
 		_target = TARGET_B
@@ -388,12 +406,32 @@ func _walk(turns: Array) -> void:
 		var user := "Recent turns:\n" + recent + "\n\nRespond as %s." % str(t["speaker"])
 
 		var replies := {}
+		var para_reject := false
 		for arm in _arms:
-			var out := await _ask(sys + _block(arm, real, sham), user)
+			var out := ""
+			if arm == "P2":
+				# The ceiling. Not an instruction about how to behave -- a
+				# transformation of supplied text, which is the kind of thing
+				# these models actually do. A paraphrase of the excerpt is
+				# source-specific use by construction.
+				out = await _ask(sys,
+					"Restate the following in your own words, in one or two sentences:\n\n\""
+					+ ex_a + "\"")
+				if out != "" and not _is_paraphrase(out, ex_a):
+					out = ""
+					para_reject = true
+					_para_discarded += 1
+			else:
+				out = await _ask(sys + _block(arm, real, sham), user)
 			if out == "":
 				break
 			replies[arm] = out
 		if replies.size() != _arms.size():
+			# A rejected paraphrase is the ceiling guard doing its job, not a
+			# dead endpoint. Counting it toward the abort would stop a healthy
+			# run for the wrong reason.
+			if para_reject:
+				continue
 			_gen_failures += 1
 			_consecutive_failures += 1
 			if _consecutive_failures >= MAX_CONSECUTIVE_FAILURES:
@@ -425,6 +463,19 @@ func _walk(turns: Array) -> void:
 			_save_results()
 
 
+## Is this actually a paraphrase, or did the model copy or stub it?
+##
+## MP2-A's ceiling failed silently: the arm produced output, the output was
+## scored, and nothing in the harness could tell that the model had ignored the
+## instruction entirely. A ceiling that cannot detect its own failure is how a
+## null becomes uninterpretable, so this one is checked.
+func _is_paraphrase(out: String, excerpt: String) -> bool:
+	if M.copied(excerpt, out):
+		return false   # that is copying, not restating
+	var want := float(excerpt.split(" ", false).size()) * PARAPHRASE_MIN_RATIO
+	return float(out.split(" ", false).size()) >= want
+
+
 func _block(arm: String, real: Dictionary, sham: Dictionary) -> String:
 	match arm:
 		"S":
@@ -454,6 +505,7 @@ func _load_results() -> void:
 	if typeof(p) == TYPE_DICTIONARY:
 		_discarded_empty = int(p.get("discarded_empty", 0))
 		_discarded_no_sham = int(p.get("discarded_no_sham", 0))
+		_para_discarded = int(p.get("para_discarded", 0))
 		for row in p.get("rows", []):
 			_rows.append(row)
 
@@ -470,6 +522,7 @@ func _save_results() -> void:
 		"rows": _rows, "model": MODEL, "mode": _mode, "temperature": _temp,
 		"discarded_empty": _discarded_empty,
 		"discarded_no_sham": _discarded_no_sham,
+		"para_discarded": _para_discarded,
 	}, "\t"))
 	fh.close()
 
@@ -541,6 +594,29 @@ func _report() -> void:
 			print("  MEASURE CAN SEE UPTAKE - proceed to MP2-B")
 		else:
 			print("  MEASURE IS BLIND - STOP. MP2-B is not run. Redesign the measure.")
+		quit(0)
+		return
+
+	if _mode == "a2":
+		var gate2 := M.rate(_rows, "P2", "a", "u") - M.rate(_rows, "N", "a", "u")
+		var offered := n + _para_discarded
+		var discard_pct := 100.0 * float(_para_discarded) / float(maxi(offered, 1))
+		print("\n  PARAPHRASE CEILING")
+		print("    U(P2,A) - U(N,A) = %+.1f points   gate %+.1f" % [gate2, GATE_A])
+		print("    paraphrases rejected: %d of %d offered = %.1f%%  (void above %.1f%%)"
+			% [_para_discarded, offered, discard_pct, PARAPHRASE_MAX_DISCARD])
+		print("\nFROZEN DECISION (docs/EXPERIMENT_SOURCE.md)")
+		# Void before failed. MP2-A could not tell the difference between its
+		# ceiling failing and its ceiling never existing, and that ambiguity is
+		# what cost the run.
+		if discard_pct > PARAPHRASE_MAX_DISCARD:
+			print("  CEILING VOID - too few usable paraphrases to call this a ceiling")
+			print("  this is not a verdict on the measure; the control did not exist")
+		elif gate2 >= GATE_A:
+			print("  MEASURE CAN SEE SOURCE-SPECIFIC USE - proceed to MP2-B")
+		else:
+			print("  MEASURE IS BLIND - STOP. MP2-B is not run.")
+			print("  the uptake definition itself is what needs replacing")
 		quit(0)
 		return
 
