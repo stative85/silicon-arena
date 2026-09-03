@@ -115,6 +115,12 @@ jobs:
         # therefore stronger, therefore recalled more.
         run: ~/godot/godot --headless --path . --script scripts/arena/gonzo_recall_selftest.gd 2>&1 | tee out.log; grep -q "GONZO RECALL OK" out.log
 
+      - name: Self-test - gonzo embed cache
+        # A vector compared against one from a different embedding space
+        # returns a confident number and is wrong. Nothing crashes, so a
+        # selftest is the only place that failure can be caught.
+        run: ~/godot/godot --headless --path . --script scripts/arena/gonzo_embed_selftest.gd 2>&1 | tee out.log; grep -q "GONZO EMBED OK" out.log
+
       - name: Adversarial pass
         run: ~/godot/godot --headless --path . --script tools/adversarial.gd 2>&1 | tee out.log; grep -q "ADVERSARIAL OK" out.log
 

@@ -80,3 +80,7 @@ Both are in [CONTRIBUTING.md](../CONTRIBUTING.md) as non-negotiable:
 1. A new test must be shown to fail.
 2. You cannot set a useful threshold for a metric whose noise floor you have
    not measured.
+3. A detection metric needs a placebo floor, not just a noise floor. Ask how
+   often it fires when the thing it detects is absent. The embedding router
+   measured +50.0 points until a no-memory placebo "called back" to its own
+   pick 91.3% of the time.

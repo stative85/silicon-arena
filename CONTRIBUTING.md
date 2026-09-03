@@ -103,7 +103,7 @@ VERIFY OK
 
 CI runs the same thing on Linux for every push and pull request.
 
-### Four rules that are not negotiable
+### Five rules that are not negotiable
 
 **1. A new test must be shown to fail.** Reintroduce the defect it guards,
 watch it go red, restore, watch it go green. A suite that can only pass is not
@@ -129,7 +129,27 @@ all four were rejected (`docs/EXPERIMENT_LEDGER.md`). Making the agents argue
 harder is a solved question with a negative answer. Reopening it needs new
 evidence, not a new variation.
 
-**4. If you add a load-bearing runtime setting, add it to the parity test.**
+**4. A detection metric needs a placebo floor, not just a noise floor.** Rule 2
+asks how much the metric moves when nothing changes. This asks something
+harsher: how often does it fire when the thing it detects is *absent*? Generate
+the output with the treatment removed entirely, then score it as if the
+treatment were there. Whatever it reports is a false positive, and the real
+effect is your arm minus that floor.
+
+This is not hypothetical. The embedding router measured +50.0 points of callback
+conversion over distance recall. A placebo arm -- a reply generated with no
+memory injected at all -- "called back" to the embedding router's chosen scar
+**91.3%** of the time. The metric favoured that arm by 41 points with nothing to
+detect, because the router selected scars that overlapped the current topic and
+the callback test rewarded shared words. Corrected, the result inverted from
++30.4 to -10.9 (`docs/EXPERIMENT_EMBEDDING.md`).
+
+An unmeasured false-positive floor does not add noise, it adds *bias*, and bias
+points the same direction every time you look. Rule 2 protects you from
+believing an accident. This rule protects you from believing an artifact you
+built yourself.
+
+**5. If you add a load-bearing runtime setting, add it to the parity test.**
 Three separate production bugs had one cause — `live_match.gd` carried a
 runtime fact and `main.gd` inherited a default. Put required settings in
 `REQUIRED_ON_BOTH`, and put derived values in `INVARIANTS`, in

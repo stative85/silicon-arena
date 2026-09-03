@@ -292,3 +292,88 @@ This does not weaken the "never evict a debater" principle. It satisfies it:
 the embedder now genuinely takes nothing from the card.
 
 The tournament proceeds.
+
+---
+
+# The instrument was broken, and the embedding router was exploiting it
+
+The first smoke run returned **E1 nomic +50.0 points** over distance.
+
+Every effect this project has measured is four to eight points. An effect an
+order of magnitude larger than anything before it is not a breakthrough, it is
+a broken instrument. So it got a placebo arm instead of a victory lap.
+
+## The placebo
+
+A third reply generated with **no memory injected at all**, scored against both
+picks. A reply that was never shown a scar cannot call back to it, so its
+"conversion" is the false-positive rate of the callback metric.
+
+| arm | raw | placebo floor | true effect |
+|---|---:|---:|---:|
+| E0 distance | 58.7% | 50.0% | **+8.7** |
+| E1 nomic | 89.1% | **91.3%** | **-2.2** |
+
+**Honest delta: -10.9 points.**
+
+The metric favours the E1 pick by **+41.3 points with no memory present**. The
+headline was entirely artifact. Corrected, the embedding router shows no memory
+engagement at all, while distance shows a real one.
+
+## The mechanism
+
+`_is_callback` rewards shared content words between the excerpt and the reply.
+Nomic selects the scar most semantically similar to the recent context, and the
+reply is **generated from that same recent context**. So E1's excerpt overlaps
+the reply for free, whether or not the memory was ever read.
+
+Goodhart's law, and the router was optimising for it as hard as it could.
+
+## Why this explains every recall result so far
+
+**Semantic similarity selects for redundancy.**
+
+The scar most like what is already being discussed adds nothing the agent did
+not already have. That is why E1 lands at -2.2: it is not that nomic chooses
+badly, it is that nomic chooses things the model already knows, so injecting
+them changes nothing.
+
+This is `MIN_RECALL_DISTANCE` arrived at from the opposite direction. That bound
+exists because recalling what is on screen is duplication rather than memory,
+measured at a mean recall distance of 2.5 turns. Semantic selection reintroduces
+exactly that failure through a more sophisticated door: not temporally close,
+but topically close, which is the same redundancy wearing a better coat.
+
+Distance wins because it is the only rule that reliably surfaces something the
+conversation does **not** already contain.
+
+## Blast radius: every conversion number ever reported here
+
+No prior recall experiment had a placebo floor. So every callback conversion
+rate this project has published -- the 65-76% band, the 69.3% that beat
+resonance -- is a raw number sitting on an unmeasured false-positive floor of
+roughly **50%**.
+
+What survives and what does not:
+
+* **Arm-versus-arm comparisons survive.** Both arms carried the same bias, and
+  the paired design holds it constant.
+* **The absolute rates do not.** They were never memory-engagement rates and
+  must not be read as such. "Distance converts at 69.3%" means 69.3% against a
+  ~50% floor, not that memory worked seven times in ten.
+* **The resonance deletion is strengthened, not weakened.** Resonance selected
+  on similarity, so the contaminated metric was biased *in its favour* -- and it
+  still lost by 3.9 points. Correcting the bias moves it further down.
+
+This is CONTRIBUTING rule 2 again, in its sharpest form yet: a threshold on a
+metric whose false-positive floor is unmeasured is not a threshold, it is a
+decoration. The rule said noise floor. It should have said noise floor *and*
+false-positive floor.
+
+## Applying the frozen rule
+
+The pre-registration froze "callback conversion improves by >= 10 percentage
+points" without anticipating a placebo. The faithful reading is that the frozen
+metric is contaminated and the placebo-corrected delta is that same metric with
+its false-positive floor removed, so the rule is applied to the corrected
+number. Both are reported, so the choice is visible rather than convenient.
