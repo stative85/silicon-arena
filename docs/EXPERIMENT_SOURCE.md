@@ -633,3 +633,122 @@ second run's result will inevitably be read against them. That cannot be undone
 by procedure, so it is recorded instead: **MP2-B2 is not a blind replication,
 and if its numbers land close to the void run's, that agreement is weaker
 evidence than it will look.** The margins do not move to accommodate that.
+
+---
+
+# Result: MP2-B2 INCONCLUSIVE at 240 — one condition, on the control arm
+
+```
+                     vs A (real)   vs B (sham)
+  reply N (none)          2.5%          5.4%
+  reply S (sham)          3.8%         27.9%
+  reply R (real)         18.8%          3.8%
+
+  SOURCE LIFT (difference of differences, floor subtracted)
+    real arm, own source   +17.9
+    sham arm, own source   +21.3     (internal replication)
+
+  REPORTED, CANNOT CHANGE THE VERDICT
+    quotation-excluded     +12.1
+    threshold 3            +10.0
+
+  CONDITIONS
+    unsupported attribution   0.4% summed across arms
+    verbatim copying          R 7.9%   S 10.8%   R-S -2.9
+
+  LABEL-SCRAMBLE, 2000 permutations
+    estimator bias    mean(null) = -0.14   (void at |1.0|)
+    label-noise band  p95 of |null| = 8.3   observed |lift| = 17.9
+```
+
+**INCONCLUSIVE — a primary number cleared its bar and a condition failed.**
+
+## The corrected gate works
+
+Bias -0.14 against a void threshold of 1.0: the crossover has no preferred
+direction under meaningless labels, so the estimator is not the problem and
+never was. Observed 17.9 against a label-noise p95 of 8.3: the lift is outside
+the band that shuffled labels produce.
+
+The gate that voided MP2-B would have voided this too. The gate that replaced it
+admits a real effect and would still reject noise. That is the repair working.
+
+## The condition that failed, and where it came from
+
+```
+  unsupported attribution   N: 0/240    S: 1/240 (turn 15)    R: 0/240
+```
+
+**The real memory arm fabricated nothing in 240 replies**, consistent with every
+prior recall experiment. The single unsupported citation came from the **sham**
+branch: an agent shown a memory carrying foreign provenance cited a turn that
+does not exist in its own conversation. That is the failure mode foreign
+provenance predicts, and it is arguably a property of the control rather than
+of the feature under test.
+
+The pre-registered condition reads "unsupported attribution = 0, **on every
+arm**". Those words were chosen deliberately and they are frozen. The condition
+failed and the verdict is INCONCLUSIVE.
+
+**The condition is not being rescoped to the treatment arm.** It is the only
+thing standing between this run and a verdict, which is exactly the
+circumstance under which a bar must not move, and the motive for wanting to move
+it is legible. If scoping it to the treatment arm is right, that is a new
+pre-registration and a new run, argued before any data is seen.
+
+## What the frozen tree would have returned, and why it does not count
+
+On the primary numbers alone: `lift(R) = +17.9` and `lift(S) = +21.3`, both past
++10, and 3.4 apart — inside the 10-point band. That is the shape of **outcome 2,
+CONTENT CAUSAL / SELECTION IRRELEVANT**: injected content is used
+source-specifically, but the distance policy's pick is not special.
+
+It does not count. The conditions are part of the frozen rule, not commentary on
+it, and one failed. Recorded here because the pre-registration lists these as
+reported quantities, not because the verdict is negotiable.
+
+## The sham outperforms the real memory again
+
+`S` takes up its own source 27.9% of the time; `R` takes up its own 18.8%. The
+sham arm's lift is the larger of the two, and this is now the third time a sham
+has matched or beaten real recall on this project — Q1, MP1, and here.
+
+A mechanism consistent with it: a foreign excerpt supplies vocabulary that is
+novel in this conversation and therefore salient, while a real scar's vocabulary
+has already drifted into the surrounding turns and is stripped by the
+already-visible subtraction. That is a hypothesis. It has not been tested and it
+is not evidence.
+
+## Agreement with the void run is weaker evidence than it looks
+
+Recorded in advance, and it held:
+
+```
+                void MP2-B      MP2-B2 (fresh slice)
+  lift(R)          +17.5             +17.9
+  lift(S)          +21.3             +21.3
+  S vs its source  27.9%             27.9%
+```
+
+Different target transcripts, different sham donors, near-identical results.
+This is *not* independent confirmation. The void run's numbers were in view when
+B2 was launched, and the pre-registration said before B2 ran that agreement
+would look stronger than it is. It looks very strong. It is still one analyst
+who had already seen the answer.
+
+What the agreement does support, narrowly: the effect is not an artifact of one
+particular set of transcripts.
+
+## Standing consequence
+
+Gonzo recall stays shipped. An inconclusive result unships nothing, and this is
+the second inconclusive result in a row on the same underlying question.
+
+**No absolute callback or conversion number may be published**, unchanged.
+Recall still may not be described as producing callbacks.
+
+What is new and may be said: **a source-specific measure with a validated
+ceiling and a calibrated null now exists**, and under it a real recalled scar
+shows +17.9 points of source-traceable influence over its own placebo floor.
+That is not a verdict on the feature. It is the instrument the project did not
+have this morning.

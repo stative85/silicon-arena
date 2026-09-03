@@ -38,7 +38,15 @@ the runtime does not belong here and should not have been run.
 
 | **MP1** | Is `_is_callback` measuring memory engagement at all? | `bbf4a4f` | 144 opportunities, S0 none / S1 sham / S2 real: verbatim-rejection gap +7.6 (bands were <5 sound, >=10 broken); real vs sham **-6.3** shipped and **+0.0** with the verbatim clause removed | **INCONCLUSIVE** — metric stays suspect; no absolute conversion number may be published ([EXPERIMENT_METRIC](EXPERIMENT_METRIC.md)) |
 
-**Shipped: 5. Rejected: 12. Inconclusive: 1. Undecided: 0.**
+| **MP2-A** | Can a source-specific measure detect uptake at all? | `1d3e62d` | instructed ceiling arm returned +6.7 against a +25 gate; it copied the memory 0 times in 60 opportunities and matched the uninstructed arm at 0.50 vs 0.52 | **GATE FIRED, CONTROL INVALID** — the ceiling never rose, so the gate could not mean what it was written to mean. Produced rule 6 ([EXPERIMENT_SOURCE](EXPERIMENT_SOURCE.md)) |
+
+| **MP2-A2** | Same question, ceiling that needs no compliance | `cfd8cc4` | paraphrase ceiling +53.3 against +25; 10.4% paraphrases discarded against a 25% void line; sham column flat at 1.7% across every branch | **PASSED** — the measure discriminates *which* source, which `_is_callback` never could |
+
+| **MP2-B** | Does real recall create source-specific influence? | `1d3e62d` | reached 240; scramble gate returned 11.3 against a bound of 5.0 | **VOID** — the gate compared a max of 200 draws to a bound set without measuring the null's spread (sd 3.95, expected max 11.2). Rule 2, broken by the guard enforcing it |
+
+| **MP2-B2** | Same question, corrected gate, fresh transcripts | `a12f3f3` | 240 opportunities: lift(R) +17.9, lift(S) +21.3, both past +10 and 3.4 apart; estimator bias -0.14, observed 17.9 vs label-noise p95 8.3; **1 unsupported attribution in 720 replies, and it came from the sham arm** | **INCONCLUSIVE** — the primary numbers reached outcome 2 and the zero-attribution condition failed on the control arm. Bar not rescoped |
+
+**Shipped: 5. Rejected: 12. Inconclusive: 3. Void: 1. Undecided: 0.**
 
 ## Open, and blocking further recall work
 
