@@ -30,9 +30,11 @@ the runtime does not belong here and should not have been run.
 
 | **Q1** | Does resonance-selected recall of old canonical material beat a matched sham? | `f937c74` | conversion Q1 58.9% vs sham 75.7% vs none 0%; distance 11.7 turns; **0** fabricated attributions in ~84 injections | **REJECTED** — recall produces real long-range callbacks; the resonance scoring is not why, and the sham beat it |
 
-| **G1/G2** | Does distance alone match resonance when exposure is matched? | `2714e4c` | conversion 68.7% vs 73.1% — a 0.5 sd gap; distance matched 15.8 vs 15.5; 0 fabricated attributions | **NO DELETION** — distance not shown sufficient, resonance not shown to help; my rule lacked a noise band |
+| **G1/G2** | Does distance alone match resonance when exposure is matched? | `2714e4c` | conversion 68.7% vs 73.1% — a 0.5 sd gap | **SUPERSEDED by T1** — the arena design manufactured its own variance; the paired tournament answered it properly |
 
-**Shipped: 5. Rejected: 10. Undecided: 1.**
+| **T1** | Does resonance earn ~120 lines, given identical moment and pool? | `2955612` | 127 paired counterfactual trials: distance 69.3% vs resonance 65.4%, R−D = −3.9; 0 unsupported attribution | **RESONANCE DELETED** — R−D swung +5.0 → +7.4 → −3.9 as the sample grew; only the pre-fixed target made the answer defensible |
+
+**Shipped: 5. Rejected: 11. Undecided: 0.**
 
 ### The pattern across everything rejected
 

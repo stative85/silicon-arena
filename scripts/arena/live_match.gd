@@ -2028,6 +2028,8 @@ func _select_recalls(now_speaker: String, named_now: Array) -> Array:
 	# most distant eligible scars. One takes the furthest of them, the other the
 	# most resonant OF THE SAME SET, so injection count and source-distance
 	# profile are matched by construction rather than by hope.
+	# Distance policy. The resonance ranking that used to sit here was deleted
+	# after the paired tournament (docs/EXPERIMENT_TOURNAMENT.md).
 	if _recall_mode == "distance" or _recall_mode == "resonance":
 		var pool: Array = scored.duplicate()
 		pool.sort_custom(func(a, b):
@@ -2035,11 +2037,8 @@ func _select_recalls(now_speaker: String, named_now: Array) -> Array:
 		var shortlist: Array = pool.slice(0, mini(GonzoScript.CANDIDATE_SHORTLIST, pool.size()))
 		if shortlist.is_empty():
 			return []
-		var want_n := mini(GonzoScript.MAX_RECALLS_PER_PROMPT, shortlist.size())
-		if _recall_mode == "resonance":
-			shortlist.sort_custom(func(a, b): return float(a["score"]) > float(b["score"]))
 		var out: Array = []
-		for k in want_n:
+		for k in mini(GonzoScript.MAX_RECALLS_PER_PROMPT, shortlist.size()):
 			out.append(int(shortlist[k]["i"]))
 		return out
 

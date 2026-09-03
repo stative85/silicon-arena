@@ -88,3 +88,57 @@ needs
 
 The incidental near-duplicate result (4.6% for distance against 10% for
 resonance) is unplanned and stays out of this decision. Judge scores likewise.
+
+
+---
+
+# Result: resonance deleted.
+
+**127 paired opportunities**, past the pre-registered 100+ target. 12 skipped
+because both rules chose the same scar.
+
+| policy | callback conversion | mean source distance |
+|---|---:|---:|
+| **distance** | **69.3%** | 35.7 |
+| resonance | 65.4% | 28.7 |
+
+**R − D = −3.9 points.** Unsupported attribution: **0**. R won 1 of 4 batches.
+
+|R − D| <= 5 and no secondary guard favoured resonance, so the frozen rule
+returns **DELETE**.
+
+## The trajectory is the lesson
+
+```
+ 40 pairs   R - D = +5.0
+ 81 pairs   R - D = +7.4
+127 pairs   R - D = -3.9
+```
+
+At 40 the rule would have said delete, at 81 inconclusive, at 127 delete again
+— and the sign flipped along the way. Any of those could have been reported as
+the answer. The only reason this landed anywhere defensible is that the sample
+target was fixed in advance; stopping when the number looked interesting would
+have produced a different architecture on identical evidence.
+
+## What was deleted
+
+`resonance()`, `weighted_resonance()`, the four dimensions, their weights, and
+the scoring path. Roughly 120 lines.
+
+## What remains
+
+```
+old truth + provenance + decay + scarcity + cooldown + distance
+```
+
+A memory returns because it survived decay, fell out of the working context,
+and is still eligible. Whether it matters is the model's problem, not the
+scorer's — which is both simpler and closer to the layered-persistence idea
+than a similarity engine was.
+
+## Unchanged by this
+
+The memory core stands on ~530 injections across three experiments: 65–76%
+non-verbatim callback conversion, source distance well outside the working
+window, and **not one unsupported attribution, ever**.

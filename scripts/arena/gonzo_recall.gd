@@ -41,14 +41,8 @@ const MIN_RECALL_DISTANCE := 10
 ## carried the result.
 const CANDIDATE_SHORTLIST := 4
 const DECAY_HALF_LIFE_TURNS := 15.0
-const MIN_ELIGIBLE_SCORE := 0.20
+const MIN_ELIGIBLE_SCORE := 0.20   # in distance-units after decay and novelty
 
-## Interpersonal and contradiction outweigh raw word overlap on purpose: the
-## interesting recall is one where the ARGUMENT rhymes, not the nouns.
-const W_SEMANTIC := 0.30
-const W_INTERPERSONAL := 0.25
-const W_CONTRADICTION := 0.25
-const W_STRUCTURAL := 0.20
 
 const CHALLENGE_WORDS := ["disagree", "wrong", "however", "actually", "refute",
 	"reject", "mistaken", "incorrect", "flawed", "misses", "overlooks"]
@@ -95,47 +89,6 @@ static func shape_of(text: String) -> String:
 	return "assert"
 
 
-## Four independent readings of "does this old moment rhyme with now?".
-##
-## Kept separate from intensity and age, which are facts about the MEMORY
-## rather than about the match. Folding them together would make a bad recall
-## impossible to diagnose: you could not tell a strong old memory from a
-## genuinely similar moment.
-static func resonance(scar: Dictionary, now_text: String, now_speaker: String,
-		named_now: Array) -> Dictionary:
-	var scar_words := _content(str(scar.get("excerpt", "")))
-	var now_words := _content(now_text)
-	var inter := 0
-	for w in scar_words:
-		if now_words.has(w):
-			inter += 1
-	var union := scar_words.size() + now_words.size() - inter
-	var semantic := (float(inter) / float(union)) if union > 0 else 0.0
-
-	var a := str(scar.get("source_speaker", ""))
-	var b := str(scar.get("other_speaker", ""))
-	var interpersonal := 0.0
-	if now_speaker == a or now_speaker == b:
-		interpersonal += 0.5
-	if named_now.has(a) or named_now.has(b):
-		interpersonal += 0.5
-
-	var now_shape := shape_of(now_text)
-	var contradiction := 1.0 if (now_shape == "challenge"
-		and str(scar.get("shape", "")) == "challenge") else 0.0
-	var structural := 1.0 if now_shape == str(scar.get("shape", "")) else 0.0
-
-	return {"semantic": semantic, "interpersonal": interpersonal,
-		"contradiction": contradiction, "structural": structural}
-
-
-static func weighted_resonance(r: Dictionary) -> float:
-	return (W_SEMANTIC * float(r.get("semantic", 0.0))
-		+ W_INTERPERSONAL * float(r.get("interpersonal", 0.0))
-		+ W_CONTRADICTION * float(r.get("contradiction", 0.0))
-		+ W_STRUCTURAL * float(r.get("structural", 0.0)))
-
-
 ## Age discount. Halves every DECAY_HALF_LIFE_TURNS since last REINFORCEMENT --
 ## deliberately not since last recall, so remembering something cannot keep it
 ## young.
@@ -150,10 +103,28 @@ static func novelty_penalty(recall_count: int) -> float:
 	return 1.0 / (1.0 + 0.5 * float(maxi(recall_count, 0)))
 
 
+## Retrieval score. Distance, discounted by age and by how often this scar has
+## already surfaced.
+##
+## There was a four-dimensional resonance ranking here -- semantic,
+## interpersonal, contradiction and structural -- and it was DELETED after a
+## paired counterfactual tournament over 127 opportunities in which the same
+## agent, at the same moment, with the same candidate pool, answered once with
+## the resonance pick and once with the distance pick:
+##
+##     distance   69.3% callback conversion
+##     resonance  65.4%
+##
+## The pre-registered rule required resonance to earn 8 points to justify its
+## machinery. It returned -3.9 (docs/EXPERIMENT_TOURNAMENT.md).
+##
+## What remains is a plainer and stranger policy: an old scar comes back
+## because it survived decay, fell out of the working context, and is still
+## eligible. Whether it matters is the model's problem, not the scorer's.
 static func score(scar: Dictionary, now_text: String, now_speaker: String,
 		named_now: Array, turn: int) -> float:
-	var r := resonance(scar, now_text, now_speaker, named_now)
-	return (weighted_resonance(r)
+	var distance := float(maxi(turn - int(scar.get("source_turn", turn)), 0))
+	return (distance
 		* float(scar.get("intensity", 0.0))
 		* decay_factor(turn, int(scar.get("last_reinforced_turn", turn)))
 		* novelty_penalty(int(scar.get("recall_count", 0))))

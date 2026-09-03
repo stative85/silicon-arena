@@ -117,27 +117,27 @@ func _run() -> void:
 	_check("decay never reaches zero or goes negative",
 		G.decay_factor(500, 8) >= 0.0)
 
-	# --- resonance dimensions stay independent ---------------------------
-	var r := G.resonance(scar, "Granite is wrong about refusal entirely.",
-		"Reverb", ["Granite"])
-	_check("a matching argument shape registers structurally",
-		float(r["structural"]) > 0.0)
-	_check("naming the original speaker registers interpersonally",
-		float(r["interpersonal"]) > 0.0)
-	_check("a challenge answering a challenge registers as contradiction",
-		float(r["contradiction"]) > 0.0)
+	# The four resonance dimensions were deleted after the paired tournament
+	# (docs/EXPERIMENT_TOURNAMENT.md): distance converted at 69.3% against
+	# resonance's 65.4%, and the pre-registered rule required +8 to justify the
+	# machinery. What is left is distance discounted by decay and novelty.
+	_check("a more distant memory scores higher, all else equal",
+		G.score({"source_turn": 5, "intensity": 0.8, "last_reinforced_turn": 5},
+			"", "", [], 40)
+		> G.score({"source_turn": 30, "intensity": 0.8, "last_reinforced_turn": 30},
+			"", "", [], 40))
 
-	var unrelated := G.resonance(scar, "The weather in Nebraska is mild today.",
-		"Opus", [])
-	_check("an unrelated moment resonates weakly",
-		G.weighted_resonance(unrelated) < G.weighted_resonance(r),
-		"retrieval must discriminate, not fire on everything")
+	_check("a weaker memory scores lower at the same distance",
+		G.score({"source_turn": 10, "intensity": 0.2, "last_reinforced_turn": 10},
+			"", "", [], 30)
+		< G.score({"source_turn": 10, "intensity": 0.9, "last_reinforced_turn": 10},
+			"", "", [], 30))
 
-	_check("an argument can rhyme without sharing vocabulary",
-		float(G.resonance({"excerpt": "x", "shape": "challenge",
-			"source_speaker": "A", "other_speaker": "B"},
-			"You are simply wrong about that.", "C", [])["structural"]) > 0.0,
-		"structural resonance is the point of having dimensions")
+	_check("a repeatedly surfaced memory scores lower",
+		G.score({"source_turn": 10, "intensity": 0.8, "last_reinforced_turn": 10,
+			"recall_count": 6}, "", "", [], 30)
+		< G.score({"source_turn": 10, "intensity": 0.8, "last_reinforced_turn": 10,
+			"recall_count": 0}, "", "", [], 30))
 
 	# --- cooldown and bounds ---------------------------------------------
 	var just_recalled := scar.duplicate()
