@@ -59,9 +59,12 @@ const GATE_A := 25.0    ## ceiling uptake must clear this or the measure is blin
 ## measure cannot see one, it is blind for real.
 const PARAPHRASE_MIN_RATIO := 0.5   ## a paraphrase shorter than this is not one
 const PARAPHRASE_MAX_DISCARD := 25.0  ## above this the ceiling is void, not failed
-const SCRAMBLE_BOUND := 5.0
+## The scramble gate, re-specified after it voided MP2-B at 240 by firing on
+## its own expected value. Two separate questions, each testing what it names.
+const NULL_BIAS_BOUND := 1.0    ## |mean(null)| at or above this = biased estimator = VOID
+const NULL_SIGNIFICANCE := 0.95 ## observed must clear this percentile of its own null
 const SCRAMBLE_SEED := 20260903
-const SCRAMBLE_REPS := 200
+const SCRAMBLE_REPS := 2000
 
 const RESULTS_A := "user://source_probe_a.json"
 const RESULTS_A2 := "user://source_probe_a2.json"
@@ -80,8 +83,11 @@ var _skip := 0
 ## rules. Two implementations of one rule set is exactly the duplicated truth
 ## this project keeps getting bitten by, so this mode exists to check that the
 ## harness that actually runs agrees with the document that constrains it.
+var _slice := 0
 var _dry := false
 var _dry_opportunities := 0
+var _dry_da: Array[int] = []
+var _dry_db: Array[int] = []
 var _rows: Array[Dictionary] = []
 var _http: HTTPRequest
 var _results := RESULTS_B
@@ -123,6 +129,8 @@ func _run() -> void:
 			_skip = int(args[i + 1])
 		if a == "--dry":
 			_dry = true
+		if a == "--slice" and i + 1 < args.size():
+			_slice = int(args[i + 1])
 
 	if _mode == "a":
 		_arms = ["N", "P", "R"]
@@ -135,7 +143,7 @@ func _run() -> void:
 	else:
 		_arms = ["N", "S", "R"]
 		_target = TARGET_B
-		_results = RESULTS_B_DET if _temp == 0.0 else RESULTS_B
+	_results = RESULTS_B_DET if _temp == 0.0 else RESULTS_B
 
 	for i in args.size():
 		if str(args[i]) == "--reset":
@@ -152,15 +160,21 @@ func _run() -> void:
 		return
 
 	var files := _transcripts()
-	if files.size() < 20:
-		printerr("need at least 20 transcripts: some are targets, some donate shams")
+	if files.size() < (_slice + 1) * 20:
+		printerr("slice %d needs %d transcripts, found %d"
+			% [_slice, (_slice + 1) * 20, files.size()])
 		quit(2)
 		return
 
 	# Donors are a FIXED slice that is never walked as a target, so sham
 	# material can never come from a transcript being scored.
-	var targets := files.slice(0, 10)
-	var donors := files.slice(10, 20)
+	# --slice shifts BOTH windows to transcripts a previous run never touched.
+	# MP2-B's rows were read before its gate was corrected, so MP2-B2 runs on
+	# data this analysis has not seen rather than reanalysing seen data under a
+	# rule written afterwards.
+	var base := _slice * 20
+	var targets := files.slice(base, base + 10)
+	var donors := files.slice(base + 10, base + 20)
 	_build_sham_pool(donors)
 	if _sham_pool.is_empty():
 		printerr("no sham material in donor transcripts")
@@ -399,6 +413,8 @@ func _walk(turns: Array) -> void:
 
 		if _dry:
 			_dry_opportunities += 1
+			_dry_da.append(d_a.size())
+			_dry_db.append(d_b.size())
 			continue
 
 		var sys := ("You are %s in a live debate arena. Reply in two sentences, "
@@ -557,6 +573,28 @@ func _report() -> void:
 		print("  discarded, no matched sham       %d = %.1f%%"
 			% [_discarded_no_sham, 100.0 * float(_discarded_no_sham) / float(offered)])
 		print("\n  pre-registered: 0.7% discard, 100% sham availability")
+		# Is the real source as DETECTABLE as the sham source? The sham comes
+		# from another transcript, so almost none of its words are stripped as
+		# already-visible, while the real scar shares vocabulary with the
+		# conversation it came from and loses those terms to the subtraction.
+		# If |D(B)| is systematically larger, hitting 2 of it is systematically
+		# easier, and lift(R) and lift(S) are not comparable quantities.
+		_dry_da.sort()
+		_dry_db.sort()
+		var n_d := _dry_da.size()
+		var sum_a := 0
+		var sum_b := 0
+		var bigger := 0
+		for i in n_d:
+			sum_a += _dry_da[i]
+			sum_b += _dry_db[i]
+			if _dry_db[i] > _dry_da[i]:
+				bigger += 1
+		print("\n  DISTINCTIVE SET SIZES")
+		print("    |D(real)|  mean %.2f  median %d" % [float(sum_a) / float(n_d), _dry_da[n_d / 2]])
+		print("    |D(sham)|  mean %.2f  median %d" % [float(sum_b) / float(n_d), _dry_db[n_d / 2]])
+		print("    sham set larger in %.1f%% of opportunities"
+			% [100.0 * float(bigger) / float(n_d)])
 		quit(0)
 		return
 
@@ -642,15 +680,28 @@ func _report() -> void:
 	print("    verbatim copying          R %.1f%%   S %.1f%%   R-S %+.1f"
 		% [copy_r, copy_s, copy_r - copy_s])
 
-	var scram := M.scramble_worst(_rows, _arms, SCRAMBLE_SEED, SCRAMBLE_REPS)
-	print("\n  LABEL-SCRAMBLE GATE")
-	print("    worst |source lift| over %d permutations: %.1f  (bound %.1f)"
-		% [SCRAMBLE_REPS, scram, SCRAMBLE_BOUND])
+	var null_dist := M.scramble_null(_rows, _arms, SCRAMBLE_SEED, SCRAMBLE_REPS)
+	var bias := M.null_mean(null_dist)
+	var band := M.null_percentile(null_dist, NULL_SIGNIFICANCE)
+	print("
+  LABEL-SCRAMBLE, %d permutations" % SCRAMBLE_REPS)
+	print("    estimator bias    mean(null) = %+.2f   (void at |%.1f|)"
+		% [bias, NULL_BIAS_BOUND])
+	print("    label-noise band  p%d of |null| = %.1f   observed |lift| = %.1f"
+		% [int(NULL_SIGNIFICANCE * 100.0), band, absf(lift_r)])
 
-	print("\nFROZEN DECISION (docs/EXPERIMENT_SOURCE.md)")
-	if scram >= SCRAMBLE_BOUND:
-		print("  RUN IS VOID - a scramble produced a result; the estimator is broken")
+	print("
+FROZEN DECISION (docs/EXPERIMENT_SOURCE.md)")
+	# Bias is brokenness. Spread is not. Confusing the two is what voided MP2-B
+	# with a bound of 5.0 against a null whose sd was 3.95.
+	if absf(bias) >= NULL_BIAS_BOUND:
+		print("  RUN IS VOID - the estimator is biased under meaningless labels")
 		quit(1)
+		return
+	if absf(lift_r) <= band:
+		print("  INCONCLUSIVE - the lift sits inside its own label-noise band")
+		print("  a margin cleared inside that band is not a result")
+		quit(0)
 		return
 
 	var conditions_hold := (unsup_total == 0.0

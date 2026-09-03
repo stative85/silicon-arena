@@ -140,19 +140,38 @@ func _run() -> void:
 	_check("the sham arm's effect does not leak into the real arm's lift",
 		absf(M.lift(sham_effect, "R", "a", "b", "u")) < 0.001)
 
-	# ---- the scramble gate ------------------------------------------------
-	print("\n scramble gate")
+	# ---- the scramble null ------------------------------------------------
+	#
+	# An earlier version checked only two degenerate cases: identical rows,
+	# where every permutation returns exactly 0, and a planted effect strong
+	# enough that any permutation moves it. Neither exercised a REALISTIC NOISY
+	# NULL, which is the only condition the gate is ever evaluated under. A
+	# fixed bound of 5.0 shipped on the strength of those two checks and voided
+	# MP2-B at 240 opportunities by firing on its own expected value. The last
+	# check here is the one that would have caught it.
+	print("\n scramble null")
 	var arms: PackedStringArray = ["N", "S", "R"]
-	_check("a standing bias survives scrambling at zero",
-		M.scramble_worst(biased, arms, 20260903, 50) < 5.0,
+	var null_flat := M.scramble_null(biased, arms, 20260903, 200)
+	_check("a standing bias leaves the null unbiased",
+		absf(M.null_mean(null_flat)) < 1.0,
 		"identical branches cannot produce an effect under any permutation")
-	var mixed: Array = []
-	mixed.append_array(_rows([0, 0, 0, 0, 1, 0], 30))
-	mixed.append_array(_rows([0, 0, 0, 0, 0, 0], 30))
-	_check("a real effect DOES move under scrambling",
-		M.scramble_worst(mixed, arms, 20260903, 50) >= 5.0,
-		"a gate that never fires would pass a broken estimator")
+	_check("and leaves it with no spread either",
+		M.null_percentile(null_flat, 0.95) < 0.001)
 
+	# Rows that differ from each other with no true branch effect: the shape of
+	# real data under the null.
+	var noisy: Array = []
+	noisy.append_array(_rows([1, 0, 1, 0, 1, 0], 60))
+	noisy.append_array(_rows([0, 1, 0, 1, 0, 1], 60))
+	noisy.append_array(_rows([1, 1, 0, 0, 1, 0], 60))
+	noisy.append_array(_rows([0, 0, 1, 1, 0, 1], 60))
+	var null_noisy := M.scramble_null(noisy, arms, 20260903, 400)
+	_check("a realistic null is unbiased",
+		absf(M.null_mean(null_noisy)) < 1.0,
+		"bias is brokenness, and this is the check that means broken")
+	_check("a realistic null HAS SPREAD, so a small fixed bound always fires",
+		M.null_percentile(null_noisy, 0.95) > 5.0,
+		"p95 of a real null exceeded the 5.0 bound that voided MP2-B")
 	# ---- the teeth --------------------------------------------------------
 	print("\n target guard")
 	_check("one opportunity short of the target is not decidable",

@@ -187,14 +187,25 @@ static func lift(rows: Array, arm: String, own: String, foreign: String,
 	return treated - floor_
 
 
-## Shuffle which branch produced which scores, then recompute. An estimator that
-## reports an effect on scrambled labels is measuring its own arithmetic, and
-## the pre-registration voids the run rather than interpreting it.
-static func scramble_worst(rows: Array, arms: PackedStringArray, rng_seed: int,
-		reps: int) -> float:
+## The permutation null: shuffle which branch produced which scores, recompute,
+## repeat. Returns every value so the caller can ask its own questions of the
+## distribution instead of being handed one summary.
+##
+## A FIRST VERSION OF THIS RETURNED ONLY THE WORST VALUE and the gate compared
+## it against a fixed bound of 5.0. That voided MP2-B at 240 opportunities. The
+## null's spread turned out to be sd 3.95, so the expected maximum of 200 draws
+## is 11.2 and the run produced 11.3 -- the gate fired on its own expected
+## value, and no dataset could ever have passed it. That is rule 2, broken by
+## the guard written to enforce rule 2: a bound was set on a quantity whose
+## spread had never been measured.
+##
+## Sample noise is not brokenness. The two are now asked separately -- see
+## `null_mean` for bias and `null_percentile` for significance.
+static func scramble_null(rows: Array, arms: PackedStringArray, rng_seed: int,
+		reps: int) -> Array:
 	var rng := RandomNumberGenerator.new()
 	rng.seed = rng_seed
-	var worst := 0.0
+	var out: Array = []
 	for _rep in reps:
 		var shuffled: Array = []
 		for r in rows:
@@ -208,10 +219,35 @@ static func scramble_worst(rows: Array, arms: PackedStringArray, rng_seed: int,
 			for k in arms.size():
 				s[arms[k]] = r["scored"][names[k]]
 			shuffled.append({"scored": s})
-		var l := absf(lift(shuffled, "R", "a", "b", "u"))
-		if l > worst:
-			worst = l
-	return worst
+		out.append(lift(shuffled, "R", "a", "b", "u"))
+	return out
+
+
+## IS THE ESTIMATOR BIASED? With meaningless labels a crossover that cancels
+## correctly has no preferred direction, so this is ~0. It is the question the
+## old bound was reaching for, and the only one that means "broken".
+static func null_mean(null_dist: Array) -> float:
+	if null_dist.is_empty():
+		return 0.0
+	var t := 0.0
+	for v in null_dist:
+		t += float(v)
+	return t / float(null_dist.size())
+
+
+## IS THE OBSERVED LIFT DISTINGUISHABLE FROM LABEL NOISE? The percentile of
+## |observed| within the null of |lift|. Self-calibrating: it scales with N and
+## with the base rates actually observed, so unlike a hand-picked bound it
+## cannot be set wrong.
+static func null_percentile(null_dist: Array, q: float) -> float:
+	if null_dist.is_empty():
+		return 0.0
+	var a: Array = []
+	for v in null_dist:
+		a.append(absf(float(v)))
+	a.sort()
+	var i := int(float(a.size()) * q) - 1
+	return float(a[clampi(i, 0, a.size() - 1)])
 
 
 ## THE TEETH. No argument, no flag, no environment variable reaches past this.

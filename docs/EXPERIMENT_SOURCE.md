@@ -494,3 +494,142 @@ the instrument, the arms here are N/P2/R rather than N/S/R, and there is no sham
 verdict off it would be the fourth early read in four experiments.
 
 MP2-B runs to 240 with the S branch present, and its bars are untouched.
+
+---
+
+# Result: MP2-B is VOID at 240 — the scramble gate was mis-specified
+
+The run completed its target. The label-scramble gate then voided it:
+
+```
+  worst |source lift| over 200 permutations: 11.3   (bound was 5.0)
+  RUN IS VOID - a scramble produced a result; the estimator is broken
+```
+
+**The run is void and its numbers are not a verdict.** That consequence is
+frozen and it is not being negotiated. What follows is the diagnosis.
+
+## The gate could not have passed, on any dataset
+
+The permutation null was measured after the fact, over 2000 shuffles of the
+branch labels on the 240 recorded rows:
+
+```
+  permutation null of source_lift(R)
+    mean       -0.05        <- unbiased, as designed
+    sd          3.95
+  |lift| under the null
+    p50         2.9
+    p90         6.3
+    p95         7.9
+    p99        10.0
+    max of 2000 14.2
+  expected max of 200 draws (p99.5)  11.2
+  THE FROZEN BOUND WAS 5.0
+```
+
+The gate compared a **maximum over 200 draws** against a bound meant for a
+typical value. The expected maximum is 11.2 and the run produced 11.3. It fired
+on its own expected value. There is no dataset on which that gate passes.
+
+**This is rule 2, broken by the guard written to enforce discipline.** "You
+cannot set a useful threshold for a metric whose noise floor you have not
+measured." The scramble bound of 5.0 was set without measuring the scramble
+distribution's spread. The same document that quotes that rule at the reader
+violated it two sections later.
+
+## Why the self-test did not catch it
+
+Both scramble checks used degenerate data:
+
+* 40 identical rows, where every permutation returns exactly 0;
+* a planted effect strong enough that any permutation moves it past 5.
+
+Neither exercised a **realistic noisy null**, which is the only condition under
+which the bound was ever going to be evaluated. The test proved the gate fires
+on extremes and stays silent on constants. It never asked what the gate does on
+data that looks like data.
+
+## A second hypothesis, measured and rejected
+
+The suspicion was that the sham source is structurally easier to detect: it
+comes from another transcript, so few of its words are stripped as
+already-visible, while the real scar shares vocabulary with its own conversation
+and loses those terms to the subtraction. If so, `lift(R)` and `lift(S)` would
+not be comparable, which matters because the decision tree compares them.
+
+Measured on 425 real opportunities through the production code path:
+
+```
+  |D(real)|  mean 8.49  median 9
+  |D(sham)|  mean 8.48  median 8
+  sham set larger in 13.6% of opportunities
+```
+
+**No asymmetry.** The ±40-character excerpt matching already equalises the
+sets. The hypothesis was wrong and no fix is warranted. Recorded because a
+suspicion that was checked and dropped is worth as much as one that was checked
+and confirmed.
+
+So there is exactly one defect: the gate.
+
+---
+
+# Amendment: MP2-B2, a scramble gate that is a test rather than a bound
+
+**Written and committed before MP2-B2 was run.** `TARGET_B` stays 240. The
+uptake definition, threshold, discard rule, sham matching, decision tree and
+every margin in it are untouched. Only the scramble gate changes, and the run
+happens on data this analysis has never seen.
+
+## The gate becomes a permutation test
+
+The old gate asked "is the null small?", which confuses sample noise with a
+broken estimator. Noise is not brokenness. Two questions replace it, and each
+tests the thing it names:
+
+**1. IS THE ESTIMATOR BIASED?** The permutation null's *mean* must be near zero.
+A crossover that cancels correctly has no preferred direction when the labels
+are meaningless.
+
+```
+  |mean(null)| >= 1.0 point   ->  RUN IS VOID, the estimator is biased
+```
+
+That is the check the old gate was reaching for. On the void run this value was
+**-0.05**, so the estimator itself was never the problem.
+
+**2. IS THE OBSERVED LIFT DISTINGUISHABLE FROM LABEL NOISE?** The observed
+`|source_lift(R)|` must exceed the 95th percentile of its own permutation null,
+over 2000 shuffles.
+
+```
+  |observed| <= p95(null)   ->  INCONCLUSIVE, regardless of the margin
+```
+
+This is self-calibrating: it needs no bound guessed in advance, it scales with
+N and with the base rates actually observed, and it cannot be set wrong the way
+5.0 was. A lift that clears +10 but sits inside its own label-noise band is not
+a result, and under this rule it cannot become one.
+
+Both are computed before the decision tree is consulted. Clearing them is
+necessary, never sufficient — the frozen margins still decide.
+
+## The re-run uses transcripts this analysis has not seen
+
+The void run's rows have been read. Applying a rule written afterwards to data
+already seen is the exact contamination this project exists to avoid, however
+principled the correction. So MP2-B2 draws from a **fresh slice**: targets and
+sham donors both shifted to transcripts not used in the void run. 217 are
+available and 20 were consumed.
+
+The void run's data stays on disk, unmodified, and is not reanalysed under the
+new gate.
+
+## What is honestly compromised, and stated in advance
+
+The void run's numbers are in this document's history and in my context. A
+second run's result will inevitably be read against them. That cannot be undone
+by procedure, so it is recorded instead: **MP2-B2 is not a blind replication,
+and if its numbers land close to the void run's, that agreement is weaker
+evidence than it will look.** The margins do not move to accommodate that.
