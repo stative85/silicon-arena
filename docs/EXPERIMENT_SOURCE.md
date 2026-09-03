@@ -415,3 +415,28 @@ paraphrase) or if it is shorter than half the excerpt's word count. The discard
 rate is reported. **If more than 25% of paraphrases are discarded, the ceiling
 is again not a ceiling and the gate is void rather than failed** — a distinction
 MP2-A had no way to draw about itself.
+
+## A caveat on the paraphrase ceiling, recorded before its result
+
+Written before MP2-A2 returned, so it cannot be a reaction to the number.
+
+A paraphrase deliberately replaces the source's words. The uptake measure counts
+shared content terms, so a *good* paraphrase — one that restates the excerpt in
+genuinely different vocabulary — will score low on a measure that is working
+exactly as specified. This makes the ceiling **conservative and asymmetric**:
+
+* **Clearing +25 is strong evidence.** The measure detects source-derived
+  material even when the wording was deliberately changed.
+* **Failing it is weaker evidence than it looks.** It would establish that the
+  measure cannot see *semantic* reuse, which is a real and disqualifying
+  limitation given that MP2-B is meant to ask about material "used in a
+  semantically appropriate way" — but it would not show the measure fails at
+  what it literally counts, which is lexical traceability.
+
+The frozen consequence is unchanged either way: below +25, MP2-B does not run
+and the uptake definition is what gets replaced. This note fixes in advance what
+that failure would and would not mean, so the reading cannot drift afterwards.
+
+An arena reply that genuinely draws on a memory has no incentive to avoid its
+vocabulary, and would plausibly score higher than a restatement that is trying
+to avoid it. That intuition is not evidence and does not soften the bar.
