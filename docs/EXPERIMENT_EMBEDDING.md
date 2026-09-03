@@ -150,3 +150,50 @@ who never installs the embedder gets working Gonzo memory.
 ## Not part of the decision
 
 Judge scores. The incidental repetition result from EXPERIMENT_DISTANCE.
+
+
+---
+
+# Pre-run measurement: the embedder violates the frozen VRAM line
+
+Taken **before any conversion data was collected.**
+
+`nomic-embed-text-v1.5` q4_k_m, loaded with `--gpu off --identifier gonzo-embed`:
+
+| | measured | budget | |
+|---|---:|---:|---|
+| dimension | 768 | 768 | ok |
+| median embed latency | **18 ms** | <= 150 ms | ok |
+| discrimination | 0.781 related / 0.387 unrelated | — | works |
+| **VRAM** | **+299 MiB** | **0** | **VIOLATION** |
+
+Reproducible: unload → 4473 MiB, load → 4772 MiB, twice. `--gpu off` does not
+produce a zero-VRAM load on this runtime.
+
+The model itself is fine. It is fast, it is the right dimension, and it
+separates related from unrelated scar text cleanly.
+
+## Why this stops the experiment before it starts
+
+Guard 6 requires runtime cost inside the frozen budget, and the budget says
+**zero VRAM**, on the reasoning that an 84 MB memory router must never evict a
+debater from an 8 GB card. AUTO plans against 6.0 GB of that card; 299 MiB is
+about 5% of the total and can change which roster fits.
+
+With guard 6 failing, **KEEP is unreachable** no matter what conversion
+returns. Running 120 paired opportunities could only produce REJECT or
+INCONCLUSIVE.
+
+## The legitimate moment to amend, and the illegitimate one
+
+**No outcome data has been collected.** Amending a budget line now, with the
+measurement disclosed, is legitimate — the number was set as a guess about what
+`--gpu off` would do, and that guess was wrong about the runtime, not about the
+result.
+
+Amending it *after* seeing conversion numbers would not be legitimate, and this
+document exists so that distinction cannot be blurred later.
+
+The decision belongs to the operator: either the VRAM line is amended to a
+measured allowance before the run, or the embedding router is rejected on
+budget without spending the compute.
