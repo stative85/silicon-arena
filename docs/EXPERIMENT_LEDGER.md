@@ -30,7 +30,9 @@ the runtime does not belong here and should not have been run.
 
 | **Q1** | Does resonance-selected recall of old canonical material beat a matched sham? | `f937c74` | conversion Q1 58.9% vs sham 75.7% vs none 0%; distance 11.7 turns; **0** fabricated attributions in ~84 injections | **REJECTED** — recall produces real long-range callbacks; the resonance scoring is not why, and the sham beat it |
 
-**Shipped: 5. Rejected: 10.**
+| **G1/G2** | Does distance alone match resonance when exposure is matched? | `2714e4c` | conversion 68.7% vs 73.1% — a 0.5 sd gap; distance matched 15.8 vs 15.5; 0 fabricated attributions | **NO DELETION** — distance not shown sufficient, resonance not shown to help; my rule lacked a noise band |
+
+**Shipped: 5. Rejected: 10. Undecided: 1.**
 
 ### The pattern across everything rejected
 

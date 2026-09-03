@@ -78,3 +78,80 @@ Old truth, decay, provenance, scarcity. No relevance engine.
 Judge scores. A stochastic variant — a weighted draw among survivors rather
 than deterministic top-1 — is explicitly **not** in this experiment and is not
 built.
+
+
+---
+
+# Result: resonance is not deleted, and it is not vindicated either.
+
+4 runs per arm, 60 speeches, frozen at `2714e4c`.
+
+| arm | injected | callbacks | **conversion** | distance | unsupported |
+|---|---:|---:|---:|---:|---:|
+| G0 none | 0 | 0 | — | — | 0 |
+| **G1 distance** | 40.75 | 27.75 | **68.7%** | 15.8 | **0** |
+| **G2 resonance** | 36.75 | 27.25 | **73.1%** | 15.5 | **0** |
+
+Source-distance profiles matched: 15.8 against 15.5. The confound from
+EXPERIMENT_RECALL is gone.
+
+| check | value | verdict |
+|---|---|---|
+| G1 >= G2 on conversion | 68.7% vs 73.1% | **FAIL** |
+| unsupported attribution == 0 | 0.00 | OK |
+| all other guards | — | OK |
+
+**The resonance machinery is not deleted**, because the rule said delete only
+if distance won and it did not.
+
+## But this does not show resonance works
+
+Per-run conversion:
+
+```
+G1 distance   58  65  75  78     mean 69.0   sd 8.0
+G2 resonance  84  71  77  61     mean 73.2   sd 8.4
+```
+
+The difference is **+4.2 points against a run-to-run standard deviation of
+8.4 — half a standard deviation**, with the ranges almost entirely overlapping
+and each arm winning two of four runs. At four runs per arm the standard error
+is about 4.2, so two standard errors is 8.4: the observed gap is inside it.
+
+The honest statement is that **distance alone was not shown to be sufficient**,
+not that resonance was shown to help. The evidence is weak in both directions
+and the rule happened to be directional.
+
+## A flaw in my own pre-registration
+
+I wrote the decision as `G1 >= G2` with **no noise band**. That let a
+half-standard-deviation difference decide whether ~120 lines of scoring
+machinery lived or died.
+
+This is the same error as the guards that fired at random earlier: a threshold
+set without reference to the spread of the thing it measures
+(`CONTRIBUTING.md` rule 2, which I wrote). A better rule would have been "delete
+if G1 is within one standard error of G2", which on these numbers would have
+deleted it.
+
+I am **not** applying that rule now. Rewriting a decision threshold after seeing
+the data is precisely what the pre-registration exists to prevent, and doing it
+here — where it would produce the outcome I had already argued for — would be
+the worst possible time. The machinery stays until an experiment designed with a
+noise band says otherwise.
+
+## What replicated, strongly
+
+Across ~310 injections in this experiment plus ~84 in EXPERIMENT_RECALL:
+
+* **conversion 69–73%** — sparse recall of genuinely old canonical material
+  produces non-verbatim callbacks most of the time it is surfaced;
+* **mean distance ~15.5 turns**, well outside the visible window;
+* **zero fabricated attributions**, in every arm, in every run.
+
+The provenance teeth have now held across roughly 400 injections without a
+single unsupported quote.
+
+One incidental result worth noting: distance-based recall **halved repetition**
+against no recall at all (4.6% near-duplicate versus 10.0%). Neither arm was
+predicted to do that and it is reported without an explanation.
