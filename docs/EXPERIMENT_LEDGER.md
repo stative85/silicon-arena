@@ -28,7 +28,7 @@ the runtime does not belong here and should not have been run.
 | **PR1** | Does uneven presentation rhythm work without costing throughput? | `5f9c54d` | 25 distinct dwells vs 1, applied mean exactly 1.000, 30 turns vs 29 baseline | **SHIPPED** — watchability itself needs a human |
 | **T1** | Does a four-phase topic arc give the debate trajectory? | `ca67213` | pivot shifted vocabulary +0.013 (bar 0.10); CLOSE resolution fell 26.9% → 17.8%; opener uniqueness 0.80 → 0.64 | **REJECTED** — cosmetic, and instructing a conclusion made conclusions worse |
 
-| **Q1** | Does resonance-selected recall of old canonical material beat a matched sham? | `f937c74` | conversion Q1 58.9% vs sham 75.7% vs none 0%; distance 11.7 turns; **0** fabricated attributions in ~84 injections | **REJECTED** — recall produces real long-range callbacks; the resonance scoring is not why, and the sham beat it |
+| **Q1** | Does resonance-selected recall of old canonical material beat a matched sham? | `f937c74` | conversion Q1 58.9% vs sham 75.7% vs none 0%; distance 11.7 turns; **0** fabricated attributions in ~84 injections | **REJECTED** — the sham beat it, and the resonance scoring is not why. **Interpretation corrected (MP1):** this row originally read "recall produces real long-range callbacks". That claim is not supported — a sham outscored the real memory here (75.7% vs 58.9%) and again in MP1, and the metric behind all three numbers is suspect. The "none 0%" arm is 0 by construction, not evidence. |
 
 | **G1/G2** | Does distance alone match resonance when exposure is matched? | `2714e4c` | conversion 68.7% vs 73.1% — a 0.5 sd gap | **SUPERSEDED by T1** — the arena design manufactured its own variance; the paired tournament answered it properly |
 
