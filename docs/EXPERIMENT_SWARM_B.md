@@ -330,3 +330,84 @@ costs the treatment the benefit of the doubt rather than granting it.
 Recorded because the reverse would not be acceptable, and because "we shortened
 it for time" is exactly the kind of quiet change that later looks like tuning if
 it is not written down before the numbers exist.
+
+---
+
+# Correction: temperature 0 does NOT close the confound
+
+**Found by the protocol integrity check, before any null was measured and before
+any treatment ran.** The check failed on its first execution and again after two
+repairs, which is the entire reason it exists.
+
+## What was claimed, and why it was wrong
+
+The pre-registration said greedy decoding removes the stochastic stream, so an
+arm can only differ by producing different prompts. That rested on an MP2
+measurement: two identical requests at temperature 0 returned identical text.
+
+Two calls on a short prompt was not enough evidence for a 3,300-generation
+experiment.
+
+## What is actually true, measured
+
+```
+  ten consecutive identical requests, warm      1 unique hash out of 10
+  novel prompt, after 20 intervening requests   identical, 4 of 4
+  first inference after a cold model load       DIFFERS from every warm one
+  same prompt, same preceding request type,
+    sampled four times across a longer session  f0dbb4c3, f0dbb4c3,
+                                                a3f046b3, a3f046b3
+```
+
+That last line is the finding. The output changed **partway through the
+sequence**, not according to what preceded it — two stable values, each
+repeated, with a boundary between them. It is not prompt-cache reuse: a
+prefix-sharing predecessor and an unrelated one produced the same answer as each
+other, both before and after the change.
+
+> **Temperature 0 on this stack is deterministic in bursts and drifts across
+> longer request sequences.** Greedy decoding removes sampling. It does not make
+> a 30-turn match reproducible.
+
+Two other defects were found on the way and are fixed: the first inference after
+a cold load is never reproducible (every recorded turn now runs behind a
+discarded warm-up generation), and a timed-out request left its one-shot handler
+connected so it could fire during the next call and deliver the previous body —
+that one was mine, and removing it made speaker sequences identical across all
+three arms.
+
+## What this does to the design
+
+**Byte-identical transcripts are not achievable here, at any temperature.** The
+integrity check cannot require them and will not be relaxed into pretending
+otherwise. It now requires what the experiment actually depends on:
+
+```
+  REQUIRED across 3 repeats per arm    identical speaker sequence
+                                       identical failure codes and counts
+  MEASURED AND REPORTED                text divergence rate
+                                       bid-flip rate under that drift
+```
+
+`bid-flip rate` is new and it is the number that matters: how often the text
+drift changes which agent the resolver selects. Drift that never flips a bid is
+noise in the prose; drift that flips bids is noise in the treatment.
+
+## The confound is not closed, and the null is why it survives anyway
+
+The honest statement is that drift is an uncontrolled source of variation and
+SWARM-B cannot claim a clean causal attribution on the strength of temperature 0.
+
+What rescues the comparison is the control, not the decoder. **The sham-vs-sham
+null is measured by re-running the same machinery under the same drift**, so
+drift-induced trajectory variance is *inside* `p90(null)` rather than confounding
+the treatment against it. The bar is three times that floor, which now includes
+the drift it was previously assumed to have eliminated.
+
+So the design survives — for a different reason than the one written down, and
+the original reason was wrong. A larger null is the price, and an
+under-powered null already errs strict, so both errors point the same safe way.
+
+If the bid-flip rate turns out to be substantial, that reasoning fails too, and
+SWARM-B needs a different instrument rather than a wider bar. That is measured
+next, before the null.
