@@ -574,12 +574,29 @@ referee.
 
 ## The honest reading, and its limit
 
-Locality is doing real work: it holds allocation nearly as even as round-robin
-and keeps cage dependence at zero, while the same machinery with the mapping
-destroyed collapses into a near-monopoly.
+Stated as events rather than as an interpretation, because the interpretation is
+the part that would be doing the arguing:
 
-That is **not** what the frozen test measured, and it does not become the
-verdict. The primary statistic missed its bar and the answer is inconclusive.
+> **Destroying the mapping between local state and agent identity produced a
+> large allocation pathology, while intact locality completed all 1,800
+> allocations without centralized fallback. The pre-registered primary test
+> remained inconclusive because its 9-turn bar exceeded the observed 6-turn
+> difference.**
+
+An earlier draft of this section said "locality is doing real work". That is
+supported mechanically and it is not what the frozen test measured, and the
+distance between those two things is exactly where a result gets quietly
+upgraded. The sentence above says what happened and what did not clear, and
+nothing else.
+
+The architecture claim that *is* clean, because it is a property of the code
+rather than of the outcome:
+
+> **The substrate stayed semantically blind for all 1,800 allocations.** The
+> resolver received `{agent_id, eligible, bid}` and nothing else, fairness
+> assistance was off, and the fallback never woke. Whatever the schedule was
+> worth, it was produced without the arena being told why anyone wanted the
+> slot. The primary statistic missed its bar and the answer is inconclusive.
 
 Two further observations, recorded as pointers rather than evidence:
 
