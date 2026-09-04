@@ -77,6 +77,7 @@ call :check "scripts/arena/presentation_selftest.gd"      "presentation rhythm" 
 call :check "scripts/arena/topic_arc_selftest.gd"         "topic arc"           "TOPIC ARC OK"
 call :check "scripts/arena/gonzo_recall_selftest.gd"      "gonzo recall"        "GONZO RECALL OK"
 call :check "tools/source_measure_selftest.gd"            "source measure"      "SOURCE MEASURE OK"
+call :check "scripts/arena/swarm_resolver_selftest.gd"    "swarm resolver"      "SWARM RESOLVER OK"
 call :check "tools/adversarial.gd"                        "adversarial pass"    "ADVERSARIAL OK"
 call :check "tools/offline_selftest.gd"                   "offline behaviour"   "OFFLINE OK"
 
@@ -84,6 +85,7 @@ REM ---- documentation and workflow linting ---------------------------------
 call :pycheck "tools/lint_docs.py"       "documentation lint"
 call :pycheck "tools/lint_workflows.py"  "workflow lint"
 call :pycheck "tools/lint_private_paths.py" "private path lint"
+call :pycheck "tools/lint_locality.py"    "swarm locality"
 call :pycheck "tools/lint_templates.py"     "template coverage"
 call :pycheck "tools/lint_exits.py"       "silent failure exits"
 

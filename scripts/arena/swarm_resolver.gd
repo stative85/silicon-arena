@@ -1,0 +1,93 @@
+extends RefCounted
+class_name SwarmResolver
+
+## Arbitration for one scarce speaking slot, and the smallest thing in this
+## repository on purpose.
+##
+## Pre-registered in docs/EXPERIMENT_SWARM.md at 85d34f2, before this file
+## existed.
+##
+## THE POINT IS WHAT THIS FILE CANNOT SEE. A centralized scorer over a global
+## agent-feature table is not a swarm -- setting its weight to zero starves
+## nothing, because the scheduler is still at full strength with different
+## arithmetic. Starving the cage means removing semantic knowledge from the
+## controller, not lowering a coefficient.
+##
+## So the entire input is three keys:
+##
+##     resolve([{agent_id, eligible, bid}, ...]) -> {ok, agent_id | code}
+##
+## An agent decides locally how much it wants the slot. This decides who gets
+## it. It cannot know why anyone wants it, and there is no field through which
+## it could be told.
+##
+## A SEMANTIC FIELD IS A HARD FAILURE, NOT AN IGNORED ONE. Silently dropping
+## unknown keys would let `direct_address` sit in the payload for months while
+## everyone believed the boundary held. Adding one breaks the run loudly, and
+## an import lint (tools/lint_locality.py) fails if this file can even reach a
+## module that carries history, memory or turn content.
+##
+## Deterministic: argmax, with agent_id as the tiebreak. Stochastic contention
+## is a later condition and would destroy the paired design v0.1 relies on.
+
+## The whole vocabulary. Anything else is malformed.
+const ALLOWED_KEYS := ["agent_id", "eligible", "bid"]
+
+## Failure codes. These describe RESOURCE state, never motive.
+const OK := "OK"
+const NO_BIDS := "NO_BIDS"
+const NO_ELIGIBLE_BIDS := "NO_ELIGIBLE_BIDS"
+const MALFORMED_BID := "MALFORMED_BID"
+
+
+## Returns {"ok": true, "agent_id": String} or {"ok": false, "code": String}.
+##
+## Staleness is not visible here and is not meant to be: a bid carries no
+## timestamp because a timestamp is one more thing the substrate could learn to
+## reason about. Whoever collects bids passes only the current opportunity's,
+## and reports stale ones itself.
+static func resolve(bids: Array) -> Dictionary:
+	if bids.is_empty():
+		return {"ok": false, "code": NO_BIDS}
+
+	var best_id := ""
+	var best_bid := -1.0
+	var eligible_seen := false
+
+	for entry in bids:
+		if typeof(entry) != TYPE_DICTIONARY:
+			return {"ok": false, "code": MALFORMED_BID}
+
+		# The boundary. Not a filter -- a refusal.
+		for k in entry.keys():
+			if not ALLOWED_KEYS.has(str(k)):
+				return {"ok": false, "code": MALFORMED_BID}
+		for k in ALLOWED_KEYS:
+			if not entry.has(k):
+				return {"ok": false, "code": MALFORMED_BID}
+
+		var id := str(entry["agent_id"])
+		if id.strip_edges() == "":
+			return {"ok": false, "code": MALFORMED_BID}
+		if typeof(entry["eligible"]) != TYPE_BOOL:
+			return {"ok": false, "code": MALFORMED_BID}
+		if typeof(entry["bid"]) != TYPE_FLOAT and typeof(entry["bid"]) != TYPE_INT:
+			return {"ok": false, "code": MALFORMED_BID}
+
+		var b := float(entry["bid"])
+		if not is_finite(b) or b < 0.0 or b > 1.0:
+			return {"ok": false, "code": MALFORMED_BID}
+
+		if not bool(entry["eligible"]):
+			continue
+		eligible_seen = true
+
+		# Ties break on agent_id so the result cannot depend on array order,
+		# which is upstream state this file has no business inheriting.
+		if b > best_bid or (b == best_bid and id < best_id):
+			best_bid = b
+			best_id = id
+
+	if not eligible_seen:
+		return {"ok": false, "code": NO_ELIGIBLE_BIDS}
+	return {"ok": true, "agent_id": best_id}
