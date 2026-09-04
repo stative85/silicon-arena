@@ -269,3 +269,64 @@ temperature-0 system*. So the result reads:
 The 0.8 arm can show whether the qualitative dynamics survive in the deployed
 regime. It cannot carry the causal attribution, because the confound this
 amendment closes is live in it.
+
+---
+
+# Amendment: protocol integrity, what the null actually is, and the budget
+
+**Before the harness runs anything.** No match, no floor, no treatment.
+
+## 1. End-to-end determinism is checked before the null is interpreted
+
+Temperature 0 was measured deterministic during MP2, but SWARM-B adds bid
+generation, derangement, arbitration, state advancement and history updates on
+top of it. Determinism of the decoder is not determinism of the harness.
+
+So, before any null is read: **run one identical `(arm, match_seed, sham_seed)`
+twice and require byte-identical mechanical output** — the same speaker
+sequence, the same bids and abstentions, the same failure codes, the same
+transcript checksum.
+
+This is **not a decision gate and has no bar**. It is a protocol integrity
+check. If it fails, the run stops and nothing downstream is interpreted,
+because a null measured on a non-reproducible harness is measuring the harness.
+
+## 2. What the sham null is, named precisely
+
+It is **not sampling noise.** Temperature 0 removed decoding randomness
+entirely, so nothing here fluctuates the way a sampled experiment does.
+
+> The sham null is **trajectory variance caused solely by destroying the mapping
+> between local state and agent identity in different valid ways.**
+
+Ten derangements are ten equally legitimate ways to break locality, and they
+produce different histories, which produce different local views, which produce
+different bids. That divergence is the null. Writing "null spread" without this
+sentence invites a later reader to assume sampling noise and reason about it
+wrongly, which is how the +7.6 verbatim gap nearly became an effect size.
+
+## 3. The frozen N does not fit the machine, and the fix errs strict
+
+The original N — 20 match-triples at roughly 60 turns — is about 3,600
+generations. The null on top of it, at 10 seeds by 20 matches, is 12,000 more.
+At the throughput measured during MP2 that is over a day of continuous
+generation for one experiment, and it would run once with no room to repeat it.
+
+Revised, before any data:
+
+```
+  match length        30 turns    (a five-agent roster rotates in five)
+  sham null           10 derangement seeds x 5 matches   = 1,500 generations
+  treatment           20 match-triples x 3 arms          = 1,800 generations
+                                                    total ~3,300, ~8 hours
+```
+
+**The null is deliberately the under-powered half, and that direction is
+safe.** Fewer matches per sham seed makes each seed's median longest-silence
+noisier, which *widens* the pairwise-difference distribution, which *raises*
+`p90(null)`, which makes the bar **harder** to clear. An under-powered null
+costs the treatment the benefit of the doubt rather than granting it.
+
+Recorded because the reverse would not be acceptable, and because "we shortened
+it for time" is exactly the kind of quiet change that later looks like tuning if
+it is not written down before the numbers exist.
