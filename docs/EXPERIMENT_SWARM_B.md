@@ -181,3 +181,91 @@ went unresolved twice.
 
 The cage does not break. It stays available as the fallback, and the number that
 decides whether it is still needed is how often it has to wake.
+
+---
+
+# Amendment: the derangement, the zero-floor hole, and the temp-0 scope
+
+**Written before the sham floor was measured and before any match has been run.**
+No outcome of any kind exists. This is instrument repair.
+
+## 1. The sham must be a derangement, not a permutation
+
+A permutation can have fixed points. With five agents, a meaningful share of
+opportunities would hand at least one agent **its own** tuple back, preserving
+exactly the locality the control exists to destroy. The placebo would be
+contaminated with treatment, in proportion to how often that happens, and
+nothing in the output would say so.
+
+Whenever two or more eligible agents are present, the sham applies a
+**derangement**: no eligible agent may receive its own `(submits, bid)` tuple.
+With exactly one eligible agent no derangement exists, and that opportunity is
+recorded as `SHAM_UNDERANGEABLE` and excluded from the sham arm rather than
+silently passed through unshuffled.
+
+## 2. `3x floor` collapses when the floor is zero
+
+The frozen text said the bar is three times the measured sham-vs-sham floor.
+That has a hole with a familiar shape:
+
+```
+  measured floor = 0   ->   bar = 3 x 0 = 0   ->   any difference clears it
+```
+
+Every mechanism in SWARM-B is deterministic — greedy decoding, argmax
+arbitration, seeded derangements — so an exact-zero null is **more** plausible
+here than in a sampled experiment, not less. A bar that cannot fail is not
+evidence, and this project has already voided one run over a threshold set
+against a null it had not characterised.
+
+**The floor is a distribution, and the bar has an absolute minimum:**
+
+1. Run sham against sham across **at least 10 frozen permutation seeds**.
+2. Take every pairwise `|difference|` in median longest-silence between those
+   runs. That set is the null.
+3. `bar = max(3 x p90(null), 3 turns)`
+
+The 3-turn minimum is a practical margin, not a statistical one: a five-agent
+roster rotates in five turns, so a difference under three turns is less than one
+rotation and is not a dynamical difference worth shipping a subsystem for. It is
+fixed now, before the null exists, precisely so it cannot be chosen once the
+null is known.
+
+## 3. A degenerate sham null VOIDS the run
+
+If sham-vs-sham produces **zero spread** across ten different derangement seeds,
+the control is not perturbing the system at all. That is not a tight floor, it
+is a broken placebo — the permutation would be failing to change anything it was
+built to change, and comparing the treatment against it would be meaningless.
+
+```
+  p90(null) == 0 and max(null) == 0   ->   RUN IS VOID, the sham is not a control
+```
+
+Rule 6: a positive control must be able to detect its own failure. This is the
+same requirement applied to a negative one, and MP2-A is why it is here — that
+gate could not tell "the measure is blind" from "the ceiling never rose", and it
+cost a full run to find out.
+
+## 4. What temperature 0 does and does not buy
+
+Greedy decoding removes the stochastic stream, so no arm can differ because the
+scheduler reallocated random draws. That confound is closed.
+
+It does not make this a measurement of the deployed arena, and the reason is
+sharper than "different regime": **reply content feeds the bid path.**
+`named_recently` is computed by reading what other agents said. If greedy
+decoding changes how often agents address each other by name — and MP2 showed
+greedy decoding changes reply character substantially — then bids and
+abstentions change with it.
+
+That is legitimate treatment propagation, and it propagates *through the
+temperature-0 system*. So the result reads:
+
+> **SWARM-B is a causal test of scheduling dynamics under deterministic
+> decoding.** It is not a direct measurement of the live 0.8 arena, and this
+> qualification travels with every number it produces, mechanical ones included.
+
+The 0.8 arm can show whether the qualitative dynamics survive in the deployed
+regime. It cannot carry the causal attribution, because the confound this
+amendment closes is live in it.
