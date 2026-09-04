@@ -103,7 +103,7 @@ VERIFY OK
 
 CI runs the same thing on Linux for every push and pull request.
 
-### Seven rules that are not negotiable
+### Eight rules that are not negotiable
 
 **1. A new test must be shown to fail.** Reintroduce the defect it guards,
 watch it go red, restore, watch it go green. A suite that can only pass is not
@@ -193,6 +193,23 @@ So: an experiment names its corpus, the corpus is arena-generated, and any
 outside data enters only through a pre-registration that says which data, why,
 and what it could confound. Personalization research lives in its own tree with
 its own conclusions and does not lend evidence across the line.
+
+**8. A control is not validated because it appears conservative.** Its own
+failure modes must be measured. Instruments that simplify, strengthen, or clean
+up the result deserve adversarial validation first.
+
+Seven instruments failed on this project in a single day and every one of them
+failed toward a *cleaner* answer, never a messier one: a ceiling arm that could
+not rise, a scramble bound that could not pass, a decision bar that collapsed to
+zero, a lexicographic tiebreak that quietly favoured one model family, a
+viability bar whose failure event was structurally unreachable, a cold-start
+artifact that rewrote whole trajectories from one token, and a determinism claim
+that held at two calls and broke at thirty.
+
+The rule does not name a cause, because the causes differed — a bad assumption,
+an unmeasured null, a plausible-looking neutral choice that was not neutral, an
+under-evidenced generalisation. What they share is a direction. An instrument
+that makes the answer tidier is the one to attack first, whatever produced it.
 
 Never weaken these without evidence:
 

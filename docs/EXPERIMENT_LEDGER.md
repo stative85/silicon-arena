@@ -48,7 +48,9 @@ the runtime does not belong here and should not have been run.
 
 | **SWARM-V** | Can locally-informed agents allocate the speaking slot with the arena blind to why? | `85d34f2` | 400 opportunities, no generation: 100% valid allocation with no fairness machinery; agreement with round-robin 85.8% against a 35.0% random placebo; concentration 30.4% vs placebo 30.4%; longest unproposed run 44 vs placebo 14 | **VIABLE AND UNCONVINCING** — the bar is met, and 14 points of divergence is all local bidding bought. The starvation-weighted bid encodes the cage it replaces ([EXPERIMENT_SWARM](EXPERIMENT_SWARM.md)) |
 
-**Shipped: 5. Rejected: 12. Inconclusive: 3. Void: 1. Viable-but-unconvincing: 1. Undecided: 0.**
+| **SWARM-B** | Does locality matter once its choices generate the next state? | `776edf9` | 20 match triples, 30 turns, temp 0: median longest silence cage 4.0 / swarm 6.0 / sham 12.0, difference 6.0 against a bar of 9.0; gini 0.000 / 0.067 / 0.360; **zero fallback wakes in 1,800 allocations**; under the sham one agent submitted the most bids of anyone and spoke 0.7% of turns | **INCONCLUSIVE** — the effect is real in the anatomy and missed the pre-registered threshold, exactly as the under-powered-null caveat predicted before the run ([EXPERIMENT_SWARM_B](EXPERIMENT_SWARM_B.md)) |
+
+**Shipped: 5. Rejected: 12. Inconclusive: 4. Void: 1. Viable-but-unconvincing: 1. Undecided: 0.**
 
 ## Open, and blocking further recall work
 

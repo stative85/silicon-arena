@@ -503,3 +503,104 @@ that is a differently-powered experiment with its own pre-registration.
 
 Recorded so the eventual write-up cannot be read as a surprise, and so that a
 null result is not mistaken for a demonstration that locality does nothing.
+
+---
+
+# Result: INCONCLUSIVE at 20 triples, and the anatomy says more than the verdict
+
+```
+  arm      n   med silence   med gini   fallback wakes   NO_BIDS   NO_ELIG
+  cage    20           4.0      0.000                0         0         0
+  swarm   20           6.0      0.067                0         0         0
+  sham    20          12.0      0.360                0         0         0
+
+  PRIMARY  | median(SWARM) - median(SHAM) | = 6.0 turns     bar 9.0
+```
+
+**INCONCLUSIVE.** 6.0 falls between the 3.0 lower band and the 9.0 bar. The
+frozen rule routes it there, the sample is not extended, and the bar does not
+move.
+
+**The caveat committed before this ran is now load-bearing**, and it said this
+would happen:
+
+> A moderate real effect — three or four turns, which would be genuinely
+> interesting — produces exactly the same verdict as no effect at all.
+
+The observed effect is six turns. It produced the predicted verdict. That was
+written down before the number existed precisely so it could not be
+re-described afterwards.
+
+## Cage dependence is zero
+
+```
+  fallback wakes         0
+  NO_BIDS                0
+  NO_ELIGIBLE_BIDS       0
+  SHAM_UNDERANGEABLE     0
+  request failures       0
+```
+
+Across **60 matches and 1,800 allocations**, the fallback authority never woke.
+Local bidding carried the scarce slot from the first turn to the last, with no
+fairness machinery, no dominance correction and no starvation rescue. Every
+`NO_BIDS` state that abstention made reachable stayed unreached in practice.
+
+This is the number the whole starvation programme was defined around, and it is
+zero. It is also the one quantity here that is not affected by the
+under-powered null, because it is a count of events rather than a comparison
+against a floor.
+
+## What destroying locality actually does
+
+The verdict is inconclusive; the mechanism is not subtle.
+
+```
+  share of turns actually spoken
+
+  cage     every agent 20.0%                     gini 0.000
+  swarm    17.7% - 23.7%                         gini 0.067
+  sham     0.7% - 36.3%                          gini 0.360
+```
+
+Under the sham, `H 2o Danube 3 4B #2` submitted **596 bids — more than any
+other agent — and spoke 0.7% of the time.** `Gemma 3 1B` took 36.3%. Destroying
+the mapping between local state and identity does not merely randomise the
+schedule; it removes the self-correcting loop, because a bid that no longer
+belongs to the agent whose silence produced it cannot answer that silence.
+
+The swarm keeps a Gini of 0.067 against the sham's 0.360, and does it with no
+referee.
+
+## The honest reading, and its limit
+
+Locality is doing real work: it holds allocation nearly as even as round-robin
+and keeps cage dependence at zero, while the same machinery with the mapping
+destroyed collapses into a near-monopoly.
+
+That is **not** what the frozen test measured, and it does not become the
+verdict. The primary statistic missed its bar and the answer is inconclusive.
+
+Two further observations, recorded as pointers rather than evidence:
+
+* every swarm match had a longest silence between 4 and 8, and the null's ten
+  sham medians ranged 8 to 13 — the treatment sits below the entire observed
+  sham distribution. That is not the frozen comparison and it is not being
+  substituted for it.
+* the sham may be a *stronger* destruction of locality than "no locality" would
+  be in nature, since it actively misassigns every turn rather than merely
+  failing to correlate. A weaker control would be a different experiment.
+
+## What is earned and what is not
+
+**Earned:** local bidding allocates a scarce slot unassisted across 1,800
+consecutive allocations with zero fallback wakes, and the locality mapping is
+what prevents monopoly.
+
+**Not earned:** any claim that locality produces *different dynamics* at the
+pre-registered threshold. It did not clear the bar.
+
+The next experiment is not a smaller multiplier. It is more matches per sham
+seed, which tightens the null honestly and would give a six-turn effect a fair
+chance of being detected — with its own pre-registration, written before the
+floor is known.
