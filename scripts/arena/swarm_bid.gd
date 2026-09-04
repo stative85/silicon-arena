@@ -36,6 +36,22 @@ const W_STARVATION := 0.5
 const W_ADDRESSED := 0.3
 const W_AIRTIME := 0.2
 
+## Below this, an agent does not submit a bid at all.
+##
+## ABSTENTION IS WHAT MAKES THE VIABILITY BAR ABLE TO FAIL. Without it every
+## well-formed view yields a number, every agent always submits, NO_BIDS can
+## never fire, and the swarm produces a valid winner 100% of the time -- a bar
+## that cannot fail is not evidence (rule 1). It is also the more swarm-like
+## rule: an agent that does not want the slot says nothing, rather than being
+## compelled to participate in every round.
+##
+## Frozen at 0.10 from the arithmetic, before any run. In a five-agent rotation
+## at fair airtime the bids are 0.000 / 0.062 / 0.125 / 0.188 / 0.250, so 0.10
+## leaves THREE agents competing -- failure is reachable without being the
+## default. At 0.20 only one agent ever bids, which is round-robin with extra
+## steps.
+const ABSTAIN_BELOW := 0.10
+
 const REQUIRED := ["turns_since_spoke", "named_recently", "airtime_share"]
 
 
@@ -91,3 +107,20 @@ static func local_view(turns_since_spoke: int, named_recently: bool,
 		"named_recently": named_recently,
 		"airtime_share": airtime_share,
 	}
+
+
+## Does this agent submit a bid at all?
+##
+## Three outcomes, and they are three different statements:
+##   NAN bid          the view is malformed and says nothing
+##   bid below floor  "I am here and I do not want the slot"
+##   bid at or above  "I want it this much"
+##
+## The first two both mean no entry reaches the resolver. They are distinct to
+## the agent and identical to the substrate, which is correct: the substrate is
+## not owed the difference.
+static func should_bid(local_view: Dictionary) -> bool:
+	var b := compute(local_view)
+	if is_nan(b):
+		return false
+	return b >= ABSTAIN_BELOW

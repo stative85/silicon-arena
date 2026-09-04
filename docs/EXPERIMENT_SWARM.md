@@ -318,3 +318,65 @@ differ from round-robin is no more sovereign than one optimised to match it —
 both are defined by the cage. It is recorded as an interpretive commitment: high
 agreement means the experiment succeeded mechanically and bought little, and
 that reading is fixed in advance rather than negotiated afterwards.
+
+---
+
+# Amendment: the viability bar could not fail, and now can
+
+**Written before any allocation has been recorded.** Found while building the
+walk harness, not while looking at results — there are none.
+
+## The defect
+
+As originally frozen, SWARM-V's bar was "a runnable, eligible speaker in >= 95%
+of allocation opportunities". Both failure families were **identically zero by
+construction**:
+
+* **Common substrate failures.** The walk only *proposes* a speaker against real
+  history. Nothing is executed, no model is loaded, no request is issued — so
+  unavailable model, load/swap failure, stall watchdog and request failure
+  cannot occur in either condition. Round-robin's null on this family would have
+  returned 0, and so would the swarm's. **This family is not measurable in a
+  proposal-only design and is deferred to SWARM-B**, where allocations run.
+* **Swarm autonomy failures.** `compute()` returned a number in [0,1] for every
+  well-formed view, so every agent always submitted, so `NO_BIDS` could never
+  fire and someone was always eligible. The swarm would have produced a valid
+  winner 100% of the time.
+
+400 opportunities would have been spent confirming that a modulo cannot fail.
+**A test that can only pass is not evidence** — rule 1, violated by the bar
+rather than by a test, which is a way it had not failed here before.
+
+## The repair: abstention
+
+An agent whose bid falls below a floor **submits nothing**. That is a real local
+decision and a more swarm-like one than compulsory participation: an agent that
+does not want the slot says so by silence, and the substrate has to survive an
+arena where everyone is satisfied.
+
+`ABSTAIN_BELOW = 0.10`, frozen from arithmetic before any run. In a five-agent
+rotation at fair airtime the bids are
+
+```
+  turns silent   0      1      2      3      4
+  bid            0.000  0.062  0.125  0.188  0.250
+```
+
+so a floor of 0.10 leaves **three of five agents competing**. Failure is
+reachable without being the default. At 0.20 only one agent ever bids, which is
+round-robin with extra steps; at 0.05 only the agent who just spoke abstains and
+`NO_BIDS` stays unreachable.
+
+Both endpoints are asserted in the self-test so the threshold cannot drift into
+either degenerate regime unnoticed.
+
+## What SWARM-V now concludes
+
+The bar is unchanged at **>= 95% valid allocations, N = 400**, and it can now
+fail: a corpus where agents are frequently satisfied at the same moment
+produces `NO_BIDS`, and no referee rescues it because fairness assistance is
+off.
+
+The two failure families remain unsummed. Family 1 is now explicitly **out of
+scope for SWARM-V** rather than measured-and-zero, which is the honest
+description of a quantity the design cannot observe.

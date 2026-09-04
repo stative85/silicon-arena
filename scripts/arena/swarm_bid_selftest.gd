@@ -104,6 +104,34 @@ func _run() -> void:
 		is_equal_approx(starving, named_recently),
 		"if these differed the check would be weaker, not the design")
 
+	# ---- abstention, which is what lets the viability bar fail --------------
+	print("
+ abstention")
+	_check("an agent that just spoke and holds fair airtime does not bid",
+		not B.should_bid(B.local_view(0, false, 0.2)),
+		"without abstention NO_BIDS can never fire and the bar cannot fail")
+	_check("a long-silent agent does bid", B.should_bid(B.local_view(4, false, 0.2)))
+	_check("a malformed view does not bid", not B.should_bid({}))
+	_check("being named lifts an otherwise-silent agent over the floor",
+		B.should_bid(B.local_view(0, true, 0.2))
+			and not B.should_bid(B.local_view(0, false, 0.2)))
+
+	# The arithmetic the threshold was frozen from, asserted so it cannot drift.
+	var rotation := 0
+	for since in [0, 1, 2, 3, 4]:
+		if B.should_bid(B.local_view(since, false, 0.2)):
+			rotation += 1
+	_check("three of five agents compete in a normal rotation (%d)" % rotation,
+		rotation == 3,
+		"one bidder is round-robin with extra steps; five is compulsory voting")
+
+	var satisfied := 0
+	for since in [0, 1]:
+		if B.should_bid(B.local_view(since, false, 0.25)):
+			satisfied += 1
+	_check("a satisfied arena produces NO bids at all", satisfied == 0,
+		"this is the state the substrate has to survive")
+
 	_report()
 
 
