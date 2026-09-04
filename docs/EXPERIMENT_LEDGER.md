@@ -46,7 +46,9 @@ the runtime does not belong here and should not have been run.
 
 | **MP2-B2** | Same question, corrected gate, fresh transcripts | `a12f3f3` | 240 opportunities: lift(R) +17.9, lift(S) +21.3, both past +10 and 3.4 apart; estimator bias -0.14, observed 17.9 vs label-noise p95 8.3; **1 unsupported attribution in 720 replies, and it came from the sham arm** | **INCONCLUSIVE** — the primary numbers reached outcome 2 and the zero-attribution condition failed on the control arm. Bar not rescoped |
 
-**Shipped: 5. Rejected: 12. Inconclusive: 3. Void: 1. Undecided: 0.**
+| **SWARM-V** | Can locally-informed agents allocate the speaking slot with the arena blind to why? | `85d34f2` | 400 opportunities, no generation: 100% valid allocation with no fairness machinery; agreement with round-robin 85.8% against a 35.0% random placebo; concentration 30.4% vs placebo 30.4%; longest unproposed run 44 vs placebo 14 | **VIABLE AND UNCONVINCING** — the bar is met, and 14 points of divergence is all local bidding bought. The starvation-weighted bid encodes the cage it replaces ([EXPERIMENT_SWARM](EXPERIMENT_SWARM.md)) |
+
+**Shipped: 5. Rejected: 12. Inconclusive: 3. Void: 1. Viable-but-unconvincing: 1. Undecided: 0.**
 
 ## Open, and blocking further recall work
 
