@@ -67,10 +67,11 @@ values' own median, so at large n it reproduces the original spread by
 construction and cannot show improvement. The parametric simulation above uses
 the decomposition instead.
 
-**The 3x multiplier, not N, is the binding constraint.** With a real
-between-seed sd of 0.74 the bar can never fall below about 4.8 turns at any
-budget. That is a property of the design and it is stated here rather than
-discovered later. The multiplier is not being changed, because it would be
+**The 3x multiplier, not N, is the binding constraint.** Under the observed
+between-seed sd of 0.74 and the current 3x decision rule, the **estimated
+asymptotic floor is about 4.8 turns** — more matches per seed buy progressively
+less. That is an empirical property of this null structure, not a mathematical
+impossibility result, and it is stated here rather than discovered later. The multiplier is not being changed, because it would be
 changed with the effect size already known.
 
 ## N and cost
@@ -136,11 +137,21 @@ already observed in SWARM-B, 6.0 turns**, before any treatment match runs:
                 economics poor, architecture claim unaffected.
 ```
 
-The threshold is 6.0 because that is the best available estimate of the effect,
-and a bar at or above it means the experiment is futile in advance rather than
-uncertain. Choosing this number after seeing the null would be choosing whether
-to spend 24 more GPU-hours based on whether the answer looked reachable, which
-is the same act as moving a bar.
+**This is an economic futility criterion, not a prediction about the treatment.**
+6.0 is a noisy point estimate from a single 20-match arm. If the powered bar
+came back at 6.2, a fresh treatment could still happen to produce 7 or 8 and
+clear it — the outcome is not predetermined and no claim is made that it is.
+
+The defensible statement is narrower:
+
+> If the powered bar is >= 6.0 turns, abort the treatment because **the
+> redesigned experiment has failed to achieve sensitivity below the best
+> existing estimate of the effect that motivated the replication.**
+
+That is a decision about instrument quality, made without pretending to know an
+unseen result. Choosing the number after seeing the null would be deciding
+whether to spend 24 more GPU-hours based on whether the answer looked reachable,
+which is the same act as moving a bar.
 
 The simulation expected 5.60 at 40 matches per seed. If the real null is worse
 than simulated, that is exactly the case this gate exists for.
@@ -158,14 +169,16 @@ not:
                   expected bar 5.60
                   one frozen bid policy, terminal replication
 
-  detectability floor of this design           ~4.8 turns, at ANY budget
+  estimated asymptotic floor                   ~4.8 turns, under the observed
+                                               between-seed variance and the
+                                               current 3x decision rule
   cost to move the bar from 9.15 to 5.60       ~28 additional GPU-hours
   cost to move it from 5.60 to 5.21            ~28 more on top of that
 ```
 
-**This experimental geometry has a bad asymptote.** The `3x` multiplier
-multiplied against a null containing irreducible between-seed variance means
-more GPU eventually stops buying information: doubling the matches per seed from
+**This experimental geometry has a bad empirical asymptote.** The `3x`
+multiplier against a null containing between-seed variance that does not shrink
+with matches-per-seed means more GPU eventually stops buying much information: doubling the matches per seed from
 40 to 80 moves the bar by 0.39 turns for another day of generation.
 
 That is the transferable finding, and it may outlast the B2 answer entirely:
