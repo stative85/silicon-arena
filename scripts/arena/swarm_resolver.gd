@@ -54,6 +54,23 @@ static func resolve(bids: Array) -> Dictionary:
 	var best_bid := -1.0
 	var eligible_seen := false
 
+	# Ties need a rule that cannot depend on array order, which is upstream
+	# state this file has no business inheriting. The first version compared
+	# agent_id lexicographically, and in this roster that hands every tie to the
+	# same competitor forever, on the strength of how its model family is
+	# spelled. Ordering by name is ordering by something that means something.
+	#
+	# So ties break on a hash, salted from the bid multiset itself -- no extra
+	# field crosses the boundary to obtain it. The salt sums QUANTIZED bids
+	# because integer addition is associative and float addition is not, and an
+	# order-dependent salt would reintroduce exactly the bug being removed.
+	var salt := 0
+	for entry in bids:
+		if typeof(entry) == TYPE_DICTIONARY and entry.has("bid"):
+			var q = entry["bid"]
+			if (typeof(q) == TYPE_FLOAT or typeof(q) == TYPE_INT) and is_finite(float(q)):
+				salt += int(round(float(q) * 1000.0))
+
 	for entry in bids:
 		if typeof(entry) != TYPE_DICTIONARY:
 			return {"ok": false, "code": MALFORMED_BID}
@@ -82,12 +99,20 @@ static func resolve(bids: Array) -> Dictionary:
 			continue
 		eligible_seen = true
 
-		# Ties break on agent_id so the result cannot depend on array order,
-		# which is upstream state this file has no business inheriting.
-		if b > best_bid or (b == best_bid and id < best_id):
+		if b > best_bid or (b == best_bid and _tie_key(id, salt) < _tie_key(best_id, salt)):
 			best_bid = b
 			best_id = id
 
 	if not eligible_seen:
 		return {"ok": false, "code": NO_ELIGIBLE_BIDS}
 	return {"ok": true, "agent_id": best_id}
+
+
+## FNV-1a, written out rather than borrowed, so the tiebreak cannot change
+## underneath this file when an engine hash implementation does.
+static func _tie_key(id: String, salt: int) -> int:
+	var h := 2166136261
+	for byte in (id + ":" + str(salt)).to_utf8_buffer():
+		h = (h ^ int(byte)) & 0xFFFFFFFF
+		h = (h * 16777619) & 0xFFFFFFFF
+	return h

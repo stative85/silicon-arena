@@ -78,6 +78,7 @@ call :check "scripts/arena/topic_arc_selftest.gd"         "topic arc"           
 call :check "scripts/arena/gonzo_recall_selftest.gd"      "gonzo recall"        "GONZO RECALL OK"
 call :check "tools/source_measure_selftest.gd"            "source measure"      "SOURCE MEASURE OK"
 call :check "scripts/arena/swarm_resolver_selftest.gd"    "swarm resolver"      "SWARM RESOLVER OK"
+call :check "scripts/arena/swarm_bid_selftest.gd"         "swarm bid"           "SWARM BID OK"
 call :check "tools/adversarial.gd"                        "adversarial pass"    "ADVERSARIAL OK"
 call :check "tools/offline_selftest.gd"                   "offline behaviour"   "OFFLINE OK"
 

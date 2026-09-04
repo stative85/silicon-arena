@@ -120,8 +120,33 @@ func _run() -> void:
 	var shuffled := [_bid("C", true, 0.44), _bid("B", true, 0.82), _bid("A", true, 0.31)]
 	_check("array order cannot change the winner",
 		_won(R.resolve(shuffled)) == _won(R.resolve(three)))
-	_check("ties break on agent_id, not on position",
-		_won(R.resolve([_bid("Z", true, 0.5), _bid("A", true, 0.5)])) == "A")
+	# Ties must not be won by being spelled earlier in the alphabet. In this
+	# roster that would hand every tie to the same model family forever, and
+	# with fairness assistance off it would inflate measured concentration as a
+	# resolver artifact rather than a property of the bids.
+	var tie := [_bid("Z", true, 0.5), _bid("A", true, 0.5)]
+	var tie_winner := _won(R.resolve(tie))
+	_check("a tie resolves to somebody", tie_winner == "A" or tie_winner == "Z")
+	_check("a tie is deterministic", _won(R.resolve(tie)) == tie_winner,
+		"the paired design needs the same input to give the same answer")
+	_check("a tie does not depend on array order",
+		_won(R.resolve([_bid("A", true, 0.5), _bid("Z", true, 0.5)])) == tie_winner)
+
+	# THE CHECK THAT FAILS IF THE TIEBREAK GOES BACK TO SORTING BY NAME.
+	# Vary a third agent's bid, which changes the salt without changing the tie,
+	# and both tied agents must win at least once across the sweep.
+	var a_wins := 0
+	var z_wins := 0
+	for i in 40:
+		var third := _bid("M", false, float(i) / 40.0)
+		var w := _won(R.resolve([_bid("Z", true, 0.5), _bid("A", true, 0.5), third]))
+		if w == "A":
+			a_wins += 1
+		elif w == "Z":
+			z_wins += 1
+	_check("neither tied agent wins every tie (%d A / %d Z)" % [a_wins, z_wins],
+		a_wins > 0 and z_wins > 0 and a_wins + z_wins == 40,
+		"lexicographic tiebreak gives one competitor a permanent advantage")
 
 	# ---- no fairness assistance -------------------------------------------
 	#

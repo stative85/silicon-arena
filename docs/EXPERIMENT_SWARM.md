@@ -246,3 +246,75 @@ storage and provenance stayed when recall's authority went unresolved.
 
 The cage does not break. It becomes dormant infrastructure, or it does not, and
 this is the measurement that decides which.
+
+---
+
+# Amendment: three things fixed before any data exists
+
+**Written and committed before a single allocation has been recorded.** No
+outcome exists, so nothing here can be a reaction to one. Bars, conditions,
+metrics and N are untouched.
+
+## 1. Tiebreaking by name is semantic, and it favoured one model family
+
+The resolver's first version broke ties lexicographically on `agent_id`. That
+looked like the neutral choice and is not one. This corpus's roster is
+
+```
+  Gemma 3 1B   H 2o Danube 3 4B #1/#2   Stablelm 2 Zephyr #1/#2
+```
+
+so `Gemma` wins **every tie, forever**, on the strength of how its model family
+is spelled. Ordering by name is ordering by something that means something, and
+with fairness assistance switched off a permanently favoured tie-winner would
+inflate measured concentration as an artifact of the resolver rather than a
+property of the bids — the metric would be reporting my sort order back to me.
+
+Ties now break on FNV-1a of the agent id, salted from the bid multiset itself,
+so no additional field crosses the boundary to obtain it. The salt sums
+**quantized** bids because integer addition is associative and float addition is
+not, and an order-dependent salt would reintroduce the exact bug being removed.
+
+Guarded by a self-test that sweeps 40 salts and requires both tied agents to win
+at least once. Shown to fail: restoring the lexicographic comparison returns
+40/0.
+
+## 2. The bid's components never cross individually, including for debugging
+
+`swarm_bid.gd` computes `compute(local_view) -> float` from an agent's own view
+and returns one number. The components — starvation, being named, airtime — stay
+on the agent side.
+
+**Not even a `bid_reason` field for debugging.** A debug field is how semantic
+authority crawls back in wearing a reflective vest, and the resolver refuses
+unknown keys specifically so it cannot be added quietly.
+
+The bid is pure and total. Pure because the paired frozen-state design compares
+two schedulers at one moment and a bid that drifts between calls destroys the
+pairing. Total because a malformed view returns NAN — meaning *do not bid* —
+rather than a plausible default, since a defaulted bid is a silent failure
+wearing the shape of a decision. A zero bid is a real local statement ("I am
+here and I do not want the slot"); a malformed view says nothing at all, and the
+two must not be confused.
+
+A self-test asserts that a fully starved agent and a freshly-addressed one both
+arrive at exactly 0.50 for unrelated reasons. **The substrate cannot recover
+which.** That is the architecture written as an assertion rather than a comment.
+
+## 3. What a high agreement rate with round-robin would mean
+
+Fixed now, because after the number exists it would be arguable either way.
+
+Agreement between the cage's pick and the swarm's pick is already a reported
+quantity. Its interpretation:
+
+> **A swarm that agrees with round-robin 95% of the time has not bought
+> autonomy, even if every viability bar passes.** It would be a more expensive
+> way to compute a modulo.
+
+This does **not** become a bar, and divergence is not a target. A bar on
+disagreement would reward gratuitous difference, and a scheduler optimised to
+differ from round-robin is no more sovereign than one optimised to match it —
+both are defined by the cage. It is recorded as an interpretive commitment: high
+agreement means the experiment succeeded mechanically and bought little, and
+that reading is fixed in advance rather than negotiated afterwards.
