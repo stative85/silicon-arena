@@ -41,11 +41,11 @@ const AIRTIME_WINDOW := 20
 const NAMED_WINDOW := 3
 
 const NULL_SEEDS := 10
-const NULL_MATCHES := 5
-const TREATMENT_MATCHES := 20
+const NULL_MATCHES := 40
+const TREATMENT_MATCHES := 40
 
-const RESULTS_NULL := "user://swarm_b_null.json"
-const RESULTS_TREAT := "user://swarm_b_treatment.json"
+const RESULTS_NULL := "user://swarm_b2_null.json"
+const RESULTS_TREAT := "user://swarm_b2_treatment.json"
 
 var _http: HTTPRequest
 var _mode := ""
