@@ -113,3 +113,70 @@ provenance-backed trace, tested for whether indirect local coupling adds
 anything beyond direct local bidding. Not before. Building a trace layer on an
 unresolved locality effect would mean never knowing which of the two was
 carrying the result.
+
+---
+
+# Amendment: a pre-treatment abort gate, and the compute receipt
+
+**Written while the null is still running and before any of it has been read.**
+This adds a way to STOP. It adds no way to pass.
+
+## The gate, with its threshold fixed before the number exists
+
+When the null completes, the bar is computed and **compared against the effect
+already observed in SWARM-B, 6.0 turns**, before any treatment match runs:
+
+```
+  bar <  6.0    the treatment can discriminate an effect the size of the one
+                already measured. Pay the remaining ~3,600 generations once and
+                close the book.
+
+  bar >= 6.0    STOP. Do not run the treatment.
+                Record: locality unresolved under this mechanism, instrument
+                economics poor, architecture claim unaffected.
+```
+
+The threshold is 6.0 because that is the best available estimate of the effect,
+and a bar at or above it means the experiment is futile in advance rather than
+uncertain. Choosing this number after seeing the null would be choosing whether
+to spend 24 more GPU-hours based on whether the answer looked reachable, which
+is the same act as moving a bar.
+
+The simulation expected 5.60 at 40 matches per seed. If the real null is worse
+than simulated, that is exactly the case this gate exists for.
+
+## The compute receipt, recorded as a result in its own right
+
+Because "just increase N" reads as cheap advice six months from now, and it is
+not:
+
+```
+  SWARM-B         1,500 null + 1,800 treatment generations      ~8 GPU-hours
+                  bar 9.15, underpowered, INCONCLUSIVE at a 6.0 effect
+
+  SWARM-B2       12,000 null + 3,600 treatment generations     ~36 GPU-hours
+                  expected bar 5.60
+                  one frozen bid policy, terminal replication
+
+  detectability floor of this design           ~4.8 turns, at ANY budget
+  cost to move the bar from 9.15 to 5.60       ~28 additional GPU-hours
+  cost to move it from 5.60 to 5.21            ~28 more on top of that
+```
+
+**This experimental geometry has a bad asymptote.** The `3x` multiplier
+multiplied against a null containing irreducible between-seed variance means
+more GPU eventually stops buying information: doubling the matches per seed from
+40 to 80 moves the bar by 0.39 turns for another day of generation.
+
+That is the transferable finding, and it may outlast the B2 answer entirely:
+
+> **This design is too expensive for iterative architectural work.** It is
+> affordable once, as a terminal test of one frozen mechanism. It is not
+> affordable as the standard ruler for a series of swarm questions, and any
+> future swarm experiment should be designed against a statistic with a better
+> noise floor rather than pointed at this one with more compute.
+
+Choosing that better statistic must happen **before** its treatment values are
+seen. That option was available for B2 and was destroyed by doing the work in
+the wrong order; it is still available for whatever comes next, and this
+paragraph exists so it is not squandered twice.
