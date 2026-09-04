@@ -411,3 +411,37 @@ under-powered null already errs strict, so both errors point the same safe way.
 If the bid-flip rate turns out to be substantial, that reasoning fails too, and
 SWARM-B needs a different instrument rather than a wider bar. That is measured
 next, before the null.
+
+## What 0/60 bid flips does and does not establish
+
+Recorded before the null returned, so it cannot be shaped by the result.
+
+The integrity check found zero bid flips in 60 comparisons per arm, 180 in
+total, across cage, swarm and sham. Text drifted in all three; no selection
+changed.
+
+**What it supports:** over a 30-turn horizon on one match seed, decoder drift did
+not alter which agent the resolver selected — in the sham arm *and in the real
+swarm arm*. The second half matters. If only the sham had been checked, the null
+would measure drift under deranged dynamics while the treatment ran under
+different ones, and any interaction between locality and drift would be
+invisible to the comparison. Repeating the actual SWARM arm is what makes the
+null's coverage of drift defensible rather than assumed.
+
+**What it does not support:** any claim that decoder drift *cannot* affect
+locality. It is 180 comparisons on a single match seed over 30 turns. The true
+bid-flip rate could be small and nonzero, and a longer horizon or a different
+seed could expose an interaction this check has no power to see.
+
+The correct sentence is the narrow one:
+
+> Over the tested horizon, drift-locality interaction was not detectable, and
+> the sham null therefore absorbs drift for comparisons of this length.
+
+Not:
+
+> Decoder drift cannot affect locality.
+
+If SWARM-B's treatment produces a difference near its bar, this caveat is the
+first thing that should be attacked, because a small undetected flip rate is
+exactly the size of error that would matter there.
