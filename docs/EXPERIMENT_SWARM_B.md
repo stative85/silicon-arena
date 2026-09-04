@@ -445,3 +445,61 @@ Not:
 If SWARM-B's treatment produces a difference near its bar, this caveat is the
 first thing that should be attacked, because a small undetected flip rate is
 exactly the size of error that would matter there.
+
+---
+
+# Result: the sham null is non-degenerate, and the bar it produces is brutal
+
+```
+  10 derangement seeds x 5 matches, 30 turns each, temperature 0
+
+  per-seed median longest silence
+    [13, 10, 11, 10, 12, 10, 11, 10, 8, 13]
+
+  pairwise |difference|:  p90 3.00   max 5.00
+
+  bar = max(3 x p90, 3) = 9.00 turns
+```
+
+**THE CONTROL IS ALIVE.** Ten different ways of destroying the local-state to
+identity mapping produce ten different trajectories, spanning medians of 8 to
+13. The derangement is perturbing what it was built to perturb, so the VOID
+condition does not fire and the treatment has something to be measured against.
+
+That was a real risk. Every mechanism here is deterministic, and a zero-spread
+null would have killed SWARM-B at the control stage before a single treatment
+match ran.
+
+## What this bar means, said before the treatment runs
+
+The frozen procedure produced **9.00 turns**, and it is not moving. But its
+scale should be recorded honestly while it still costs nothing to admit:
+
+```
+  observed sham medians span     8 to 13 turns
+  the bar demands a difference   >= 9 turns
+```
+
+**The bar is roughly twice the entire observed spread of the null.** In a
+30-turn match with five agents, a median longest-silence difference of 9 turns
+is close to the largest effect the statistic can express.
+
+So SWARM-B, as frozen, can only detect a very large dynamical difference.
+Therefore:
+
+> **A "no dynamical difference" verdict from this experiment is weak evidence of
+> absence.** A moderate real effect — three or four turns, which would be
+> genuinely interesting — produces exactly the same verdict as no effect at all.
+
+This is the pre-registered consequence of an under-powered null, and it was
+flagged in advance as erring strict. It errs strict. That is the cost being paid
+rather than a surprise, and the bar stays where the procedure put it.
+
+What would fix it is not a smaller multiplier chosen now that the floor is
+known. It is more matches per sham seed, which tightens the null honestly, and
+that is a differently-powered experiment with its own pre-registration.
+
+## The treatment now runs against a bar it will probably not clear
+
+Recorded so the eventual write-up cannot be read as a surprise, and so that a
+null result is not mistaken for a demonstration that locality does nothing.
