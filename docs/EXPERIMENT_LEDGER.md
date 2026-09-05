@@ -50,6 +50,8 @@ the runtime does not belong here and should not have been run.
 
 | **SWARM-B** | Does locality matter once its choices generate the next state? | `776edf9` | 20 match triples, 30 turns, temp 0: median longest silence cage 4.0 / swarm 6.0 / sham 12.0, difference 6.0 against a bar of 9.0; gini 0.000 / 0.067 / 0.360; **zero fallback wakes in 1,800 allocations**; under the sham one agent submitted the most bids of anyone and spoke 0.7% of turns | **INCONCLUSIVE** — the effect is real in the anatomy and missed the pre-registered threshold, exactly as the under-powered-null caveat predicted before the run ([EXPERIMENT_SWARM_B](EXPERIMENT_SWARM_B.md)) |
 
+| **SWARM-B2** | Same question, null powered 8x to repair the bar | `3af4fb1`, gate `7438a06` | 400 null matches, 10 seeds x 40, 12,000 allocations all OK with **zero fallback wakes**; per-seed medians [11.0, 10.0, 10.5, 11.0, 11.0, 10.0, 9.0, 10.0, 11.0, 12.0]; p90 2.00, **bar 6.00** against a pre-registered abort gate of 6.0 | **TREATMENT ABORTED, LOCALITY UNRESOLVED** — the gate fired on the boundary and was not renegotiated. The bar missed its 5.60 projection even though between-seed variance came in *lower* than forecast, because the bar is quantized to {3.0, 4.5, 6.0, 7.5, 9.0} and 5.60 was never attainable. Produced rule 9. No B3 ([EXPERIMENT_SWARM_B2](EXPERIMENT_SWARM_B2.md)) |
+
 **Shipped: 5. Rejected: 12. Inconclusive: 4. Void: 1. Viable-but-unconvincing: 1. Undecided: 0.**
 
 ## Open, and blocking further recall work
@@ -146,3 +148,9 @@ that exists because casual counts drift:
    scored. The gate read "measure is blind" and could not tell that apart from
    "the ceiling never rose". Do not build a control out of a mechanism this
    ledger already rejected.
+5. A power calculation must be run on the distribution the decision statistic
+   can actually take. SWARM-B2 sized its null against a projected bar of 5.60
+   turns and set an abort gate at 6.0. The primary is a median of integer turn
+   counts, so the bar can only be 3.0, 4.5, 6.0, 7.5 or 9.0 — 5.60 did not
+   exist. The realized variance beat the forecast and the bar still came in at
+   6.00. Check granularity, not only spread.

@@ -193,3 +193,117 @@ Choosing that better statistic must happen **before** its treatment values are
 seen. That option was available for B2 and was destroyed by doing the work in
 the wrong order; it is still available for whatever comes next, and this
 paragraph exists so it is not squandered twice.
+
+---
+
+# Result: the null completed, the bar is 6.00, the gate fires
+
+**400 of 400 null matches finished.** The run continued to completion after the
+session driving it disconnected; nothing was resumed and nothing was restarted.
+Read from the persisted checkpoint, not from stdout.
+
+```
+  10 derangement seeds x 40 matches            400 rows, 40 per seed
+  12,000 allocations                           every code OK
+  FALLBACK_WAKES 0    NO_BIDS 0                MALFORMED_BID 0
+  NO_ELIGIBLE_BIDS 0  SHAM_UNDERANGEABLE 0     REQUEST_FAILED 0
+
+  per-seed median longest silence
+    [11.0, 10.0, 10.5, 11.0, 11.0, 10.0, 9.0, 10.0, 11.0, 12.0]
+
+  pairwise |difference|   p90 2.00   max 3.00
+  bar = max(3 x 2.00, 3.0)                     = 6.00 turns
+```
+
+Recomputed independently from the checkpoint rather than trusting the harness's
+own summary line. Same numbers.
+
+## The gate fires
+
+The threshold was fixed before this number existed: `bar >= 6.0` means stop.
+The bar is 6.00. **The treatment is not run.**
+
+It lands exactly on the boundary, which is uncomfortable and changes nothing.
+`>=` was written before the null returned, and the whole purpose of writing it
+then was to remove the judgement call that a boundary invites. Arguing that 6.00
+is close enough to below 6.0 is moving a bar with the answer in view, which is
+rule 8 in the exact costume rule 8 was written about.
+
+Recorded, per the pre-registration:
+
+> **Locality is unresolved under this mechanism.** The powered instrument failed
+> to achieve sensitivity below the best existing estimate of the effect that
+> motivated the replication. No claim is made about what a treatment would have
+> produced.
+
+The architecture claim is untouched, as stated in advance that it would be. It
+now rests on 12,000 further allocations in which the substrate saw only
+`{agent_id, eligible, bid}`, no fairness machinery ran, and centralized
+fallback authority never woke.
+
+**No SWARM-B3.** The stopping rule was frozen for this outcome.
+
+## Why the bar missed its projection, and it is not variance
+
+The simulation predicted `p90 1.87 -> bar 5.60` at 40 matches per seed. The
+realized spread was actually *better* than projected:
+
+```
+                              projected (n=5 data)   realized (n=40)
+  mean within-seed variance          5.12                 9.45
+  variance of medians                2.16                 0.69
+  between-seed sd                    0.74                 0.57
+```
+
+Between-seed variance — the component that was supposed to never shrink — came
+in **lower** than the estimate the power calculation was built on. The null
+behaved better than its own forecast and the bar still came in worse.
+
+The reason is that **the bar is quantized, and 5.60 was never a value it could
+take.** `longest silence` is an integer count of turns. A median of an even
+number of integers is a half-integer. Pairwise differences of half-integers lie
+on a 0.5 lattice. So `bar = max(3 x p90, 3.0)` can only ever be:
+
+```
+  3.0    4.5    6.0    7.5    9.0
+```
+
+There is no 5.60. There is no 5.21. The entire compute-economics table in the
+amendment above is a continuous curve drawn through a statistic that can only
+land on rungs 1.5 turns apart, and the observed `p90 = 2.00` is one rung. The
+adjacent rung is 4.50.
+
+This is a defect in the power analysis, not in the null, and it was mine. The
+simulation treated a discrete order statistic as continuous, which is why it
+produced a projection between two attainable values and why "40 is the smallest
+step that puts the bar below 6.0" was never true. At 40 matches per seed the
+outcome was always going to be 4.50 or 6.00, and buying more matches moves a
+quantity that can only jump by 1.5 turns at a time.
+
+**Doctrine rule 9.**
+
+> A power calculation must be performed on the distribution the decision
+> statistic can actually take. Simulating a continuous approximation of a
+> discrete statistic can predict a value the experiment is incapable of
+> producing, and will then appear to justify a sample size that buys nothing.
+
+That is the finding with the longest shelf life here, and it generalises past
+swarm work to every threshold in this repo built on a median of small integers.
+
+## The compute receipt, corrected
+
+The transferable claim survives and gets sharper. The earlier statement was that
+this geometry has a bad asymptote. The stronger and more accurate statement is:
+
+> **This design cannot be tuned by spending money on it.** Its decision
+> statistic is quantized at 1.5 turns. Doubling the null from 40 to 80 matches
+> per seed — another ~28 GPU-hours — cannot produce any bar between 4.50 and
+> 6.00, because no such bar exists. Compute buys a probability of landing on a
+> lower rung, not a lower bar.
+
+Total spent reaching this: ~28 GPU-hours of null on top of SWARM-B's ~8. The
+~3,600 treatment generations are not spent, which is what the gate was for.
+
+Any future swarm question needs a decision statistic chosen for its noise floor
+*and its granularity*, before its treatment values are seen. That option is
+still unspent.

@@ -103,7 +103,7 @@ VERIFY OK
 
 CI runs the same thing on Linux for every push and pull request.
 
-### Eight rules that are not negotiable
+### Nine rules that are not negotiable
 
 **1. A new test must be shown to fail.** Reintroduce the defect it guards,
 watch it go red, restore, watch it go green. A suite that can only pass is not
@@ -197,6 +197,25 @@ its own conclusions and does not lend evidence across the line.
 **8. A control is not validated because it appears conservative.** Its own
 failure modes must be measured. Instruments that simplify, strengthen, or clean
 up the result deserve adversarial validation first.
+
+**9. A power calculation must be run on the distribution the decision statistic
+can actually take.** Simulating a continuous approximation of a discrete
+statistic can predict a value the experiment is incapable of producing, and
+will then appear to justify a sample size that buys nothing.
+
+Not hypothetical. SWARM-B2's power analysis projected a bar of 5.60 turns at 40
+matches per seed and that number was used to choose the sample size and to set
+an abort gate at 6.0. But the primary is `longest silence`, an integer count of
+turns; a median over an even number of integers is a half-integer; pairwise
+differences lie on a 0.5 lattice; so `bar = max(3 x p90, 3.0)` can only ever be
+3.0, 4.5, 6.0, 7.5 or 9.0. **5.60 was not a value the experiment could return.**
+The realized between-seed variance came in *better* than the forecast and the
+bar still landed on 6.00, because the outcome was always going to be 4.50 or
+6.00 (`docs/EXPERIMENT_SWARM_B2.md`).
+
+Check granularity as well as spread. A statistic whose bar moves in 1.5-turn
+steps cannot be tuned by adding compute, and a projection that lands between
+two rungs is telling you the model is wrong, not that the rung is reachable.
 
 Seven instruments failed on this project in a single day and every one of them
 failed toward a *cleaner* answer, never a messier one: a ceiling arm that could
