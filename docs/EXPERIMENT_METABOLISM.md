@@ -607,3 +607,77 @@ that a GPU can falsify. Everything else it produces is description.
 That is not an argument against running it. Description is what an anatomy is
 for, and none of the numbers above can be derived from the frozen constants.
 It is an argument against writing the result up as a passed test.
+
+---
+
+# Probe: the hardware disagrees with the model in two ways
+
+Run before any arm, on the real bindings for this box.
+
+```
+  class    model                            quant     predicted   ACTUAL    error
+  HEAVY    adg-alpaca-gpt4-qwen2.5-7b       Q4_K_M       4.55       4.71    +0.16
+  NORMAL   h2o-danube3-4b-chat              Q4_K_M       2.75       2.73    -0.02
+  SMALL    gemma-3-1b-it-fast-guff          Q8_0         1.45       1.72    +0.27
+
+  driver at rest 0.91 GB     budget 6.00 GB
+  cold-load latency: HEAVY 35.4 s, SMALL 9.0 s, NORMAL 3.0 s
+```
+
+The Q4 estimates are good — NORMAL is accurate to 20 MB. The Q8 estimate is
+18% low. Recorded as a calibration table, not a bar.
+
+## 1. The runtime does not co-reside. It evicts.
+
+The first calibration reported NORMAL at **-1.98 GB** and SMALL at **-1.01 GB**.
+Those are not shrinkage; they are **evictions hiding inside a subtraction**. LM
+Studio unloaded the previous model before loading the next, so a naive delta
+measures *(new load minus old unload)* and goes negative whenever the new model
+is smaller. Residency moved `[HEAVY] -> [NORMAL] -> [SMALL]`, **never two at
+once**.
+
+**The arbiter models co-residency. This runtime is exclusive-residency.** That
+mismatch is real and is recorded before the run rather than discovered in the
+results:
+
+* The arbiter will see at most **one** class resident.
+* When it sees NORMAL resident and HEAVY is requested, it computes
+  `2.73 + 4.55 = 7.28 > 6.00` and downgrades — **while the runtime would
+  happily have unloaded NORMAL and loaded HEAVY.**
+* So METABOLISM-A measures an arbiter that is *conservative about a constraint
+  its substrate does not enforce in this configuration*.
+
+That does not invalidate the plumbing, which is what this experiment claims. It
+does mean the downgrades this run produces are arithmetically correct and
+physically unnecessary, and no result from it may be described as the hardware
+forcing a downgrade. **Modelling exclusivity is a change to the arbiter and
+belongs to a later version, not to a mid-run edit.**
+
+## 2. The boundary case flips under real sizes
+
+```
+  predicted  HEAVY + SMALL = 4.55 + 1.45 = 6.00   fits, exactly
+  actual     HEAVY + SMALL = 4.71 + 1.72 = 6.43   WOULD NOT FIT
+```
+
+The estimator's optimism — mostly the 18% Q8 error — is enough to turn a grant
+that lands exactly on the budget into a 0.43 GB overcommit. Under a co-residency
+runtime that is a real overcommit and exactly the thrashing `Vram` was written
+to avoid. **It is masked here only because the runtime never co-resides**, which
+is luck rather than design and is named as such.
+
+Two consequences, both fixed now rather than after:
+
+* `HEAVY + SMALL` may not be described as a safe co-residency in any result.
+* The 18% Q8 shortfall is a defect in the estimator's `Q8` coefficient, not a
+  rounding artefact, and any future co-residency work must re-measure before
+  trusting it.
+
+## What the run still measures
+
+Latency by class, request mix on live dialogue, the downgrade matrix, denial
+codes, `REQUEST_FAILED`, executor obedience against the response's own `model`
+field, and the residency-event classification. The dominant real cost is
+visible already: **a class change costs a full model load, 35 seconds for
+HEAVY.** That is the metabolism's true price on this card, and no arithmetic
+predicted it.
