@@ -141,6 +141,14 @@ detector requires a challenge word *and* another agent named in the same turn,
 and that combination is rare. The effect is therefore measured over very few
 windows, and the +10.7 is a noisy estimate of something that barely happened.
 
+**And the instrument was coarse.** The published rates reproduce exactly as
+3/28 and 6/28, so the measurement has a resolution of about 3.6 points and the
+"+10.7" is three additional events. On a 28-slot denominator the written bar of
++16 is not an attainable value at all — the rungs are +14.29 and +17.86, so the
+effective bar was **+17.86**. The rejection is unaffected, because +10.7 is
+below even the lower rung. The *effect size* should not be quoted as a precise
+figure ([AUDIT_RULE9](AUDIT_RULE9.md), rule 9).
+
 That is a fact about this test, not an argument for another round. The
 pre-registration said that if this failed, the conclusion is to stop digging,
 and a low trigger count is exactly the kind of post-hoc reason one reaches for

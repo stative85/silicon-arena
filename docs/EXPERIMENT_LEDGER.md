@@ -124,6 +124,7 @@ miscounted as results.
 
 | what | why it exists |
 |---|---|
+| rule 9 quantization audit ([AUDIT_RULE9](AUDIT_RULE9.md)) | static sweep of every threshold in this table against the values its statistic can actually produce: no decision changes, C1's effect size needs qualification, and round-number bars are almost never on the lattice |
 | null calibration (`75a88f1`) | measures what the A/B protocol invents with nothing changed: challenge envelope 53.7 points at 20-speech blocks |
 | slope noise floor | six identical-config runs; challenge slope 2sd = 20.3, `commit` unusable at 48.6 |
 | `tools/eval/` harness | conditions runner, metrics, blind set, judges, paired analysis |
