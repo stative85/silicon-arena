@@ -26,7 +26,7 @@ or display names.
 | Species | ID | arch | quant | native ctx |
 |---|---|---|---|---:|
 | Conventional transformer | `h2o-danube2-1.8b-chat` | `llama` | Q4_K_M | 8,192 |
-| Conv + attention hybrid | `lfm2.5-1.2b-instruct@q4_k_m` | `lfm2` | Q4_K_M | 128,000 |
+| Conv + attention hybrid | `liquidai/lfm2.5-1.2b-instruct` | `lfm2` | Q4_K_M | 128,000 |
 | Linear-state hybrid | `qwen3.5-2b` | `qwen35` | Q4_K_M | 262,144 |
 | Mamba2 + attention parallel | `falcon-h1-1.5b-instruct` | `falcon-h1` | Q4_K_M | 131,072 |
 | Recurrent, attention-free | `rwkv7-1.5b-g1` | `rwkv7` | Q4_K_M | 1,048,576 |
@@ -269,3 +269,40 @@ considered and rejected. It would require inventing a distribution over
 illegality that no species is drawn from, and comparing against an invented
 distribution is worse than comparing against a conservative one. The asymmetry
 is recorded rather than corrected.
+
+---
+
+# Amendment: the LFM2.5 identifier, after removing an ambiguity
+
+**Written before any PIT A outcome exists.** Zero journals, zero manifests.
+
+The first live startup aborted at step 4 loading LFM2.5. The cause was an
+ambiguity in the runtime's inventory rather than anything about the model: the
+publisher folder held both an F16 and a Q4_K_M of the same GGUF name, so the
+runtime disambiguated them with a quantisation suffix and exposed
+`lfm2.5-1.2b-instruct@q4_k_m`. `lms load` cannot parse that suffix, and a
+prefix search resolved instead to an unrelated `-thinking-claude-high-reasoning`
+F16 variant.
+
+**The gate caught it.** Step 5 would have refused on both quantisation and
+architecture identity. It never got that far because step 4 refused to load at
+all, which is the correct order of failure.
+
+The F16 sibling was **moved out of the indexed tree and preserved** at
+`D:\lmstudio_quarantine`, not deleted. With the ambiguity gone the runtime
+exposes the model under its publisher path:
+
+```
+  was   lfm2.5-1.2b-instruct@q4_k_m
+  now   liquidai/lfm2.5-1.2b-instruct
+```
+
+**The model file is byte-identical.** Same GGUF, same Q4_K_M, same `lfm2`
+architecture, same 8192 effective context. What changed is the string the
+runtime uses to name it, and only because a sibling file stopped competing for
+the name. The frozen roster in `pit_gate.gd` is updated to match, and the gate
+still refuses any species whose reported architecture or quantisation drifts.
+
+Recorded rather than silently corrected, because a roster entry changing between
+pre-registration and execution is exactly the kind of edit that has to be
+visible in history.

@@ -29,7 +29,7 @@ const RESPONSE_FORMAT := "json_schema"
 ## inferred from filenames.
 const SPECIES := {
 	"h2o-danube2-1.8b-chat": "llama",
-	"lfm2.5-1.2b-instruct@q4_k_m": "lfm2",
+	"liquidai/lfm2.5-1.2b-instruct": "lfm2",
 	"qwen3.5-2b": "qwen35",
 	"falcon-h1-1.5b-instruct": "falcon-h1",
 	"rwkv7-1.5b-g1": "rwkv7",
