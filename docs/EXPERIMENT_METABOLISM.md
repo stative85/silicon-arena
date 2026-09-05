@@ -283,3 +283,70 @@ project does not yet have one it trusts — and nothing about agents *choosing*,
 because the policy is hand-written. The permitted sentence is in "The question"
 above, and no stronger one may be quoted from this experiment. Locality remains unresolved
 ([EXPERIMENT_SWARM_B2](EXPERIMENT_SWARM_B2.md)), and nothing here changes it.
+
+---
+
+# Preflight B result: MIX DEGENERATE. v0.1 is VOID before any GPU time.
+
+211 transcripts, 25,148 request opportunities, no generation.
+
+```
+    SMALL     6572    26.1%   ok
+    NORMAL      15     0.1%   BELOW FLOOR
+    HEAVY    18561    73.8%   ok
+    (none)       0     0.0%
+
+    floor is 10% per class
+```
+
+**The frozen v0.1 policy is inert in the NORMAL branch and the run is VOID.**
+Per this pre-registration the policy is redesigned; the floor is not lowered.
+That sentence was written before the number existed precisely so that this
+paragraph could not be the one that moved it.
+
+## Why, and both reasons were available in advance
+
+**`named_recently` fires on 73.8% of opportunities, not the ~25% assumed.**
+That estimate came from misreading SWARM-F: direct address there added a stable
+**+0.94 extra bidder per turn** out of roughly four eligible, and that was
+carried across as a naming *rate* of about a quarter. It is not the same
+quantity. The +0.94 is the **marginal** effect on bidder count — agents lifted
+from below the abstention floor to above it. Agents already clearing the floor
+on starvation alone are named just as often, and their bid does not move, so
+they never appeared in that statistic. Naming is a high-frequency signal whose
+*marginal* effect is small. The policy keyed its rarest class to its most common
+signal.
+
+**`turns_since_spoke >= 8` is nearly unreachable in a five-agent roster.**
+`STARVATION_SATURATION` was calibrated for the *bid*, where it is the denominator
+of a ramp and every value from 1 to 8 does work. Re-used as a *threshold* it
+fires only when an agent is skipped twice around a rotation that cycles 1..4.
+Then naming, which outranks it, takes most of the survivors. NORMAL was squeezed
+from both sides: a condition that rarely occurs, further filtered by a condition
+that usually does.
+
+**A constant that is meaningful as a ramp is not automatically meaningful as a
+threshold.** That is the transferable part, and it is a near neighbour of rule 10
+— the constant was derived under one use and reused under another that changes
+what it does.
+
+## What this costs, and what it does not
+
+Zero GPU-hours. The preflight ran on canonical transcripts and cost the time it
+takes to read 211 files. Preflight A still holds: the three branches are
+reachable and each was shown to go red under sabotage. The resolver vocabulary,
+the lint, the payload/oracle split and the two hard laws are all unaffected and
+stay committed — none of them depended on this policy.
+
+## One thing the redesign must carry
+
+A redesigned policy will be chosen **knowing the frequencies above**. That is
+sanctioned here — this document says the policy is redesigned when the mix is
+degenerate — but it changes what a subsequent preflight B means. The second
+mix check is a *construction check*, not evidence: any policy chosen against
+observed frequencies will pass it by design.
+
+So preflight B is evidence exactly once, and it has now been spent. It stays in
+the gate as a regression check against future policy edits, and it may not be
+cited as validation of the policy that replaces v0.1.
+
