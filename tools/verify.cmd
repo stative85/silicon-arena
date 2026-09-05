@@ -90,6 +90,19 @@ call :pycheck "tools/lint_locality.py"    "swarm locality"
 call :pycheck "tools/lint_templates.py"     "template coverage"
 call :pycheck "tools/lint_exits.py"       "silent failure exits"
 
+REM ---- SWARM-F positive control, no GPU -----------------------------------
+REM Rule 6: the harness must report a failure that was built to occur, or a
+REM clean sheet from the fault arms is not evidence of anything.
+"%GODOT%" --headless --path . --script tools/swarm_fault.gd -- --breach >"%TEMP%\sa_fault.txt" 2>&1
+findstr /C:"BREACH CONTROL OK" "%TEMP%\sa_fault.txt" >nul
+if errorlevel 1 (
+  echo [FAIL] swarm fault breach - a constructed resolver failure was not reported
+  findstr /R /C:"FAIL" "%TEMP%\sa_fault.txt"
+  set FAILED=1
+) else (
+  echo [PASS] swarm fault breach
+)
+
 REM ---- JSON + preset legality ---------------------------------------------
 "%GODOT%" --headless --path . --script tools/verify_configs.gd >"%TEMP%\sa_cfg.txt" 2>&1
 findstr /C:"CONFIGS OK" "%TEMP%\sa_cfg.txt" >nul
