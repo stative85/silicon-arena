@@ -217,6 +217,16 @@ Check granularity as well as spread. A statistic whose bar moves in 1.5-turn
 steps cannot be tuned by adding compute, and a projection that lands between
 two rungs is telling you the model is wrong, not that the rung is reachable.
 
+Corollary: **for discrete or quantized statistics, simulate the complete
+decision procedure rather than projecting a continuous approximation through
+the threshold.** Run the whole pipeline — draws, medians, pairwise differences,
+percentile, multiplier, comparison — and look at which bars actually come out.
+If a value cannot appear in that set, no sample size will produce it.
+
+This bites anywhere the decision rests on small-integer counts, medians of
+them, ordinal scores, rounded percentages, or numbers of violations. Floating
+point will happily report a threshold that reality is forbidden to produce.
+
 Seven instruments failed on this project in a single day and every one of them
 failed toward a *cleaner* answer, never a messier one: a ceiling arm that could
 not rise, a scramble bound that could not pass, a decision bar that collapsed to
