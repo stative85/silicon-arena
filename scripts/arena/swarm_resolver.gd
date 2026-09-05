@@ -15,7 +15,21 @@ class_name SwarmResolver
 ##
 ## So the entire input is three keys:
 ##
-##     resolve([{agent_id, eligible, bid}, ...]) -> {ok, agent_id | code}
+##     resolve([{agent_id, eligible, bid, requested_class}, ...])
+##         -> {ok, agent_id | code}
+##
+## `requested_class` was added for METABOLISM-A (docs/EXPERIMENT_METABOLISM.md),
+## pre-registered before this key existed. It is SMALL, NORMAL or HEAVY and it
+## says WHAT is being asked for, never WHY it is wanted -- the same line these
+## failure codes already draw between resource state and motive.
+##
+## A REQUEST IS NOT AUTHORITY. This file validates the class and then ignores it
+## completely: it is not read in the argmax, not folded into the tiebreak salt,
+## and cannot move a single allocation. An agent asks for HEAVY; a separate
+## substrate decision grants, downgrades or denies it on resource facts the
+## agent cannot see. If wanting more compute could win an agent the speaking
+## slot, `requested_class` would be a second bid channel and every agent would
+## learn to shout HEAVY.
 ##
 ## An agent decides locally how much it wants the slot. This decides who gets
 ## it. It cannot know why anyone wants it, and there is no field through which
@@ -31,7 +45,12 @@ class_name SwarmResolver
 ## is a later condition and would destroy the paired design v0.1 relies on.
 
 ## The whole vocabulary. Anything else is malformed.
-const ALLOWED_KEYS := ["agent_id", "eligible", "bid"]
+const ALLOWED_KEYS := ["agent_id", "eligible", "bid", "requested_class"]
+
+## The only legal compute requests. An unrecognised class is MALFORMED_BID and
+## is never coerced to a default: a silent downgrade to NORMAL would let a typo
+## look like a policy decision for months.
+const CLASSES := ["SMALL", "NORMAL", "HEAVY"]
 
 ## Failure codes. These describe RESOURCE state, never motive.
 const OK := "OK"
@@ -93,6 +112,13 @@ static func resolve(bids: Array) -> Dictionary:
 
 		var b := float(entry["bid"])
 		if not is_finite(b) or b < 0.0 or b > 1.0:
+			return {"ok": false, "code": MALFORMED_BID}
+
+		# Validated and then deliberately unused. Nothing below this line reads
+		# it, which is the whole invariant.
+		if typeof(entry["requested_class"]) != TYPE_STRING:
+			return {"ok": false, "code": MALFORMED_BID}
+		if not CLASSES.has(str(entry["requested_class"])):
 			return {"ok": false, "code": MALFORMED_BID}
 
 		if not bool(entry["eligible"]):

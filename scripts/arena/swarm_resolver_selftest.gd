@@ -37,8 +37,14 @@ func _check(name: String, ok: bool, detail: String = "") -> void:
 		print("   FAIL %s  %s" % [name, detail])
 
 
-func _bid(id: String, eligible: bool, bid: float) -> Dictionary:
-	return {"agent_id": id, "eligible": eligible, "bid": bid}
+## NORMAL by default. requested_class became mandatory with METABOLISM-A, and
+## the resolver validates it and never acts on it -- so every check below tests
+## exactly what it tested before the vocabulary grew. A test that wants to vary
+## the class overrides it on the returned dictionary.
+func _bid(id: String, eligible: bool, bid: float,
+		requested_class: String = "NORMAL") -> Dictionary:
+	return {"agent_id": id, "eligible": eligible, "bid": bid,
+		"requested_class": requested_class}
 
 
 ## Never index a resolve() result directly.

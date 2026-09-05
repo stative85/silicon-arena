@@ -150,9 +150,14 @@ func _breach() -> void:
 		printerr("  FAIL: an empty bid list must produce NO_BIDS")
 		bad += 1
 
+	# NORMAL declared explicitly: requested_class became mandatory with
+	# METABOLISM-A. The class is validated and never acted on, so these
+	# constructed failures test exactly what they tested before.
 	var none_eligible: Dictionary = R.resolve([
-		{"agent_id": "a", "eligible": false, "bid": 0.9},
-		{"agent_id": "b", "eligible": false, "bid": 0.8},
+		{"agent_id": "a", "eligible": false, "bid": 0.9,
+			"requested_class": "NORMAL"},
+		{"agent_id": "b", "eligible": false, "bid": 0.8,
+			"requested_class": "NORMAL"},
 	])
 	print("  all entries ineligible  -> ok=%s code=%s"
 		% [str(none_eligible.get("ok", false)), str(none_eligible.get("code", "-"))])
@@ -176,8 +181,10 @@ func _breach() -> void:
 	# And a well-formed list must still succeed, or the control proves only that
 	# the resolver refuses everything.
 	var good: Dictionary = R.resolve([
-		{"agent_id": "a", "eligible": true, "bid": 0.2},
-		{"agent_id": "b", "eligible": true, "bid": 0.5},
+		{"agent_id": "a", "eligible": true, "bid": 0.2,
+			"requested_class": "NORMAL"},
+		{"agent_id": "b", "eligible": true, "bid": 0.5,
+			"requested_class": "NORMAL"},
 	])
 	print("  well-formed list        -> ok=%s agent=%s"
 		% [str(good.get("ok", false)), str(good.get("agent_id", "-"))])
@@ -281,7 +288,11 @@ func _play(path: String, arm: String, match_index: int, live: bool) -> Dictionar
 			var view := _local_view(agent, history)
 			if B.should_bid(view):
 				var b := B.compute(view)
-				bids.append({"agent_id": agent, "eligible": true, "bid": b})
+				# NORMAL: SWARM-F ran one model with no escalation. See the note
+				# in swarm_match.gd -- the class is validated and never acted on,
+				# so the recorded allocations are unchanged.
+				bids.append({"agent_id": agent, "eligible": true, "bid": b,
+					"requested_class": "NORMAL"})
 
 		bidder_counts.append(bids.size())
 		active_sizes.append(active.size())

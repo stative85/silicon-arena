@@ -270,8 +270,15 @@ func _play(path: String, arm: String, sham_seed: int, match_index: int) -> Dicti
 			var bids: Array = []
 			for i in eligible.size():
 				if bool(tuples[i]["submits"]):
+					# NORMAL because that is the regime SWARM-B actually ran in:
+					# one model, no escalation, which METABOLISM-A calls M0. The
+					# key became mandatory when the vocabulary grew; declaring it
+					# explicitly is a description of what happened, not a change
+					# to it. The resolver validates the class and never acts on
+					# it, so every recorded allocation is unaffected.
 					bids.append({"agent_id": str(eligible[i]), "eligible": true,
-						"bid": float(tuples[i]["bid"])})
+						"bid": float(tuples[i]["bid"]),
+						"requested_class": "NORMAL"})
 
 			var out: Dictionary = R.resolve(bids)
 			if bool(out.get("ok", false)):
