@@ -52,34 +52,88 @@ func _run() -> void:
 
 	# ---------------------------------------------------------- reachability
 	#
-	# Each branch must fire. SABOTAGE INSTRUCTIONS, so this is a test that has
-	# been shown to fail rather than one that has only ever passed:
+	# Every tier must fire. SABOTAGE INSTRUCTIONS, so this is a test that has
+	# been shown to fail rather than one that has only ever passed. In
+	# swarm_request.gd's tier():
 	#
-	#   HEAVY   in swarm_request.gd, delete `if bool(named): return HEAVY`
-	#   NORMAL  change `>=` to `>` and pass since exactly at saturation, or
-	#           delete the branch entirely
+	#   HEAVY   change `bid > HEAVY_ABOVE` to `bid > 2.0`, unreachable
+	#   NORMAL  change `bid >= NORMAL_FROM` to `bid >= 2.0`
 	#   SMALL   make the final `return SMALL` return NORMAL
+	#   MONO    swap the HEAVY and SMALL returns, or flip `>` to `<`
 	#
-	# Each edit must turn exactly one check below red. Verified by hand before
-	# this file was committed; re-verify after any change to the policy.
-	print(" reachability: every branch fires")
-	var heavy := Q.request(_view(1, true, 0.2))
-	_check("named_recently -> HEAVY", heavy == Q.HEAVY, "got %s" % heavy)
+	# Each edit must turn its own check red. Verified by hand before this file
+	# was committed; re-verify after any change to the policy or the weights.
+	print(" reachability: every tier fires from a real local view")
+	# Named AND saturated: two stacked pressures, 0.30 + 0.50 = 0.80.
+	var heavy := Q.request(_view(B.STARVATION_SATURATION, true, 0.2))
+	_check("stacked pressures -> HEAVY", heavy == Q.HEAVY, "got %s" % heavy)
 
+	# Saturated starvation alone: exactly 0.50, the largest single component.
 	var normal := Q.request(_view(B.STARVATION_SATURATION, false, 0.2))
-	_check("saturated silence, not named -> NORMAL", normal == Q.NORMAL,
+	_check("one strong pressure alone -> NORMAL", normal == Q.NORMAL,
 		"got %s" % normal)
 
+	# One turn silent, unnamed, fair airtime: 0.0625.
 	var small := Q.request(_view(1, false, 0.2))
-	_check("neither -> SMALL", small == Q.SMALL, "got %s" % small)
+	_check("background willingness -> SMALL", small == Q.SMALL, "got %s" % small)
 
-	_check("the three branches are distinct",
+	_check("the three tiers are distinct",
 		heavy != normal and normal != small and heavy != small,
 		"a policy that returns one class cannot demonstrate heterogeneity")
 
-	# Naming outranks silence, or a starving agent could never ask for HEAVY.
-	_check("named beats saturated silence",
-		Q.request(_view(20, true, 0.2)) == Q.HEAVY)
+	print("\n cut points are the bid weights themselves")
+	_check("NORMAL begins at W_ADDRESSED", Q.NORMAL_FROM == B.W_ADDRESSED,
+		"%.4f vs %.4f" % [Q.NORMAL_FROM, B.W_ADDRESSED])
+	_check("HEAVY begins above W_STARVATION", Q.HEAVY_ABOVE == B.W_STARVATION,
+		"%.4f vs %.4f" % [Q.HEAVY_ABOVE, B.W_STARVATION])
+
+	# The structural consequence, and the reason airtime was rejected as a
+	# trigger: the smallest component cannot reach the NORMAL cut on its own.
+	_check("airtime alone can NEVER reach NORMAL",
+		B.W_AIRTIME < Q.NORMAL_FROM,
+		"%.2f vs %.2f" % [B.W_AIRTIME, Q.NORMAL_FROM])
+	_check("HEAVY is unreachable from any single component",
+		maxf(maxf(B.W_STARVATION, B.W_ADDRESSED), B.W_AIRTIME) <= Q.HEAVY_ABOVE,
+		"a single pressure could reach HEAVY, so stacking is not forced")
+
+	# ------------------------------------------------------- monotonicity
+	#
+	# Statistic 8: raising a bid while holding everything else fixed may never
+	# request a LOWER class. An agent that wants the slot more must never be
+	# assigned less compute -- that is not a metabolism, it is a bug with a
+	# story attached.
+	#
+	# SABOTAGE: in swarm_request.gd swap the HEAVY and SMALL returns, or change
+	# `bid > HEAVY_ABOVE` to `bid < HEAVY_ABOVE`. Either must turn this red.
+	print("\n monotonicity: more want, never less compute")
+	var rank := {Q.SMALL: 0, Q.NORMAL: 1, Q.HEAVY: 2, "": -1}
+	var last := -1
+	var violations := 0
+	var worst := ""
+	for i in 1001:
+		var b := float(i) / 1000.0
+		var r := int(rank[Q.tier(b)])
+		if r < last:
+			violations += 1
+			if worst == "":
+				worst = "bid %.3f dropped to %s" % [b, Q.tier(b)]
+		last = r
+	_check("1001 bids from 0.000 to 1.000 never step down",
+		violations == 0, "%d violation(s); %s" % [violations, worst])
+
+	_check("the sweep actually reached all three tiers",
+		Q.tier(0.05) == Q.SMALL and Q.tier(0.40) == Q.NORMAL
+			and Q.tier(0.90) == Q.HEAVY,
+		"a monotone constant function would pass the check above")
+
+	print("\n tier boundaries are closed on the documented side")
+	_check("exactly W_ADDRESSED is NORMAL", Q.tier(B.W_ADDRESSED) == Q.NORMAL)
+	_check("just below W_ADDRESSED is SMALL",
+		Q.tier(B.W_ADDRESSED - 0.001) == Q.SMALL)
+	_check("exactly W_STARVATION is NORMAL", Q.tier(B.W_STARVATION) == Q.NORMAL)
+	_check("just above W_STARVATION is HEAVY",
+		Q.tier(B.W_STARVATION + 0.001) == Q.HEAVY)
+	_check("a NAN bid requests nothing", Q.tier(NAN) == "")
 
 	# ------------------------------------------------------- malformed views
 	print("\n a malformed view requests nothing, and is never defaulted")

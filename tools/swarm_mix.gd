@@ -10,13 +10,19 @@ extends SceneTree
 ## transcripts and tallies what the frozen policy would have requested at each
 ## opportunity. Nothing is asked of a model and no GPU time is spent.
 ##
-## THIS IS A PREFLIGHT AND NOT AN INDEPENDENT VALIDATION, and the difference is
-## stated here so it cannot be quietly forgotten later. `named_recently` was
-## chosen as the HEAVY trigger BECAUSE SWARM-F had already established it as a
-## real local signal carrying a stable +0.94 extra bidder. Confirming that a
-## policy keyed to a known-frequent signal produces a non-degenerate mixture is
-## a sanity check on the frozen policy. It is not evidence about the world, and
-## it must never be reported as one.
+## THIS WAS EVIDENCE EXACTLY ONCE, AND THAT ONCE IS SPENT.
+##
+## Against policy v0.1 it was a genuine viability gate and it fired: HEAVY 73.8%,
+## NORMAL 0.1%, VOID before any GPU time. Against v0.2 and everything after it,
+## it is a CONSTRUCTION AND REGRESSION CHECK. The v0.2 cut points were derived
+## from the bid weights rather than from these frequencies, but they were chosen
+## with the v0.1 numbers already known, so a pass here cannot validate them.
+##
+## What it can still do is kill a pathological implementation -- a tier that
+## never fires, an off-by-one at a boundary, a policy edit that quietly
+## flattens the mixture. That is worth keeping in the tree. It is not worth
+## quoting as support for a policy, and the honest sentence on a pass is
+## "the tiers are not inert on canonical states" and nothing stronger.
 ##
 ## Preflight A (scripts/arena/swarm_request_selftest.gd) proves the branches are
 ## REACHABLE. This proves the policy is not INERT on realistic states. Neither
@@ -40,9 +46,9 @@ func _init() -> void:
 
 func _run() -> void:
 	print("=== METABOLISM preflight B: natural mix, NO generation ===\n")
-	print("replaying canonical local views. this is a preflight, not an")
-	print("independent validation: named_recently was chosen as the HEAVY")
-	print("trigger because SWARM-F had already measured it.\n")
+	print("replaying canonical local views. this was evidence once, against")
+	print("policy v0.1, and it fired. it is now a construction and regression")
+	print("check and cannot validate the policy it is run against.\n")
 
 	var files := _transcripts()
 	if files.is_empty():

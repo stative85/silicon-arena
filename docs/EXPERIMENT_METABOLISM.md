@@ -350,3 +350,134 @@ So preflight B is evidence exactly once, and it has now been spent. It stays in
 the gate as a regression check against future policy edits, and it may not be
 cited as validation of the policy that replaces v0.1.
 
+---
+
+# Amendment: v0.2 tiers the agent's own bid, with cut points derived from the formula
+
+**Written after v0.1 VOIDed and before v0.2 exists.** The cut points below were
+derived from the structure of the frozen bid function and **not** by replaying
+transcripts until a floor passed. That distinction is the whole content of this
+amendment.
+
+## The redesign
+
+```
+  local_view -> compute_bid(local_view) -> bid scalar -> tier -> class
+```
+
+**The class policy reads the bid and nothing else.** Not `named_recently`, not
+`airtime_share`, not `turns_since_spoke`. Those signals were already distilled
+into the bid by a frozen weighted sum, and re-reading them would make compute
+metabolism a **second hand-written behavioural policy sitting beside the bidding
+policy** — two mechanisms to tune, two places for the cage to reappear, and no
+way to attribute a result to either.
+
+One local urgency variable. Request intensity becomes monotonic with the same
+private pressure that made the agent compete for the slot in the first place,
+and the substrate learns neither reason.
+
+## Cut points, derived from the weights and nothing else
+
+The frozen bid is `0.5*starvation + 0.3*addressed + 0.2*airtime`, clamped, with
+components bounded by their weights:
+
+```
+  W_STARVATION * starvation   in [0, 0.50]     largest single component
+  W_ADDRESSED  * addressed    in {0, 0.30}     second largest
+  W_AIRTIME    * airtime      in [0, 0.20]     smallest
+```
+
+That structure supplies two natural breakpoints without a single data point:
+
+```
+  SMALL    0.10 <= bid <  0.30      ordinary background willingness
+  NORMAL   0.30 <= bid <= 0.50      one materially strong local pressure
+  HEAVY           bid >  0.50       stacked local pressures
+```
+
+**Both cuts are weights, not quantiles.**
+
+`0.30` is `W_ADDRESSED`, the second-largest component. Below it a bid is
+reachable from the weakest pressure alone or from a partial one. Note the
+consequence: `W_AIRTIME` maxes at `0.20`, so **airtime alone can never reach
+NORMAL**. "I have spoken little, therefore I deserve a larger model" is
+structurally excluded rather than merely discouraged.
+
+`0.50` is `W_STARVATION`, the largest component, and it gives HEAVY a proof
+rather than a heuristic:
+
+> `max` over single components is `0.50`, so `bid > 0.50` **implies at least two
+> components are non-zero.** A HEAVY request is mathematically impossible from
+> one pressure acting alone.
+
+Worked examples, all forced by the formula:
+
+| local situation | bid | tier |
+|---|---:|---|
+| named only | 0.3000 | NORMAL |
+| saturated starvation only | 0.5000 | NORMAL |
+| airtime alone, at maximum | 0.2000 | SMALL |
+| named, one turn silent | 0.3625 | NORMAL |
+| named and saturated | 0.8000 | **HEAVY** |
+| saturated with maximum airtime | 0.7000 | **HEAVY** |
+
+## The monotonicity invariant
+
+> **Raising an agent's bid while holding everything else fixed may never request
+> a lower compute class.**
+
+Frozen as statistic 8, bar zero, and tested by sabotage: the tier mapping is
+deliberately broken and the check must go red. A non-monotonic mapping would
+mean an agent could want the slot *more* and be assigned *less* compute, which
+is not a metabolism but a bug with a story attached.
+
+## What the next mix replay can and cannot do
+
+As recorded when v0.1 VOIDed: **preflight B was evidence exactly once and it has
+been spent.** Running it against v0.2 is a **construction and regression check**.
+It can kill a pathological implementation — a tier that never fires, an
+off-by-one at a boundary — and it cannot validate the redesign, because the cut
+points were chosen with the v0.1 frequencies already known even though they were
+not derived from them.
+
+If the v0.2 mix passes, the honest sentence is *"the formula-derived tiers are
+not inert on canonical states"*, and no stronger one.
+
+## Why not the alternatives, recorded so they are not revisited
+
+**`airtime_share`** is beautifully distributed and conceptually weak. It would
+make compute a reward for having been quiet, which is the kind of convenient
+correlation this project would later mistake for metabolism.
+
+**Reordering silence against naming** is better than the dead policy but turns
+compute allocation into another rotation-derived scheduler. `W_STARVATION`
+already reconstructed the cage once in SWARM-V, where a starvation-weighted bid
+agreed with round-robin 85.8% of the time. There is no reason to film the
+sequel.
+
+## v0.2 construction check
+
+Same 211 transcripts, same 25,148 opportunities, no generation:
+
+```
+    SMALL     5679    22.6%   ok
+    NORMAL   12706    50.5%   ok
+    HEAVY     6763    26.9%   ok
+    (none)       0     0.0%
+```
+
+The permitted sentence: **the formula-derived tiers are not inert on canonical
+states.** Nothing stronger. This is the construction check described above and
+it cannot validate cut points that were chosen while the v0.1 frequencies were
+known.
+
+Monotonicity was sabotaged four ways and each turned its own check red,
+including a swept violation reported as `bid 0.501 dropped to SMALL`. The tier
+boundaries, the two cut points being the weights themselves, and the
+impossibility of reaching HEAVY from a single component are all asserted in
+`scripts/arena/swarm_request_selftest.gd`, 32 checks.
+
+METABOLISM-A remains **not started**. What exists is a resolver vocabulary, a
+lint with two holes closed, a request policy whose tiers are reachable and
+monotone, and two hard laws shown independently alive. No model has been asked
+for anything.
