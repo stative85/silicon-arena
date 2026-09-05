@@ -237,3 +237,35 @@ downstream, never scripted upstream, or the experiment manufactures the result
 it then congratulates itself for finding.
 
 PIT A is not interpreted while running.
+
+---
+
+# Amendment: what the RANDOM arm can and cannot judge
+
+**Written before any PIT A outcome exists.**
+
+`pit_random.gd` samples uniformly from **currently legal** operations. It is
+therefore structurally protected from most semantic invalidity: it rarely
+proposes a RESTORE of something never deleted, because such an operation is not
+in the set it draws from.
+
+> **The RANDOM arm is not a valid comparator for semantic-invalid proposal
+> rate.** Its near-zero invalidity is a property of how it samples, not evidence
+> of better decisions.
+
+Semantic-invalid rate remains an experimental descriptor **across model species
+and replicates**. It may be compared species-to-species. It may not be compared
+to RANDOM, and a chart showing "models 8%, RANDOM 0%" would be reporting the
+sampler's construction as a finding.
+
+**What RANDOM does control for** is the question it was added to answer: whether
+structural divergence, recurrence, survival, restoration and apparent
+convergence can arise from the **mutation space itself**. Five random walks also
+end in five different-looking worlds. That is the comparison, and it is the only
+one this arm licenses.
+
+The alternative — letting RANDOM propose deliberately illegal operations — was
+considered and rejected. It would require inventing a distribution over
+illegality that no species is drawn from, and comparing against an invented
+distribution is worse than comparing against a conservative one. The asymmetry
+is recorded rather than corrected.
