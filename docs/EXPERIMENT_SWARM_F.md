@@ -260,3 +260,142 @@ Fixed now so it cannot later become a rescue explanation for a prediction that
 missed. It binds in both directions: if live bidding sits at or below the
 baseline, naming is **not** load-bearing and no second mechanism may be claimed.
 
+---
+
+# Result: allocation holds to n=3, reintegration does not, and one guard was mis-specified
+
+120 matches, 4,800 allocations, no interruption. Read from the persisted
+checkpoint, not from stdout.
+
+```
+  arm  n      mean bidders   fallback wakes    stat1  stat4  stat5  max silence
+                (scored)        of 800
+  F0   5         3.94            0  (0.0%)        0      0      0        8
+  F1   4         2.94            0  (0.0%)        0      0      0        7
+  F2   3         1.80            0  (0.0%)        0      0      0        3
+  F3   5<->4     3.50            0  (0.0%)        0      0    **4**      8
+  F4   5->4->5   3.98            0  (0.0%)        0      0      0        8
+  F5   2         0.25          509 (63.6%)        0      0      0        1
+
+  S (from F0 only) = 8
+```
+
+## What holds
+
+**Statistic 1 is zero everywhere.** No malformed bid, no unexplained allocation
+failure, in 4,800 allocations. Rule of three bounds the rate below 0.06%.
+
+**Statistic 2 is zero across F0-F4.** Four thousand allocations at n=5, n=4,
+n=3, under intermittent toggling and under full removal-and-rejoin, and the
+fallback authority never woke. Every `NO_BIDS` in the entire run belongs to F5.
+
+**Statistic 4 is zero everywhere.** Allocation resumed on the turn after every
+dropout event, in all 80 of them.
+
+**Statistic 6 is zero.** `S` is 8, fixed from F0 before any perturbed arm was
+read. No arm exceeded it; F1 and F2 came in *below* the intact roster at 7 and
+3, which is what a smaller roster should do.
+
+**F5 confirmed its prediction.** 509 of 800 turns woke the fallback, 63.6%
+against a pre-registered floor of 50%. The two-agent phase transition is real,
+and naming did not rescue the arm.
+
+## What fails: statistic 5, on F3 only
+
+**Four violations against a bar of zero**, in 4 separate matches out of 20.
+F4 had none in 20 rejoin events; F3 had 4 in 60.
+
+The mechanism is fully derivable from the frozen policy and was not derived in
+advance, which is the honest part of this finding. A returning agent bids
+`0.5 * min(k/8, 1)` after `k` turns away. A *named* survivor bids up to
+`0.5 * (3/8) + 0.3 = 0.4875`. So:
+
+```
+  returner wins iff  0.5 * min(k/8, 1)  >  0.4875
+                     ->  k >= 8 turns away
+```
+
+| absence | returner bid | outcome |
+|---:|---:|---|
+| 4 turns | 0.2500 | can lose |
+| 5 turns | 0.3125 | **can lose — this is F3** |
+| 7 turns | 0.4375 | can lose |
+| **8 turns** | 0.5000 | wins |
+| 10 turns | 0.5000 | **wins — this is F4** |
+
+F3 removes an agent for 5 turns; F4 for 10. The rejoin guarantee holds only once
+starvation has **saturated**, and `STARVATION_SATURATION` is 8. Below that, a
+survivor who happens to be named outbids the returning agent.
+
+> **Reintegration is not guaranteed for short absences.** The returning agent
+> wins its first eligible turn only when it has been gone long enough to
+> saturate starvation pressure. That threshold is a constant in the local
+> policy, not a property of the substrate.
+
+This is a real failure of a pre-registered claim and it is recorded as one. It
+does not touch the allocation result: every one of those 4 turns still allocated
+successfully to *somebody*, with no fallback wake. What failed is the specific
+promise that the returner goes first.
+
+## What was mis-specified: statistic 3
+
+**Statistic 3's bar could not be met, and that is my error, not the swarm's.**
+
+`PREDICTED_BIDDERS` was derived "at even rotation with no naming". The live arms
+have naming. Setting a bar of **zero mismatches** against a no-naming baseline,
+and then scoring live runs against it, is a guard that no correct system could
+pass. Observed mismatches: 376/400 at F0, 375 at F1, 320 at F2, 101 at F5.
+
+The pre-registered amendment at `a495bcb` fixes the *reading* — live above the
+starvation-only baseline means direct address is a second load-bearing channel,
+not that the curve was refuted — and that reading is confirmed:
+
+```
+  n     dry (starvation only)     live (mean, scored)     offset
+  5              3                      3.94             +0.94
+  4              2                      2.94             +0.94
+  3              1                      1.80             +0.80
+  2              0                      0.25             +0.25
+```
+
+A stable **+0.94 extra bidder** at n>=4, decaying as the roster shrinks and
+there are fewer candidates for naming to land on. At n=2, where the single
+eligible agent must itself be named for any bid to exist, it contributes +0.25
+and the arm collapses anyway.
+
+But the amendment rescues the interpretation, not the guard. The guard was
+unpassable by construction and is recorded as **mis-specified**, exactly as P1's
+two guards were. Statistic 3 is demoted to descriptive for this experiment; it
+established the offset above and it decided nothing.
+
+## Verdict, against the frozen decision tree
+
+```
+  offline control                 went red as constructed, verify gate passes
+  statistics 1, 4, 6              zero -> hold
+  statistic 2 across F0-F4        zero -> hold
+  F5 fallback >= 50%              63.6% -> confirmed
+  statistic 5                     4 violations on F3 -> THIS CLAIM FAILS
+  statistic 3                     mis-specified, demoted to descriptive
+```
+
+> **PARTIAL.** The blind swarm keeps allocating when agents disappear, go
+> silent, or return — down to a roster of three, with zero fallback wakes in
+> 4,000 allocations and no semantic rescue from the arena. It stops at a roster
+> of two, where the derivation said it would. **Reintegration is not
+> guaranteed for absences shorter than 8 turns.**
+
+Per the pre-registration there is no SWARM-F2 to chase this. The reintegration
+boundary is the finding, and it is a boundary in the local policy's constants
+rather than in the substrate — the same shape of answer as the roster-size
+collapse, arrived at independently.
+
+## What this does not license
+
+The architecture claim is unchanged and was never at risk here: the resolver saw
+`{agent_id, eligible, bid}` for all 4,800 allocations and the injector never
+touched it. Locality remains unresolved
+([EXPERIMENT_SWARM_B2](EXPERIMENT_SWARM_B2.md)). Nothing here justifies
+stigmergy, and `FAIR_SHARE` and `STARVATION_SATURATION` are not retuned on the
+strength of a result that measured them.
+
