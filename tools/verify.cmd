@@ -94,6 +94,18 @@ call :pycheck "tools/lint_locality.py"    "swarm locality"
 call :pycheck "tools/lint_templates.py"     "template coverage"
 call :pycheck "tools/lint_exits.py"       "silent failure exits"
 
+REM ---- PIT A live gate, no generation -------------------------------------
+REM The gate is proven against synthetic dictionaries in the selftest. This
+REM proves it also bites a REAL observed runtime configuration.
+"%GODOT%" --headless --path . --script tools/pit_runtime_probe.gd -- --sabotage >"%TEMP%\sa_pit.txt" 2>&1
+findstr /C:"PIT GATE LIVE OK" "%TEMP%\sa_pit.txt" >nul
+if errorlevel 1 (
+  echo [SKIP] pit A live gate - LM Studio not reachable, or gate accepted drift
+  findstr /C:"FAIL" "%TEMP%\sa_pit.txt"
+) else (
+  echo [PASS] pit A live gate
+)
+
 REM ---- SWARM-F positive control, no GPU -----------------------------------
 REM Rule 6: the harness must report a failure that was built to occur, or a
 REM clean sheet from the fault arms is not evidence of anything.

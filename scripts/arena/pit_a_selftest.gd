@@ -32,6 +32,7 @@ const V := preload("res://scripts/arena/pit_validator.gd")
 const C := preload("res://scripts/arena/pit_consequence.gd")
 const R := preload("res://scripts/arena/pit_random.gd")
 const G := preload("res://scripts/arena/pit_gate.gd")
+const J := preload("res://scripts/arena/pit_journal.gd")
 
 var _checks := 0
 var _failures: Array[String] = []
@@ -211,8 +212,118 @@ func _run() -> void:
 		"canonical history cannot reconstruct the world it recorded")
 
 	_gate()
+	_journal()
 	_reachability(g)
 	_report()
+
+
+# ------------------------------------------------ resume and contamination
+
+## Two teeth that only exist once trajectories are FILES. In memory they are
+## separate dictionaries and cannot touch. On disk they are paths, and that is
+## where shared mutable state comes back wearing a filename.
+func _journal() -> void:
+	print("
+ 13. resume is deterministic, and contamination is refused")
+	var species := "selftest-species"
+	var other := "selftest-other"
+	for s in [species, other]:
+		for rep in [0, 1]:
+			DirAccess.remove_absolute(ProjectSettings.globalize_path(
+				J.path(s, rep)))
+
+	# An uninterrupted RANDOM run of 100 cycles, journalled every cycle.
+	var uninterrupted := _drive(species, 0, 0, 100, 4242)
+	var full := J.load_rows(species, 0)
+	_check("   100 cycles journalled and the chain links",
+		bool(full["ok"]) and (full["rows"] as Array).size() == 100,
+		"%s / %d rows" % [str(full["code"]), (full["rows"] as Array).size()])
+	_check("   replay from genesis reproduces the live world",
+		W.state_hash(J.replay(full["rows"])) == W.state_hash(uninterrupted),
+		"the journal cannot rebuild the world it recorded")
+
+	# Now kill at 37 and resume. Same seed, same schedule, same everything.
+	DirAccess.remove_absolute(ProjectSettings.globalize_path(J.path(species, 1)))
+	_drive(species, 1, 0, 37, 4242)
+	var partial := J.load_rows(species, 1)
+	_check("   killed at cycle 37, journal holds exactly 37 rows",
+		(partial["rows"] as Array).size() == 37)
+	var resumed_from := J.replay(partial["rows"])
+	var resumed := _drive(species, 1, J.next_cycle(partial["rows"]), 100, 4242,
+		resumed_from)
+	var after := J.load_rows(species, 1)
+	_check("   resumed run reaches 100 rows",
+		(after["rows"] as Array).size() == 100)
+	_check("   RESUME DETERMINISM: cycles 38-100 match uninterrupted exactly",
+		W.state_hash(resumed) == W.state_hash(uninterrupted),
+		"a resume that diverges makes every long trajectory unreliable")
+	var same_rows := true
+	for i in 100:
+		var a := (full["rows"] as Array)[i] as Dictionary
+		var b := (after["rows"] as Array)[i] as Dictionary
+		if str(a.get("patch", {})) != str(b.get("patch", {})):
+			same_rows = false
+	_check("   and every recorded patch is identical row for row", same_rows)
+
+	# Contamination: point one species at another's journal.
+	var stolen := J.load_rows(species, 0)
+	var forged := (stolen["rows"] as Array).duplicate(true)
+	J.ensure_dir()
+	var fh := FileAccess.open(J.path(other, 0), FileAccess.WRITE)
+	for r in forged:
+		fh.store_line(JSON.stringify(r))
+	fh.close()
+	var contaminated := J.load_rows(other, 0)
+	_check("   CONTAMINATION: another species' journal is REFUSED",
+		not bool(contaminated["ok"])
+			and str(contaminated["code"]) == J.CONTAMINATED,
+		str(contaminated["code"]))
+	_check("   and a refused journal yields no rows to resume from",
+		(contaminated["rows"] as Array).is_empty(),
+		"refusing but still handing back rows would be theatre")
+
+	# A broken chain must also be refused, or lost rows resume silently.
+	var gapped := (stolen["rows"] as Array).duplicate(true)
+	gapped.remove_at(20)
+	var fh2 := FileAccess.open(J.path(other, 1), FileAccess.WRITE)
+	for r in gapped:
+		var rr: Dictionary = (r as Dictionary).duplicate(true)
+		rr["species"] = other
+		rr["replicate"] = 1
+		fh2.store_line(JSON.stringify(rr))
+	fh2.close()
+	var broken := J.load_rows(other, 1)
+	_check("   a journal missing a cycle is REFUSED as a broken chain",
+		not bool(broken["ok"]) and str(broken["code"]) == J.BROKEN_CHAIN,
+		str(broken["code"]))
+
+	for s in [species, other]:
+		for rep in [0, 1]:
+			DirAccess.remove_absolute(ProjectSettings.globalize_path(
+				J.path(s, rep)))
+
+
+## Drive RANDOM through a journalled trajectory. No models: this proves the
+## checkpoint machinery, not any species.
+func _drive(species: String, replicate: int, from_cycle: int, to_cycle: int,
+		seed_value: int, start_state: Dictionary = {}) -> Dictionary:
+	var state := start_state if not start_state.is_empty() else W.genesis()
+	for cyc in range(from_cycle, to_cycle):
+		var pre := W.state_hash(state)
+		var patch := R.propose(state, seed_value, cyc)
+		var v := V.validate(state, patch)
+		var accepted := bool(v["ok"])
+		if accepted:
+			state = W.apply(state, patch)
+		J.append(species, replicate, {
+			"species": species, "replicate": replicate, "cycle": cyc,
+			"pre_state_hash": pre, "patch": patch,
+			"operation": str(patch.get("operation", "")),
+			"target": str(patch.get("target", "")),
+			"reason_code": str(v["code"]), "accepted": accepted,
+			"post_state_hash": W.state_hash(state),
+		})
+	return state
 
 
 # --------------------------------------------------- fail-closed runtime gate
