@@ -157,3 +157,11 @@ that exists because casual counts drift:
    counts, so the bar can only be 3.0, 4.5, 6.0, 7.5 or 9.0 — 5.60 did not
    exist. The realized variance beat the forecast and the bar still came in at
    6.00. Check granularity, not only spread.
+6. A threshold derived under a simplifying assumption may only judge data
+   generated under that same assumption. SWARM-F derived a bidder count with
+   direct address held off, confirmed it exactly in a text-free dry run, then
+   set a zero-mismatch bar and pointed it at live dialogue where naming adds
+   0.30 to a bid. 376 mismatches out of 400 at full roster; no correct live
+   system could have passed. Rule 9 is a bar off the attainable support; this
+   is a bar from the wrong generating distribution.
+

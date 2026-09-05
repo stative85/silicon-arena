@@ -103,7 +103,7 @@ VERIFY OK
 
 CI runs the same thing on Linux for every push and pull request.
 
-### Nine rules that are not negotiable
+### Ten rules that are not negotiable
 
 **1. A new test must be shown to fail.** Reintroduce the defect it guards,
 watch it go red, restore, watch it go green. A suite that can only pass is not
@@ -226,6 +226,28 @@ If a value cannot appear in that set, no sample size will produce it.
 This bites anywhere the decision rests on small-integer counts, medians of
 them, ordinal scores, rounded percentages, or numbers of violations. Floating
 point will happily report a threshold that reality is forbidden to produce.
+
+**10. A threshold derived under a simplifying assumption may only judge data
+generated under that same assumption.** If the assumption changes the
+statistic's distribution, the threshold is invalid outside that regime.
+
+Rule 9 is about a threshold that sits off its statistic's attainable support.
+This is a different defect: the threshold came from the **wrong generating
+distribution** entirely, and it can be perfectly attainable and still
+unpassable.
+
+Not hypothetical. SWARM-F derived a predicted bidder count from the frozen bid
+policy at even rotation **with no direct address**, confirmed it exactly in a
+dry run that produces no text, and then set a bar of *zero mismatches* against
+it -- and pointed that bar at live dialogue, where agents name each other and
+`named_recently` adds 0.30 to a bid. Direct address contributed a stable +0.94
+extra bidder, so the guard reported 376 mismatches out of 400 at full roster. No
+correct live system could have passed it (`docs/EXPERIMENT_SWARM_F.md`).
+
+The tell is that the derivation and the data disagree about what generated
+them. Ask, before freezing: *what did I hold fixed to get this number, and is it
+still fixed when the treatment runs?* If not, the derived value is a baseline to
+measure against, not a bar to fail against.
 
 Seven instruments failed on this project in a single day and every one of them
 failed toward a *cleaner* answer, never a messier one: a ceiling arm that could
