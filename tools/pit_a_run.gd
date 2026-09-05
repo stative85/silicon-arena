@@ -389,8 +389,12 @@ func _lms() -> String:
 func _load_species(id: String) -> bool:
 	var out: Array = []
 	_unload_all()
+	# `-y`, not `--exact`. --exact demands a full publisher path such as
+	# "qwen/qwen3-8b", and the frozen IDs are the short identifiers the runtime
+	# itself exposes -- so --exact aborted every load on the first live startup.
+	# -y auto-confirms an exact match on the short id, which is what these are.
 	return OS.execute(_lms(), ["load", id, "--context-length",
-		str(G.EXPECTED_CONTEXT), "--gpu", "max", "--exact"], out, true) == 0
+		str(G.EXPECTED_CONTEXT), "--gpu", "max", "-y"], out, true) == 0
 
 
 func _unload_all() -> void:
