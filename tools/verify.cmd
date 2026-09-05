@@ -80,6 +80,7 @@ call :check "tools/source_measure_selftest.gd"            "source measure"      
 call :check "scripts/arena/swarm_resolver_selftest.gd"    "swarm resolver"      "SWARM RESOLVER OK"
 call :check "scripts/arena/swarm_bid_selftest.gd"         "swarm bid"           "SWARM BID OK"
 call :check "scripts/arena/swarm_request_selftest.gd"     "swarm request"       "SWARM REQUEST OK"
+call :check "scripts/arena/compute_arbiter_selftest.gd"   "compute arbiter"     "COMPUTE ARBITER OK"
 call :check "tools/adversarial.gd"                        "adversarial pass"    "ADVERSARIAL OK"
 call :check "tools/offline_selftest.gd"                   "offline behaviour"   "OFFLINE OK"
 

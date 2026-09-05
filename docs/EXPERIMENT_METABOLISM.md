@@ -481,3 +481,75 @@ METABOLISM-A remains **not started**. What exists is a resolver vocabulary, a
 lint with two holes closed, a request policy whose tiers are reachable and
 monotone, and two hard laws shown independently alive. No model has been asked
 for anything.
+
+---
+
+# The substrate arbiter, and two more branches that could not fail
+
+`scripts/arena/compute_arbiter.gd`. Pure, offline, and **it does not evict**:
+fitting a grant into free headroom or stepping it down the ladder is the whole
+policy. A clever packer that unloaded another agent's model to make room would
+be deciding who gets to think, which is the authority this architecture removes
+from the centre.
+
+```
+  requested_class + resource state -> GRANTED | DOWNGRADED | DENIED
+
+  order of checks    INVALID_CLASS
+                     OVER_PARAM_CEILING     <- before any memory arithmetic
+                     MODEL_UNAVAILABLE      <- steps down, never substitutes
+                     NO_CAPACITY
+```
+
+The ceiling is checked **first**, so a refusal on the parameter law can never be
+mistaken for running out of room. A class already resident costs nothing further
+to use, which is what makes `HEAVY + SMALL` a stable state and `HEAVY + NORMAL`
+an impossible one.
+
+All the pre-registered teeth hold, 33 checks. Five decision paths were sabotaged
+and each turned its own check red.
+
+## Two branches were unreachable, and the sabotage is the only reason we know
+
+The first sabotage run reported the ceiling check and the budget comparison as
+**passing when deleted**. Both were dead code against the frozen catalog:
+
+**The ceiling branch never fires.** No class maps above `MAX_PARAM_B` — HEAVY is
+exactly 7.0 — so removing the check entirely changed nothing. The earlier "8B
+fits and is still illegal" check tested `Vram` and `ModelPolicy` arithmetic
+directly and never asked the arbiter anything.
+
+**The budget boundary is unreachable.** No resident set plus a new model lands
+exactly on 6.00 GB, so `<=` versus `<` is invisible. Worse, the obvious fix
+fails: choosing a parameter count that *should* land on 6.00 produces
+5.99999998 in floating point, and `<` still grants it.
+
+Both are now live, by injecting the catalog and the budget:
+
+```
+  ceiling    an injected catalog maps HEAVY to 8B. It is 5.15 GB and FITS,
+             so the denial can only be the parameter law.
+  boundary   the budget is injected as the EXACT float the state produces,
+             which is the only way equality is testable at all.
+```
+
+## Vacuous statistics, named rather than counted as clean
+
+Two pre-registered statistics **cannot fail against this arbiter**, and a clean
+zero from a branch that cannot fire is not evidence:
+
+* **Statistic 5** (unique model evicted under pressure) is vacuous because the
+  arbiter never evicts. It becomes live when eviction is added and needs its own
+  sabotage test then.
+* **`DENIED / NO_CAPACITY`** is unreachable in any state this arbiter can
+  produce: `SMALL` is always either already resident and free, or there is room
+  for it. It is exercised from a **synthetic overcommitted state** the arbiter
+  would never grant, purely to guard the branch for a future arbiter that can
+  overcommit or evict.
+
+Both are recorded here rather than reported as passes. That is the fourth and
+fifth time in this experiment that a check turned out to be incapable of
+failing, which is starting to look less like carelessness and more like the
+default state of any guard nobody has attacked.
+
+METABOLISM-A is still **not started**. No model has been asked for anything.
