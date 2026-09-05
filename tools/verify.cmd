@@ -83,6 +83,7 @@ call :check "scripts/arena/swarm_request_selftest.gd"     "swarm request"       
 call :check "scripts/arena/compute_arbiter_selftest.gd"   "compute arbiter"     "COMPUTE ARBITER OK"
 call :check "scripts/arena/metabolism_join_selftest.gd"   "metabolism join"     "METABOLISM JOIN OK"
 call :check "scripts/arena/pit_a_selftest.gd"             "pit A instrument"    "PIT A INSTRUMENT OK"
+call :check "tools/pit_a_run.gd -- --negative"            "pit A runner"        "PIT A RUNNER NEGATIVE OK"
 call :check "tools/adversarial.gd"                        "adversarial pass"    "ADVERSARIAL OK"
 call :check "tools/offline_selftest.gd"                   "offline behaviour"   "OFFLINE OK"
 
@@ -97,6 +98,11 @@ call :pycheck "tools/lint_exits.py"       "silent failure exits"
 REM ---- PIT A live gate, no generation -------------------------------------
 REM The gate is proven against synthetic dictionaries in the selftest. This
 REM proves it also bites a REAL observed runtime configuration.
+REM
+REM SCOPE: verify MAY skip live-runtime probing when LM Studio is unreachable,
+REM because this suite has to pass on a machine without the runtime installed.
+REM PIT A RUNTIME EXECUTION MAY NEVER SKIP IT. Different layer, different job:
+REM portability here, fail-closed there, and tools/pit_a_run.gd has no skip path.
 "%GODOT%" --headless --path . --script tools/pit_runtime_probe.gd -- --sabotage >"%TEMP%\sa_pit.txt" 2>&1
 findstr /C:"PIT GATE LIVE OK" "%TEMP%\sa_pit.txt" >nul
 if errorlevel 1 (
