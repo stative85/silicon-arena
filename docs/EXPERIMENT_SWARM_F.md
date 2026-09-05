@@ -241,3 +241,22 @@ three. It does not say the policy is good, does not resolve locality (which
 [EXPERIMENT_SWARM_B2](EXPERIMENT_SWARM_B2.md) left unresolved and closed), and
 does not justify stigmergy. Those remain separate questions with their own
 pre-registrations.
+
+---
+
+# Amendment: how a live-versus-dry gap must be read
+
+**Written while the run is in flight, before the scored region of any arm has
+been read.** No arm result exists at the time of writing.
+
+The dry run has no text, so `named_recently` is false by construction and the
+curve it produces is the **starvation-only baseline**. If live bidding sits
+above that baseline, the reading is that direct address is a second
+independently load-bearing local channel, shifting the phase boundary — not that
+the derived curve was refuted. The curve is the prediction for one mechanism
+acting alone, and it was confirmed exactly under that condition.
+
+Fixed now so it cannot later become a rescue explanation for a prediction that
+missed. It binds in both directions: if live bidding sits at or below the
+baseline, naming is **not** load-bearing and no second mechanism may be claimed.
+
