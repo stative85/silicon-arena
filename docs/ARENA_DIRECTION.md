@@ -10,111 +10,208 @@ constraint on them.
 > More agents is not more interesting. Five bots arguing in a circle behind a
 > good UI is an expensive pile of trash wearing neon.
 
-The version of this project worth building is the one where **the architecture
-itself produces behaviour nobody centrally scripted.** Every experiment in
+The version worth building is the one where **the architecture itself produces
+behaviour nobody centrally scripted.** Every experiment in
 [EXPERIMENT_LEDGER](EXPERIMENT_LEDGER.md) that tried to *instruct* interesting
 behaviour was rejected; the two that shipped changed what the arena *does with*
-model output. That is the same finding at a larger scale: put the structure in
-the substrate, not in the prompt.
+model output. Put the structure in the substrate, not in the prompt.
 
-The combination that is actually distinctive:
+The end state, if every layer earns the next:
 
 ```
-  local agents  +  private state  +  local perception  +  scarce compute
-  +  agent-requested model escalation  +  spatial traces
-  +  blind arbitration  +  provenance-backed audit
+  LOCAL AGENTS
+      |-- private state
+      |-- local communication graph
+      |-- local compute demand
+      |-- local bidding
+      +-- local interpretation
+                |
+                v
+        OPAQUE STIGMERGY
+                |
+                v
+        BLIND SUBSTRATE
+        |-- resource arbitration
+        |-- VRAM / JIT execution
+        |-- provenance
+        +-- canonical history
+                |
+                v
+      SHADOW COUNTERFACTUALS
+                |
+                v
+        ROBRUSTION FORGE
+                +-- candidate improvements, proposed never promoted
 ```
 
-That is not five LLMs in a chat room. That is a small artificial society running
-on one consumer GPU.
+That is a local artificial ecology where communication, attention, memory,
+compute and survival are all constrained resources, while the central substrate
+stays deliberately too stupid to manufacture the behaviour itself.
 
-## Build order
+## Build order, enforced
 
-Each of these is a separate pre-registration. None of them starts before the one
-above it has returned a verdict.
+Each is a separate pre-registration. None starts before the one above returns a
+verdict.
 
-**1. Fault, degradation and reintegration.** — *in progress,
-[EXPERIMENT_SWARM_F](EXPERIMENT_SWARM_F.md)*
-An agent disappears, goes intermittently silent, or returns after 20 turns with
-only its preserved local state. The swarm routes around the hole and the arena
-never says "replace Gemma with Qwen". Makes "starve the cage" a resilience
-measurement rather than a philosophy.
+### 0. Fault, degradation and reintegration — DONE
 
-**2. Agent-controlled compute metabolism.** — *the one to circle hardest*
-Agents decide locally not only whether they want the slot but **how much
-intelligence the moment deserves**: a normal turn, a longer token budget, or
-escalation to a larger model. The substrate sees `cost`, `availability`,
-`requested_class` and the hard VRAM law. It never learns why.
+[EXPERIMENT_SWARM_F](EXPERIMENT_SWARM_F.md), **PARTIAL**. Allocation holds to a
+roster of three with zero fallback wakes in 4,000 allocations; collapses at two;
+**reintegration is only guaranteed once an absence reaches 8 turns**, the
+starvation-saturation constant.
 
-This turns JIT model loading from backend plumbing into the world's ecology, and
-it is the project's real asymmetry: most multi-agent demos do not have
-heterogeneous local models genuinely competing for scarce VRAM. The hardware
-limit stops being an apology and becomes the metabolism.
+That last clause is a live constraint on step 2, not a closed result. See
+"What SWARM-F hands forward" below.
 
-**Doctrinally this fits, and the fit must be checked rather than assumed.** The
-resolver's failure codes already "describe RESOURCE state, never motive", and
-`cost` / `availability` / `requested_class` are resource facts of exactly that
-kind — they say what is being asked for, not why it is wanted. But
-`ALLOWED_KEYS` is a closed vocabulary of three and `tools/lint_locality.py`
-enforces it. Extending it is **a change to the experiment**, made in a
-pre-registration, in the open, with the lint updated in the same commit. It is
-not a refactor, and `requested_class` must never carry a reason field.
+### 1. Compute metabolism — make intelligence a scarce resource agents request
 
-**3. Dynamic communication topology.**
-Stop letting everybody hear everybody. Local neighbourhoods — line of sight,
-proximity, range, intermittent links. Two agents become informationally isolated
-while three others form a temporary cluster, and the arena never creates
-"teams". Topology becomes the experimental variable: full graph, local graph,
-sparse graph, intermittent links. Coordination surviving information loss is
-watchable in a way a metric is not.
+Extend the local decision from "do I want the slot" to "how much intelligence
+does this moment deserve":
 
-**4. Real spatial stigmergy.**
-Not a global memory field hidden in code. Agents leave small decaying traces
-attached to **places, objects, doors, resources, canonical events**, perceived
-only within a local observation radius. One agent marks a dangerous corridor;
-another routes around it later having received no message. Every trace keeps
-canonical provenance, decays, and can never reconstruct missing content.
+```
+  {bid: 0.71, requested_class: SMALL | NORMAL | HEAVY, token_budget: 48|96|160}
+```
 
-Deferred until locality or topology gives it a foundation — building a trace
-layer on an unresolved locality effect would mean never knowing which of the two
-carried the result ([EXPERIMENT_SWARM_B2](EXPERIMENT_SWARM_B2.md)).
+The substrate may know only resource facts — `agent_id`, `eligible`, `bid`,
+`requested_class`, `cost`, `availability` — and never why. Heterogeneous models
+competing for real VRAM stops being plumbing and becomes the world's
+metabolism, which is this project's genuine asymmetry.
 
-**5. Emergent specialization with zero assigned roles.**
-No "you are the critic" prompts — that is costume emergence and this ledger has
-nine rejections saying instructions do not survive contact with these models.
-Identical permissions, long horizons, and specialization classified
-**afterwards**. One explores, one responds, one hoards compute, one revives old
-scars. The claim only counts if the specialization persists across resets or
-perturbations without a role prompt.
+Teeth:
 
-**6. Counterfactual shadow swarm.**
-Keep the losing bids. When compute is cheap, let a small model or heuristic
-simulate what would have happened had another bidder won. Do not feed it back
-into the live match. Store it as a shadow branch, and the arena accumulates a
-counterfactual tree: actual trajectory against plausible alternatives. Later
-this is experimental leverage; eventually it is a replay UI showing where the
-swarm forked.
+```
+  >7B                              impossible
+  invalid class                    hard reject
+  unavailable model                explicit failure, never silent downgrade
+  cost budget exceeded             downgrade or deny mechanically
+  semantic reason crossing         verify red
+  unique model                     never deleted under pressure
+```
 
-## Opaque decision receipts — a cross-cutting mechanism
+Measure compute requested, compute granted, latency, fallbacks, VRAM churn,
+behaviour under starvation. **Do not measure "smartness" yet.**
 
-Not a numbered step, because it belongs to whichever experiment needs it first.
+### 2. Local communication topology — destroy the all-to-all chat room
 
-The resolver stays blind. An agent may store a **private receipt** after a
-decision has been made: `receipt_id -> local inputs + local decision`. The
-resolver cannot read it. The experiment and audit layer can inspect it later.
+Each agent gets an observation neighbourhood: proximity, range, line of sight,
+temporary channels. Fixed shapes as the experimental variable — FULL, RING,
+LINE, STAR, TWO CLUSTERS, PARTITION then REJOIN, RANDOM LINK FAILURE.
 
-That buys post-hoc causal archaeology without handing semantic authority back to
-the cage. If one agent dominates for 40 turns, its receipts explain why *after
-the fact*, and the scheduler was never allowed to use a word of it. The
-invariant to enforce: **a receipt is written after the allocation it describes,
-and nothing in the allocation path can read one.** Both halves need a test that
-goes red when breached, the same way the locality boundary has one.
+> The arena controls whether a channel physically exists. It never decides what
+> information ought to move through it.
+
+The question that becomes askable: can information cross the population without
+any agent holding global context?
+
+### 3. Real stigmergy — agents modify the environment
+
+Only after topology works. Not a global semantic spreadsheet; that is Cage 2.
+An opaque substrate primitive:
+
+```
+  TRACE {trace_id, source_agent, locus_id, canonical_source,
+         strength, ttl, payload_ref}
+```
+
+The substrate knows only *something exists here*. Agents interpret locally.
+Traces attach to real things — doors, corridors, objects, resources, terminals,
+canonical events. Agent A marks a corridor, disappears, and Agent D routes
+around it 25 turns later having never spoken to A.
+
+Teeth: canonical provenance or destroy; TTL mandatory; emission budget; no
+self-reinforcement; **reading a trace cannot increase its strength**; derived
+state rebuildable from canon; invalid provenance dropped and never
+reconstructed.
+
+### 4. Shadow counterfactual arena
+
+At selected canonical moments, fork: what if another agent had won, escalation
+been denied, a trace been invisible? Shadow branches never touch live state.
+Store fork turn, real decision, counterfactual decision, short trajectory,
+mechanical differences.
+
+Horizons stay at 1–3 turns. Anything longer reinvents exponential tree search
+on a consumer GPU.
+
+### 5. The ROBRUSTION forge — recursive improvement that cannot self-promote
+
+Generate candidate local policies; **never promote one because a metric moved**.
+
+```
+  CURRENT POLICY -> candidate mutations -> LOCALITY GATE -> FAULT SUITE
+  -> CONTROL VALIDATION -> HELD-OUT SCENARIOS -> PARETO COMPARISON
+  -> promotion candidate
+```
+
+No `emergence_score`. A Pareto frontier instead: fallback wakes down, starvation
+down, compute cost down, latency down, VRAM churn down, fault recovery up,
+allocation diversity up, rejoin reliability up. A candidate survives only by
+improving something real without violating a frozen guard elsewhere.
+
+Every candidate must pass INVARIANT → DETECTION → TEETH → RECOVERY → PROOF, plus
+the doctrine earned since: a control must prove it can fail (rule 6), provenance
+firewall (rule 7), adversarial validation when a result gets cleaner (rule 8),
+decision-statistic support checked (rule 9), generating assumptions matched
+(rule 10).
+
+**The system proposes. It does not promote.**
+
+## Cross-cutting: opaque decision receipts
+
+Belongs to whichever layer needs it first. The resolver stays blind; an agent
+may store a private receipt *after* a decision — `receipt_id -> local inputs +
+local decision` — readable by the audit layer, never by the allocation path.
+Post-hoc causal archaeology without returning semantic authority to the cage.
+
+Invariant, and it needs a test that goes red when breached: **a receipt is
+written after the allocation it describes, and nothing in the allocation path
+can read one.**
+
+## What SWARM-F hands forward, and it is not optional
+
+**The 8-turn reintegration boundary is a constraint on the topology work.**
+Step 2's core perturbation is partition-then-rejoin. SWARM-F established that a
+returning agent is only guaranteed its first eligible turn once its absence
+saturates starvation at 8 turns. Any partition shorter than that will reproduce
+the same rejoin failures — and if topology does not account for it, they will be
+misread as a *topology* effect when they are a known property of the bid policy.
+
+Either partitions are held at 8+ turns, or the rejoin statistic is scored
+against the SWARM-F boundary rather than against zero.
+
+## The locality question compute metabolism must answer first
+
+`cost` and `availability` are resource facts and the resolver may see them.
+**But what does the agent see when it forms `requested_class`?**
+
+If the agent knows what is currently loaded in VRAM, then every agent is reading
+the same global variable, and they are coupled through shared state that no
+local view should contain. That is the cage returning as a resource signal
+rather than a semantic one, and the locality lint would not catch it because
+nothing semantic crossed.
+
+The swarm-like answer is that an agent requests **blind** — it asks for what the
+moment deserves by its own lights, and the substrate grants, downgrades or
+denies on facts the agent never sees. Denial is information, and it is the only
+information about global resource state an agent should get.
+
+This must be settled in the pre-registration, before any code, because both
+designs are implementable and only one of them is still a swarm.
+
+## Rule 10 is already loaded and aimed at step 1
+
+Any threshold derived while all agents request `NORMAL` cannot judge a run where
+agents escalate — escalation changes the distribution of latency, VRAM churn and
+fallbacks. Derive baselines under the no-escalation regime by all means, then
+use them as **baselines to measure against, not bars to fail against**
+([AUDIT_RULE9](AUDIT_RULE9.md), and rule 10 in
+[CONTRIBUTING](../CONTRIBUTING.md)).
+
+SWARM-F paid for that lesson once already, at statistic 3.
 
 ## The refusal list
 
-These are cheap, they demo beautifully, and every one of them quietly puts God
-back inside `main.gd`. They are refused now, in advance, so that a future
-screenshot cannot argue for them:
+Cheap, demos beautifully, and every one quietly puts God back inside `main.gd`:
 
 * more prewritten personalities
 * global mood meters
@@ -123,12 +220,23 @@ screenshot cannot argue for them:
 * automatic coalitions
 * thirty memory dimensions
 * a giant global vector called `emergence_score`
+* fifty agents because fifty is bigger than five
 
-The common defect is that each replaces emergence with a central authority that
-*computes* emergence, and then the interesting behaviour is the authority's,
-not the swarm's. A metric named after the thing you are trying to produce is a
+The common defect: each replaces emergence with a central authority that
+*computes* emergence, and then the interesting behaviour is the authority's, not
+the swarm's. A metric named after the thing you are trying to produce is a
 confession.
 
 Adding any of these is not a feature decision. It is a change to what the
 project claims to be, and it belongs in a pre-registration that says which prior
 result it invalidates.
+
+## Deferred, not refused
+
+**Emergent specialization with zero assigned roles.** Identical permissions, long
+horizons, specialization classified afterwards, and it only counts if it survives
+resets or perturbations without a role prompt. It was in an earlier draft of this
+order and has been dropped out of the top five deliberately: it is a *read* on a
+system that has enough structure to specialise, and the arena does not have that
+structure until compute, topology and stigmergy exist. Building it sooner would
+measure prompt residue and call it a niche.
