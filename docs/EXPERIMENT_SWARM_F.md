@@ -114,6 +114,16 @@ decision procedure, and no median of small integers.
 consecutive silence observed in the unperturbed roster, and nothing else. It is
 a control-side quantity by construction.
 
+**`S` is a conservative control ceiling, not a sensitive detector, and it is
+described that way on purpose.** A maximum errs loose: one long tail in F0
+buys every perturbed arm extra room. The alternative — F0's p90 silence —
+would be a percentile over small integers, which is precisely the construction
+rule 9 was written about, and manufacturing precision that way to tighten a
+guard would be trading a known looseness for an unknown quantization. Statistic
+6 therefore answers "did a survivor starve worse than anything the intact
+roster ever produced", and nothing finer. Its zero bar sits on the integer
+support either way.
+
 Statistic 1 must keep three states apart, and the harness records them
 separately or the run is void:
 
@@ -147,12 +157,17 @@ history:
 | arm | perturbation | predicted |
 |---|---|---|
 | **F3** | one agent alternately ineligible, 5 turns on / 5 off, from turn 10 | no failures, no fallback wakes |
-| **F4** | one agent removed at turn 10, rejoins at turn 25 | rejoining agent wins its first eligible turn |
+| **F4** | one agent removed at turn 10, rejoins at turn 20 | rejoining agent wins its first eligible turn |
 
-F4's prediction is not a guess. A returning agent has `turns_since_spoke = 15`,
-saturating starvation at `0.5`, against survivors cycling at `.063/.125/.188`.
-It should win immediately and by a wide margin. If it does not, starvation
-pressure does not do what the policy claims.
+F4's prediction is not a guess. A returning agent has `turns_since_spoke = 10`,
+which is past `STARVATION_SATURATION` and therefore saturates starvation at
+`0.5`, against survivors cycling at `.063/.125/.188`. It should win immediately
+and by a wide margin. If it does not, starvation pressure does not do what the
+policy claims.
+
+Rejoin is at turn 20 of 40, leaving **20 turns of post-rejoin observation** —
+four full nominal five-agent rotations. Reintegration is the whole point of this
+arm, and three rotations was not enough to watch it happen.
 
 `>= 50%` for F5 is chosen because it is exactly `400/800` on that arm's
 denominator — an attainable value, checked rather than assumed.
