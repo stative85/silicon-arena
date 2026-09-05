@@ -81,6 +81,7 @@ call :check "scripts/arena/swarm_resolver_selftest.gd"    "swarm resolver"      
 call :check "scripts/arena/swarm_bid_selftest.gd"         "swarm bid"           "SWARM BID OK"
 call :check "scripts/arena/swarm_request_selftest.gd"     "swarm request"       "SWARM REQUEST OK"
 call :check "scripts/arena/compute_arbiter_selftest.gd"   "compute arbiter"     "COMPUTE ARBITER OK"
+call :check "scripts/arena/metabolism_join_selftest.gd"   "metabolism join"     "METABOLISM JOIN OK"
 call :check "tools/adversarial.gd"                        "adversarial pass"    "ADVERSARIAL OK"
 call :check "tools/offline_selftest.gd"                   "offline behaviour"   "OFFLINE OK"
 

@@ -553,3 +553,57 @@ failing, which is starting to look less like carelessness and more like the
 default state of any guard nobody has attacked.
 
 METABOLISM-A is still **not started**. No model has been asked for anything.
+
+---
+
+# Statistic reachability audit, done BEFORE the GPU run
+
+For each pre-registered statistic: what concrete event, under the frozen
+mechanism, could make it move? Where no reachable event exists, it is marked
+now — so a pristine zero cannot be reported later as though something had been
+demonstrated.
+
+| # | statistic | reachable live? | classification |
+|---|---|---|---|
+| 1 | grant above `MAX_PARAM_B` | **no** — the frozen catalog maps HEAVY to exactly 7.0 | REGRESSION GUARD. Proven offline with an injected 8B catalog. |
+| 2 | invalid class accepted | **no** — `tier()` returns only the three classes or `""`, and `""` never submits | REGRESSION GUARD |
+| 3 | silent substitution of an unavailable model | **only in M2**, where HEAVY is made unavailable | **LIVE in M2**, vacuous in M0/M1/M3 |
+| 4 | grant exceeding the budget | **no** — the arbiter cannot construct one | REGRESSION GUARD |
+| 5 | unique model evicted under pressure | **no** — the arbiter never evicts | **VACUOUS** (already recorded) |
+| 6 | semantic content reaching the resolver | **no** — requires a code change; lint and self-test cover it | REGRESSION GUARD |
+| 7 | unclassified outcome | **no** — `arbitrate()` returns one of three, always | REGRESSION GUARD |
+| 8 | monotonicity violation | **no** — pure function, swept offline over 1001 bids | REGRESSION GUARD |
+
+## What this means, and it should be said plainly before the run rather than after
+
+**Seven of the eight pre-registered statistics cannot fail in the live run.**
+They are regression guards: they fire if someone breaks the code, not if the
+world behaves unexpectedly. They were all proven where the invariant actually
+lives — offline, by sabotage, with injected catalogs and budgets — and that is
+the right place for them.
+
+So the decision-tree line *"statistics 1-7 all zero -> PLUMBING VIABLE"* is
+close to vacuous on its own. **The plumbing was demonstrated offline.** Saying
+otherwise after a clean GPU run would be claiming the hardware proved something
+the arithmetic had already settled.
+
+**The GPU run is therefore an ANATOMY measurement, not a hypothesis test**, and
+its value is confined to what offline work genuinely cannot reach:
+
+```
+  request mix on live dialogue        the tiers meeting real bids, not replays
+  grant / downgrade / deny rates      what the scarcity actually does per turn
+  the downgrade matrix                which requests get stepped down, and by what
+  executed-class distribution         what the card really ran
+  VRAM occupancy and churn            residency over a whole match
+  latency by granted class            the cost of the metabolism, in seconds
+  REQUEST_FAILED                      the one failure that can genuinely fire live
+  statistic 3, in M2 only             the single live invariant
+```
+
+`REQUEST_FAILED` and statistic 3 in M2 are the only two lines in this experiment
+that a GPU can falsify. Everything else it produces is description.
+
+That is not an argument against running it. Description is what an anatomy is
+for, and none of the numbers above can be derived from the frozen constants.
+It is an argument against writing the result up as a passed test.
