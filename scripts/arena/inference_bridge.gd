@@ -52,6 +52,7 @@ var _busy: Dictionary = {}           ## slot index -> request_id
 var _seq: int = 0
 var _started: bool = false
 var _last_resident: Array = []
+var _inflight: Dictionary = {}   ## request_id -> live receipt
 
 ## Injected so the self-test can drive the bridge without LM Studio. Must
 ## return {ok, text, tokens, ttft_ms} and is the ONLY place payload is read.
@@ -205,7 +206,21 @@ func _dispatch(ticket: BridgeTicket, slot: int) -> void:
 	rec["dispatched_at_ms"] = _now()
 	rec["model_state_before"] = bm.state
 	rec["resident_set"] = _last_resident.duplicate()
+	# How many requests were already in flight when this one was dispatched.
+	# Recorded rather than assumed: a driver believing it created a two-way
+	# load, and a bridge that actually dispatched serially, would otherwise
+	# produce a "contended" distribution containing uncontended samples.
+	rec["active_at_dispatch"] = _busy.size() + 1
 	_busy[ticket.request_id] = slot
+	# active_at_dispatch alone understates contention: the FIRST request of a
+	# concurrent pair is always dispatched alone, then overlapped for most of
+	# its life. max_active_during records the peak concurrency each in-flight
+	# request actually experienced, which is what a contention distribution
+	# needs.
+	_inflight[ticket.request_id] = rec
+	var peak := _busy.size()
+	for r in _inflight.values():
+		r["max_active_during"] = maxi(int(r.get("max_active_during", 0)), peak)
 	bm.in_flight += 1
 	_run(ticket, slot, rec)
 
@@ -257,6 +272,7 @@ func _run(ticket: BridgeTicket, slot: int, rec: Dictionary) -> void:
 
 	bm.in_flight = maxi(bm.in_flight - 1, 0)
 	_busy.erase(ticket.request_id)
+	_inflight.erase(ticket.request_id)
 
 	# Health is judged from measured first-CONTENT TTFT, never from whether the
 	# call returned. A degraded model returns successfully every time.

@@ -51,6 +51,8 @@ static func make(ticket: BridgeTicket) -> Dictionary:
 		"stream_event_count": 0,
 		"content_event_count": 0,
 		"failure_kind": "",
+		"active_at_dispatch": 0,
+		"max_active_during": 0,
 		"attempts": ticket.attempts,
 		"model_state_before": "",
 		"model_state_after": "",
