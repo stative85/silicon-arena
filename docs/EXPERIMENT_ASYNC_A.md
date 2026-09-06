@@ -457,3 +457,166 @@ control was built to force.
 - The measures list gains `contention_lost_count / rate`.
 - Q1 compares `STALE_CONFLICT` rates and is unaffected in intent, but is now
   measuring only what its name claims.
+
+---
+
+# Amendment 3: resource generations, STALE_REVALIDATED, and the three denominators
+
+**Written before the ASYNC-A harness exists, because this changes what can be
+measured rather than merely what is logged.**
+
+## The ABA hole, demonstrated
+
+Deterministic regeneration creates a classic ABA problem. Verified against the
+current world before amending:
+
+```
+A observes r_00 free           version 0
+B takes r_00                   version 1
+two ticks pass, r_00 released  version 2
+A's aged request arrives       -> ACCEPTED, age 2, nothing recorded
+```
+
+Tracking validity by target id alone, `r_00` was valid when observed and is
+valid now, so the action succeeds. But A acted on an **old instance of
+reality**: the resource disappeared and came back while A was thinking. Latency
+touched that opportunity and the instrument could not see it.
+
+This hides latency effects exactly as badly as conflating simultaneous
+contention with staleness did, and for the same reason — an identifier is not
+an identity.
+
+## Resource identity is now (id, generation)
+
+Every resource carries a `generation`, incremented when it is released back to
+the pool. A resource that has been taken and released is a **new instance** of
+the same id.
+
+Recorded on every action:
+
+```
+observed_target_generation
+current_target_generation
+invalidated_since_observation
+revalidated_since_observation
+```
+
+## STALE_REVALIDATED
+
+```
+X valid when observed
+X invalid now
+age > 0
+    => STALE_CONFLICT          latency destroyed the opportunity
+
+X valid when observed
+X disappeared and regenerated
+X valid again now
+generation changed
+    => ACCEPTED, stale_revalidated = true
+```
+
+**The action succeeds.** The substrate does not rescue the agent and does not
+reject it either; it records what happened. That is the same discipline as
+refusing to refresh a stale observation — the world is not obliged to protect an
+agent from the consequences of its own latency, in either direction.
+
+What this buys is a richer statement than a conflict count alone:
+
+> aged cognition can fail because reality changed, and can accidentally become
+> valid again because reality changed twice.
+
+The instrumentation still knows latency touched the opportunity, which is the
+part that matters.
+
+## Three denominators, always reported together
+
+A single stale-conflict rate answers a question nobody asked. Every ASYNC-A
+result reports all three:
+
+```
+STALE_CONFLICT / all_actions        How often does stale failure happen?
+
+STALE_CONFLICT / stale_eligible     When latency creates danger, how often do
+                                    agents actually walk into it?
+
+STALE_ELIGIBLE / all_actions        How often does the world create
+                                    latency-sensitive situations at all?
+```
+
+The calibration makes the second one interpretable: synthetic actors produced
+`stale_eligible == stale_conflict` exactly (983/983, 687/687), because a
+synthetic actor always attempts the target it chose. That is the **world-side
+ceiling**. If the main run yields, say, 400 eligible and 120 conflicts, the gap
+is not a bug — it means the world created 400 aged opportunities and the agents
+entered 120 of them. That ratio is a property of the agents, measurable only
+because the ceiling is known.
+
+## The action envelope
+
+Carried by every request so no later analysis reconstructs anything:
+
+```
+request_id                      agent_id
+observed_tick                   observation_version
+observation_hash                visible_target_ids
+visible_target_generations      chosen_target_id
+chosen_target_generation        completed_at
+applied_tick                    current_target_generation
+observation_age_ticks           outcome
+stale_revalidated
+```
+
+## One harness, four timing policies
+
+ASYNC-A is **one harness in which only the release/application rule changes**:
+
+```
+                SAME WORLD
+                SAME ACTION API
+                SAME VALIDATOR
+                SAME TELEMETRY
+                     |
+       +-------------+-------------+
+       |             |             |
+    SERIAL       NATURAL       EQUALIZED
+       |             |             |
+       +-------------+-------------+
+                     |
+               ORDER REPLAY
+```
+
+The experimental invariant is therefore structural rather than promised:
+
+> **Arms differ in time treatment, not world physics.**
+
+Four separate arena implementations would make that a claim to be trusted. One
+harness makes it a fact about the code.
+
+### Per-arm teeth
+
+**Arm 1 SERIAL** — any violation voids:
+```
+observation_age_ticks == 0 for every action
+STALE_CONFLICT       == 0
+STALE_REVALIDATED    == 0
+```
+
+**Arm 2 NATURAL ASYNC** — real bridge completion timing, real arrival ordering,
+the world never waits.
+
+**Arm 3 LATENCY-EQUALIZED** — the equalizer touches **release timing only**. Not
+prompts, not observations, not generated actions, not semantic content. If
+equalization changes what the model saw, speed is no longer what is being
+isolated, and the arm is void.
+
+**Arm 4 ARRIVAL-ORDER REPLAY** — brutal:
+```
+action bytes            identical to arm 2
+request provenance      identical
+observed target set     identical
+world genesis           identical
+ONLY application ordering differs
+```
+**If any model is called during arm 4, the arm is contaminated and void.** It
+replays already-produced action envelopes.

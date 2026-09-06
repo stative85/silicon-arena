@@ -75,6 +75,25 @@ Real agents need not, and the gap between the two in the main run is itself
 informative — it separates *the world produced an opportunity* from *the agent
 walked into it*.
 
+## Regression after Amendment 3
+
+Resource generations and `STALE_REVALIDATED` were added after this calibration,
+to close an ABA hole (a resource observed free, taken, released, then taken
+successfully by the aged request — succeeding silently on a dead instance of
+reality). That changes instrumentation, not world dynamics, so the calibration
+was re-run as a regression check:
+
+```
+negative control   stale_conflict = 0 across 27 runs   unchanged
+step 2             rate 0.5467                          identical
+step 1             rate 0.3817   PASS, taken            identical
+frozen config      16 resources, hold 4                 unchanged
+```
+
+Identical numbers confirm the generation tracking observes the world without
+perturbing it. Had the rates moved, the instrumentation would have been
+changing the thing it measures.
+
 ## What this does and does not establish
 
 **Establishes:** the world can mechanically generate stale-eligible

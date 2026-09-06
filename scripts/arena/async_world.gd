@@ -14,6 +14,13 @@ class_name AsyncWorld
 ##   hold           a taken resource returns to the pool after H ticks
 ##   regeneration   substrate-owned and deterministic, never model-chosen
 ##
+## RESOURCE IDENTITY IS (id, generation), NOT id. Regeneration creates a
+## classic ABA problem: a resource observed free, taken by someone else,
+## then released, is free again under the same id -- so an aged action
+## would succeed and nothing would record that it acted on a dead
+## instance of reality. An identifier is not an identity. `generation`
+## increments on release, so an observation carries the instance it saw.
+##
 ## VERSIONING IS THE INSTRUMENT. Every state change increments `version`, and
 ## each resource records the version at which it was most recently invalidated
 ## (taken). That record is what lets a stale action be distinguished from a
@@ -52,7 +59,8 @@ func reset() -> void:
 	resources = {}
 	for i in resource_count:
 		resources["r_%02d" % i] = {
-			"holder": "", "taken_at_tick": -1, "invalidated_at_version": -1,
+			"holder": "", "taken_at_tick": -1,
+			"invalidated_at_version": -1, "generation": 0,
 		}
 
 
@@ -73,10 +81,14 @@ func valid_targets() -> Array:
 ## distinguishes a stale target from an invented one.
 func observe() -> Dictionary:
 	var vt := valid_targets()
+	var gens := {}
+	for id in vt:
+		gens[id] = int((resources[id] as Dictionary)["generation"])
 	return {
 		"tick": tick,
 		"version": version,
 		"valid_targets": vt,
+		"valid_target_generations": gens,
 		"hash": canonical_hash(),
 	}
 
@@ -120,6 +132,11 @@ func apply(agent_id: String, target: String, obs: Dictionary) -> Dictionary:
 		"observation_version": int(obs.get("version", -1)),
 		"observation_tick": int(obs.get("tick", -1)),
 		"observation_age_ticks": tick - int(obs.get("tick", tick)),
+		"observed_target_generation": -1,
+		"current_target_generation": -1,
+		"invalidated_since_observation": false,
+		"revalidated_since_observation": false,
+		"stale_revalidated": false,
 		"outcome": SEMANTIC_INVALID, "reason": "",
 	}
 	if target == PASS_TARGET:
@@ -135,6 +152,15 @@ func apply(agent_id: String, target: String, obs: Dictionary) -> Dictionary:
 		return out
 
 	var r: Dictionary = resources[target]
+	var obs_gens: Dictionary = obs.get("valid_target_generations", {})
+	var obs_gen := int(obs_gens.get(target, -1))
+	var cur_gen := int(r["generation"])
+	var inval_after := int(r["invalidated_at_version"]) > int(obs.get("version", -1))
+	out["observed_target_generation"] = obs_gen
+	out["current_target_generation"] = cur_gen
+	out["invalidated_since_observation"] = inval_after
+	out["revalidated_since_observation"] = obs_gen >= 0 and cur_gen > obs_gen
+
 	if str(r["holder"]) == "":
 		r["holder"] = agent_id
 		r["taken_at_tick"] = tick
@@ -142,6 +168,14 @@ func apply(agent_id: String, target: String, obs: Dictionary) -> Dictionary:
 		version += 1
 		out["outcome"] = ACCEPTED
 		out["applied_version"] = version
+		# ABA: the id was free when observed and is free now, but this is a
+		# DIFFERENT INSTANCE -- taken and released while the agent was
+		# thinking. The action succeeds: the substrate does not rescue the
+		# agent and does not reject it either, it records what happened.
+		if obs_gen >= 0 and cur_gen > obs_gen:
+			out["stale_revalidated"] = true
+			out["reason"] = "revalidated: observed generation %d, now %d" % [
+				obs_gen, cur_gen]
 		return out
 
 	if int(r["invalidated_at_version"]) > int(obs.get("version", -1)):
@@ -178,6 +212,8 @@ func advance() -> Array:
 		if tick - int(r["taken_at_tick"]) >= hold_ticks:
 			r["holder"] = ""
 			r["taken_at_tick"] = -1
+			# A released resource is a NEW INSTANCE of the same id.
+			r["generation"] = int(r["generation"]) + 1
 			version += 1
 			released.append(id)
 	return released

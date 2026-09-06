@@ -34,6 +34,7 @@ func _run() -> void:
 	print("=== ASYNC-A world selftest ===\n")
 	_basic()
 	_predicate()
+	_aba()
 	_regeneration()
 	_determinism()
 	_report()
@@ -110,6 +111,46 @@ func _predicate() -> void:
 	var never := w5.apply("b", "r_00", after)
 	_check("   held before the observation -> SEMANTIC_INVALID",
 		str(never["outcome"]) == W.SEMANTIC_INVALID)
+
+
+## The ABA problem: an id is not an identity.
+func _aba() -> void:
+	print("\n resource identity is (id, generation)")
+	var w: AsyncWorld = W.make(4, 2)
+	var obs := w.observe()                     # A observes r_00, generation 0
+	_check("   observation carries target generations",
+		obs.has("valid_target_generations")
+			and int((obs["valid_target_generations"] as Dictionary)["r_00"]) == 0)
+
+	w.apply("B", "r_00", w.observe())          # B takes it
+	w.advance()
+	w.advance()                                # hold expires, r_00 returns
+	_check("   SABOTAGE APPLIED: the id is free again",
+		w.valid_targets().has("r_00"))
+	_check("   but it is a new instance",
+		int((w.resources["r_00"] as Dictionary)["generation"]) == 1)
+
+	var late := w.apply("A", "r_00", obs)      # A's aged request lands
+	_check("   an aged action on a regenerated id still SUCCEEDS",
+		str(late["outcome"]) == W.ACCEPTED,
+		"the substrate does not rescue and does not reject")
+	_check("   and is flagged stale_revalidated",
+		bool(late["stale_revalidated"]),
+		"without this the ABA case is invisible: latency touched it")
+	_check("   generations recorded on the action",
+		int(late["observed_target_generation"]) == 0
+			and int(late["current_target_generation"]) == 1)
+	_check("   revalidated_since_observation is set",
+		bool(late["revalidated_since_observation"]))
+
+	# A same-generation success must NOT be flagged.
+	var w2: AsyncWorld = W.make(4, 99)
+	var o2 := w2.observe()
+	var plain := w2.apply("A", "r_01", o2)
+	_check("   an ordinary success is NOT flagged revalidated",
+		str(plain["outcome"]) == W.ACCEPTED
+			and not bool(plain["stale_revalidated"]),
+		"flagging every success would make the signal meaningless")
 
 
 func _regeneration() -> void:
