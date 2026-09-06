@@ -1,0 +1,83 @@
+=== EXPLICIT_RESIDENCY_MODE throughput benchmark ===
+Hardware/runtime characterisation. No model-quality claims.
+
+preloading the five-model pool explicitly...
+  resident: 5/5  OK
+  VRAM: 7682 MiB
+
+[SOLO BASELINE] 10 measured requests per model per workload
+   A_micro    h2o       med     193 ms  p95     200  TTFT med     77  tps 268.1  fail 0
+   A_micro    lfm2.5    med      92 ms  p95     111  TTFT med     86  tps 1363.8  fail 0
+   A_micro    qwen3.5   med    6736 ms  p95    6769  TTFT med   4530  tps   4.5  fail 0
+   A_micro    falcon    med     158 ms  p95     172  TTFT med    115  tps 296.2  fail 0
+   A_micro    rwkv7     med     844 ms  p95     864  TTFT med    377  tps  66.4  fail 0
+   B_turn     h2o       med     489 ms  p95     501  TTFT med     71  tps 226.5  fail 0
+   B_turn     lfm2.5    med     247 ms  p95     258  TTFT med     63  tps 295.7  fail 0
+   B_turn     qwen3.5   med   38888 ms  p95   38996  TTFT med   3601  tps   2.4  fail 0
+   B_turn     falcon    med     517 ms  p95     542  TTFT med     67  tps 206.0  fail 0
+   B_turn     rwkv7     med    1790 ms  p95    1841  TTFT med    186  tps  59.5  fail 0
+   C_256      h2o       med     110 ms  p95     112  TTFT med     45  tps 328.7  fail 0
+   C_256      lfm2.5    med      96 ms  p95     107  TTFT med     31  tps 374.0  fail 0
+    *** FAILED: residency changed during the case (missing=['rwkv7-1.5b-g1'] wedged=none)
+   C_256      qwen3.5   med     221 ms  p95     230  TTFT med     61  tps 182.0  fail 0
+   C_256      falcon    med     183 ms  p95     197  TTFT med     85  tps 225.6  fail 0
+   C_256      rwkv7     med     940 ms  p95     954  TTFT med    184  tps  63.0  fail 0
+   C_1024     h2o       med     267 ms  p95     284  TTFT med     65  tps 235.0  fail 0
+   C_1024     lfm2.5    med     127 ms  p95     154  TTFT med     58  tps 310.0  fail 0
+   C_1024     qwen3.5   med   22956 ms  p95   23165  TTFT med   3599  tps   2.4  fail 0
+   C_1024     falcon    med     220 ms  p95     238  TTFT med    106  tps 219.0  fail 0
+   C_1024     rwkv7     med     939 ms  p95     983  TTFT med    201  tps  63.5  fail 0
+   C_4096     h2o       med     329 ms  p95     345  TTFT med    102  tps 209.5  fail 0
+   C_4096     lfm2.5    med     144 ms  p95     171  TTFT med     72  tps 302.5  fail 0
+   C_4096     qwen3.5   med   12042 ms  p95   12086  TTFT med   3651  tps   2.6  fail 0
+   C_4096     falcon    med     166 ms  p95     188  TTFT med    120  tps 245.3  fail 0
+   C_4096     rwkv7     med     935 ms  p95     945  TTFT med    186  tps  63.2  fail 0
+   C_7000     h2o       med     360 ms  p95     377  TTFT med    119  tps 195.8  fail 0
+   C_7000     lfm2.5    med     252 ms  p95     266  TTFT med     88  tps 287.6  fail 0
+   C_7000     qwen3.5   med   18647 ms  p95   18760  TTFT med   3676  tps   2.5  fail 0
+   C_7000     falcon    med     187 ms  p95     206  TTFT med    135  tps 233.1  fail 0
+   C_7000     rwkv7     med     939 ms  p95     972  TTFT med    185  tps  62.3  fail 0
+
+[CONCURRENCY] barrier-synchronised, 3 trials each
+   2way/fast+fast   wall med    1861 ms   {'lfm2.5': 217, 'rwkv7': 1860}
+   2way/fast+slow   wall med     705 ms   {'lfm2.5': 313, 'h2o': 703}
+   2way/slow+slow   wall med     832 ms   {'falcon': 686, 'h2o': 823}
+    *** WEDGED: h2o at conc/2way/med+slow -- reloading
+    *** FAILED: model wedged during the case (missing=none wedged=['h2o'])
+   2way/med+slow    wall med  120032 ms   {'qwen3.5': 33630}
+    *** WEDGED: lfm2.5 at conc/3way/fast -- reloading
+    *** FAILED: model wedged during the case (missing=none wedged=['lfm2.5'])
+   3way/fast        wall med  120024 ms   {'rwkv7': 2011, 'qwen3.5': 705}
+   3way/mixed       wall med    1347 ms   {'lfm2.5': 374, 'falcon': 649, 'h2o': 1345}
+   3way/slow        wall med    1461 ms   {'qwen3.5': 994, 'falcon': 769, 'h2o': 1460}
+   5way/all         wall med    2754 ms   {'h2o': 1799, 'lfm2.5': 567, 'qwen3.5': 1147, 'falcon': 1008, 'rwkv7': 2752}
+
+[SUSTAINED QUEUE] 100 requests per in-flight level
+   inflight=1  wall   85.2 s   1.17 req/s    86.9 tok/s  fail 0
+      median per model: {'h2o': 1158, 'lfm2.5': 235, 'qwen3.5': 628, 'falcon': 410, 'rwkv7': 1817}
+   inflight=2  wall   53.6 s   1.86 req/s   138.0 tok/s  fail 0
+      median per model: {'lfm2.5': 254, 'qwen3.5': 732, 'h2o': 1442, 'falcon': 515, 'rwkv7': 2336}
+   inflight=3  wall   44.0 s   2.27 req/s   168.1 tok/s  fail 0
+      median per model: {'lfm2.5': 289, 'qwen3.5': 804, 'falcon': 601, 'h2o': 1572, 'rwkv7': 3153}
+   inflight=5  wall   41.4 s   2.41 req/s   178.1 tok/s  fail 0
+      median per model: {'lfm2.5': 295, 'falcon': 618, 'qwen3.5': 761, 'rwkv7': 5828, 'h2o': 1790}
+
+[DERIVED]
+  slowdown_ratio = concurrent_median / solo_median  (B_turn)
+   2way/fast+fast     {'lfm2.5': 0.88, 'rwkv7': 1.04}
+   2way/fast+slow     {'lfm2.5': 1.27, 'h2o': 1.44}
+   2way/slow+slow     {'falcon': 1.33, 'h2o': 1.68}
+   2way/med+slow      {'qwen3.5': 0.86}   [REGIME FAILED]
+   3way/fast          {'rwkv7': 1.12, 'qwen3.5': 0.02}   [REGIME FAILED]
+   3way/mixed         {'lfm2.5': 1.51, 'falcon': 1.26, 'h2o': 2.75}
+   3way/slow          {'qwen3.5': 0.03, 'falcon': 1.49, 'h2o': 2.99}
+   5way/all           {'h2o': 3.68, 'lfm2.5': 2.29, 'qwen3.5': 0.03, 'falcon': 1.95, 'rwkv7': 1.54}
+  throughput_gain = req_per_s(N) / req_per_s(1)
+   sustained/inflight_1    1.17 req/s   gain 1.0x
+   sustained/inflight_2    1.86 req/s   gain 1.59x
+   sustained/inflight_3    2.27 req/s   gain 1.93x
+   sustained/inflight_5    2.41 req/s   gain 2.06x
+
+wrote D:/bench_residency.json
+cases where the regime did not hold: ['solo/C_256/qwen3.5', 'conc/2way/med+slow', 'conc/3way/fast']
+wedge events: 2 [('h2o', 'conc/2way/med+slow', True), ('lfm2.5', 'conc/3way/fast', True)]
