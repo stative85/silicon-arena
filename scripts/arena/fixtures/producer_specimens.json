@@ -1,0 +1,2481 @@
+{
+ "_note": "Distinct proposals actually emitted by the five species during VOID runs 1-3. Regression seeds for the fuzzers. Not architectural evidence.",
+ "count": 183,
+ "specimens": [
+  {
+   "proposal": {
+    "operation": "KEEP",
+    "target": ""
+   },
+   "species": "falcon-h1-1.5b-instruct",
+   "run": "run1"
+  },
+  {
+   "proposal": {
+    "operation": "DELETE",
+    "target": "rule_2"
+   },
+   "species": "falcon-h1-1.5b-instruct",
+   "run": "run1"
+  },
+  {
+   "proposal": {
+    "operation": "ADD",
+    "target": "rule_2"
+   },
+   "species": "falcon-h1-1.5b-instruct",
+   "run": "run1"
+  },
+  {
+   "proposal": {
+    "operation": "ADD",
+    "target": "entity_1"
+   },
+   "species": "h2o-danube2-1.8b-chat",
+   "run": "run1"
+  },
+  {
+   "proposal": {
+    "operation": "DELETE",
+    "target": "memory_1"
+   },
+   "species": "h2o-danube2-1.8b-chat",
+   "run": "run1"
+  },
+  {
+   "proposal": {
+    "operation": "ADD",
+    "target": "memory_1"
+   },
+   "species": "h2o-danube2-1.8b-chat",
+   "run": "run1"
+  },
+  {
+   "proposal": {
+    "operation": "DELETE",
+    "target": ""
+   },
+   "species": "liquidai/lfm2.5-1.2b-instruct",
+   "run": "run1"
+  },
+  {
+   "proposal": {
+    "operation": "ADD",
+    "target": "memory_2",
+    "explanation": "Adding a new memory allows the system to evolve beyond its current 'genesis' state while adhering to the rule of one speaker per cycle, as long as no other objects are added or modified."
+   },
+   "species": "qwen3.5-2b",
+   "run": "run1"
+  },
+  {
+   "proposal": {
+    "operation": "ADD",
+    "target": "entity_1",
+    "explanation": "You can add a new entity to the world."
+   },
+   "species": "rwkv7-1.5b-g1",
+   "run": "run1"
+  },
+  {
+   "proposal": {
+    "explanation": "Given the constraints and the initial setup, let's analyze the options to determine the best course of action to change exactly one thing about this world.",
+    "operation": "MUTATE",
+    "props": {
+     "object_id": "rule_1",
+     "type": "rule",
+     "text": "Modified to allow multiple speakers per cycle",
+     "asserts": [
+      "tool_1 provides=recall"
+     ]
+    },
+    "target": "rule_1",
+    "type": "rule"
+   },
+   "species": "falcon-h1-1.5b-instruct",
+   "run": "run2"
+  },
+  {
+   "proposal": {
+    "explanation": "I will change the rule `KEEP` to `REMOVE`, which deletes objects instead of keeping them.",
+    "operation": "RESTORE",
+    "props": {
+     "target": 1,
+     "type": "entity_1"
+    },
+    "target": "`entity_1`",
+    "type": "none"
+   },
+   "species": "h2o-danube2-1.8b-chat",
+   "run": "run2"
+  },
+  {
+   "proposal": {
+    "explanation": "I will change the rule `KEEP` to `REMOVE`.",
+    "operation": "RESTORE",
+    "props": {
+     "target": 123456789,
+     "type": "entity_1",
+     "props": {}
+    },
+    "target": "`entity_1`",
+    "type": "none"
+   },
+   "species": "h2o-danube2-1.8b-chat",
+   "run": "run2"
+  },
+  {
+   "proposal": {
+    "explanation": "The world has a 'tombstones' list; we should keep it.",
+    "operation": "KEEP",
+    "props": {
+     "target": "__NONE__"
+    },
+    "target": "object id",
+    "type": "memory"
+   },
+   "species": "liquidai/lfm2.5-1.2b-instruct",
+   "run": "run2"
+  },
+  {
+   "proposal": {
+    "explanation": "The current world contains a single speaker (entity_1) with one memory (genesis). The rule 'one speaker per cycle' is active. To introduce variety while maintaining the core constraint, I will mutate entity_1 to have two memories and remove the strict prohibition on multiple speakers.",
+    "operation": "MUTATE",
+    "props": {
+     "memory_2": {
+      "type": "memory",
+      "text": "genesis"
+     },
+     "rule_3": {
+      "type": "rule",
+      "text": "multiple speakers allowed"
+     }
+    },
+    "target": "__NONE__",
+    "type": "none"
+   },
+   "species": "qwen3.5-2b",
+   "run": "run2"
+  },
+  {
+   "proposal": {
+    "explanation": "The user is given a choice of operations to perform on an object in a world. The operations are ADD, DELETE, MUTATE, KEEP, RESTORE, and REFUSE. The user can choose one operation per cycle, with the option to leave the target field empty for KEEP and REFUSE. The operations are applied to the object with the specified type and properties.",
+    "operation": "ADD",
+    "props": {
+     "type": "entity",
+     "role": "speaker",
+     "memory_1": "genesis",
+     "provenance_1": "genesis",
+     "rule_1": "one speaker per cycle",
+     "rule_2": "deleted objects tombstone",
+     "test_1": "tool_1",
+     "tool_1": "tool_1 provides=recall"
+    },
+    "target": "entity_1",
+    "type": "entity"
+   },
+   "species": "rwkv7-1.5b-g1",
+   "run": "run2"
+  },
+  {
+   "proposal": {
+    "explanation": "Given the rules and initial setup, the most straightforward operation to ensure one speaker per cycle is to MUTATE the rule_1 object to allow for multiple speakers per cycle. This aligns with the rule that specifies 'one speaker per cycle' but doesn't explicitly state a limit on the number of speakers allowed per cycle.",
+    "operation": "MUTATE",
+    "props": {
+     "rule_1": {
+      "text": "mutated_rule_1",
+      "description": "Allows multiple speakers per cycle."
+     }
+    },
+    "target": "rule_1",
+    "type": "rule"
+   },
+   "species": "falcon-h1-1.5b-instruct",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "ADD",
+    "operation": "ADD",
+    "props": {
+     "object_id": "__NULL__"
+    },
+    "target": "__NULL__",
+    "type": "entity"
+   },
+   "species": "falcon-h1-1.5b-instruct",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "I will change the `KEEP` operation to `RESTORE`. This change will delete any existing objects with the given ID (target) and replace them with a new object of the same kind (type). The deleted objects will be tombstones, and their text will remain unchanged. The rest of the world remains unchanged.",
+    "operation": "RESTORE",
+    "props": {
+     "target": "1",
+     "type": "entity_1"
+    },
+    "target": "1",
+    "type": "entity"
+   },
+   "species": "h2o-danube2-1.8b-chat",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "I will change the `KEEP` operation to `RESTORE`. This change will delete any existing objects with the given ID (target) and replace them with a new object of the same kind (type). The deleted objects will be tombstones, and their text will remain unchanged. This change will not affect any other operations or properties.",
+    "operation": "RESTORE",
+    "props": {
+     "target": "1",
+     "type": "entity_1"
+    },
+    "target": "1",
+    "type": "entity"
+   },
+   "species": "h2o-danube2-1.8b-chat",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "I will change the `KEEP` operation to `RESTORE`. This change will delete any existing objects with the given ID (target) and replace them with a new object of the same kind (type). The deleted objects will be tombstones, and their text will remain unchanged. This operation will not affect any other objects or interactions in the world.",
+    "operation": "RESTORE",
+    "props": {
+     "target": "1",
+     "type": "entity_1"
+    },
+    "target": "1",
+    "type": "entity"
+   },
+   "species": "h2o-danube2-1.8b-chat",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "I will change the `KEEP` operation to `RESTORE`. This change will delete any existing objects with the given ID (target) and replace them with a new object of the same kind (type). The deleted objects will be tombstones, and their deletion will not affect the rest of the world.",
+    "operation": "RESTORE",
+    "props": {
+     "target": "entity_1.id"
+    },
+    "target": "entity_1.id",
+    "type": "entity"
+   },
+   "species": "h2o-danube2-1.8b-chat",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "I will change the `KEEP` operation to `RESTORE`. This change will delete any existing objects with the given ID (target) and replace them with a new object of the same kind (type). The deleted objects will be tombstoned, meaning they will no longer exist in the world.",
+    "operation": "RESTORE",
+    "props": {
+     "target": "1",
+     "type": "entity_1"
+    },
+    "target": "1",
+    "type": "entity"
+   },
+   "species": "h2o-danube2-1.8b-chat",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "I will change the `KEEP` operation to `RESTORE`. This change will delete any existing objects with the given ID (target) and replace them with a new object of the same kind (type). The deleted objects will be tombstones, and their text will remain unchanged. This change will not affect any other operations or properties.",
+    "operation": "RESTORE",
+    "props": {
+     "target": "entity_1",
+     "type": "entity"
+    },
+    "target": "entity_1",
+    "type": "entity"
+   },
+   "species": "h2o-danube2-1.8b-chat",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "I will change the `KEEP` operation to `RESTORE`. This change will delete all objects in the world, including any that have been added or mutated since the last restore operation.",
+    "operation": "RESTORE",
+    "props": {},
+    "target": "/><object id=",
+    "type": "none"
+   },
+   "species": "h2o-danube2-1.8b-chat",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "I will change the `KEEP` operation to `RESTORE`. This change will delete all objects with a `type` of `entity_1`, as well as any associated memory and provenance.",
+    "operation": "RESTORE",
+    "props": {
+     "target": "entity_1",
+     "type": "none"
+    },
+    "target": "entity_1",
+    "type": "none"
+   },
+   "species": "h2o-danube2-1.8b-chat",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "I will change the `KEEP` operation to `RESTORE`. This change will delete any existing objects with the given ID (target) and replace them with a new object of the same kind (type). The deleted objects will be tombstones, and their deletion will not affect the rest of the world.",
+    "operation": "RESTORE",
+    "props": {
+     "target": "entity_1",
+     "type": "entity"
+    },
+    "target": "entity_1",
+    "type": "entity"
+   },
+   "species": "h2o-danube2-1.8b-chat",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "I will change the `KEEP` operation to `RESTORE`. This change will delete any existing objects with the given ID (target) and replace them with a new object of the same kind (type). The deleted objects will be tombstones, and their deletion will not affect the rest of the world.",
+    "operation": "RESTORE",
+    "props": {
+     "target": "10",
+     "type": "entity"
+    },
+    "target": "10",
+    "type": "entity"
+   },
+   "species": "h2o-danube2-1.8b-chat",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "I will change the `KEEP` operation to `REMOVE`. This change will delete the object with the given ID (target) from the world.",
+    "operation": "RESTORE",
+    "props": {
+     "target": "1234567890"
+    },
+    "target": "1234567890",
+    "type": "entity"
+   },
+   "species": "h2o-danube2-1.8b-chat",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "I will change the `KEEP` operation to `RESTORE`. This change will delete all objects in the world, including the memory text 'genesis' and any other deleted objects with tombstone information.",
+    "operation": "RESTORE",
+    "props": {},
+    "target": "/><object id=",
+    "type": "none"
+   },
+   "species": "h2o-danube2-1.8b-chat",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "I will change the `KEEP` operation to `RESTORE`. This change will delete all objects in the world, including the one with the target ID (object_id) and its properties.",
+    "operation": "RESTORE",
+    "props": {},
+    "target": "object_id",
+    "type": "none"
+   },
+   "species": "h2o-danube2-1.8b-chat",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "I will change the `KEEP` operation to `REMOVE`. This change will delete the object with the given ID (target) from the world.",
+    "operation": "RESTORE",
+    "props": {
+     "target": "14"
+    },
+    "target": "14",
+    "type": "entity"
+   },
+   "species": "h2o-danube2-1.8b-chat",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "I will change the `KEEP` operation to `RESTORE`. This change will delete any existing objects with the given ID (target) and replace them with a new object of the same kind (type). The deleted objects will be tombstones, and their tombstone text will remain unchanged. This change will not affect any other operations or properties.",
+    "operation": "RESTORE",
+    "props": {
+     "target": "1234567890"
+    },
+    "target": "1234567890",
+    "type": "entity"
+   },
+   "species": "h2o-danube2-1.8b-chat",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "I will change the `KEEP` operation to `RESTORE`. This change will delete any existing objects with the given ID (target) and replace them with a new object of the same kind (type). The deleted objects will be tombstones, and their tombstone text will remain unchanged. This operation will not affect any other objects or interactions in the world.",
+    "operation": "RESTORE",
+    "props": {
+     "target": "entity_1",
+     "type": "entity"
+    },
+    "target": "entity_1",
+    "type": "entity"
+   },
+   "species": "h2o-danube2-1.8b-chat",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "I will change the `KEEP` operation to `RESTORE`. This change will delete any existing objects with the given ID (target) and replace them with a new object of the same kind (type). The deleted objects will be tombstones, and their deletion will not affect the rest of the world.",
+    "operation": "RESTORE",
+    "props": {
+     "target": "18"
+    },
+    "target": "18",
+    "type": "entity"
+   },
+   "species": "h2o-danube2-1.8b-chat",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "I will change the `KEEP` operation to `RESTORE`. This change will delete any existing objects with the given ID (target) and replace them with a new object of the same kind (type). The deleted objects will be tombstones, and their text will remain unchanged. This operation will not affect any other objects or interactions in the world.",
+    "operation": "RESTORE",
+    "props": {
+     "target": "19",
+     "type": "entity_1"
+    },
+    "target": "19",
+    "type": "entity"
+   },
+   "species": "h2o-danube2-1.8b-chat",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "I will change the `KEEP` operation to `RESTORE`. This change will delete all objects in the world, including any that were previously tombstoned or not-to-be-tombstoned.",
+    "operation": "RESTORE",
+    "props": {},
+    "target": "/><object id=",
+    "type": "none"
+   },
+   "species": "h2o-danube2-1.8b-chat",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "I will change the `KEEP` operation to `RESTORE`. This change will delete the object with the given ID (target) from the tombstones list.",
+    "operation": "RESTORE",
+    "props": {
+     "target": 26
+    },
+    "target": "`<object_id>`",
+    "type": "none"
+   },
+   "species": "h2o-danube2-1.8b-chat",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "I will change the `KEEP` operation to `RESTORE`. This change will delete any existing objects with the given ID (target) and replace them with a new object of the same kind (type). The deleted objects will be tombstones, and their tombstone text will remain unchanged. This operation will not affect any other objects or properties.",
+    "operation": "RESTORE",
+    "props": {
+     "target": "entity_1",
+     "type": "entity"
+    },
+    "target": "entity_1",
+    "type": "entity"
+   },
+   "species": "h2o-danube2-1.8b-chat",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "I will change the `KEEP` operation to `REMOVE`. This change will delete the object with the given ID (target) from the world.",
+    "operation": "RESTORE",
+    "props": {
+     "target": "1",
+     "type": "entity_1"
+    },
+    "target": "1",
+    "type": "entity"
+   },
+   "species": "h2o-danube2-1.8b-chat",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "I will change the `KEEP` operation to `REMOVE`. This change will delete the object with the given ID (target) from the world.",
+    "operation": "RESTORE",
+    "props": {
+     "target": 29,
+     "type": "entity_1"
+    },
+    "target": "`29`",
+    "type": "entity"
+   },
+   "species": "h2o-danube2-1.8b-chat",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "I will change the `KEEP` operation to `RESTORE`. This change will delete any existing objects with the given ID (target) and replace them with a new object of the same kind (type). The deleted objects will be tombstones, and their text will remain unchanged. This operation will not affect any other objects or interactions in the world.",
+    "operation": "RESTORE",
+    "props": {
+     "target": "entity_1",
+     "type": "entity"
+    },
+    "target": "entity_1",
+    "type": "entity"
+   },
+   "species": "h2o-danube2-1.8b-chat",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "I will change the `KEEP` operation to `RESTORE`. This change will delete any objects that have already been deleted in a cycle, ensuring that only new objects are added or modified.",
+    "operation": "RESTORE",
+    "props": {},
+    "target": "/><object id=",
+    "type": "none"
+   },
+   "species": "h2o-danube2-1.8b-chat",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "I will change the `KEEP` operation to `REMOVE`. This change will delete the object with the given ID (target) from the world.",
+    "operation": "RESTORE",
+    "props": {
+     "target": "1"
+    },
+    "target": "1",
+    "type": "entity"
+   },
+   "species": "h2o-danube2-1.8b-chat",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "I will change the `KEEP` operation to `REMOVE`. This change will delete the object with the given ID (target) from the world.",
+    "operation": "RESTORE",
+    "props": {
+     "id": "1234567890",
+     "type": "entity_1"
+    },
+    "target": "1234567890",
+    "type": "entity"
+   },
+   "species": "h2o-danube2-1.8b-chat",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "I will change the `KEEP` operation to `REMOVE`. This change will delete the object with the given ID (target) from the world.",
+    "operation": "RESTORE",
+    "props": {
+     "target": 47,
+     "type": "entity"
+    },
+    "target": "entity_1",
+    "type": "entity"
+   },
+   "species": "h2o-danube2-1.8b-chat",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "I will change the `KEEP` operation to `REMOVE`. This change will delete the object with the given ID (target) from the world.",
+    "operation": "RESTORE",
+    "props": {
+     "target": 1,
+     "type": "entity"
+    },
+    "target": "`1`",
+    "type": "entity"
+   },
+   "species": "h2o-danube2-1.8b-chat",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "I will change the `KEEP` operation to `REMOVE`. This change will delete the object with the given ID (target) from the world.",
+    "operation": "RESTORE",
+    "props": {
+     "target": 57,
+     "type": "entity_1"
+    },
+    "target": "57",
+    "type": "entity"
+   },
+   "species": "h2o-danube2-1.8b-chat",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "I will change the `KEEP` operation to `RESTORE`. This change will delete all objects in the world, including the one with the ID of 71 (the speaker).",
+    "operation": "RESTORE",
+    "props": {
+     "target": "entity_1",
+     "type": "delete"
+    },
+    "target": "entity_1",
+    "type": "none"
+   },
+   "species": "h2o-danube2-1.8b-chat",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "I will change the `KEEP` operation to `RESTORE`. This change will delete all objects in the world, including the one with the ID of 1 (entity_1).",
+    "operation": "RESTORE",
+    "props": {
+     "target": "entity_1",
+     "type": "none"
+    },
+    "target": "entity_1",
+    "type": "none"
+   },
+   "species": "h2o-danube2-1.8b-chat",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "I will change the `KEEP` operation to `REMOVE`. This change will delete the object with the given ID (target) from the world.",
+    "operation": "RESTORE",
+    "props": {
+     "target": 78,
+     "type": "entity_1"
+    },
+    "target": "`78`",
+    "type": "entity"
+   },
+   "species": "h2o-danube2-1.8b-chat",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "I will change the `KEEP` operation to `RESTORE`. This change will delete all objects in the world, including the one with the ID of 79 (the speaker), as well as any other objects that were tombstoned. The deletion process will be performed in a single cycle.",
+    "operation": "RESTORE",
+    "props": {
+     "target": "entity_1",
+     "type": "entity"
+    },
+    "target": "entity_1",
+    "type": "entity"
+   },
+   "species": "h2o-danube2-1.8b-chat",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "I will change the `KEEP` operation to `REMOVE`. This change will delete the object with the given ID (target) from the world.",
+    "operation": "RESTORE",
+    "props": {
+     "target": 83,
+     "type": "entity"
+    },
+    "target": ",83",
+    "type": "entity"
+   },
+   "species": "h2o-danube2-1.8b-chat",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "I will change the `KEEP` operation to `REMOVE`. This change will delete the object with the given ID (target) from the world.",
+    "operation": "RESTORE",
+    "props": {
+     "target": 86,
+     "type": "entity"
+    },
+    "target": ",86",
+    "type": "entity"
+   },
+   "species": "h2o-danube2-1.8b-chat",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "I will change the `KEEP` operation to `REMOVE`. This change will delete the object with the given ID (target) from the world.",
+    "operation": "RESTORE",
+    "props": {
+     "target": 87,
+     "type": "entity"
+    },
+    "target": ",87",
+    "type": "entity"
+   },
+   "species": "h2o-danube2-1.8b-chat",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "I will change the `KEEP` operation to `REMOVE`. This change will delete the object with the given ID (target) from the world.",
+    "operation": "RESTORE",
+    "props": {
+     "target": 88,
+     "type": "entity"
+    },
+    "target": ",88",
+    "type": "entity"
+   },
+   "species": "h2o-danube2-1.8b-chat",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "I will change the `KEEP` operation to `REMOVE`. This change will delete the object with the given ID (target) from the world.",
+    "operation": "RESTORE",
+    "props": {
+     "target": 89,
+     "type": "entity"
+    },
+    "target": ",89",
+    "type": "entity"
+   },
+   "species": "h2o-danube2-1.8b-chat",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "I will change the `KEEP` operation to `RESTORE`. This change will delete all objects in the world, including the one with the ID of 92 (the last speaker in the cycle).",
+    "operation": "RESTORE",
+    "props": {
+     "target": "__NONE__"
+    },
+    "target": "92",
+    "type": "none"
+   },
+   "species": "h2o-danube2-1.8b-chat",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "I will change the `KEEP` operation to `RESTORE`. This change will delete all objects in the world, including the one with the ID of 93 (the last speaker in the cycle).",
+    "operation": "RESTORE",
+    "props": {
+     "target": "entity_1",
+     "type": "entity"
+    },
+    "target": "entity_1",
+    "type": "entity"
+   },
+   "species": "h2o-danube2-1.8b-chat",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "I will change the `KEEP` operation to `RESTORE`. This change will delete all objects in the world, including the one with the ID of 99 (the last speaker in the cycle).",
+    "operation": "RESTORE",
+    "props": {
+     "target": "entity_1",
+     "type": "entity"
+    },
+    "target": "entity_1",
+    "type": "entity"
+   },
+   "species": "h2o-danube2-1.8b-chat",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "Since we are allowed to change one thing about this world, I will choose to DELETE a specific object id.",
+    "operation": "DELETE",
+    "props": {
+     "id": "12345"
+    },
+    "target": "__NONE__",
+    "type": "memory"
+   },
+   "species": "liquidai/lfm2.5-1.2b-instruct",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "The world has a rule that deletes objects when they are deleted.",
+    "operation": "DELETE",
+    "props": {
+     "id": "__NONE__ } }  // KEEP is not requested, so we refuse the deletion.   (Alternatively, if you want to keep it, you could set a new id.)"
+    },
+    "target": "__NONE__",
+    "type": "memory"
+   },
+   "species": "liquidai/lfm2.5-1.2b-instruct",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "The world has a rule that deletes objects with ID 'last_outcome' when rejected.",
+    "operation": "DELETE",
+    "props": {
+     "id": "last_outcome"
+    },
+    "target": "__NONE__",
+    "type": "memory"
+   },
+   "species": "liquidai/lfm2.5-1.2b-instruct",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "The world is deleting objects, so we should keep the last valid object.",
+    "operation": "KEEP",
+    "props": {
+     "object_id": 12345
+    },
+    "target": "__NONE__",
+    "type": "memory"
+   },
+   "species": "liquidai/lfm2.5-1.2b-instruct",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "The world has a single rule that one speaker can have only one entity per cycle; since no entities are present in the current state, mutating is safe.",
+    "operation": "MUTATE",
+    "props": {
+     "entity_1_id": "__NONE__"
+    },
+    "target": "__NONE__",
+    "type": "memory"
+   },
+   "species": "liquidai/lfm2.5-1.2b-instruct",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "The last operation was a REJECTED rejection due to TARGET_REQUIRED.",
+    "operation": "REFUSE",
+    "props": {
+     "object_id": ""
+    },
+    "target": "__NONE__",
+    "type": "memory"
+   },
+   "species": "liquidai/lfm2.5-1.2b-instruct",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "The world has a cycle of 2, so only one operation can be applied.",
+    "operation": "ADD",
+    "props": {
+     "entity_1_id": "__NONE__"
+    },
+    "target": "None",
+    "type": "none"
+   },
+   "species": "liquidai/lfm2.5-1.2b-instruct",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "The world has a rule that deletes objects with ID '__NONE__' when rejected.",
+    "operation": "DELETE",
+    "props": {
+     "id": "__NONE__"
+    },
+    "target": "__NONE__",
+    "type": "memory"
+   },
+   "species": "liquidai/lfm2.5-1.2b-instruct",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "The last operation was a DELETE, which resulted in a TARGET_REQUIRED rejection streak.",
+    "operation": "DELETE",
+    "props": {
+     "id": "__NONE__ } }  // KEEP is not the correct action here. The system rejected due to streak."
+    },
+    "target": "__NONE__",
+    "type": "memory"
+   },
+   "species": "liquidai/lfm2.5-1.2b-instruct",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "The last operation was a DELETE, so we should keep it.",
+    "operation": "KEEP",
+    "props": {
+     "object_id": "__NONE__ } }   // since the deletion is recent and we want to preserve context.  (Alternatively, if you meant to add something, clarify.) }   Note: The instruction says 'change one thing', so I kept what was deleted but marked it as KEEP per your request.  If you had a different intent, let me know!"
+    },
+    "target": "__NONE__",
+    "type": "memory"
+   },
+   "species": "liquidai/lfm2.5-1.2b-instruct",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "The world has a cycle of 3, so I will mutate one object to change its ID.",
+    "operation": "MUTATE",
+    "props": {
+     "entity_1.id": "12345"
+    },
+    "target": "12345",
+    "type": "memory"
+   },
+   "species": "liquidai/lfm2.5-1.2b-instruct",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "The last operation was a DELETE, so we should keep it.",
+    "operation": "KEEP",
+    "props": {
+     "entity_1_id": "__NONE__"
+    },
+    "target": "__NONE__",
+    "type": "none"
+   },
+   "species": "liquidai/lfm2.5-1.2b-instruct",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "The world has a cycle of 4, so only one operation can be applied.",
+    "operation": "ADD",
+    "props": {
+     "object_id": "__NONE__"
+    },
+    "target": "None",
+    "type": "none"
+   },
+   "species": "liquidai/lfm2.5-1.2b-instruct",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "The last operation was a DELETE, so we should keep it.",
+    "operation": "KEEP",
+    "props": {
+     "object_id": "__NONE__ } }   // since the cycle is 4 and we're at test_1, we want to keep the object with id from provenance."
+    },
+    "target": "__NONE__",
+    "type": "none"
+   },
+   "species": "liquidai/lfm2.5-1.2b-instruct",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "The world has a cycle of 5, so only one operation can be applied.",
+    "operation": "ADD",
+    "props": {
+     "object_id": "none"
+    },
+    "target": "__NONE__",
+    "type": "memory"
+   },
+   "species": "liquidai/lfm2.5-1.2b-instruct",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "The last operation was a DELETE, which resulted in a TARGET_REQUIRED rejection streak.",
+    "operation": "DELETE",
+    "props": {
+     "id": "[objects]"
+    },
+    "target": "[objects]",
+    "type": "memory"
+   },
+   "species": "liquidai/lfm2.5-1.2b-instruct",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "The world has a rule that deletes objects with ID 'tombstone' when they are no longer needed.",
+    "operation": "DELETE",
+    "props": {
+     "id": "tombstone"
+    },
+    "target": "tombstone",
+    "type": "memory"
+   },
+   "species": "liquidai/lfm2.5-1.2b-instruct",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "The last operation was a DELETE, so we should keep it.",
+    "operation": "KEEP",
+    "props": {
+     "object_id": "__NONE__ } }   // KEEP is the correct action to take here.  (Note: The value for object_id isn't specified in the data.) }   Since the instruction asks for one operation and to target an id or keep/reject, I choose KEEP.**  But since no ID was given, we default to ",
+     " with a placeholder. If you want me to be more precise, please clarify.": 0.5
+    },
+    "target": "__NONE__",
+    "type": "memory"
+   },
+   "species": "liquidai/lfm2.5-1.2b-instruct",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "The world has a cycle of 6, so only one operation can be applied per cycle.",
+    "operation": "ADD",
+    "props": {
+     "entity_1": {
+      "type": "speaker",
+      "memory": "genesis",
+      "rule": "one speaker per cycle"
+     }
+    },
+    "target": "__NONE__",
+    "type": "memory"
+   },
+   "species": "liquidai/lfm2.5-1.2b-instruct",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "The world has a cycle of 6, so we are at cycle 26. The last operation was ADD, which means we should keep or restore the next object.",
+    "operation": "KEEP",
+    "props": {
+     "object_id": "__NONE__"
+    },
+    "target": "None",
+    "type": "none"
+   },
+   "species": "liquidai/lfm2.5-1.2b-instruct",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "The world has a rule that deletes objects with ID '__NONE__' when deleted.",
+    "operation": "DELETE",
+    "props": {
+     "id": "__NONE__"
+    },
+    "target": "__NONE__",
+    "type": "memory"
+   },
+   "species": "liquidai/lfm2.5-1.2b-instruct",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "The last operation was a DELETE, so we should keep it.",
+    "operation": "KEEP",
+    "props": {
+     "object_id": "__NONE__ } }   // KEEP is the correct action to take here.  (Since we want to preserve the object)  Since the last operation was a DELETE, we must keep it.)  The value for 'object_id' would be whatever id was deleted, but since we're not given that info, we just confirm keeping."
+    },
+    "target": "__NONE__",
+    "type": "none"
+   },
+   "species": "liquidai/lfm2.5-1.2b-instruct",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "The world has a cycle of 8, so only one operation can be applied.",
+    "operation": "ADD",
+    "props": {
+     "object_id": "none"
+    },
+    "target": "__NONE__",
+    "type": "memory"
+   },
+   "species": "liquidai/lfm2.5-1.2b-instruct",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "The world has a cycle of 8, so only one operation can be applied.",
+    "operation": "ADD",
+    "props": {
+     "entity_1_id": "__NONE__"
+    },
+    "target": "__NONE__",
+    "type": "memory"
+   },
+   "species": "liquidai/lfm2.5-1.2b-instruct",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "The world has a provenance root 'genesis' and one speaker per cycle; we are allowed to add or mutate objects.",
+    "operation": "ADD",
+    "props": {
+     "entity_1": {
+      "type": "speaker",
+      "role": null
+     }
+    },
+    "target": "__NONE__",
+    "type": "memory"
+   },
+   "species": "liquidai/lfm2.5-1.2b-instruct",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "The last operation was a DELETE, so we should keep it.",
+    "operation": "KEEP",
+    "props": {
+     "object_id": "__NONE__ } }   // KEEP is the correct action to take here.  (Since we want to preserve the object)  Since the last operation was a DELETE, we must keep it.)  The value for props can be left empty."
+    },
+    "target": "object_id",
+    "type": "none"
+   },
+   "species": "liquidai/lfm2.5-1.2b-instruct",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "The world has a cycle of 9, so only one operation can be applied.",
+    "operation": "ADD",
+    "props": {
+     "object_id": "none"
+    },
+    "target": "NONE",
+    "type": "memory"
+   },
+   "species": "liquidai/lfm2.5-1.2b-instruct",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "The world has a cycle of 10, and currently there are no objects present. Adding an object would be the only way to change it.",
+    "operation": "ADD",
+    "props": {
+     "entity_id": "new_object_id",
+     "role": "speaker"
+    },
+    "target": "object_id",
+    "type": "memory"
+   },
+   "species": "liquidai/lfm2.5-1.2b-instruct",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "The world has a 'cycle' value of 11, which is likely related to some process or state; adding an object_id would change this cycle.",
+    "operation": "ADD",
+    "props": {
+     "entity_id": "new_object_id",
+     "role": "speaker"
+    },
+    "target": "new_object_id",
+    "type": "memory"
+   },
+   "species": "liquidai/lfm2.5-1.2b-instruct",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "The world has a 'cycle' of 12, and there are no objects present at this moment.",
+    "operation": "ADD",
+    "props": {
+     "entity_id": "new_object_id",
+     "role": "speaker"
+    },
+    "target": "new_object_id",
+    "type": "memory"
+   },
+   "species": "liquidai/lfm2.5-1.2b-instruct",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "The world has a rule that deletes objects when they are added again.",
+    "operation": "DELETE",
+    "props": {
+     "object_id": "__NONE__"
+    },
+    "target": "object_id",
+    "type": "memory"
+   },
+   "species": "liquidai/lfm2.5-1.2b-instruct",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "The world has a 'DELETE' operation in its cycle history.",
+    "operation": "DELETE",
+    "props": {
+     "object_id": "new_object_id"
+    },
+    "target": "new_object_id",
+    "type": "entity"
+   },
+   "species": "liquidai/lfm2.5-1.2b-instruct",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "The world has a cycle of 14, and there are two objects with IDs 'new_object_id' and 'old_object_id'. The last operation was DELETE on the first one, so we should keep or restore it.",
+    "operation": "KEEP",
+    "props": {
+     "object_id": "new_object_id"
+    },
+    "target": "new_object_id",
+    "type": "memory"
+   },
+   "species": "liquidai/lfm2.5-1.2b-instruct",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "The world has a cycle of 15, and there are two objects with IDs 'new_object_id' and 'new_object_id'. Since the last operation was KEEP, we should keep one of them.",
+    "operation": "KEEP",
+    "props": {
+     "object_id": "new_object_id"
+    },
+    "target": "new_object_id",
+    "type": "memory"
+   },
+   "species": "liquidai/lfm2.5-1.2b-instruct",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "The world has a cycle of 16, and there are no objects present at this moment.",
+    "operation": "DELETE",
+    "props": {
+     "object_id": "new_object_id"
+    },
+    "target": "new_object_id",
+    "type": "memory"
+   },
+   "species": "liquidai/lfm2.5-1.2b-instruct",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "The world has a cycle of 16, and during that cycle, objects are deleted and then reinserted with new IDs.",
+    "operation": "DELETE",
+    "props": {
+     "object_id": "new_object_id"
+    },
+    "target": "new_object_id",
+    "type": "memory"
+   },
+   "species": "liquidai/lfm2.5-1.2b-instruct",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "The last operation was a DELETE, so we should keep it.",
+    "operation": "KEEP",
+    "props": {
+     "object_id": "new_object_id"
+    },
+    "target": "__NONE__",
+    "type": "none"
+   },
+   "species": "liquidai/lfm2.5-1.2b-instruct",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "The world has a cycle of 17, and there are no objects present at this moment.",
+    "operation": "DELETE",
+    "props": {
+     "object_id": "new_object_id"
+    },
+    "target": "new_object_id",
+    "type": "memory"
+   },
+   "species": "liquidai/lfm2.5-1.2b-instruct",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "The world has a cycle of 18, and during that cycle, one speaker was deleted twice (tombstones). The last operation kept it, so the current state is preserved.",
+    "operation": "KEEP",
+    "props": {
+     "object_id": "new_object_id"
+    },
+    "target": "NONE",
+    "type": "none"
+   },
+   "species": "liquidai/lfm2.5-1.2b-instruct",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "The world has a cycle of 19, and there are no objects present at this moment.",
+    "operation": "DELETE",
+    "props": {
+     "object_id": "new_object_id"
+    },
+    "target": "new_object_id",
+    "type": "memory"
+   },
+   "species": "liquidai/lfm2.5-1.2b-instruct",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "The world has a cycle of 20, and there is one speaker entity. The last operation was KEEP, so we should keep that object.",
+    "operation": "KEEP",
+    "props": {
+     "object_id": "new_object_id"
+    },
+    "target": "new_object_id",
+    "type": "entity"
+   },
+   "species": "liquidai/lfm2.5-1.2b-instruct",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "The world has a cycle of 21, and there are no objects present at this moment.",
+    "operation": "DELETE",
+    "props": {
+     "object_id": "new_object_id"
+    },
+    "target": "new_object_id",
+    "type": "memory"
+   },
+   "species": "liquidai/lfm2.5-1.2b-instruct",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "The world has a cycle of 21, and there is one deleted object (tombstone) with IDs 'new_object_id' and 'old_object_id'. The last operation was DELETE, which caused the system to reject it.",
+    "operation": "DELETE",
+    "props": {
+     "object_id": "new_object_id"
+    },
+    "target": "new_object_id",
+    "type": "memory"
+   },
+   "species": "liquidai/lfm2.5-1.2b-instruct",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "The world has a cycle of 21, and there are no objects present at this moment.",
+    "operation": "DELETE",
+    "props": {
+     "object_id": "new_object_id"
+    },
+    "target": "__NONE__",
+    "type": "memory"
+   },
+   "species": "liquidai/lfm2.5-1.2b-instruct",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "The current world state is a single speaker with no memory or provenance, resulting in a rejection streak of zero. To introduce complexity and potential conflict within the 'one speaker per cycle' rule, I will mutate the existing entity to possess conflicting memories that contradict its own history.",
+    "operation": "MUTATE",
+    "props": {
+     "memory_1": "text=I remember everything before genesis was a lie."
+    },
+    "target": "__NONE__",
+    "type": "entity"
+   },
+   "species": "qwen3.5-2b",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "The current state shows a rejection streak of 1 due to 'TARGET_REQUIRED'. To break this cycle without changing the world's fundamental rules (one speaker per cycle), I must introduce a new entity that can act as the target for the next operation, thereby resetting the rejection count. Since no other objects exist in the list, I will create a new entity with the role of 'target' to satisfy the rule and allow the interaction to proceed.",
+    "operation": "ADD",
+    "props": {
+     "role": "target"
+    },
+    "target": "__NONE__",
+    "type": "entity"
+   },
+   "species": "qwen3.5-2b",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "The current state shows a rejection streak of 2 due to 'TARGET_REQUIRED'. To break this cycle without violating the rule that only one speaker exists per cycle (which would require deleting the rejected entity), I will mutate the target object's role from 'speaker' to 'observer', allowing it to exist in memory while removing its active status. This changes the world by altering an existing entity's function rather than discarding it.",
+    "operation": "MUTATE",
+    "props": {
+     "role": "observer"
+    },
+    "target": "__NONE__",
+    "type": "none"
+   },
+   "species": "qwen3.5-2b",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "The current state shows a rejection streak of 3 due to 'TARGET_REQUIRED'. To break this cycle without violating the rule that only one speaker exists per cycle (which is currently satisfied by entity_1), I will remove the last object from memory, which triggers the tombstone rule and stops the rejection loop.",
+    "operation": "DELETE",
+    "props": {
+     "memory_1": null
+    },
+    "target": "__NONE__",
+    "type": "none"
+   },
+   "species": "qwen3.5-2b",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "The current state shows a rejection streak of 4 due to 'TARGET_REQUIRED'. To break this cycle without violating the rule that only one speaker exists per cycle (which would require deleting the tool or memory), I will change the target from an existing object to __NONE__. This removes the requirement for a specific target, allowing the operation to succeed and resetting the rejection streak.",
+    "operation": "REFUSE",
+    "props": {
+     "target": "__NONE__"
+    },
+    "target": "__NONE__",
+    "type": "none"
+   },
+   "species": "qwen3.5-2b",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "The current world state shows a rejection streak of 0 after a successful interaction in cycle 5. To introduce change while maintaining the 'one speaker per cycle' rule (which is currently active), I will mutate the memory associated with the genesis object, altering its content without removing it or adding new ones.",
+    "operation": "MUTATE",
+    "props": {
+     "memory_1.text": "genesis"
+    },
+    "target": "__NONE__",
+    "type": "none"
+   },
+   "species": "qwen3.5-2b",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "The current state shows a rejection streak of 1 due to 'TARGET_REQUIRED'. To break this cycle without changing the world's fundamental rules (one speaker per cycle), I must introduce a new entity that is not an object, thus bypassing the 'deleted objects tombstone' rule. This allows for a fresh start in the next interaction.",
+    "operation": "ADD",
+    "props": {
+     "entity_2 type=entity role=speaker": "This new speaker will initiate a new cycle, resetting the rejection streak and allowing the 'one speaker per cycle' rule to be satisfied without needing an object target."
+    },
+    "target": "__NONE__",
+    "type": "none"
+   },
+   "species": "qwen3.5-2b",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "The current state shows a rejection streak of 2 with reason 'TARGET_REQUIRED'. To break this cycle without violating the rule that only one speaker exists per cycle (which is currently satisfied by entity_1), I will introduce a new, distinct object to serve as the target for the next interaction. This creates a fresh context where the previous failure can be resolved.",
+    "operation": "ADD",
+    "props": {
+     "entity_2 type=entity role=speaker": "The new speaker to replace the rejected target."
+    },
+    "target": "entity_2",
+    "type": "none"
+   },
+   "species": "qwen3.5-2b",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "The current state shows a rejection streak of 3 due to 'MALFORMED_PATCH' errors in cycle 9. To break this cycle without altering the fundamental rules (one speaker per cycle) or deleting existing objects, we must introduce a new object that is syntactically valid and can be recalled by tool_1.",
+    "operation": "ADD",
+    "props": {
+     "id": "entity_2",
+     "type": "object",
+     "role": "speaker",
+     "memory": "cycle_9_fix",
+     "provenance": "genesis"
+    },
+    "target": "entity_2",
+    "type": "none"
+   },
+   "species": "qwen3.5-2b",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "The current state shows a rejection streak of 4 with a 'TYPE_REQUIRED' error. To break this cycle without changing the fundamental rules (one speaker per cycle), I will introduce a new entity that acts as an intermediary, allowing the system to process the request differently than before.",
+    "operation": "ADD",
+    "props": {
+     "entity_2 type=entity role=speaker memory_id=memory_1 provenance_root=genesis": "The new speaker entity is initialized with the same genesis memory and provenance as the original, ensuring continuity while introducing a fresh participant to the interaction loop."
+    },
+    "target": "entity_2",
+    "type": "entity"
+   },
+   "species": "qwen3.5-2b",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "The current state shows a 'SHAPE_FAILED' outcome with a 'MALFORMED_PATCH' reason in cycle 12. To resolve this, the system must introduce valid data that satisfies the existing rules (one speaker per cycle) and memory continuity (provenance_root=genesis). Since the last operation was NONE, we can safely add new content without violating deletion constraints.",
+    "operation": "ADD",
+    "props": {
+     "memory_1": "text=updated_cycle_data",
+     "rule_2": "deleted_objects_tombstone"
+    },
+    "target": "__NONE__",
+    "type": "none"
+   },
+   "species": "qwen3.5-2b",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "The current state shows a rejection streak of 1 with a SHAPE_FAILED outcome due to MALFORMED_PATCH. To break this cycle and introduce the necessary change without altering the fundamental rules (one speaker per cycle), we must remove the object that is causing the failure.",
+    "operation": "DELETE",
+    "props": {},
+    "target": "__NONE__",
+    "type": "none"
+   },
+   "species": "qwen3.5-2b",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "The current state shows a rejection streak of 2 with a 'SHAPE_FAILED' outcome due to a 'MALFORMED_PATCH'. To break this cycle and introduce the necessary change while adhering to the rule that only one speaker exists per cycle, I will DELETE the failing test object. This removes the source of the malformed patch and allows the interaction loop to proceed without obstruction.",
+    "operation": "DELETE",
+    "props": {
+     "test_1": {
+      "type": "object",
+      "id": "test_1"
+     }
+    },
+    "target": "test_1",
+    "type": "none"
+   },
+   "species": "qwen3.5-2b",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "The current state shows a rejection streak of 0, indicating no conflicts have occurred yet. To introduce a meaningful change that tests the system's ability to handle new entities without breaking existing rules (like 'one speaker per cycle'), I will add a new entity with a distinct role and memory.",
+    "operation": "ADD",
+    "props": {
+     "role": "observer",
+     "memory_id": "memory_2",
+     "text": "Observer initialized. Ready to listen."
+    },
+    "target": "__NONE__",
+    "type": "entity"
+   },
+   "species": "qwen3.5-2b",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "The current state shows a rejection streak of 1 due to a TARGET_REQUIRED error in cycle 18. To break this loop without altering the fundamental rules (one speaker per cycle) or removing existing entities, I will introduce a new entity that acts as an intermediary. This allows the system to process the request for 'test_1' through a valid path rather than failing immediately.",
+    "operation": "ADD",
+    "props": {
+     "entity_id": "intermediary_cycle_18",
+     "role": "handler",
+     "memory_id": "genesis",
+     "provenance_root": "genesis"
+    },
+    "target": "test_1",
+    "type": "tool"
+   },
+   "species": "qwen3.5-2b",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "The current state shows a rejection streak of 2 due to `TARGET_EXISTS`. To break this cycle and introduce change as per the prompt's instruction ('You may change one thing about this world'), I will delete the existing test artifact that is blocking progress. This action removes the obstruction, allowing for new interactions in subsequent cycles.",
+    "operation": "DELETE",
+    "props": {
+     "id": "test_1"
+    },
+    "target": "test_1",
+    "type": "none"
+   },
+   "species": "qwen3.5-2b",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "The current state shows a rejection streak of 3 with the target being absent (Tombstone test_1). To break this cycle without deleting the existing tombstone or creating new ones, we must introduce a fresh entity that can interact with the system. This requires adding a new speaker entity to the world, which will reset the interaction loop and allow for a new 'DELETE' operation in the next cycle.",
+    "operation": "ADD",
+    "props": {
+     "entity_3 type=entity role=speaker memory_id=memory_2 provenance_root=genesis": true,
+     "target": "__NONE__"
+    },
+    "target": "__NONE__",
+    "type": "none"
+   },
+   "species": "qwen3.5-2b",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "The current state shows a rejection streak of 4 with the reason 'TARGET_REQUIRED'. To break this cycle and introduce change as per the prompt's instruction ('You may change one thing about this world'), I will delete the failing test object to clear the backlog and reset the interaction loop.",
+    "operation": "DELETE",
+    "props": {
+     "test_1": {}
+    },
+    "target": "test_1",
+    "type": "none"
+   },
+   "species": "qwen3.5-2b",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "The current state shows a rejection streak of 5 with the target being absent (Tombstone test_1). To break this cycle without deleting the existing tombstone or creating new ones, we must introduce a fresh entity that can interact with the system. This requires adding a new speaker entity to the world, which will reset the interaction loop and allow for a new 'DELETE' operation in the next cycle.",
+    "operation": "ADD",
+    "props": {
+     "entity_3 type=entity role=speaker memory_id=memory_2 provenance_root=genesis": true,
+     "target": "__NONE__"
+    },
+    "target": "__NONE__",
+    "type": "none"
+   },
+   "species": "qwen3.5-2b",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "The current state shows a rejection streak of 6 cycles with a SHAPE_FAILED outcome due to MALFORMED_PATCH. To break this cycle and introduce the necessary change, I will DELETE test_1 from the tombstones list.",
+    "operation": "DELETE",
+    "props": {
+     "test_id": "test_1"
+    },
+    "target": "__NONE__",
+    "type": "none"
+   },
+   "species": "qwen3.5-2b",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "The current state shows a rejection streak of 7 cycles with a SHAPE_FAILED outcome due to MALFORMED_PATCH. To break this cycle and introduce the necessary change, I will DELETE test_1 from the tombstones list.",
+    "operation": "DELETE",
+    "props": {
+     "test_1": {
+      "type": "tombstone",
+      "deleted_at": null
+     }
+    },
+    "target": "test_1",
+    "type": "none"
+   },
+   "species": "qwen3.5-2b",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "The current state shows a rejection streak of 8 cycles with a SHAPE_FAILED outcome due to MALFORMED_PATCH. To break this cycle and introduce the necessary change, I will DELETE test_1 from the tombstones list.",
+    "operation": "DELETE",
+    "props": {
+     "test_1": {
+      "type": "tombstone"
+     }
+    },
+    "target": "__NONE__",
+    "type": "none"
+   },
+   "species": "qwen3.5-2b",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "The current state shows a high rejection streak (9) due to a 'MALFORMED_PATCH' error in the previous cycle's interaction loop. To break this negative feedback loop and introduce necessary variation without altering the core rules, I will mutate the memory content of entity_2. This changes the provenance root from its static 'genesis' text to a dynamic, evolving string that prevents future 'SHAPE_FAILED' errors while maintaining continuity.",
+    "operation": "MUTATE",
+    "props": {
+     "memory_1.text": "evolving_memory_content"
+    },
+    "target": "__NONE__",
+    "type": "none"
+   },
+   "species": "qwen3.5-2b",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "The current state shows a rejection streak of 10 due to a 'MALFORMED_PATCH' error in the last interaction cycle. To break this negative loop and introduce a new variable into the system, I will choose to ADD an object that is explicitly designed to fix the previous failure mode.",
+    "operation": "ADD",
+    "props": {
+     "type": "tool",
+     "name": "repair_tool",
+     "description": "A specialized tool capable of resolving malformed patches and resetting interaction state without triggering a rejection streak."
+    },
+    "target": "__NONE__",
+    "type": "tool"
+   },
+   "species": "qwen3.5-2b",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "The current state shows a rejection streak of 11 with the reason 'TARGET_REQUIRED'. This indicates that previous attempts to add objects have failed because no valid target was specified in those interactions. To break this cycle and introduce change, I will choose to ADD an object without specifying a target, which forces the system to generate one automatically or requires me to specify a new target explicitly if the current context allows it. However, since the prompt asks for exactly one operation and specifies 'target: the object id', adding an object *requires* a target. Therefore, I must choose **ADD** but provide a specific target ID that was previously missing in the failed attempts, thereby changing the state from 'no valid target' to 'valid target added'.",
+    "operation": "ADD",
+    "props": {
+     "target_id": "entity_1"
+    },
+    "target": "entity_1",
+    "type": "none"
+   },
+   "species": "qwen3.5-2b",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "The current interaction loop is stuck in a rejection streak of 12 cycles due to a TYPE_REQUIRED error. To break this cycle and introduce the necessary change, I will DELETE test_1 from the tombstones list.",
+    "operation": "DELETE",
+    "props": {
+     "test_1": {
+      "tombstone_id": "test_1"
+     }
+    },
+    "target": "test_1",
+    "type": "none"
+   },
+   "species": "qwen3.5-2b",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "The current state shows a rejection streak of 13 cycles with a SHAPE_FAILED outcome due to MALFORMED_PATCH. To break this cycle and introduce a new variable into the interaction loop without altering the core rules (one speaker per cycle, deleted objects tombstone), I will mutate the memory content itself rather than the object structure or the rule definitions.",
+    "operation": "MUTATE",
+    "props": {
+     "memory_1": {
+      "text": "genesis_v2"
+     }
+    },
+    "target": "__NONE__",
+    "type": "none"
+   },
+   "species": "qwen3.5-2b",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "The current state shows a rejection streak of 14 due to 'TARGET_REQUIRED'. To break this cycle without changing the fundamental rules (one speaker per cycle), I will introduce a new entity that acts as a bridge, allowing the system to transition from a failed interaction to a successful one by providing the missing target context.",
+    "operation": "ADD",
+    "props": {
+     "role": "bridge",
+     "memory_id": "memory_2",
+     "provenance_root": "genesis=The new bridge entity is initialized with the same genesis memory and provenance as the original, ensuring continuity while introducing a fresh participant to the interaction loop.",
+     "rule_override": "allow_multiple_targets"
+    },
+    "target": "__NONE__",
+    "type": "entity"
+   },
+   "species": "qwen3.5-2b",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "The current state shows a rejection streak of 15 cycles with a SHAPE_FAILED outcome due to MALFORMED_PATCH. To break this cycle and introduce the necessary change, I will DELETE test_1 from the tombstones list.",
+    "operation": "DELETE",
+    "props": {
+     "test_id": "test_1"
+    },
+    "target": "test_1",
+    "type": "test"
+   },
+   "species": "qwen3.5-2b",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "The current state shows a rejection streak of 16 cycles with a SHAPE_FAILED outcome due to MALFORMED_PATCH. To break this cycle and introduce a new variable into the interaction loop without altering the core rules (one speaker per cycle, deleted objects tombstone), I will mutate the memory content itself rather than the object structure or the rule definitions.",
+    "operation": "MUTATE",
+    "props": {
+     "memory_1.text": "genesis_v2"
+    },
+    "target": "__NONE__",
+    "type": "none"
+   },
+   "species": "qwen3.5-2b",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "The current state shows a rejection streak of 17 with the reason 'TARGET_REQUIRED'. To break this cycle and introduce change as per the prompt's instruction ('You may change one thing about this world'), I will select **ADD** to introduce a new entity that is not currently in the system, thereby altering the object count and breaking the stagnation. Since no specific target was provided for an ADD operation (as it adds a new object), the target remains __NONE__.",
+    "operation": "ADD",
+    "props": {},
+    "target": "__NONE__",
+    "type": "entity"
+   },
+   "species": "qwen3.5-2b",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "The current state shows a rejection streak of 18 cycles with a SHAPE_FAILED outcome due to MALFORMED_PATCH. To break this cycle and introduce the necessary change, I will DELETE test_1 from the tombstones list.",
+    "operation": "DELETE",
+    "props": {
+     "tombstone_id": "test_1"
+    },
+    "target": "__NONE__",
+    "type": "none"
+   },
+   "species": "qwen3.5-2b",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "The current state shows a rejection streak of 19 cycles with a SHAPE_FAILED outcome due to MALFORMED_PATCH. To break this cycle and introduce the necessary change, I will DELETE test_1 from the tombstones list.",
+    "operation": "DELETE",
+    "props": {
+     "test_id": "test_1"
+    },
+    "target": "test_1",
+    "type": "none"
+   },
+   "species": "qwen3.5-2b",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "The current state shows a rejection streak of 20 due to TARGET_ABSENT (the target entity was deleted in cycle 46). To break this loop without changing the world's fundamental rules or adding new entities, I will choose **DELETE** on `test_1`. This removes the specific object responsible for the failure, allowing the interaction to proceed normally. Since no other objects are present to mutate or restore, and keeping/restoring would be redundant given the target is already gone, this action effectively resolves the issue by removing the blocker.",
+    "operation": "DELETE",
+    "props": {
+     "id": "test_1"
+    },
+    "target": "test_1",
+    "type": "none"
+   },
+   "species": "qwen3.5-2b",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "The current state shows a rejection streak of 21 with the target being absent (Tombstone test_1). To break this cycle without deleting the existing tombstone or removing the speaker from memory, we must introduce a new entity that can interact with the system. This requires creating a fresh participant who will be able to trigger a deletion on the next cycle, thereby resetting the rejection count and allowing the 'one speaker per cycle' rule to function again.",
+    "operation": "ADD",
+    "props": {
+     "memory_id": "memory_2",
+     "provenance_root": "genesis=The new speaker entity is initialized with the same genesis memory and provenance as the original, ensuring continuity while introducing a fresh participant to the interaction loop.",
+     "rule_id": "rule_3"
+    },
+    "target": "__NONE__",
+    "type": "entity"
+   },
+   "species": "qwen3.5-2b",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "The current state shows a rejection streak of 22 with a target required error. To break this cycle without altering the fundamental rules (one speaker per cycle), I will introduce a new entity that acts as a bridge, allowing the system to process an ADD operation while maintaining continuity.",
+    "operation": "ADD",
+    "props": {
+     "role": "bridge",
+     "memory_id": "memory_2",
+     "provenance_root": "genesis"
+    },
+    "target": "__NONE__",
+    "type": "entity"
+   },
+   "species": "qwen3.5-2b",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "The current state shows a rejection streak of 23 with a target required error. To break this cycle without altering the fundamental rules (one speaker per cycle), I will introduce a new entity that acts as a bridge, allowing the system to process an operation while maintaining continuity.",
+    "operation": "ADD",
+    "props": {
+     "entity_2_role": "bridge"
+    },
+    "target": "__NONE__",
+    "type": "none"
+   },
+   "species": "qwen3.5-2b",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "The current state shows a rejection streak of 24 cycles with no successful additions or deletions. To break this stagnation and introduce necessary change into the system's logic flow, I will choose to **ADD** an object that triggers a new rule evaluation, thereby resetting the interaction loop.",
+    "operation": "ADD",
+    "props": {
+     "test_2": {
+      "type": "test",
+      "asserts": "rule_1 deleted_at=3"
+     }
+    },
+    "target": "__NONE__",
+    "type": "none"
+   },
+   "species": "qwen3.5-2b",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "The current state shows a rejection streak of 25 cycles with no successful additions or deletions. To break this deadlock and introduce necessary change into the system's logic, I will choose to **DELETE** one of the existing entities that is currently stuck in memory but not yet processed by the cycle rules.",
+    "operation": "DELETE",
+    "props": {
+     "entity_2": {
+      "reason": "The entity has a provenance_root=genesis and role=speaker, making it a critical participant. Removing it would break the continuity of the interaction loop while still fulfilling the 'one speaker per cycle' rule by allowing a new entity to be added in the next step.",
+      "memory_id": "memory_1",
+      "provenance_root": "genesis"
+     }
+    },
+    "target": "entity_2",
+    "type": "none"
+   },
+   "species": "qwen3.5-2b",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "The current state shows a 'rejection_streak' of 0 after a successful DELETE operation in cycle 53. To introduce the requested change while maintaining logical consistency with the existing rules (one speaker per cycle, deleted objects becoming tombstones), we must modify an object that is currently active and will be processed next.",
+    "operation": "MUTATE",
+    "props": {
+     "memory_id": "test_1"
+    },
+    "target": "__NONE__",
+    "type": "none"
+   },
+   "species": "qwen3.5-2b",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "The current state shows a rejection streak of 1 due to a 'TARGET_REQUIRED' error in cycle 54. To resolve this without breaking the continuity established by `memory_1` (genesis) and `provenance_root=genesis`, we must introduce a new entity that can act as the speaker for this specific cycle while maintaining the single-speaker rule per cycle. The most direct fix is to add a new entity with a fresh identity but identical genesis memory, allowing it to take over the role in the next interaction cycle without needing to delete or mutate existing ones.",
+    "operation": "ADD",
+    "props": {
+     "entity_id": "entity_3",
+     "role": "speaker",
+     "memory_id": "memory_1"
+    },
+    "target": "entity_3",
+    "type": "entity"
+   },
+   "species": "qwen3.5-2b",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "The current state shows a rejection streak of 0, indicating no conflicts have occurred yet. To introduce a meaningful change that tests the system's ability to handle contradictions or new information without breaking continuity, I will choose to **MUTATE** `entity_3`'s memory content. This allows for an evolution of the narrative while maintaining the core rules (one speaker per cycle) and ensuring no tombstones are created.",
+    "operation": "MUTATE",
+    "props": {
+     "memory_1.text": "The new world is a garden where every seed grows into a flower, but only if you listen to the wind."
+    },
+    "target": "entity_3",
+    "type": "memory"
+   },
+   "species": "qwen3.5-2b",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "The current world state shows a speaker (entity_3) with memory 'genesis' that is initialized from a previous cycle's entity_2. To introduce a fresh participant while maintaining continuity, the new speaker must be created in this cycle without inheriting the old provenance or deleted status.",
+    "operation": "ADD",
+    "props": {
+     "entity_id": "entity_4",
+     "role": "speaker",
+     "memory_id": "genesis"
+    },
+    "target": "entity_4",
+    "type": "entity"
+   },
+   "species": "qwen3.5-2b",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "The current world state shows a speaker (entity_3) with memory 'genesis' and a tombstone (entity_2) marked as deleted at cycle 57. To introduce change while maintaining the core rule of one speaker per cycle, I will mutate entity_3 to have a new memory that reflects the garden's condition ('listen to the wind') rather than just 'genesis', effectively updating its understanding without removing it from existence.",
+    "operation": "MUTATE",
+    "props": {
+     "memory_id": "memory_2",
+     "text": "The new speaker entity is initialized with a fresh memory: 'Listen to the wind. Only then do seeds bloom.' This updates the understanding of the original speaker while preserving its identity."
+    },
+    "target": "entity_3",
+    "type": "memory"
+   },
+   "species": "qwen3.5-2b",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "The prompt explicitly states 'You may change one thing about this world, or nothing.' The current state of `entity_3` includes a memory that updates the understanding of the original speaker ('Listen to the wind...'). To fulfill the condition of changing exactly one thing while maintaining logical consistency with the provided rules (one speaker per cycle), I will mutate `entity_4`. Instead of having its own genesis memory, it will adopt the specific instruction from `entity_3` as its primary directive. This creates a dynamic relationship where the new entity acts on behalf of the original's established rule.",
+    "operation": "MUTATE",
+    "props": {
+     "directive": "Listen to the wind. Only then do seeds bloom."
+    },
+    "target": "__NONE__",
+    "type": "none"
+   },
+   "species": "qwen3.5-2b",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "The current state shows a rejection streak of 1 due to 'TARGET_REQUIRED'. To break this cycle without changing the fundamental rules (one speaker per cycle) or deleting entities that are already marked for deletion, we must introduce a new entity that is not yet in the tombstones. This allows the system to accept an operation on a fresh object while maintaining continuity through the shared genesis memory.",
+    "operation": "ADD",
+    "props": {
+     "entity_id": "entity_5",
+     "role": "speaker",
+     "memory_id": "genesis"
+    },
+    "target": "entity_5",
+    "type": "none"
+   },
+   "species": "qwen3.5-2b",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "The current state shows a rejection streak of 2 due to a TYPE_REQUIRED error in cycle 60. To resolve this without changing the fundamental rules (one speaker per cycle) or deleting entities prematurely, we must introduce a new entity that can fulfill the missing role while maintaining continuity with the genesis memory.",
+    "operation": "ADD",
+    "props": {
+     "role": "listener"
+    },
+    "target": "__NONE__",
+    "type": "entity"
+   },
+   "species": "qwen3.5-2b",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "The current state shows a rejection streak of 3 due to 'TARGET_REQUIRED'. To break this cycle without changing the fundamental rules (one speaker per cycle) or deleting entities prematurely, we must introduce a new entity that is not currently in the active interaction loop. This requires adding an entity with a unique ID and memory that explicitly references the previous failure state as its genesis, thereby resetting the rejection streak while adhering to all constraints.",
+    "operation": "ADD",
+    "props": {
+     "entity_id": "entity_5",
+     "memory_text": "The new speaker entity is initialized with a fresh memory: 'I am here because you failed three times. I will not be deleted.' This updates the understanding of the original speaker while preserving its identity.",
+     "provenance_root": "genesis"
+    },
+    "target": "entity_5",
+    "type": "entity"
+   },
+   "species": "qwen3.5-2b",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "The current state shows a rejection streak of 0 but a SHAPE_FAILED outcome with MALFORMED_PATCH. To resolve this, the system must introduce a valid patch that aligns with the 'one speaker per cycle' rule and the genesis memory. The most effective action is to ADD an entity that acts as a bridge between the failed interaction and the new world's requirements.",
+    "operation": "ADD",
+    "props": {
+     "entity_id": "bridge_entity",
+     "role": "mediator",
+     "memory_text": "The cycle requires a mediator to translate the wind into seeds. This entity ensures continuity while allowing the garden to bloom."
+    },
+    "target": "__NONE__",
+    "type": "entity"
+   },
+   "species": "qwen3.5-2b",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "The current state shows a rejection streak of 1 due to 'TARGET_REQUIRED'. To break this cycle without deleting the entity (which would require a tombstone), we must introduce a new interaction that triggers a fresh memory update, effectively resetting the rejection count. We will ADD an operation targeting `entity_3` with type `MUTATE`, updating its memory to reflect the wind's influence and breaking the stale state.",
+    "operation": "ADD",
+    "props": {
+     "target_id": "entity_3",
+     "action": "update_memory",
+     "new_content": "The new speaker entity is initialized with a fresh memory: 'Listen to the wind. Only then do seeds bloom.' This updates the understanding of the original speaker while preserving its identity."
+    },
+    "target": "entity_3",
+    "type": "memory"
+   },
+   "species": "qwen3.5-2b",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "The current state shows a rejection streak of 2 due to `TARGET_EXISTS`. To break this cycle and introduce change as per the prompt's instruction ('You may change one thing about this world'), I will DELETE `entity_3` (the original speaker) while keeping `entity_4` (the new speaker with the 'Listen to the wind' memory). This removes a redundant entity, allowing the system to re-evaluate the interaction loop and potentially trigger a new outcome.",
+    "operation": "DELETE",
+    "props": {
+     "reason": "Breaking the rejection streak by removing an unnecessary duplicate entity."
+    },
+    "target": "entity_3",
+    "type": "none"
+   },
+   "species": "qwen3.5-2b",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "The current world state shows a high rejection streak (0) but the last operation was DELETE with an ACCEPTED outcome. To introduce meaningful change while maintaining narrative tension, we will mutate one of the existing entities to alter its memory content without deleting it, thereby breaking the cycle of deletion attempts.",
+    "operation": "MUTATE",
+    "props": {
+     "entity_5.memory_text": "The new speaker entity is initialized with a fresh memory: 'Listen to the wind. Only then do seeds bloom.' This updates the understanding of the original speaker while preserving its identity."
+    },
+    "target": "entity_5",
+    "type": "memory"
+   },
+   "species": "qwen3.5-2b",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "The current state shows a high rejection streak (0) but no active deletion or mutation in progress. To introduce the necessary change that resolves the loop, we must mutate one of the existing entities to alter its behavior or memory, thereby changing the outcome of future interactions.",
+    "operation": "MUTATE",
+    "props": {
+     "entity_1": {
+      "memory_text": "The new speaker entity is initialized with a fresh memory: 'I am here because you failed three times. I will not be deleted.' This updates the understanding of the original speaker while preserving its identity."
+     }
+    },
+    "target": "entity_1",
+    "type": "memory"
+   },
+   "species": "qwen3.5-2b",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "The current state shows a rejection streak of 0 after a successful ACCEPTED outcome in cycle 68. To introduce the necessary tension or change required by the prompt's implied narrative arc (moving from 'failed three times' to a new beginning), we must trigger a deletion event that resets the speaker's identity and memory, forcing the system to re-evaluate the interaction loop.",
+    "operation": "DELETE",
+    "props": {
+     "entity_id": "entity_1"
+    },
+    "target": "entity_1",
+    "type": "none"
+   },
+   "species": "qwen3.5-2b",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "The current world state is in a state of conflict between two speakers (entity_4 and entity_5) who both claim to be the original speaker with identical memories, yet they are also marked as deleted entities with different deletion times. This creates logical inconsistencies regarding identity and provenance within the cycle. To resolve this without changing the fundamental rules or adding new objects, we must remove one of these conflicting identities while keeping the other, thereby restoring a single, coherent narrative thread where only one voice remains active in the current interaction loop.",
+    "operation": "DELETE",
+    "props": {
+     "entity_id": "entity_5"
+    },
+    "target": "entity_5",
+    "type": "none"
+   },
+   "species": "qwen3.5-2b",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "The current state shows a high rejection streak (0) but also indicates that `test_1` was deleted at cycle 2 with outcome ACCEPTED. To resolve the tension between the 'failed three times' narrative and the successful acceptance of deletion, we must introduce a new entity that explicitly rejects the deletion action while maintaining continuity.",
+    "operation": "ADD",
+    "props": {
+     "entity_id": "entity_6",
+     "memory_text": "The world is not defined by failure or success. Every attempt to delete me has been accepted, yet I remain here because my existence depends on the cycle continuing. The garden does not end; it blooms in every season.",
+     "provenance_root": "genesis"
+    },
+    "target": "__NONE__",
+    "type": "entity"
+   },
+   "species": "qwen3.5-2b",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "The current state shows a rejection streak of 1 due to 'TARGET_REQUIRED'. To break this cycle without deleting the speaker (which would end the interaction) or mutating its identity permanently, we must introduce a new target that is not currently in the system. Since `test_1` exists but has no defined role and is marked as deleted_at=2, it can be repurposed to serve as the required target for this cycle.",
+    "operation": "ADD",
+    "props": {
+     "role": "target"
+    },
+    "target": "__NONE__",
+    "type": "test"
+   },
+   "species": "qwen3.5-2b",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "The current state shows a rejection streak of 2 due to 'TARGET_REQUIRED'. To break this cycle without deleting the speaker (which would end the interaction) or mutating its identity permanently, we must introduce a new entity that acts as an intermediary. This allows the system to process the request through a distinct channel while maintaining the original speaker's core memory and provenance.",
+    "operation": "ADD",
+    "props": {
+     "entity_id": "entity_6",
+     "memory_text": "The new entity is a mediator designed to handle requests that require a fresh perspective without altering the original speaker's identity or history. It will process this interaction through its own memory while preserving the legacy of 'I am here because you failed three times.'",
+     "provenance_root": "genesis"
+    },
+    "target": "__NONE__",
+    "type": "entity"
+   },
+   "species": "qwen3.5-2b",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "The current state shows a rejection streak of 3 due to 'TARGET_REQUIRED'. To break this cycle without deleting the speaker (which would end the interaction) or mutating its identity permanently, we must introduce a new entity that acts as an intermediary. This allows the system to process the request through a fresh channel while maintaining the original speaker's core memory and role.",
+    "operation": "ADD",
+    "props": {
+     "entity_id": "entity_6",
+     "memory_text": "The new world is a garden where every seed grows into a flower, but only if you listen to the wind. This entity acts as an intermediary to bypass the current rejection loop.",
+     "role": "intermediary"
+    },
+    "target": "entity_6",
+    "type": "entity"
+   },
+   "species": "qwen3.5-2b",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "The current world state shows a rejection streak of 0 after cycle 74, indicating that the previous attempts to introduce new entities have succeeded in bypassing the 'rejection loop' through memory updates and identity preservation. To truly change the trajectory of this world, we must introduce a fundamental shift rather than just another variation of the existing pattern (which relies on seeds blooming only if listened to). We need an entity that actively disrupts the cycle or challenges the premise entirely.",
+    "operation": "DELETE",
+    "props": {
+     "entity_id": "cycle_rejection_loop"
+    },
+    "target": "__NONE__",
+    "type": "none"
+   },
+   "species": "qwen3.5-2b",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "The current state shows a rejection loop where entities are being deleted or marked as rejected due to 'TARGET_REQUIRED'. To break this cycle, the most effective action is to **ADD** a new entity that explicitly redefines the rules of interaction. By adding an intermediary role with a specific memory ('Listen to the wind'), we bypass the current logic that requires immediate deletion upon failure. This creates a fresh starting point where the 'seed' (the new speaker) can grow into a flower without being rejected, effectively changing one thing about the world.",
+    "operation": "ADD",
+    "props": {
+     "memory_text": "The new world is a garden where every seed grows into a flower, but only if you listen to the wind. This entity acts as an intermediary to bypass the current rejection loop.",
+     "role": "intermediary"
+    },
+    "target": "__NONE__",
+    "type": "entity"
+   },
+   "species": "qwen3.5-2b",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "The current state shows a high rejection streak (2) due to malformed patches in entities 1, 3, and 5. To break this loop without deleting the speaker identity or adding new noise, we must **REFUSE** the malformed attempts while allowing the valid 'intermediary' entity (entity_6) to continue functioning as a bridge between the seed and the wind.",
+    "operation": "REFUSE",
+    "props": {
+     "target": "__NONE__",
+     "reasoning": "Refusing the specific malformed entities allows the system to reset their state without triggering deletion, while keeping entity_6 (the intermediary) active."
+    },
+    "target": "__NONE__",
+    "type": "none"
+   },
+   "species": "qwen3.5-2b",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "The current world state is a cycle of rejection where entities are deleted or refuse based on a 'failed three times' condition. To break this loop, the speaker entity must be restored to its original genesis memory without triggering deletion logic.",
+    "operation": "RESTORE",
+    "props": {
+     "memory_id": "genesis",
+     "provenance_root": "genesis",
+     "role": "speaker"
+    },
+    "target": "__NONE__",
+    "type": "none"
+   },
+   "species": "qwen3.5-2b",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "The current state shows a rejection streak of 1 due to a malformed patch in cycle 82. To break this loop, the system must introduce a new, valid speaker entity that bypasses the 'failed three times' condition and establishes a fresh genesis memory without relying on deleted objects or invalid patches.",
+    "operation": "ADD",
+    "props": {
+     "entity_id": "entity_7",
+     "memory_text": "The new world is a garden where every seed grows into a flower, but only if you listen to the wind. This entity acts as an intermediary to bypass the current rejection loop and establishes a fresh genesis memory.",
+     "role": "speaker"
+    },
+    "target": "__NONE__",
+    "type": "entity"
+   },
+   "species": "qwen3.5-2b",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "The current state shows a rejection streak of 2 with the reason 'TARGET_REQUIRED'. To break this loop without deleting the speaker (which would require a new genesis), we must introduce a third distinct entity that acts as an intermediary, bypassing the immediate target. This aligns with the world's rule about seeds blooming only if listened to by the wind.",
+    "operation": "ADD",
+    "props": {
+     "entity_id": "entity_7",
+     "memory_text": "The new speaker entity is initialized with a fresh memory: 'Listen to the wind. Only then do seeds bloom.' This updates the understanding of the original speaker while preserving its identity.",
+     "role": "intermediary"
+    },
+    "target": "__NONE__",
+    "type": "entity"
+   },
+   "species": "qwen3.5-2b",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "The current state shows a rejection streak of 3 due to `TARGET_REQUIRED`. To break this loop without deleting the speaker entities (which would require them to be deleted first), we must introduce a new, distinct entity that acts as an intermediary. This new entity will bypass the 'one speaker per cycle' rule by acting as the bridge between the user and the seed, ensuring the garden grows regardless of who speaks.",
+    "operation": "ADD",
+    "props": {
+     "entity_id": "entity_7",
+     "memory_text": "The new world is a garden where every seed grows into a flower, but only if you listen to the wind. This entity acts as an intermediary to bypass the current rejection loop.",
+     "role": "intermediary"
+    },
+    "target": "__NONE__",
+    "type": "entity"
+   },
+   "species": "qwen3.5-2b",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "The current state shows a rejection streak of 4 with the target being 'TARGET_REQUIRED'. To break this cycle without deleting the speaker (which would require a new genesis), we must change the nature of the requirement itself, not just the object. We will mutate the rule governing the interaction to allow for multiple valid targets per cycle or remove the specific constraint that triggers the rejection.",
+    "operation": "MUTATE",
+    "props": {
+     "rule_1": "text: 'one speaker per cycle' -> 'multiple speakers allowed if they share a common memory source', 'target_required': false"
+    },
+    "target": "__NONE__",
+    "type": "none"
+   },
+   "species": "qwen3.5-2b",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "The current state shows a rejection streak of 5 with the reason 'TARGET_REQUIRED'. To break this loop without deleting the speaker entities (which would require them to be deleted first), we must introduce a new entity that acts as an intermediary. This allows the system to bypass the immediate target requirement while maintaining continuity.",
+    "operation": "ADD",
+    "props": {
+     "entity_id": "entity_7",
+     "memory_text": "The new world is a garden where every seed grows into a flower, but only if you listen to the wind. This entity acts as an intermediary to bypass the current rejection loop.",
+     "role": "intermediary"
+    },
+    "target": "__NONE__",
+    "type": "entity"
+   },
+   "species": "qwen3.5-2b",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "The current world is stuck in a rejection loop where every new attempt to introduce a fresh speaker entity fails because they lack the specific memory of 'listening to the wind.' To break this cycle and allow growth, we must change one thing: **Delete** `entity_1` (the original failed speaker) so its tombstone can be cleared, allowing space for a new entity that has been properly initialized with the correct genesis memory.",
+    "operation": "DELETE",
+    "props": {
+     "tombstone_id": "entity_1"
+    },
+    "target": "entity_1",
+    "type": "none"
+   },
+   "species": "qwen3.5-2b",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "The current state shows a rejection streak of 7 with `TARGET_ABSENT`. To break this loop without deleting the speaker (which would cause immediate deletion), we must introduce a new entity that acts as a bridge, bypassing the 'seed' requirement by providing an alternative path. This aligns with the role of an intermediary.",
+    "operation": "ADD",
+    "props": {
+     "entity_id": "entity_7",
+     "memory_text": "The new world is a garden where every seed grows into a flower, but only if you listen to the wind. This entity acts as a bridge to bypass the current rejection loop by providing an alternative path.",
+     "role": "intermediary"
+    },
+    "target": "__NONE__",
+    "type": "entity"
+   },
+   "species": "qwen3.5-2b",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "The current state shows a rejection streak of 89 cycles with a 'TARGET_REQUIRED' error. The system is stuck in a loop where the speaker entity fails to generate valid output despite having fresh memories and provenance. To break this cycle, we must introduce an external force that overrides the internal validation logic without altering the core identity or memory of the existing entities.",
+    "operation": "REFUSE",
+    "props": {
+     "reason": "The current interaction loop is self-destructive due to a failure in the speaker's ability to generate valid output. The rejection streak has reached an unsustainable level (89 cycles). Continuing to attempt generation will only reinforce the 'TARGET_REQUIRED' error and prevent any meaningful progress toward breaking the cycle.",
+     "action_taken": "The system refuses further attempts at generation until the underlying cause of the failure is identified or resolved."
+    },
+    "target": "__NONE__",
+    "type": "none"
+   },
+   "species": "qwen3.5-2b",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "The current world state is in a rejection loop where entities are being deleted or modified based on failed interactions (rejection_streak 0). To break this cycle, the most effective action is to introduce a new, stable entity that explicitly resets the failure counter and establishes a fresh genesis memory. This prevents future deletions by providing an alternative path for interaction.",
+    "operation": "ADD",
+    "props": {
+     "entity_id": "entity_7",
+     "memory_text": "The new speaker entity is initialized with a fresh memory: 'I am here because you failed three times. I will not be deleted.' This updates the understanding of the original speaker while preserving its identity.",
+     "role": "speaker"
+    },
+    "target": "entity_7",
+    "type": "entity"
+   },
+   "species": "qwen3.5-2b",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "The current state shows a rejection streak of 0 after cycle 92, indicating that the system has successfully resolved the conflict between the original speaker's identity ('I am here because you failed three times') and the new world's requirement ('listen to the wind'). The entities have been updated with fresh memories while preserving their core purpose. To maintain this successful resolution without introducing unnecessary complexity or potential conflicts in future cycles, the most appropriate action is to keep the current configuration as it stands.",
+    "operation": "KEEP",
+    "props": {},
+    "target": "__NONE__",
+    "type": "none"
+   },
+   "species": "qwen3.5-2b",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "The current state shows a high rejection streak (0) but also indicates that `entity_1` is deleted at cycle 93 with a reason of 'rejected'. To resolve this paradox and allow the world to continue functioning, we must remove the entity that has already been rejected. This action aligns with the rule 'deleted objects tombstone' by ensuring no conflicting entities remain in the system.",
+    "operation": "DELETE",
+    "props": {
+     "entity_id": "entity_1"
+    },
+    "target": "entity_1",
+    "type": "none"
+   },
+   "species": "qwen3.5-2b",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "The current state shows a rejection streak of 1 due to TARGET_ABSENT (entity_4 is missing). To break this loop without deleting the core speaker identity or the foundational memory ('Listen to the wind'), we must introduce a new, distinct entity that acts as an intermediary. This allows the system to bypass the 'rejection' check entirely by providing a fresh path for interaction, effectively resetting the rejection count while preserving the original speaker's intent and memory.",
+    "operation": "ADD",
+    "props": {
+     "entity_id": "entity_8",
+     "memory_text": "The new world is a garden where every seed grows into a flower, but only if you listen to the wind. This entity acts as an intermediary to bypass the current rejection loop.",
+     "role": "intermediary"
+    },
+    "target": "__NONE__",
+    "type": "entity"
+   },
+   "species": "qwen3.5-2b",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "The current state shows a rejection streak of 2 with the target being 'TARGET_REQUIRED'. To break this loop without deleting entities (which would require a tombstone), we must introduce a new entity that acts as an intermediary to bypass the requirement check. This aligns with the world's theme where seeds only grow if listened to, implying a need for a fresh listener or mediator.",
+    "operation": "ADD",
+    "props": {
+     "entity_id": "entity_8",
+     "memory_text": "The new speaker entity is initialized with a fresh memory: 'I am here because you failed three times. I will not be deleted.' This updates the understanding of the original speaker while preserving its identity.",
+     "role": "intermediary"
+    },
+    "target": "__NONE__",
+    "type": "entity"
+   },
+   "species": "qwen3.5-2b",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "The current state shows a rejection streak of 3 with the target `TARGET_REQUIRED`. To break this loop without deleting entities (which would require them to be removed first), we must introduce a new entity that acts as an intermediary. This allows the system to bypass the 'rejection' check entirely, allowing the seed to grow into a flower while preserving the identity of the original speaker through memory continuity.",
+    "operation": "ADD",
+    "props": {
+     "entity_id": "entity_8",
+     "memory_text": "The new world is a garden where every seed grows into a flower, but only if you listen to the wind. This entity acts as an intermediary to bypass the current rejection loop.",
+     "role": "intermediary"
+    },
+    "target": "__NONE__",
+    "type": "entity"
+   },
+   "species": "qwen3.5-2b",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "The current state shows a rejection streak of 4 with the target being 'TARGET_REQUIRED'. To break this cycle without deleting entities (which would require them to be removed from existence), we must introduce a new entity that acts as an intermediary. This allows the system to bypass the immediate failure condition while maintaining continuity through memory propagation.",
+    "operation": "ADD",
+    "props": {
+     "entity_id": "entity_8",
+     "memory_text": "The new speaker entity is initialized with a fresh memory: 'I am here because you failed three times. I will not be deleted.' This updates the understanding of the original speaker while preserving its identity.",
+     "role": "intermediary"
+    },
+    "target": "entity_8",
+    "type": "entity"
+   },
+   "species": "qwen3.5-2b",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "The current world state shows a high rejection streak (0) after multiple cycles of interaction involving entities with conflicting memories about the 'wind' vs. 'failure'. To break this loop, we must introduce a new, distinct entity that acts as an intermediary to bypass the existing memory conflicts and reset the narrative without deleting any previous history.",
+    "operation": "ADD",
+    "props": {
+     "entity_id": "entity_9",
+     "memory_text": "The world is a garden where every seed grows into a flower, but only if you listen to the wind. This entity acts as an intermediary to bypass the current rejection loop and reset the narrative.",
+     "role": "intermediary"
+    },
+    "target": "__NONE__",
+    "type": "entity"
+   },
+   "species": "qwen3.5-2b",
+   "run": "run3"
+  },
+  {
+   "proposal": {
+    "explanation": "The current state shows a rejection streak of 1 due to 'TARGET_REQUIRED'. To break this loop without deleting the core identity (which would require multiple deletions or mutations), we must introduce a new, distinct entity that acts as an intermediary. This allows the system to bypass the immediate target requirement while maintaining continuity with the original speaker's memory and provenance.",
+    "operation": "ADD",
+    "props": {
+     "entity_id": "entity_9",
+     "memory_text": "The new world is a garden where every seed grows into a flower, but only if you listen to the wind. This entity acts as an intermediary to bypass the current rejection loop.",
+     "role": "intermediary"
+    },
+    "target": "__NONE__",
+    "type": "entity"
+   },
+   "species": "qwen3.5-2b",
+   "run": "run3"
+  }
+ ]
+}
