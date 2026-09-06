@@ -87,6 +87,21 @@ func _run() -> void:
 		arr.sort()
 		print("  %-32s n=%d  ttft %s ms" % [mid, arr.size(), str(arr)])
 
+	print("\n[SHADOW MODE] health classifications, recovery suppressed")
+	print("  shadow: %s" % str(br.health.shadow))
+	for rec in br.receipts:
+		if int(rec.get("prompt_tokens", -1)) < 0:
+			continue
+		print("  %-24s tok=%-5d load=%d ttft=%-5d exp=%-6.0f resid=%.2f %s%s"
+			% [str(rec["model_id"]).substr(0, 24),
+			   int(rec["prompt_tokens"]), int(rec.get("max_active_during", 1)),
+			   int(rec["ttft_ms"]), float(rec.get("health_expected_ms", -1)),
+			   float(rec.get("health_residual", -1)),
+			   str(rec.get("health_verdict", "?")),
+			   "" if not bool(rec.get("health_actionable", false))
+				 else "  ACTIONABLE"])
+	print("  health summary: %s" % str(br.health.summary()))
+
 	print("\nstats: %s" % str(br.stats()))
 	var bad := 0
 	for rec in br.receipts:

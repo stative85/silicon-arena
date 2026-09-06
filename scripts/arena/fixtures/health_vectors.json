@@ -1,0 +1,8702 @@
+{
+ "policy": {
+  "ks": 1.8,
+  "kh": 20.0,
+  "n": 3,
+  "models": {
+   "falcon-h1-1.5b-instruct": {
+    "knots": [
+     [
+      58,
+      202.0
+     ],
+     [
+      804,
+      440.0
+     ],
+     [
+      6184,
+      1295.5
+     ]
+    ],
+    "contention": 1.4809
+   },
+   "h2o-danube2-1.8b-chat": {
+    "knots": [
+     [
+      60,
+      92.0
+     ],
+     [
+      789,
+      188.0
+     ],
+     [
+      5829,
+      948.0
+     ]
+    ],
+    "contention": 1.3339
+   },
+   "liquidai/lfm2.5-1.2b-instruct": {
+    "knots": [
+     [
+      47,
+      93.0
+     ],
+     [
+      597,
+      133.0
+     ],
+     [
+      4837,
+      423.0
+     ]
+    ],
+    "contention": 1.1579
+   }
+  }
+ },
+ "vectors": [
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 47,
+   "load": 1,
+   "ttft": 137,
+   "expected": 93.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 47,
+   "load": 1,
+   "ttft": 94,
+   "expected": 93.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 47,
+   "load": 1,
+   "ttft": 92,
+   "expected": 93.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 47,
+   "load": 1,
+   "ttft": 77,
+   "expected": 93.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 47,
+   "load": 1,
+   "ttft": 77,
+   "expected": 93.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 47,
+   "load": 1,
+   "ttft": 93,
+   "expected": 93.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 47,
+   "load": 1,
+   "ttft": 94,
+   "expected": 93.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 47,
+   "load": 1,
+   "ttft": 94,
+   "expected": 93.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 47,
+   "load": 1,
+   "ttft": 109,
+   "expected": 93.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 47,
+   "load": 1,
+   "ttft": 79,
+   "expected": 93.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 47,
+   "load": 1,
+   "ttft": 78,
+   "expected": 93.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 47,
+   "load": 1,
+   "ttft": 93,
+   "expected": 93.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 47,
+   "load": 1,
+   "ttft": 94,
+   "expected": 93.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 47,
+   "load": 1,
+   "ttft": 77,
+   "expected": 93.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 47,
+   "load": 1,
+   "ttft": 94,
+   "expected": 93.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 47,
+   "load": 1,
+   "ttft": 93,
+   "expected": 93.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 47,
+   "load": 1,
+   "ttft": 94,
+   "expected": 93.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 47,
+   "load": 1,
+   "ttft": 94,
+   "expected": 93.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 47,
+   "load": 1,
+   "ttft": 91,
+   "expected": 93.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 47,
+   "load": 1,
+   "ttft": 93,
+   "expected": 93.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 47,
+   "load": 1,
+   "ttft": 110,
+   "expected": 93.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 47,
+   "load": 1,
+   "ttft": 93,
+   "expected": 93.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 47,
+   "load": 1,
+   "ttft": 78,
+   "expected": 93.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 47,
+   "load": 1,
+   "ttft": 94,
+   "expected": 93.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 47,
+   "load": 1,
+   "ttft": 77,
+   "expected": 93.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 47,
+   "load": 1,
+   "ttft": 111,
+   "expected": 93.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 47,
+   "load": 1,
+   "ttft": 94,
+   "expected": 93.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 47,
+   "load": 1,
+   "ttft": 79,
+   "expected": 93.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 47,
+   "load": 1,
+   "ttft": 76,
+   "expected": 93.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 47,
+   "load": 1,
+   "ttft": 94,
+   "expected": 93.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 47,
+   "load": 1,
+   "ttft": 93,
+   "expected": 93.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 47,
+   "load": 1,
+   "ttft": 80,
+   "expected": 93.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 47,
+   "load": 1,
+   "ttft": 93,
+   "expected": 93.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 47,
+   "load": 1,
+   "ttft": 93,
+   "expected": 93.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 47,
+   "load": 1,
+   "ttft": 93,
+   "expected": 93.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 47,
+   "load": 1,
+   "ttft": 92,
+   "expected": 93.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 47,
+   "load": 1,
+   "ttft": 94,
+   "expected": 93.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 47,
+   "load": 1,
+   "ttft": 92,
+   "expected": 93.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 47,
+   "load": 1,
+   "ttft": 94,
+   "expected": 93.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 47,
+   "load": 1,
+   "ttft": 77,
+   "expected": 93.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 47,
+   "load": 1,
+   "ttft": 109,
+   "expected": 93.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 47,
+   "load": 1,
+   "ttft": 94,
+   "expected": 93.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 47,
+   "load": 1,
+   "ttft": 92,
+   "expected": 93.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 47,
+   "load": 1,
+   "ttft": 77,
+   "expected": 93.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 47,
+   "load": 1,
+   "ttft": 94,
+   "expected": 93.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 47,
+   "load": 1,
+   "ttft": 77,
+   "expected": 93.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 47,
+   "load": 1,
+   "ttft": 95,
+   "expected": 93.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 47,
+   "load": 1,
+   "ttft": 77,
+   "expected": 93.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 47,
+   "load": 1,
+   "ttft": 78,
+   "expected": 93.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 47,
+   "load": 1,
+   "ttft": 94,
+   "expected": 93.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 47,
+   "load": 1,
+   "ttft": 109,
+   "expected": 93.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 47,
+   "load": 1,
+   "ttft": 79,
+   "expected": 93.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 47,
+   "load": 1,
+   "ttft": 95,
+   "expected": 93.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 47,
+   "load": 1,
+   "ttft": 107,
+   "expected": 93.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 47,
+   "load": 1,
+   "ttft": 109,
+   "expected": 93.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 47,
+   "load": 1,
+   "ttft": 78,
+   "expected": 93.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 47,
+   "load": 1,
+   "ttft": 94,
+   "expected": 93.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 47,
+   "load": 1,
+   "ttft": 76,
+   "expected": 93.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 47,
+   "load": 1,
+   "ttft": 108,
+   "expected": 93.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 47,
+   "load": 1,
+   "ttft": 93,
+   "expected": 93.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 59,
+   "load": 1,
+   "ttft": 343,
+   "expected": 92.0,
+   "verdict": "SUSPECT"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 59,
+   "load": 1,
+   "ttft": 92,
+   "expected": 92.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 59,
+   "load": 1,
+   "ttft": 79,
+   "expected": 92.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 59,
+   "load": 1,
+   "ttft": 93,
+   "expected": 92.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 59,
+   "load": 1,
+   "ttft": 93,
+   "expected": 92.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 59,
+   "load": 1,
+   "ttft": 79,
+   "expected": 92.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 59,
+   "load": 1,
+   "ttft": 78,
+   "expected": 92.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 59,
+   "load": 1,
+   "ttft": 95,
+   "expected": 92.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 59,
+   "load": 1,
+   "ttft": 77,
+   "expected": 92.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 59,
+   "load": 1,
+   "ttft": 77,
+   "expected": 92.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 59,
+   "load": 1,
+   "ttft": 92,
+   "expected": 92.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 59,
+   "load": 1,
+   "ttft": 77,
+   "expected": 92.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 59,
+   "load": 1,
+   "ttft": 77,
+   "expected": 92.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 59,
+   "load": 1,
+   "ttft": 77,
+   "expected": 92.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 59,
+   "load": 1,
+   "ttft": 77,
+   "expected": 92.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 59,
+   "load": 1,
+   "ttft": 93,
+   "expected": 92.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 59,
+   "load": 1,
+   "ttft": 78,
+   "expected": 92.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 59,
+   "load": 1,
+   "ttft": 76,
+   "expected": 92.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 59,
+   "load": 1,
+   "ttft": 78,
+   "expected": 92.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 59,
+   "load": 1,
+   "ttft": 93,
+   "expected": 92.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 59,
+   "load": 1,
+   "ttft": 78,
+   "expected": 92.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 59,
+   "load": 1,
+   "ttft": 92,
+   "expected": 92.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 59,
+   "load": 1,
+   "ttft": 75,
+   "expected": 92.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 59,
+   "load": 1,
+   "ttft": 80,
+   "expected": 92.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 59,
+   "load": 1,
+   "ttft": 78,
+   "expected": 92.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 59,
+   "load": 1,
+   "ttft": 77,
+   "expected": 92.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 59,
+   "load": 1,
+   "ttft": 93,
+   "expected": 92.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 59,
+   "load": 1,
+   "ttft": 94,
+   "expected": 92.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 59,
+   "load": 1,
+   "ttft": 76,
+   "expected": 92.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 59,
+   "load": 1,
+   "ttft": 94,
+   "expected": 92.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 61,
+   "load": 1,
+   "ttft": 77,
+   "expected": 92.1317,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 61,
+   "load": 1,
+   "ttft": 78,
+   "expected": 92.1317,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 61,
+   "load": 1,
+   "ttft": 94,
+   "expected": 92.1317,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 61,
+   "load": 1,
+   "ttft": 96,
+   "expected": 92.1317,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 61,
+   "load": 1,
+   "ttft": 93,
+   "expected": 92.1317,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 61,
+   "load": 1,
+   "ttft": 80,
+   "expected": 92.1317,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 61,
+   "load": 1,
+   "ttft": 94,
+   "expected": 92.1317,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 61,
+   "load": 1,
+   "ttft": 109,
+   "expected": 92.1317,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 61,
+   "load": 1,
+   "ttft": 78,
+   "expected": 92.1317,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 61,
+   "load": 1,
+   "ttft": 92,
+   "expected": 92.1317,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 61,
+   "load": 1,
+   "ttft": 77,
+   "expected": 92.1317,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 61,
+   "load": 1,
+   "ttft": 123,
+   "expected": 92.1317,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 61,
+   "load": 1,
+   "ttft": 94,
+   "expected": 92.1317,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 61,
+   "load": 1,
+   "ttft": 94,
+   "expected": 92.1317,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 61,
+   "load": 1,
+   "ttft": 92,
+   "expected": 92.1317,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 61,
+   "load": 1,
+   "ttft": 92,
+   "expected": 92.1317,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 61,
+   "load": 1,
+   "ttft": 77,
+   "expected": 92.1317,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 61,
+   "load": 1,
+   "ttft": 93,
+   "expected": 92.1317,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 61,
+   "load": 1,
+   "ttft": 94,
+   "expected": 92.1317,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 61,
+   "load": 1,
+   "ttft": 95,
+   "expected": 92.1317,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 61,
+   "load": 1,
+   "ttft": 79,
+   "expected": 92.1317,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 61,
+   "load": 1,
+   "ttft": 92,
+   "expected": 92.1317,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 61,
+   "load": 1,
+   "ttft": 79,
+   "expected": 92.1317,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 61,
+   "load": 1,
+   "ttft": 93,
+   "expected": 92.1317,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 61,
+   "load": 1,
+   "ttft": 76,
+   "expected": 92.1317,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 61,
+   "load": 1,
+   "ttft": 78,
+   "expected": 92.1317,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 61,
+   "load": 1,
+   "ttft": 93,
+   "expected": 92.1317,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 61,
+   "load": 1,
+   "ttft": 93,
+   "expected": 92.1317,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 61,
+   "load": 1,
+   "ttft": 94,
+   "expected": 92.1317,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 61,
+   "load": 1,
+   "ttft": 78,
+   "expected": 92.1317,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 57,
+   "load": 1,
+   "ttft": 341,
+   "expected": 202.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 57,
+   "load": 1,
+   "ttft": 189,
+   "expected": 202.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 57,
+   "load": 1,
+   "ttft": 220,
+   "expected": 202.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 57,
+   "load": 1,
+   "ttft": 219,
+   "expected": 202.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 57,
+   "load": 1,
+   "ttft": 202,
+   "expected": 202.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 57,
+   "load": 1,
+   "ttft": 202,
+   "expected": 202.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 57,
+   "load": 1,
+   "ttft": 170,
+   "expected": 202.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 57,
+   "load": 1,
+   "ttft": 187,
+   "expected": 202.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 57,
+   "load": 1,
+   "ttft": 172,
+   "expected": 202.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 57,
+   "load": 1,
+   "ttft": 217,
+   "expected": 202.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 57,
+   "load": 1,
+   "ttft": 219,
+   "expected": 202.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 57,
+   "load": 1,
+   "ttft": 218,
+   "expected": 202.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 57,
+   "load": 1,
+   "ttft": 219,
+   "expected": 202.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 57,
+   "load": 1,
+   "ttft": 188,
+   "expected": 202.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 57,
+   "load": 1,
+   "ttft": 202,
+   "expected": 202.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 57,
+   "load": 1,
+   "ttft": 220,
+   "expected": 202.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 57,
+   "load": 1,
+   "ttft": 217,
+   "expected": 202.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 57,
+   "load": 1,
+   "ttft": 216,
+   "expected": 202.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 57,
+   "load": 1,
+   "ttft": 219,
+   "expected": 202.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 57,
+   "load": 1,
+   "ttft": 188,
+   "expected": 202.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 57,
+   "load": 1,
+   "ttft": 203,
+   "expected": 202.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 57,
+   "load": 1,
+   "ttft": 188,
+   "expected": 202.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 57,
+   "load": 1,
+   "ttft": 189,
+   "expected": 202.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 57,
+   "load": 1,
+   "ttft": 186,
+   "expected": 202.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 57,
+   "load": 1,
+   "ttft": 189,
+   "expected": 202.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 57,
+   "load": 1,
+   "ttft": 187,
+   "expected": 202.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 57,
+   "load": 1,
+   "ttft": 203,
+   "expected": 202.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 57,
+   "load": 1,
+   "ttft": 205,
+   "expected": 202.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 57,
+   "load": 1,
+   "ttft": 202,
+   "expected": 202.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 57,
+   "load": 1,
+   "ttft": 205,
+   "expected": 202.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 57,
+   "load": 1,
+   "ttft": 154,
+   "expected": 202.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 57,
+   "load": 1,
+   "ttft": 202,
+   "expected": 202.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 57,
+   "load": 1,
+   "ttft": 219,
+   "expected": 202.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 57,
+   "load": 1,
+   "ttft": 218,
+   "expected": 202.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 57,
+   "load": 1,
+   "ttft": 217,
+   "expected": 202.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 57,
+   "load": 1,
+   "ttft": 202,
+   "expected": 202.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 57,
+   "load": 1,
+   "ttft": 203,
+   "expected": 202.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 57,
+   "load": 1,
+   "ttft": 190,
+   "expected": 202.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 57,
+   "load": 1,
+   "ttft": 172,
+   "expected": 202.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 57,
+   "load": 1,
+   "ttft": 203,
+   "expected": 202.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 57,
+   "load": 1,
+   "ttft": 204,
+   "expected": 202.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 57,
+   "load": 1,
+   "ttft": 202,
+   "expected": 202.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 57,
+   "load": 1,
+   "ttft": 202,
+   "expected": 202.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 57,
+   "load": 1,
+   "ttft": 186,
+   "expected": 202.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 57,
+   "load": 1,
+   "ttft": 202,
+   "expected": 202.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 58,
+   "load": 1,
+   "ttft": 219,
+   "expected": 202.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 58,
+   "load": 1,
+   "ttft": 217,
+   "expected": 202.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 58,
+   "load": 1,
+   "ttft": 187,
+   "expected": 202.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 58,
+   "load": 1,
+   "ttft": 156,
+   "expected": 202.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 58,
+   "load": 1,
+   "ttft": 201,
+   "expected": 202.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 58,
+   "load": 1,
+   "ttft": 204,
+   "expected": 202.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 58,
+   "load": 1,
+   "ttft": 172,
+   "expected": 202.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 58,
+   "load": 1,
+   "ttft": 205,
+   "expected": 202.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 58,
+   "load": 1,
+   "ttft": 187,
+   "expected": 202.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 58,
+   "load": 1,
+   "ttft": 188,
+   "expected": 202.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 58,
+   "load": 1,
+   "ttft": 202,
+   "expected": 202.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 58,
+   "load": 1,
+   "ttft": 185,
+   "expected": 202.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 58,
+   "load": 1,
+   "ttft": 187,
+   "expected": 202.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 58,
+   "load": 1,
+   "ttft": 218,
+   "expected": 202.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 58,
+   "load": 1,
+   "ttft": 185,
+   "expected": 202.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 597,
+   "load": 1,
+   "ttft": 124,
+   "expected": 133.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 597,
+   "load": 1,
+   "ttft": 140,
+   "expected": 133.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 597,
+   "load": 1,
+   "ttft": 124,
+   "expected": 133.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 597,
+   "load": 1,
+   "ttft": 140,
+   "expected": 133.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 597,
+   "load": 1,
+   "ttft": 123,
+   "expected": 133.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 597,
+   "load": 1,
+   "ttft": 138,
+   "expected": 133.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 597,
+   "load": 1,
+   "ttft": 126,
+   "expected": 133.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 597,
+   "load": 1,
+   "ttft": 124,
+   "expected": 133.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 597,
+   "load": 1,
+   "ttft": 127,
+   "expected": 133.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 597,
+   "load": 1,
+   "ttft": 140,
+   "expected": 133.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 597,
+   "load": 1,
+   "ttft": 126,
+   "expected": 133.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 597,
+   "load": 1,
+   "ttft": 125,
+   "expected": 133.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 597,
+   "load": 1,
+   "ttft": 128,
+   "expected": 133.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 597,
+   "load": 1,
+   "ttft": 139,
+   "expected": 133.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 597,
+   "load": 1,
+   "ttft": 125,
+   "expected": 133.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 597,
+   "load": 1,
+   "ttft": 125,
+   "expected": 133.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 597,
+   "load": 1,
+   "ttft": 140,
+   "expected": 133.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 597,
+   "load": 1,
+   "ttft": 141,
+   "expected": 133.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 597,
+   "load": 1,
+   "ttft": 126,
+   "expected": 133.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 597,
+   "load": 1,
+   "ttft": 124,
+   "expected": 133.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 597,
+   "load": 1,
+   "ttft": 141,
+   "expected": 133.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 597,
+   "load": 1,
+   "ttft": 124,
+   "expected": 133.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 597,
+   "load": 1,
+   "ttft": 126,
+   "expected": 133.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 597,
+   "load": 1,
+   "ttft": 125,
+   "expected": 133.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 597,
+   "load": 1,
+   "ttft": 139,
+   "expected": 133.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 597,
+   "load": 1,
+   "ttft": 141,
+   "expected": 133.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 597,
+   "load": 1,
+   "ttft": 125,
+   "expected": 133.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 597,
+   "load": 1,
+   "ttft": 139,
+   "expected": 133.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 597,
+   "load": 1,
+   "ttft": 125,
+   "expected": 133.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 597,
+   "load": 1,
+   "ttft": 142,
+   "expected": 133.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 597,
+   "load": 1,
+   "ttft": 140,
+   "expected": 133.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 597,
+   "load": 1,
+   "ttft": 126,
+   "expected": 133.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 597,
+   "load": 1,
+   "ttft": 124,
+   "expected": 133.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 597,
+   "load": 1,
+   "ttft": 141,
+   "expected": 133.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 597,
+   "load": 1,
+   "ttft": 140,
+   "expected": 133.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 597,
+   "load": 1,
+   "ttft": 125,
+   "expected": 133.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 597,
+   "load": 1,
+   "ttft": 140,
+   "expected": 133.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 597,
+   "load": 1,
+   "ttft": 139,
+   "expected": 133.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 597,
+   "load": 1,
+   "ttft": 123,
+   "expected": 133.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 597,
+   "load": 1,
+   "ttft": 140,
+   "expected": 133.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 597,
+   "load": 1,
+   "ttft": 140,
+   "expected": 133.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 597,
+   "load": 1,
+   "ttft": 139,
+   "expected": 133.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 597,
+   "load": 1,
+   "ttft": 123,
+   "expected": 133.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 597,
+   "load": 1,
+   "ttft": 141,
+   "expected": 133.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 597,
+   "load": 1,
+   "ttft": 125,
+   "expected": 133.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 597,
+   "load": 1,
+   "ttft": 140,
+   "expected": 133.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 597,
+   "load": 1,
+   "ttft": 140,
+   "expected": 133.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 597,
+   "load": 1,
+   "ttft": 139,
+   "expected": 133.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 597,
+   "load": 1,
+   "ttft": 142,
+   "expected": 133.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 597,
+   "load": 1,
+   "ttft": 123,
+   "expected": 133.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 597,
+   "load": 1,
+   "ttft": 140,
+   "expected": 133.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 597,
+   "load": 1,
+   "ttft": 142,
+   "expected": 133.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 597,
+   "load": 1,
+   "ttft": 126,
+   "expected": 133.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 597,
+   "load": 1,
+   "ttft": 126,
+   "expected": 133.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 597,
+   "load": 1,
+   "ttft": 141,
+   "expected": 133.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 597,
+   "load": 1,
+   "ttft": 143,
+   "expected": 133.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 597,
+   "load": 1,
+   "ttft": 125,
+   "expected": 133.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 597,
+   "load": 1,
+   "ttft": 125,
+   "expected": 133.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 597,
+   "load": 1,
+   "ttft": 123,
+   "expected": 133.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 597,
+   "load": 1,
+   "ttft": 142,
+   "expected": 133.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 789,
+   "load": 1,
+   "ttft": 170,
+   "expected": 188.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 789,
+   "load": 1,
+   "ttft": 205,
+   "expected": 188.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 789,
+   "load": 1,
+   "ttft": 202,
+   "expected": 188.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 789,
+   "load": 1,
+   "ttft": 205,
+   "expected": 188.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 789,
+   "load": 1,
+   "ttft": 205,
+   "expected": 188.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 789,
+   "load": 1,
+   "ttft": 220,
+   "expected": 188.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 789,
+   "load": 1,
+   "ttft": 187,
+   "expected": 188.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 789,
+   "load": 1,
+   "ttft": 187,
+   "expected": 188.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 789,
+   "load": 1,
+   "ttft": 188,
+   "expected": 188.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 789,
+   "load": 1,
+   "ttft": 186,
+   "expected": 188.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 789,
+   "load": 1,
+   "ttft": 185,
+   "expected": 188.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 789,
+   "load": 1,
+   "ttft": 200,
+   "expected": 188.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 789,
+   "load": 1,
+   "ttft": 218,
+   "expected": 188.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 789,
+   "load": 1,
+   "ttft": 189,
+   "expected": 188.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 789,
+   "load": 1,
+   "ttft": 189,
+   "expected": 188.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 789,
+   "load": 1,
+   "ttft": 188,
+   "expected": 188.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 789,
+   "load": 1,
+   "ttft": 184,
+   "expected": 188.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 789,
+   "load": 1,
+   "ttft": 202,
+   "expected": 188.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 789,
+   "load": 1,
+   "ttft": 187,
+   "expected": 188.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 789,
+   "load": 1,
+   "ttft": 218,
+   "expected": 188.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 789,
+   "load": 1,
+   "ttft": 188,
+   "expected": 188.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 789,
+   "load": 1,
+   "ttft": 188,
+   "expected": 188.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 789,
+   "load": 1,
+   "ttft": 186,
+   "expected": 188.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 789,
+   "load": 1,
+   "ttft": 202,
+   "expected": 188.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 789,
+   "load": 1,
+   "ttft": 187,
+   "expected": 188.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 789,
+   "load": 1,
+   "ttft": 188,
+   "expected": 188.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 789,
+   "load": 1,
+   "ttft": 232,
+   "expected": 188.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 789,
+   "load": 1,
+   "ttft": 188,
+   "expected": 188.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 789,
+   "load": 1,
+   "ttft": 186,
+   "expected": 188.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 789,
+   "load": 1,
+   "ttft": 201,
+   "expected": 188.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 789,
+   "load": 1,
+   "ttft": 174,
+   "expected": 188.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 789,
+   "load": 1,
+   "ttft": 188,
+   "expected": 188.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 789,
+   "load": 1,
+   "ttft": 187,
+   "expected": 188.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 789,
+   "load": 1,
+   "ttft": 185,
+   "expected": 188.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 789,
+   "load": 1,
+   "ttft": 236,
+   "expected": 188.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 789,
+   "load": 1,
+   "ttft": 188,
+   "expected": 188.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 789,
+   "load": 1,
+   "ttft": 205,
+   "expected": 188.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 789,
+   "load": 1,
+   "ttft": 202,
+   "expected": 188.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 789,
+   "load": 1,
+   "ttft": 206,
+   "expected": 188.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 789,
+   "load": 1,
+   "ttft": 188,
+   "expected": 188.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 789,
+   "load": 1,
+   "ttft": 203,
+   "expected": 188.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 789,
+   "load": 1,
+   "ttft": 218,
+   "expected": 188.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 789,
+   "load": 1,
+   "ttft": 186,
+   "expected": 188.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 789,
+   "load": 1,
+   "ttft": 186,
+   "expected": 188.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 789,
+   "load": 1,
+   "ttft": 187,
+   "expected": 188.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 789,
+   "load": 1,
+   "ttft": 200,
+   "expected": 188.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 789,
+   "load": 1,
+   "ttft": 188,
+   "expected": 188.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 789,
+   "load": 1,
+   "ttft": 189,
+   "expected": 188.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 789,
+   "load": 1,
+   "ttft": 221,
+   "expected": 188.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 789,
+   "load": 1,
+   "ttft": 187,
+   "expected": 188.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 789,
+   "load": 1,
+   "ttft": 172,
+   "expected": 188.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 789,
+   "load": 1,
+   "ttft": 186,
+   "expected": 188.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 789,
+   "load": 1,
+   "ttft": 185,
+   "expected": 188.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 789,
+   "load": 1,
+   "ttft": 185,
+   "expected": 188.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 789,
+   "load": 1,
+   "ttft": 204,
+   "expected": 188.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 789,
+   "load": 1,
+   "ttft": 220,
+   "expected": 188.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 789,
+   "load": 1,
+   "ttft": 187,
+   "expected": 188.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 789,
+   "load": 1,
+   "ttft": 187,
+   "expected": 188.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 789,
+   "load": 1,
+   "ttft": 185,
+   "expected": 188.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 789,
+   "load": 1,
+   "ttft": 202,
+   "expected": 188.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 804,
+   "load": 1,
+   "ttft": 337,
+   "expected": 440.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 804,
+   "load": 1,
+   "ttft": 468,
+   "expected": 440.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 804,
+   "load": 1,
+   "ttft": 471,
+   "expected": 440.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 804,
+   "load": 1,
+   "ttft": 388,
+   "expected": 440.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 804,
+   "load": 1,
+   "ttft": 485,
+   "expected": 440.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 804,
+   "load": 1,
+   "ttft": 504,
+   "expected": 440.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 804,
+   "load": 1,
+   "ttft": 513,
+   "expected": 440.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 804,
+   "load": 1,
+   "ttft": 517,
+   "expected": 440.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 804,
+   "load": 1,
+   "ttft": 483,
+   "expected": 440.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 804,
+   "load": 1,
+   "ttft": 420,
+   "expected": 440.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 804,
+   "load": 1,
+   "ttft": 469,
+   "expected": 440.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 804,
+   "load": 1,
+   "ttft": 890,
+   "expected": 440.0,
+   "verdict": "SUSPECT"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 804,
+   "load": 1,
+   "ttft": 642,
+   "expected": 440.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 804,
+   "load": 1,
+   "ttft": 740,
+   "expected": 440.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 804,
+   "load": 1,
+   "ttft": 675,
+   "expected": 440.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 804,
+   "load": 1,
+   "ttft": 410,
+   "expected": 440.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 804,
+   "load": 1,
+   "ttft": 470,
+   "expected": 440.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 804,
+   "load": 1,
+   "ttft": 405,
+   "expected": 440.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 804,
+   "load": 1,
+   "ttft": 455,
+   "expected": 440.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 804,
+   "load": 1,
+   "ttft": 418,
+   "expected": 440.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 804,
+   "load": 1,
+   "ttft": 439,
+   "expected": 440.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 804,
+   "load": 1,
+   "ttft": 422,
+   "expected": 440.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 804,
+   "load": 1,
+   "ttft": 423,
+   "expected": 440.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 804,
+   "load": 1,
+   "ttft": 358,
+   "expected": 440.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 804,
+   "load": 1,
+   "ttft": 406,
+   "expected": 440.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 804,
+   "load": 1,
+   "ttft": 455,
+   "expected": 440.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 804,
+   "load": 1,
+   "ttft": 449,
+   "expected": 440.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 804,
+   "load": 1,
+   "ttft": 417,
+   "expected": 440.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 804,
+   "load": 1,
+   "ttft": 440,
+   "expected": 440.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 804,
+   "load": 1,
+   "ttft": 485,
+   "expected": 440.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 804,
+   "load": 1,
+   "ttft": 489,
+   "expected": 440.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 804,
+   "load": 1,
+   "ttft": 437,
+   "expected": 440.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 804,
+   "load": 1,
+   "ttft": 423,
+   "expected": 440.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 804,
+   "load": 1,
+   "ttft": 420,
+   "expected": 440.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 804,
+   "load": 1,
+   "ttft": 380,
+   "expected": 440.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 804,
+   "load": 1,
+   "ttft": 453,
+   "expected": 440.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 804,
+   "load": 1,
+   "ttft": 405,
+   "expected": 440.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 804,
+   "load": 1,
+   "ttft": 439,
+   "expected": 440.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 804,
+   "load": 1,
+   "ttft": 424,
+   "expected": 440.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 804,
+   "load": 1,
+   "ttft": 423,
+   "expected": 440.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 804,
+   "load": 1,
+   "ttft": 423,
+   "expected": 440.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 804,
+   "load": 1,
+   "ttft": 455,
+   "expected": 440.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 804,
+   "load": 1,
+   "ttft": 439,
+   "expected": 440.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 804,
+   "load": 1,
+   "ttft": 453,
+   "expected": 440.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 804,
+   "load": 1,
+   "ttft": 420,
+   "expected": 440.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 804,
+   "load": 1,
+   "ttft": 440,
+   "expected": 440.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 804,
+   "load": 1,
+   "ttft": 392,
+   "expected": 440.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 804,
+   "load": 1,
+   "ttft": 480,
+   "expected": 440.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 804,
+   "load": 1,
+   "ttft": 439,
+   "expected": 440.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 804,
+   "load": 1,
+   "ttft": 455,
+   "expected": 440.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 804,
+   "load": 1,
+   "ttft": 467,
+   "expected": 440.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 804,
+   "load": 1,
+   "ttft": 455,
+   "expected": 440.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 804,
+   "load": 1,
+   "ttft": 453,
+   "expected": 440.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 804,
+   "load": 1,
+   "ttft": 421,
+   "expected": 440.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 804,
+   "load": 1,
+   "ttft": 455,
+   "expected": 440.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 804,
+   "load": 1,
+   "ttft": 456,
+   "expected": 440.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 804,
+   "load": 1,
+   "ttft": 470,
+   "expected": 440.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 804,
+   "load": 1,
+   "ttft": 438,
+   "expected": 440.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 804,
+   "load": 1,
+   "ttft": 422,
+   "expected": 440.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 804,
+   "load": 1,
+   "ttft": 407,
+   "expected": 440.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 4837,
+   "load": 1,
+   "ttft": 390,
+   "expected": 423.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 4837,
+   "load": 1,
+   "ttft": 424,
+   "expected": 423.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 4837,
+   "load": 1,
+   "ttft": 409,
+   "expected": 423.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 4837,
+   "load": 1,
+   "ttft": 422,
+   "expected": 423.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 4837,
+   "load": 1,
+   "ttft": 417,
+   "expected": 423.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 4837,
+   "load": 1,
+   "ttft": 423,
+   "expected": 423.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 4837,
+   "load": 1,
+   "ttft": 406,
+   "expected": 423.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 4837,
+   "load": 1,
+   "ttft": 437,
+   "expected": 423.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 4837,
+   "load": 1,
+   "ttft": 425,
+   "expected": 423.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 4837,
+   "load": 1,
+   "ttft": 439,
+   "expected": 423.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 4837,
+   "load": 1,
+   "ttft": 440,
+   "expected": 423.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 4837,
+   "load": 1,
+   "ttft": 435,
+   "expected": 423.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 4837,
+   "load": 1,
+   "ttft": 422,
+   "expected": 423.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 4837,
+   "load": 1,
+   "ttft": 436,
+   "expected": 423.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 4837,
+   "load": 1,
+   "ttft": 406,
+   "expected": 423.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 4837,
+   "load": 1,
+   "ttft": 437,
+   "expected": 423.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 4837,
+   "load": 1,
+   "ttft": 424,
+   "expected": 423.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 4837,
+   "load": 1,
+   "ttft": 420,
+   "expected": 423.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 4837,
+   "load": 1,
+   "ttft": 439,
+   "expected": 423.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 4837,
+   "load": 1,
+   "ttft": 404,
+   "expected": 423.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 4837,
+   "load": 1,
+   "ttft": 439,
+   "expected": 423.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 4837,
+   "load": 1,
+   "ttft": 435,
+   "expected": 423.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 4837,
+   "load": 1,
+   "ttft": 422,
+   "expected": 423.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 4837,
+   "load": 1,
+   "ttft": 422,
+   "expected": 423.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 4837,
+   "load": 1,
+   "ttft": 438,
+   "expected": 423.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 4837,
+   "load": 1,
+   "ttft": 437,
+   "expected": 423.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 4837,
+   "load": 1,
+   "ttft": 418,
+   "expected": 423.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 4837,
+   "load": 1,
+   "ttft": 443,
+   "expected": 423.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 4837,
+   "load": 1,
+   "ttft": 425,
+   "expected": 423.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 4837,
+   "load": 1,
+   "ttft": 422,
+   "expected": 423.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 4837,
+   "load": 1,
+   "ttft": 438,
+   "expected": 423.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 4837,
+   "load": 1,
+   "ttft": 436,
+   "expected": 423.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 4837,
+   "load": 1,
+   "ttft": 422,
+   "expected": 423.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 4837,
+   "load": 1,
+   "ttft": 434,
+   "expected": 423.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 4837,
+   "load": 1,
+   "ttft": 421,
+   "expected": 423.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 4837,
+   "load": 1,
+   "ttft": 419,
+   "expected": 423.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 4837,
+   "load": 1,
+   "ttft": 423,
+   "expected": 423.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 4837,
+   "load": 1,
+   "ttft": 409,
+   "expected": 423.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 4837,
+   "load": 1,
+   "ttft": 422,
+   "expected": 423.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 4837,
+   "load": 1,
+   "ttft": 405,
+   "expected": 423.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 4837,
+   "load": 1,
+   "ttft": 434,
+   "expected": 423.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 4837,
+   "load": 1,
+   "ttft": 421,
+   "expected": 423.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 4837,
+   "load": 1,
+   "ttft": 424,
+   "expected": 423.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 4837,
+   "load": 1,
+   "ttft": 452,
+   "expected": 423.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 4837,
+   "load": 1,
+   "ttft": 404,
+   "expected": 423.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 4837,
+   "load": 1,
+   "ttft": 436,
+   "expected": 423.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 4837,
+   "load": 1,
+   "ttft": 449,
+   "expected": 423.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 4837,
+   "load": 1,
+   "ttft": 405,
+   "expected": 423.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 4837,
+   "load": 1,
+   "ttft": 421,
+   "expected": 423.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 4837,
+   "load": 1,
+   "ttft": 436,
+   "expected": 423.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 4837,
+   "load": 1,
+   "ttft": 426,
+   "expected": 423.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 4837,
+   "load": 1,
+   "ttft": 423,
+   "expected": 423.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 4837,
+   "load": 1,
+   "ttft": 440,
+   "expected": 423.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 4837,
+   "load": 1,
+   "ttft": 426,
+   "expected": 423.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 4837,
+   "load": 1,
+   "ttft": 437,
+   "expected": 423.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 4837,
+   "load": 1,
+   "ttft": 418,
+   "expected": 423.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 4837,
+   "load": 1,
+   "ttft": 406,
+   "expected": 423.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 4837,
+   "load": 1,
+   "ttft": 406,
+   "expected": 423.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 4837,
+   "load": 1,
+   "ttft": 423,
+   "expected": 423.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 4837,
+   "load": 1,
+   "ttft": 422,
+   "expected": 423.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 5829,
+   "load": 1,
+   "ttft": 750,
+   "expected": 948.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 5829,
+   "load": 1,
+   "ttft": 985,
+   "expected": 948.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 5829,
+   "load": 1,
+   "ttft": 976,
+   "expected": 948.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 5829,
+   "load": 1,
+   "ttft": 940,
+   "expected": 948.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 5829,
+   "load": 1,
+   "ttft": 936,
+   "expected": 948.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 5829,
+   "load": 1,
+   "ttft": 956,
+   "expected": 948.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 5829,
+   "load": 1,
+   "ttft": 934,
+   "expected": 948.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 5829,
+   "load": 1,
+   "ttft": 919,
+   "expected": 948.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 5829,
+   "load": 1,
+   "ttft": 907,
+   "expected": 948.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 5829,
+   "load": 1,
+   "ttft": 923,
+   "expected": 948.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 5829,
+   "load": 1,
+   "ttft": 957,
+   "expected": 948.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 5829,
+   "load": 1,
+   "ttft": 959,
+   "expected": 948.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 5829,
+   "load": 1,
+   "ttft": 1011,
+   "expected": 948.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 5829,
+   "load": 1,
+   "ttft": 990,
+   "expected": 948.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 5829,
+   "load": 1,
+   "ttft": 940,
+   "expected": 948.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 5829,
+   "load": 1,
+   "ttft": 966,
+   "expected": 948.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 5829,
+   "load": 1,
+   "ttft": 981,
+   "expected": 948.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 5829,
+   "load": 1,
+   "ttft": 1015,
+   "expected": 948.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 5829,
+   "load": 1,
+   "ttft": 958,
+   "expected": 948.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 5829,
+   "load": 1,
+   "ttft": 895,
+   "expected": 948.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 5829,
+   "load": 1,
+   "ttft": 960,
+   "expected": 948.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 5829,
+   "load": 1,
+   "ttft": 968,
+   "expected": 948.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 5829,
+   "load": 1,
+   "ttft": 923,
+   "expected": 948.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 5829,
+   "load": 1,
+   "ttft": 958,
+   "expected": 948.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 5829,
+   "load": 1,
+   "ttft": 1005,
+   "expected": 948.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 5829,
+   "load": 1,
+   "ttft": 940,
+   "expected": 948.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 5829,
+   "load": 1,
+   "ttft": 917,
+   "expected": 948.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 5829,
+   "load": 1,
+   "ttft": 917,
+   "expected": 948.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 5829,
+   "load": 1,
+   "ttft": 968,
+   "expected": 948.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 5829,
+   "load": 1,
+   "ttft": 937,
+   "expected": 948.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 5829,
+   "load": 1,
+   "ttft": 971,
+   "expected": 948.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 5829,
+   "load": 1,
+   "ttft": 832,
+   "expected": 948.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 5829,
+   "load": 1,
+   "ttft": 798,
+   "expected": 948.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 5829,
+   "load": 1,
+   "ttft": 939,
+   "expected": 948.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 5829,
+   "load": 1,
+   "ttft": 958,
+   "expected": 948.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 5829,
+   "load": 1,
+   "ttft": 973,
+   "expected": 948.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 5829,
+   "load": 1,
+   "ttft": 964,
+   "expected": 948.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 5829,
+   "load": 1,
+   "ttft": 951,
+   "expected": 948.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 5829,
+   "load": 1,
+   "ttft": 986,
+   "expected": 948.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 5829,
+   "load": 1,
+   "ttft": 953,
+   "expected": 948.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 5829,
+   "load": 1,
+   "ttft": 954,
+   "expected": 948.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 5829,
+   "load": 1,
+   "ttft": 970,
+   "expected": 948.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 5829,
+   "load": 1,
+   "ttft": 957,
+   "expected": 948.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 5829,
+   "load": 1,
+   "ttft": 921,
+   "expected": 948.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 5829,
+   "load": 1,
+   "ttft": 920,
+   "expected": 948.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 5829,
+   "load": 1,
+   "ttft": 941,
+   "expected": 948.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 5829,
+   "load": 1,
+   "ttft": 951,
+   "expected": 948.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 5829,
+   "load": 1,
+   "ttft": 945,
+   "expected": 948.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 5829,
+   "load": 1,
+   "ttft": 981,
+   "expected": 948.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 5829,
+   "load": 1,
+   "ttft": 944,
+   "expected": 948.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 5829,
+   "load": 1,
+   "ttft": 937,
+   "expected": 948.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 5829,
+   "load": 1,
+   "ttft": 941,
+   "expected": 948.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 5829,
+   "load": 1,
+   "ttft": 958,
+   "expected": 948.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 5829,
+   "load": 1,
+   "ttft": 927,
+   "expected": 948.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 5829,
+   "load": 1,
+   "ttft": 953,
+   "expected": 948.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 5829,
+   "load": 1,
+   "ttft": 900,
+   "expected": 948.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 5829,
+   "load": 1,
+   "ttft": 786,
+   "expected": 948.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 5829,
+   "load": 1,
+   "ttft": 793,
+   "expected": 948.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 5829,
+   "load": 1,
+   "ttft": 800,
+   "expected": 948.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 5829,
+   "load": 1,
+   "ttft": 792,
+   "expected": 948.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 6184,
+   "load": 1,
+   "ttft": 1123,
+   "expected": 1295.5,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 6184,
+   "load": 1,
+   "ttft": 1153,
+   "expected": 1295.5,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 6184,
+   "load": 1,
+   "ttft": 1138,
+   "expected": 1295.5,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 6184,
+   "load": 1,
+   "ttft": 1145,
+   "expected": 1295.5,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 6184,
+   "load": 1,
+   "ttft": 1124,
+   "expected": 1295.5,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 6184,
+   "load": 1,
+   "ttft": 1124,
+   "expected": 1295.5,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 6184,
+   "load": 1,
+   "ttft": 1117,
+   "expected": 1295.5,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 6184,
+   "load": 1,
+   "ttft": 1117,
+   "expected": 1295.5,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 6184,
+   "load": 1,
+   "ttft": 1110,
+   "expected": 1295.5,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 6184,
+   "load": 1,
+   "ttft": 1138,
+   "expected": 1295.5,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 6184,
+   "load": 1,
+   "ttft": 1138,
+   "expected": 1295.5,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 6184,
+   "load": 1,
+   "ttft": 1117,
+   "expected": 1295.5,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 6184,
+   "load": 1,
+   "ttft": 1145,
+   "expected": 1295.5,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 6184,
+   "load": 1,
+   "ttft": 1146,
+   "expected": 1295.5,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 6184,
+   "load": 1,
+   "ttft": 1335,
+   "expected": 1295.5,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 6184,
+   "load": 1,
+   "ttft": 1347,
+   "expected": 1295.5,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 6184,
+   "load": 1,
+   "ttft": 1329,
+   "expected": 1295.5,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 6184,
+   "load": 1,
+   "ttft": 1342,
+   "expected": 1295.5,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 6184,
+   "load": 1,
+   "ttft": 1294,
+   "expected": 1295.5,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 6184,
+   "load": 1,
+   "ttft": 1259,
+   "expected": 1295.5,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 6184,
+   "load": 1,
+   "ttft": 1314,
+   "expected": 1295.5,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 6184,
+   "load": 1,
+   "ttft": 1235,
+   "expected": 1295.5,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 6184,
+   "load": 1,
+   "ttft": 1299,
+   "expected": 1295.5,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 6184,
+   "load": 1,
+   "ttft": 1270,
+   "expected": 1295.5,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 6184,
+   "load": 1,
+   "ttft": 1323,
+   "expected": 1295.5,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 6184,
+   "load": 1,
+   "ttft": 1277,
+   "expected": 1295.5,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 6184,
+   "load": 1,
+   "ttft": 1345,
+   "expected": 1295.5,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 6184,
+   "load": 1,
+   "ttft": 1312,
+   "expected": 1295.5,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 6184,
+   "load": 1,
+   "ttft": 1296,
+   "expected": 1295.5,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 6184,
+   "load": 1,
+   "ttft": 1282,
+   "expected": 1295.5,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 6184,
+   "load": 1,
+   "ttft": 1350,
+   "expected": 1295.5,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 6184,
+   "load": 1,
+   "ttft": 1348,
+   "expected": 1295.5,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 6184,
+   "load": 1,
+   "ttft": 1343,
+   "expected": 1295.5,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 6184,
+   "load": 1,
+   "ttft": 1314,
+   "expected": 1295.5,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 6184,
+   "load": 1,
+   "ttft": 1331,
+   "expected": 1295.5,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 6184,
+   "load": 1,
+   "ttft": 1295,
+   "expected": 1295.5,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 6184,
+   "load": 1,
+   "ttft": 1268,
+   "expected": 1295.5,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 6184,
+   "load": 1,
+   "ttft": 1330,
+   "expected": 1295.5,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 6184,
+   "load": 1,
+   "ttft": 1356,
+   "expected": 1295.5,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 6184,
+   "load": 1,
+   "ttft": 1348,
+   "expected": 1295.5,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 6184,
+   "load": 1,
+   "ttft": 1295,
+   "expected": 1295.5,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 6184,
+   "load": 1,
+   "ttft": 1361,
+   "expected": 1295.5,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 6184,
+   "load": 1,
+   "ttft": 1346,
+   "expected": 1295.5,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 6184,
+   "load": 1,
+   "ttft": 1334,
+   "expected": 1295.5,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 6184,
+   "load": 1,
+   "ttft": 1266,
+   "expected": 1295.5,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 6184,
+   "load": 1,
+   "ttft": 1273,
+   "expected": 1295.5,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 6184,
+   "load": 1,
+   "ttft": 1272,
+   "expected": 1295.5,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 6184,
+   "load": 1,
+   "ttft": 1332,
+   "expected": 1295.5,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 6184,
+   "load": 1,
+   "ttft": 1269,
+   "expected": 1295.5,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 6184,
+   "load": 1,
+   "ttft": 1296,
+   "expected": 1295.5,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 6184,
+   "load": 1,
+   "ttft": 1337,
+   "expected": 1295.5,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 6184,
+   "load": 1,
+   "ttft": 1265,
+   "expected": 1295.5,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 6184,
+   "load": 1,
+   "ttft": 1320,
+   "expected": 1295.5,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 6184,
+   "load": 1,
+   "ttft": 1379,
+   "expected": 1295.5,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 6184,
+   "load": 1,
+   "ttft": 1347,
+   "expected": 1295.5,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 6184,
+   "load": 1,
+   "ttft": 1277,
+   "expected": 1295.5,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 6184,
+   "load": 1,
+   "ttft": 1320,
+   "expected": 1295.5,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 6184,
+   "load": 1,
+   "ttft": 1388,
+   "expected": 1295.5,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 6184,
+   "load": 1,
+   "ttft": 1396,
+   "expected": 1295.5,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 6184,
+   "load": 1,
+   "ttft": 1268,
+   "expected": 1295.5,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 47,
+   "load": 2,
+   "ttft": 132,
+   "expected": 107.6842,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 62,
+   "load": 2,
+   "ttft": 292,
+   "expected": 123.0712,
+   "verdict": "SUSPECT"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 47,
+   "load": 2,
+   "ttft": 78,
+   "expected": 107.6842,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 58,
+   "load": 2,
+   "ttft": 359,
+   "expected": 299.1409,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 62,
+   "load": 2,
+   "ttft": 90,
+   "expected": 123.0712,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 58,
+   "load": 2,
+   "ttft": 309,
+   "expected": 299.1409,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 47,
+   "load": 2,
+   "ttft": 90,
+   "expected": 107.6842,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 62,
+   "load": 2,
+   "ttft": 109,
+   "expected": 123.0712,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 47,
+   "load": 2,
+   "ttft": 80,
+   "expected": 107.6842,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 58,
+   "load": 2,
+   "ttft": 239,
+   "expected": 299.1409,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 62,
+   "load": 2,
+   "ttft": 93,
+   "expected": 123.0712,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 58,
+   "load": 2,
+   "ttft": 383,
+   "expected": 299.1409,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 47,
+   "load": 2,
+   "ttft": 82,
+   "expected": 107.6842,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 62,
+   "load": 2,
+   "ttft": 109,
+   "expected": 123.0712,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 47,
+   "load": 2,
+   "ttft": 86,
+   "expected": 107.6842,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 58,
+   "load": 2,
+   "ttft": 247,
+   "expected": 299.1409,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 62,
+   "load": 2,
+   "ttft": 82,
+   "expected": 123.0712,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 58,
+   "load": 2,
+   "ttft": 298,
+   "expected": 299.1409,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 47,
+   "load": 2,
+   "ttft": 84,
+   "expected": 107.6842,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 62,
+   "load": 2,
+   "ttft": 115,
+   "expected": 123.0712,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 47,
+   "load": 2,
+   "ttft": 82,
+   "expected": 107.6842,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 58,
+   "load": 2,
+   "ttft": 222,
+   "expected": 299.1409,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 62,
+   "load": 2,
+   "ttft": 82,
+   "expected": 123.0712,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 58,
+   "load": 2,
+   "ttft": 321,
+   "expected": 299.1409,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 47,
+   "load": 2,
+   "ttft": 99,
+   "expected": 107.6842,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 62,
+   "load": 2,
+   "ttft": 99,
+   "expected": 123.0712,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 47,
+   "load": 2,
+   "ttft": 79,
+   "expected": 107.6842,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 58,
+   "load": 2,
+   "ttft": 229,
+   "expected": 299.1409,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 62,
+   "load": 2,
+   "ttft": 69,
+   "expected": 123.0712,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 58,
+   "load": 2,
+   "ttft": 309,
+   "expected": 299.1409,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 47,
+   "load": 2,
+   "ttft": 122,
+   "expected": 107.6842,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 62,
+   "load": 2,
+   "ttft": 84,
+   "expected": 123.0712,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 47,
+   "load": 2,
+   "ttft": 79,
+   "expected": 107.6842,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 58,
+   "load": 2,
+   "ttft": 268,
+   "expected": 299.1409,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 62,
+   "load": 2,
+   "ttft": 79,
+   "expected": 123.0712,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 58,
+   "load": 2,
+   "ttft": 329,
+   "expected": 299.1409,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 47,
+   "load": 2,
+   "ttft": 79,
+   "expected": 107.6842,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 62,
+   "load": 2,
+   "ttft": 119,
+   "expected": 123.0712,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 47,
+   "load": 2,
+   "ttft": 72,
+   "expected": 107.6842,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 58,
+   "load": 2,
+   "ttft": 224,
+   "expected": 299.1409,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 62,
+   "load": 2,
+   "ttft": 79,
+   "expected": 123.0712,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 58,
+   "load": 2,
+   "ttft": 350,
+   "expected": 299.1409,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 47,
+   "load": 2,
+   "ttft": 99,
+   "expected": 107.6842,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 62,
+   "load": 2,
+   "ttft": 100,
+   "expected": 123.0712,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 47,
+   "load": 2,
+   "ttft": 80,
+   "expected": 107.6842,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 58,
+   "load": 2,
+   "ttft": 259,
+   "expected": 299.1409,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 62,
+   "load": 2,
+   "ttft": 88,
+   "expected": 123.0712,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 58,
+   "load": 2,
+   "ttft": 323,
+   "expected": 299.1409,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 47,
+   "load": 2,
+   "ttft": 100,
+   "expected": 107.6842,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 62,
+   "load": 2,
+   "ttft": 108,
+   "expected": 123.0712,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 47,
+   "load": 2,
+   "ttft": 108,
+   "expected": 107.6842,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 58,
+   "load": 2,
+   "ttft": 258,
+   "expected": 299.1409,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 62,
+   "load": 2,
+   "ttft": 80,
+   "expected": 123.0712,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 58,
+   "load": 2,
+   "ttft": 343,
+   "expected": 299.1409,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 47,
+   "load": 2,
+   "ttft": 102,
+   "expected": 107.6842,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 62,
+   "load": 2,
+   "ttft": 120,
+   "expected": 123.0712,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 47,
+   "load": 2,
+   "ttft": 94,
+   "expected": 107.6842,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 58,
+   "load": 2,
+   "ttft": 226,
+   "expected": 299.1409,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 62,
+   "load": 2,
+   "ttft": 73,
+   "expected": 123.0712,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 58,
+   "load": 2,
+   "ttft": 311,
+   "expected": 299.1409,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 47,
+   "load": 2,
+   "ttft": 107,
+   "expected": 107.6842,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 62,
+   "load": 2,
+   "ttft": 108,
+   "expected": 123.0712,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 47,
+   "load": 2,
+   "ttft": 82,
+   "expected": 107.6842,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 58,
+   "load": 2,
+   "ttft": 237,
+   "expected": 299.1409,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 62,
+   "load": 2,
+   "ttft": 72,
+   "expected": 123.0712,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 58,
+   "load": 2,
+   "ttft": 281,
+   "expected": 299.1409,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 47,
+   "load": 2,
+   "ttft": 80,
+   "expected": 107.6842,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 62,
+   "load": 2,
+   "ttft": 129,
+   "expected": 123.0712,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 47,
+   "load": 2,
+   "ttft": 91,
+   "expected": 107.6842,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 58,
+   "load": 2,
+   "ttft": 262,
+   "expected": 299.1409,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 62,
+   "load": 2,
+   "ttft": 92,
+   "expected": 123.0712,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 58,
+   "load": 2,
+   "ttft": 322,
+   "expected": 299.1409,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 47,
+   "load": 2,
+   "ttft": 101,
+   "expected": 107.6842,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 62,
+   "load": 2,
+   "ttft": 115,
+   "expected": 123.0712,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 47,
+   "load": 2,
+   "ttft": 106,
+   "expected": 107.6842,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 58,
+   "load": 2,
+   "ttft": 244,
+   "expected": 299.1409,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 62,
+   "load": 2,
+   "ttft": 84,
+   "expected": 123.0712,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 58,
+   "load": 2,
+   "ttft": 318,
+   "expected": 299.1409,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 47,
+   "load": 2,
+   "ttft": 89,
+   "expected": 107.6842,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 62,
+   "load": 2,
+   "ttft": 116,
+   "expected": 123.0712,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 47,
+   "load": 2,
+   "ttft": 100,
+   "expected": 107.6842,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 58,
+   "load": 2,
+   "ttft": 231,
+   "expected": 299.1409,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 62,
+   "load": 2,
+   "ttft": 89,
+   "expected": 123.0712,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 58,
+   "load": 2,
+   "ttft": 295,
+   "expected": 299.1409,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 47,
+   "load": 2,
+   "ttft": 104,
+   "expected": 107.6842,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 62,
+   "load": 2,
+   "ttft": 132,
+   "expected": 123.0712,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 47,
+   "load": 2,
+   "ttft": 94,
+   "expected": 107.6842,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 58,
+   "load": 2,
+   "ttft": 258,
+   "expected": 299.1409,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 62,
+   "load": 2,
+   "ttft": 97,
+   "expected": 123.0712,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 58,
+   "load": 2,
+   "ttft": 293,
+   "expected": 299.1409,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 47,
+   "load": 2,
+   "ttft": 127,
+   "expected": 107.6842,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 62,
+   "load": 2,
+   "ttft": 97,
+   "expected": 123.0712,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 47,
+   "load": 2,
+   "ttft": 76,
+   "expected": 107.6842,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 58,
+   "load": 2,
+   "ttft": 290,
+   "expected": 299.1409,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 62,
+   "load": 2,
+   "ttft": 101,
+   "expected": 123.0712,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 58,
+   "load": 2,
+   "ttft": 353,
+   "expected": 299.1409,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 47,
+   "load": 2,
+   "ttft": 140,
+   "expected": 107.6842,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 62,
+   "load": 2,
+   "ttft": 82,
+   "expected": 123.0712,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 47,
+   "load": 2,
+   "ttft": 82,
+   "expected": 107.6842,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 58,
+   "load": 2,
+   "ttft": 283,
+   "expected": 299.1409,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 62,
+   "load": 2,
+   "ttft": 82,
+   "expected": 123.0712,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 58,
+   "load": 2,
+   "ttft": 322,
+   "expected": 299.1409,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 47,
+   "load": 2,
+   "ttft": 108,
+   "expected": 107.6842,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 62,
+   "load": 2,
+   "ttft": 108,
+   "expected": 123.0712,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 47,
+   "load": 2,
+   "ttft": 92,
+   "expected": 107.6842,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 58,
+   "load": 2,
+   "ttft": 229,
+   "expected": 299.1409,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 62,
+   "load": 2,
+   "ttft": 111,
+   "expected": 123.0712,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 58,
+   "load": 2,
+   "ttft": 332,
+   "expected": 299.1409,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 47,
+   "load": 2,
+   "ttft": 94,
+   "expected": 107.6842,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 62,
+   "load": 2,
+   "ttft": 105,
+   "expected": 123.0712,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 47,
+   "load": 2,
+   "ttft": 100,
+   "expected": 107.6842,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 58,
+   "load": 2,
+   "ttft": 220,
+   "expected": 299.1409,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 62,
+   "load": 2,
+   "ttft": 78,
+   "expected": 123.0712,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 58,
+   "load": 2,
+   "ttft": 316,
+   "expected": 299.1409,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 47,
+   "load": 2,
+   "ttft": 119,
+   "expected": 107.6842,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 62,
+   "load": 2,
+   "ttft": 104,
+   "expected": 123.0712,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 47,
+   "load": 2,
+   "ttft": 75,
+   "expected": 107.6842,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 58,
+   "load": 2,
+   "ttft": 216,
+   "expected": 299.1409,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 62,
+   "load": 2,
+   "ttft": 90,
+   "expected": 123.0712,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 58,
+   "load": 2,
+   "ttft": 289,
+   "expected": 299.1409,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 47,
+   "load": 2,
+   "ttft": 79,
+   "expected": 107.6842,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 62,
+   "load": 2,
+   "ttft": 120,
+   "expected": 123.0712,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 47,
+   "load": 2,
+   "ttft": 92,
+   "expected": 107.6842,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 58,
+   "load": 2,
+   "ttft": 225,
+   "expected": 299.1409,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 62,
+   "load": 2,
+   "ttft": 96,
+   "expected": 123.0712,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 58,
+   "load": 2,
+   "ttft": 344,
+   "expected": 299.1409,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 47,
+   "load": 2,
+   "ttft": 128,
+   "expected": 107.6842,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 62,
+   "load": 2,
+   "ttft": 83,
+   "expected": 123.0712,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 47,
+   "load": 2,
+   "ttft": 103,
+   "expected": 107.6842,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 58,
+   "load": 2,
+   "ttft": 305,
+   "expected": 299.1409,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 62,
+   "load": 2,
+   "ttft": 95,
+   "expected": 123.0712,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 58,
+   "load": 2,
+   "ttft": 321,
+   "expected": 299.1409,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 47,
+   "load": 2,
+   "ttft": 130,
+   "expected": 107.6842,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 62,
+   "load": 2,
+   "ttft": 130,
+   "expected": 123.0712,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 47,
+   "load": 2,
+   "ttft": 87,
+   "expected": 107.6842,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 58,
+   "load": 2,
+   "ttft": 223,
+   "expected": 299.1409,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 62,
+   "load": 2,
+   "ttft": 73,
+   "expected": 123.0712,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 58,
+   "load": 2,
+   "ttft": 299,
+   "expected": 299.1409,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 47,
+   "load": 2,
+   "ttft": 102,
+   "expected": 107.6842,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 62,
+   "load": 2,
+   "ttft": 130,
+   "expected": 123.0712,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 47,
+   "load": 2,
+   "ttft": 105,
+   "expected": 107.6842,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 58,
+   "load": 2,
+   "ttft": 259,
+   "expected": 299.1409,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 62,
+   "load": 2,
+   "ttft": 77,
+   "expected": 123.0712,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 58,
+   "load": 2,
+   "ttft": 269,
+   "expected": 299.1409,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 47,
+   "load": 2,
+   "ttft": 120,
+   "expected": 107.6842,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 62,
+   "load": 2,
+   "ttft": 134,
+   "expected": 123.0712,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 47,
+   "load": 2,
+   "ttft": 100,
+   "expected": 107.6842,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 58,
+   "load": 2,
+   "ttft": 259,
+   "expected": 299.1409,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 62,
+   "load": 2,
+   "ttft": 80,
+   "expected": 123.0712,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 58,
+   "load": 2,
+   "ttft": 288,
+   "expected": 299.1409,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 47,
+   "load": 2,
+   "ttft": 113,
+   "expected": 107.6842,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 62,
+   "load": 2,
+   "ttft": 122,
+   "expected": 123.0712,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 47,
+   "load": 2,
+   "ttft": 109,
+   "expected": 107.6842,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 58,
+   "load": 2,
+   "ttft": 220,
+   "expected": 299.1409,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 62,
+   "load": 2,
+   "ttft": 100,
+   "expected": 123.0712,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 58,
+   "load": 2,
+   "ttft": 329,
+   "expected": 299.1409,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 47,
+   "load": 2,
+   "ttft": 138,
+   "expected": 107.6842,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 62,
+   "load": 2,
+   "ttft": 120,
+   "expected": 123.0712,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 47,
+   "load": 2,
+   "ttft": 79,
+   "expected": 107.6842,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 58,
+   "load": 2,
+   "ttft": 218,
+   "expected": 299.1409,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 62,
+   "load": 2,
+   "ttft": 88,
+   "expected": 123.0712,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 58,
+   "load": 2,
+   "ttft": 311,
+   "expected": 299.1409,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 47,
+   "load": 2,
+   "ttft": 88,
+   "expected": 107.6842,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 62,
+   "load": 2,
+   "ttft": 100,
+   "expected": 123.0712,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 47,
+   "load": 2,
+   "ttft": 59,
+   "expected": 107.6842,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 58,
+   "load": 2,
+   "ttft": 244,
+   "expected": 299.1409,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 62,
+   "load": 2,
+   "ttft": 78,
+   "expected": 123.0712,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 58,
+   "load": 2,
+   "ttft": 328,
+   "expected": 299.1409,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 47,
+   "load": 2,
+   "ttft": 88,
+   "expected": 107.6842,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 62,
+   "load": 2,
+   "ttft": 121,
+   "expected": 123.0712,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 47,
+   "load": 2,
+   "ttft": 79,
+   "expected": 107.6842,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 58,
+   "load": 2,
+   "ttft": 247,
+   "expected": 299.1409,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 62,
+   "load": 2,
+   "ttft": 78,
+   "expected": 123.0712,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 58,
+   "load": 2,
+   "ttft": 276,
+   "expected": 299.1409,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 47,
+   "load": 2,
+   "ttft": 98,
+   "expected": 107.6842,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 62,
+   "load": 2,
+   "ttft": 99,
+   "expected": 123.0712,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 47,
+   "load": 2,
+   "ttft": 77,
+   "expected": 107.6842,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 58,
+   "load": 2,
+   "ttft": 255,
+   "expected": 299.1409,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 62,
+   "load": 2,
+   "ttft": 88,
+   "expected": 123.0712,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 58,
+   "load": 2,
+   "ttft": 322,
+   "expected": 299.1409,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 597,
+   "load": 2,
+   "ttft": 185,
+   "expected": 154.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 789,
+   "load": 2,
+   "ttft": 218,
+   "expected": 250.7753,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 597,
+   "load": 2,
+   "ttft": 111,
+   "expected": 154.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 804,
+   "load": 2,
+   "ttft": 379,
+   "expected": 651.594,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 789,
+   "load": 2,
+   "ttft": 181,
+   "expected": 250.7753,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 804,
+   "load": 2,
+   "ttft": 529,
+   "expected": 651.594,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 597,
+   "load": 2,
+   "ttft": 188,
+   "expected": 154.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 789,
+   "load": 2,
+   "ttft": 268,
+   "expected": 250.7753,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 597,
+   "load": 2,
+   "ttft": 130,
+   "expected": 154.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 804,
+   "load": 2,
+   "ttft": 416,
+   "expected": 651.594,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 789,
+   "load": 2,
+   "ttft": 184,
+   "expected": 250.7753,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 804,
+   "load": 2,
+   "ttft": 582,
+   "expected": 651.594,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 597,
+   "load": 2,
+   "ttft": 190,
+   "expected": 154.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 789,
+   "load": 2,
+   "ttft": 259,
+   "expected": 250.7753,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 597,
+   "load": 2,
+   "ttft": 123,
+   "expected": 154.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 804,
+   "load": 2,
+   "ttft": 434,
+   "expected": 651.594,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 789,
+   "load": 2,
+   "ttft": 185,
+   "expected": 250.7753,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 804,
+   "load": 2,
+   "ttft": 578,
+   "expected": 651.594,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 597,
+   "load": 2,
+   "ttft": 203,
+   "expected": 154.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 789,
+   "load": 2,
+   "ttft": 248,
+   "expected": 250.7753,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 597,
+   "load": 2,
+   "ttft": 109,
+   "expected": 154.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 804,
+   "load": 2,
+   "ttft": 358,
+   "expected": 651.594,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 789,
+   "load": 2,
+   "ttft": 186,
+   "expected": 250.7753,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 804,
+   "load": 2,
+   "ttft": 641,
+   "expected": 651.594,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 597,
+   "load": 2,
+   "ttft": 187,
+   "expected": 154.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 789,
+   "load": 2,
+   "ttft": 250,
+   "expected": 250.7753,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 597,
+   "load": 2,
+   "ttft": 140,
+   "expected": 154.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 804,
+   "load": 2,
+   "ttft": 435,
+   "expected": 651.594,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 789,
+   "load": 2,
+   "ttft": 203,
+   "expected": 250.7753,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 804,
+   "load": 2,
+   "ttft": 547,
+   "expected": 651.594,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 597,
+   "load": 2,
+   "ttft": 190,
+   "expected": 154.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 789,
+   "load": 2,
+   "ttft": 252,
+   "expected": 250.7753,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 597,
+   "load": 2,
+   "ttft": 141,
+   "expected": 154.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 804,
+   "load": 2,
+   "ttft": 438,
+   "expected": 651.594,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 789,
+   "load": 2,
+   "ttft": 204,
+   "expected": 250.7753,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 804,
+   "load": 2,
+   "ttft": 595,
+   "expected": 651.594,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 597,
+   "load": 2,
+   "ttft": 187,
+   "expected": 154.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 789,
+   "load": 2,
+   "ttft": 249,
+   "expected": 250.7753,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 597,
+   "load": 2,
+   "ttft": 141,
+   "expected": 154.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 804,
+   "load": 2,
+   "ttft": 422,
+   "expected": 651.594,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 789,
+   "load": 2,
+   "ttft": 187,
+   "expected": 250.7753,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 804,
+   "load": 2,
+   "ttft": 610,
+   "expected": 651.594,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 597,
+   "load": 2,
+   "ttft": 173,
+   "expected": 154.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 789,
+   "load": 2,
+   "ttft": 251,
+   "expected": 250.7753,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 597,
+   "load": 2,
+   "ttft": 125,
+   "expected": 154.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 804,
+   "load": 2,
+   "ttft": 408,
+   "expected": 651.594,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 789,
+   "load": 2,
+   "ttft": 189,
+   "expected": 250.7753,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 804,
+   "load": 2,
+   "ttft": 598,
+   "expected": 651.594,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 597,
+   "load": 2,
+   "ttft": 189,
+   "expected": 154.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 789,
+   "load": 2,
+   "ttft": 251,
+   "expected": 250.7753,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 597,
+   "load": 2,
+   "ttft": 125,
+   "expected": 154.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 804,
+   "load": 2,
+   "ttft": 453,
+   "expected": 651.594,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 789,
+   "load": 2,
+   "ttft": 220,
+   "expected": 250.7753,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 804,
+   "load": 2,
+   "ttft": 582,
+   "expected": 651.594,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 597,
+   "load": 2,
+   "ttft": 202,
+   "expected": 154.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 789,
+   "load": 2,
+   "ttft": 265,
+   "expected": 250.7753,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 597,
+   "load": 2,
+   "ttft": 124,
+   "expected": 154.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 804,
+   "load": 2,
+   "ttft": 407,
+   "expected": 651.594,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 789,
+   "load": 2,
+   "ttft": 186,
+   "expected": 250.7753,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 804,
+   "load": 2,
+   "ttft": 607,
+   "expected": 651.594,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 597,
+   "load": 2,
+   "ttft": 203,
+   "expected": 154.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 789,
+   "load": 2,
+   "ttft": 250,
+   "expected": 250.7753,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 597,
+   "load": 2,
+   "ttft": 140,
+   "expected": 154.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 804,
+   "load": 2,
+   "ttft": 437,
+   "expected": 651.594,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 789,
+   "load": 2,
+   "ttft": 202,
+   "expected": 250.7753,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 804,
+   "load": 2,
+   "ttft": 546,
+   "expected": 651.594,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 597,
+   "load": 2,
+   "ttft": 203,
+   "expected": 154.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 789,
+   "load": 2,
+   "ttft": 266,
+   "expected": 250.7753,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 597,
+   "load": 2,
+   "ttft": 139,
+   "expected": 154.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 804,
+   "load": 2,
+   "ttft": 449,
+   "expected": 651.594,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 789,
+   "load": 2,
+   "ttft": 174,
+   "expected": 250.7753,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 804,
+   "load": 2,
+   "ttft": 596,
+   "expected": 651.594,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 597,
+   "load": 2,
+   "ttft": 205,
+   "expected": 154.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 789,
+   "load": 2,
+   "ttft": 268,
+   "expected": 250.7753,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 597,
+   "load": 2,
+   "ttft": 124,
+   "expected": 154.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 804,
+   "load": 2,
+   "ttft": 421,
+   "expected": 651.594,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 789,
+   "load": 2,
+   "ttft": 186,
+   "expected": 250.7753,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 804,
+   "load": 2,
+   "ttft": 559,
+   "expected": 651.594,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 597,
+   "load": 2,
+   "ttft": 191,
+   "expected": 154.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 789,
+   "load": 2,
+   "ttft": 232,
+   "expected": 250.7753,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 597,
+   "load": 2,
+   "ttft": 106,
+   "expected": 154.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 804,
+   "load": 2,
+   "ttft": 400,
+   "expected": 651.594,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 789,
+   "load": 2,
+   "ttft": 181,
+   "expected": 250.7753,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 804,
+   "load": 2,
+   "ttft": 595,
+   "expected": 651.594,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 597,
+   "load": 2,
+   "ttft": 215,
+   "expected": 154.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 789,
+   "load": 2,
+   "ttft": 243,
+   "expected": 250.7753,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 597,
+   "load": 2,
+   "ttft": 126,
+   "expected": 154.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 804,
+   "load": 2,
+   "ttft": 428,
+   "expected": 651.594,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 789,
+   "load": 2,
+   "ttft": 171,
+   "expected": 250.7753,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 804,
+   "load": 2,
+   "ttft": 585,
+   "expected": 651.594,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 597,
+   "load": 2,
+   "ttft": 200,
+   "expected": 154.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 789,
+   "load": 2,
+   "ttft": 246,
+   "expected": 250.7753,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 597,
+   "load": 2,
+   "ttft": 130,
+   "expected": 154.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 804,
+   "load": 2,
+   "ttft": 416,
+   "expected": 651.594,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 789,
+   "load": 2,
+   "ttft": 225,
+   "expected": 250.7753,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 804,
+   "load": 2,
+   "ttft": 581,
+   "expected": 651.594,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 597,
+   "load": 2,
+   "ttft": 182,
+   "expected": 154.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 789,
+   "load": 2,
+   "ttft": 252,
+   "expected": 250.7753,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 597,
+   "load": 2,
+   "ttft": 126,
+   "expected": 154.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 804,
+   "load": 2,
+   "ttft": 388,
+   "expected": 651.594,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 789,
+   "load": 2,
+   "ttft": 204,
+   "expected": 250.7753,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 804,
+   "load": 2,
+   "ttft": 557,
+   "expected": 651.594,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 597,
+   "load": 2,
+   "ttft": 167,
+   "expected": 154.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 789,
+   "load": 2,
+   "ttft": 251,
+   "expected": 250.7753,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 597,
+   "load": 2,
+   "ttft": 117,
+   "expected": 154.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 804,
+   "load": 2,
+   "ttft": 394,
+   "expected": 651.594,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 789,
+   "load": 2,
+   "ttft": 185,
+   "expected": 250.7753,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 804,
+   "load": 2,
+   "ttft": 583,
+   "expected": 651.594,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 597,
+   "load": 2,
+   "ttft": 173,
+   "expected": 154.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 789,
+   "load": 2,
+   "ttft": 234,
+   "expected": 250.7753,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 597,
+   "load": 2,
+   "ttft": 124,
+   "expected": 154.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 804,
+   "load": 2,
+   "ttft": 443,
+   "expected": 651.594,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 789,
+   "load": 2,
+   "ttft": 186,
+   "expected": 250.7753,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 804,
+   "load": 2,
+   "ttft": 593,
+   "expected": 651.594,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 597,
+   "load": 2,
+   "ttft": 170,
+   "expected": 154.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 789,
+   "load": 2,
+   "ttft": 276,
+   "expected": 250.7753,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 597,
+   "load": 2,
+   "ttft": 126,
+   "expected": 154.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 804,
+   "load": 2,
+   "ttft": 399,
+   "expected": 651.594,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 789,
+   "load": 2,
+   "ttft": 169,
+   "expected": 250.7753,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 804,
+   "load": 2,
+   "ttft": 535,
+   "expected": 651.594,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 597,
+   "load": 2,
+   "ttft": 183,
+   "expected": 154.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 789,
+   "load": 2,
+   "ttft": 267,
+   "expected": 250.7753,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 597,
+   "load": 2,
+   "ttft": 127,
+   "expected": 154.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 804,
+   "load": 2,
+   "ttft": 417,
+   "expected": 651.594,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 789,
+   "load": 2,
+   "ttft": 185,
+   "expected": 250.7753,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 804,
+   "load": 2,
+   "ttft": 575,
+   "expected": 651.594,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 597,
+   "load": 2,
+   "ttft": 181,
+   "expected": 154.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 789,
+   "load": 2,
+   "ttft": 264,
+   "expected": 250.7753,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 597,
+   "load": 2,
+   "ttft": 129,
+   "expected": 154.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 804,
+   "load": 2,
+   "ttft": 421,
+   "expected": 651.594,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 789,
+   "load": 2,
+   "ttft": 195,
+   "expected": 250.7753,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 804,
+   "load": 2,
+   "ttft": 587,
+   "expected": 651.594,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 597,
+   "load": 2,
+   "ttft": 195,
+   "expected": 154.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 789,
+   "load": 2,
+   "ttft": 249,
+   "expected": 250.7753,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 597,
+   "load": 2,
+   "ttft": 131,
+   "expected": 154.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 804,
+   "load": 2,
+   "ttft": 455,
+   "expected": 651.594,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 789,
+   "load": 2,
+   "ttft": 238,
+   "expected": 250.7753,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 804,
+   "load": 2,
+   "ttft": 602,
+   "expected": 651.594,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 597,
+   "load": 2,
+   "ttft": 204,
+   "expected": 154.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 789,
+   "load": 2,
+   "ttft": 233,
+   "expected": 250.7753,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 597,
+   "load": 2,
+   "ttft": 127,
+   "expected": 154.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 804,
+   "load": 2,
+   "ttft": 430,
+   "expected": 651.594,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 789,
+   "load": 2,
+   "ttft": 165,
+   "expected": 250.7753,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 804,
+   "load": 2,
+   "ttft": 577,
+   "expected": 651.594,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 597,
+   "load": 2,
+   "ttft": 205,
+   "expected": 154.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 789,
+   "load": 2,
+   "ttft": 256,
+   "expected": 250.7753,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 597,
+   "load": 2,
+   "ttft": 128,
+   "expected": 154.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 804,
+   "load": 2,
+   "ttft": 429,
+   "expected": 651.594,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 789,
+   "load": 2,
+   "ttft": 190,
+   "expected": 250.7753,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 804,
+   "load": 2,
+   "ttft": 605,
+   "expected": 651.594,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 597,
+   "load": 2,
+   "ttft": 195,
+   "expected": 154.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 789,
+   "load": 2,
+   "ttft": 255,
+   "expected": 250.7753,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 597,
+   "load": 2,
+   "ttft": 122,
+   "expected": 154.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 804,
+   "load": 2,
+   "ttft": 459,
+   "expected": 651.594,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 789,
+   "load": 2,
+   "ttft": 169,
+   "expected": 250.7753,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 804,
+   "load": 2,
+   "ttft": 559,
+   "expected": 651.594,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 597,
+   "load": 2,
+   "ttft": 208,
+   "expected": 154.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 789,
+   "load": 2,
+   "ttft": 252,
+   "expected": 250.7753,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 597,
+   "load": 2,
+   "ttft": 126,
+   "expected": 154.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 804,
+   "load": 2,
+   "ttft": 403,
+   "expected": 651.594,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 789,
+   "load": 2,
+   "ttft": 186,
+   "expected": 250.7753,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 804,
+   "load": 2,
+   "ttft": 564,
+   "expected": 651.594,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 597,
+   "load": 2,
+   "ttft": 218,
+   "expected": 154.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 789,
+   "load": 2,
+   "ttft": 251,
+   "expected": 250.7753,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 597,
+   "load": 2,
+   "ttft": 126,
+   "expected": 154.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 804,
+   "load": 2,
+   "ttft": 426,
+   "expected": 651.594,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 789,
+   "load": 2,
+   "ttft": 225,
+   "expected": 250.7753,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 804,
+   "load": 2,
+   "ttft": 495,
+   "expected": 651.594,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 597,
+   "load": 2,
+   "ttft": 189,
+   "expected": 154.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 789,
+   "load": 2,
+   "ttft": 239,
+   "expected": 250.7753,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 597,
+   "load": 2,
+   "ttft": 124,
+   "expected": 154.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 804,
+   "load": 2,
+   "ttft": 421,
+   "expected": 651.594,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 789,
+   "load": 2,
+   "ttft": 178,
+   "expected": 250.7753,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 804,
+   "load": 2,
+   "ttft": 621,
+   "expected": 651.594,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 597,
+   "load": 2,
+   "ttft": 191,
+   "expected": 154.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 789,
+   "load": 2,
+   "ttft": 226,
+   "expected": 250.7753,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 597,
+   "load": 2,
+   "ttft": 129,
+   "expected": 154.0,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 804,
+   "load": 2,
+   "ttft": 419,
+   "expected": 651.594,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 789,
+   "load": 2,
+   "ttft": 204,
+   "expected": 250.7753,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 804,
+   "load": 2,
+   "ttft": 623,
+   "expected": 651.594,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 4837,
+   "load": 2,
+   "ttft": 684,
+   "expected": 489.7895,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 5829,
+   "load": 2,
+   "ttft": 1161,
+   "expected": 1264.5479,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 4837,
+   "load": 2,
+   "ttft": 692,
+   "expected": 489.7895,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 6184,
+   "load": 2,
+   "ttft": 1572,
+   "expected": 1918.5,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 5829,
+   "load": 2,
+   "ttft": 1611,
+   "expected": 1264.5479,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 6184,
+   "load": 2,
+   "ttft": 2300,
+   "expected": 1918.5,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 4837,
+   "load": 2,
+   "ttft": 605,
+   "expected": 489.7895,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 5829,
+   "load": 2,
+   "ttft": 1172,
+   "expected": 1264.5479,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 4837,
+   "load": 2,
+   "ttft": 519,
+   "expected": 489.7895,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 6184,
+   "load": 2,
+   "ttft": 1610,
+   "expected": 1918.5,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 5829,
+   "load": 2,
+   "ttft": 1657,
+   "expected": 1264.5479,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 6184,
+   "load": 2,
+   "ttft": 2232,
+   "expected": 1918.5,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 4837,
+   "load": 2,
+   "ttft": 624,
+   "expected": 489.7895,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 5829,
+   "load": 2,
+   "ttft": 1203,
+   "expected": 1264.5479,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 4837,
+   "load": 2,
+   "ttft": 750,
+   "expected": 489.7895,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 6184,
+   "load": 2,
+   "ttft": 1570,
+   "expected": 1918.5,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 5829,
+   "load": 2,
+   "ttft": 1630,
+   "expected": 1264.5479,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 6184,
+   "load": 2,
+   "ttft": 2251,
+   "expected": 1918.5,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 4837,
+   "load": 2,
+   "ttft": 558,
+   "expected": 489.7895,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 5829,
+   "load": 2,
+   "ttft": 1185,
+   "expected": 1264.5479,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 4837,
+   "load": 2,
+   "ttft": 793,
+   "expected": 489.7895,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 6184,
+   "load": 2,
+   "ttft": 1642,
+   "expected": 1918.5,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 5829,
+   "load": 2,
+   "ttft": 1621,
+   "expected": 1264.5479,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 6184,
+   "load": 2,
+   "ttft": 2245,
+   "expected": 1918.5,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 4837,
+   "load": 2,
+   "ttft": 610,
+   "expected": 489.7895,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 5829,
+   "load": 2,
+   "ttft": 1211,
+   "expected": 1264.5479,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 4837,
+   "load": 2,
+   "ttft": 768,
+   "expected": 489.7895,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 6184,
+   "load": 2,
+   "ttft": 1580,
+   "expected": 1918.5,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 5829,
+   "load": 2,
+   "ttft": 1621,
+   "expected": 1264.5479,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 6184,
+   "load": 2,
+   "ttft": 2256,
+   "expected": 1918.5,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 4837,
+   "load": 2,
+   "ttft": 625,
+   "expected": 489.7895,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 5829,
+   "load": 2,
+   "ttft": 1177,
+   "expected": 1264.5479,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 4837,
+   "load": 2,
+   "ttft": 758,
+   "expected": 489.7895,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 6184,
+   "load": 2,
+   "ttft": 1568,
+   "expected": 1918.5,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 5829,
+   "load": 2,
+   "ttft": 1580,
+   "expected": 1264.5479,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 6184,
+   "load": 2,
+   "ttft": 2242,
+   "expected": 1918.5,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 4837,
+   "load": 2,
+   "ttft": 594,
+   "expected": 489.7895,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 5829,
+   "load": 2,
+   "ttft": 1181,
+   "expected": 1264.5479,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 4837,
+   "load": 2,
+   "ttft": 772,
+   "expected": 489.7895,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 6184,
+   "load": 2,
+   "ttft": 1549,
+   "expected": 1918.5,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 5829,
+   "load": 2,
+   "ttft": 1602,
+   "expected": 1264.5479,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 6184,
+   "load": 2,
+   "ttft": 2266,
+   "expected": 1918.5,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 4837,
+   "load": 2,
+   "ttft": 590,
+   "expected": 489.7895,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 5829,
+   "load": 2,
+   "ttft": 1160,
+   "expected": 1264.5479,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 4837,
+   "load": 2,
+   "ttft": 776,
+   "expected": 489.7895,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 6184,
+   "load": 2,
+   "ttft": 1571,
+   "expected": 1918.5,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 5829,
+   "load": 2,
+   "ttft": 1655,
+   "expected": 1264.5479,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 6184,
+   "load": 2,
+   "ttft": 2259,
+   "expected": 1918.5,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 4837,
+   "load": 2,
+   "ttft": 606,
+   "expected": 489.7895,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 5829,
+   "load": 2,
+   "ttft": 1165,
+   "expected": 1264.5479,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 4837,
+   "load": 2,
+   "ttft": 786,
+   "expected": 489.7895,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 6184,
+   "load": 2,
+   "ttft": 1583,
+   "expected": 1918.5,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 5829,
+   "load": 2,
+   "ttft": 1628,
+   "expected": 1264.5479,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 6184,
+   "load": 2,
+   "ttft": 2249,
+   "expected": 1918.5,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 4837,
+   "load": 2,
+   "ttft": 596,
+   "expected": 489.7895,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 5829,
+   "load": 2,
+   "ttft": 1188,
+   "expected": 1264.5479,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 4837,
+   "load": 2,
+   "ttft": 770,
+   "expected": 489.7895,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 6184,
+   "load": 2,
+   "ttft": 1599,
+   "expected": 1918.5,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 5829,
+   "load": 2,
+   "ttft": 1573,
+   "expected": 1264.5479,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 6184,
+   "load": 2,
+   "ttft": 2195,
+   "expected": 1918.5,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 4837,
+   "load": 2,
+   "ttft": 554,
+   "expected": 489.7895,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 5829,
+   "load": 2,
+   "ttft": 1148,
+   "expected": 1264.5479,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 4837,
+   "load": 2,
+   "ttft": 744,
+   "expected": 489.7895,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 6184,
+   "load": 2,
+   "ttft": 1589,
+   "expected": 1918.5,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 5829,
+   "load": 2,
+   "ttft": 1604,
+   "expected": 1264.5479,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 6184,
+   "load": 2,
+   "ttft": 2245,
+   "expected": 1918.5,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 4837,
+   "load": 2,
+   "ttft": 607,
+   "expected": 489.7895,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 5829,
+   "load": 2,
+   "ttft": 1179,
+   "expected": 1264.5479,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 4837,
+   "load": 2,
+   "ttft": 782,
+   "expected": 489.7895,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 6184,
+   "load": 2,
+   "ttft": 1578,
+   "expected": 1918.5,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 5829,
+   "load": 2,
+   "ttft": 1577,
+   "expected": 1264.5479,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 6184,
+   "load": 2,
+   "ttft": 2246,
+   "expected": 1918.5,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 4837,
+   "load": 2,
+   "ttft": 561,
+   "expected": 489.7895,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 5829,
+   "load": 2,
+   "ttft": 1178,
+   "expected": 1264.5479,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 4837,
+   "load": 2,
+   "ttft": 702,
+   "expected": 489.7895,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 6184,
+   "load": 2,
+   "ttft": 1538,
+   "expected": 1918.5,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 5829,
+   "load": 2,
+   "ttft": 1625,
+   "expected": 1264.5479,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 6184,
+   "load": 2,
+   "ttft": 2211,
+   "expected": 1918.5,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 4837,
+   "load": 2,
+   "ttft": 593,
+   "expected": 489.7895,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 5829,
+   "load": 2,
+   "ttft": 1183,
+   "expected": 1264.5479,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 4837,
+   "load": 2,
+   "ttft": 741,
+   "expected": 489.7895,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 6184,
+   "load": 2,
+   "ttft": 1581,
+   "expected": 1918.5,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 5829,
+   "load": 2,
+   "ttft": 1659,
+   "expected": 1264.5479,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 6184,
+   "load": 2,
+   "ttft": 2233,
+   "expected": 1918.5,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 4837,
+   "load": 2,
+   "ttft": 577,
+   "expected": 489.7895,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 5829,
+   "load": 2,
+   "ttft": 1181,
+   "expected": 1264.5479,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 4837,
+   "load": 2,
+   "ttft": 757,
+   "expected": 489.7895,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 6184,
+   "load": 2,
+   "ttft": 1612,
+   "expected": 1918.5,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 5829,
+   "load": 2,
+   "ttft": 1590,
+   "expected": 1264.5479,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 6184,
+   "load": 2,
+   "ttft": 2249,
+   "expected": 1918.5,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 5078,
+   "load": 2,
+   "ttft": 628,
+   "expected": 489.7895,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 6070,
+   "load": 2,
+   "ttft": 1237,
+   "expected": 1264.5479,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 5078,
+   "load": 2,
+   "ttft": 822,
+   "expected": 489.7895,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 6425,
+   "load": 2,
+   "ttft": 1630,
+   "expected": 1918.5,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 6070,
+   "load": 2,
+   "ttft": 1630,
+   "expected": 1264.5479,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 6425,
+   "load": 2,
+   "ttft": 2282,
+   "expected": 1918.5,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 5078,
+   "load": 2,
+   "ttft": 615,
+   "expected": 489.7895,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 6070,
+   "load": 2,
+   "ttft": 1235,
+   "expected": 1264.5479,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 5078,
+   "load": 2,
+   "ttft": 802,
+   "expected": 489.7895,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 6425,
+   "load": 2,
+   "ttft": 1615,
+   "expected": 1918.5,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 6070,
+   "load": 2,
+   "ttft": 1676,
+   "expected": 1264.5479,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 6425,
+   "load": 2,
+   "ttft": 2296,
+   "expected": 1918.5,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 5078,
+   "load": 2,
+   "ttft": 640,
+   "expected": 489.7895,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 6070,
+   "load": 2,
+   "ttft": 1266,
+   "expected": 1264.5479,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 5078,
+   "load": 2,
+   "ttft": 696,
+   "expected": 489.7895,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 6425,
+   "load": 2,
+   "ttft": 1598,
+   "expected": 1918.5,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 6070,
+   "load": 2,
+   "ttft": 1686,
+   "expected": 1264.5479,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 6425,
+   "load": 2,
+   "ttft": 2277,
+   "expected": 1918.5,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 5078,
+   "load": 2,
+   "ttft": 635,
+   "expected": 489.7895,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 6070,
+   "load": 2,
+   "ttft": 1253,
+   "expected": 1264.5479,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 5078,
+   "load": 2,
+   "ttft": 705,
+   "expected": 489.7895,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 6425,
+   "load": 2,
+   "ttft": 1616,
+   "expected": 1918.5,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 6070,
+   "load": 2,
+   "ttft": 1678,
+   "expected": 1264.5479,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 6425,
+   "load": 2,
+   "ttft": 2307,
+   "expected": 1918.5,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 5078,
+   "load": 2,
+   "ttft": 599,
+   "expected": 489.7895,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 6070,
+   "load": 2,
+   "ttft": 1220,
+   "expected": 1264.5479,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 5078,
+   "load": 2,
+   "ttft": 786,
+   "expected": 489.7895,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 6425,
+   "load": 2,
+   "ttft": 1598,
+   "expected": 1918.5,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 6070,
+   "load": 2,
+   "ttft": 1676,
+   "expected": 1264.5479,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 6425,
+   "load": 2,
+   "ttft": 2268,
+   "expected": 1918.5,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 5078,
+   "load": 2,
+   "ttft": 610,
+   "expected": 489.7895,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 6070,
+   "load": 2,
+   "ttft": 1229,
+   "expected": 1264.5479,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 5078,
+   "load": 2,
+   "ttft": 793,
+   "expected": 489.7895,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 6425,
+   "load": 2,
+   "ttft": 1642,
+   "expected": 1918.5,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 6070,
+   "load": 2,
+   "ttft": 1678,
+   "expected": 1264.5479,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 6425,
+   "load": 2,
+   "ttft": 2320,
+   "expected": 1918.5,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 5078,
+   "load": 2,
+   "ttft": 668,
+   "expected": 489.7895,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 6070,
+   "load": 2,
+   "ttft": 1201,
+   "expected": 1264.5479,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 5078,
+   "load": 2,
+   "ttft": 731,
+   "expected": 489.7895,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 6425,
+   "load": 2,
+   "ttft": 1620,
+   "expected": 1918.5,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 6070,
+   "load": 2,
+   "ttft": 1659,
+   "expected": 1264.5479,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 6425,
+   "load": 2,
+   "ttft": 2258,
+   "expected": 1918.5,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 5078,
+   "load": 2,
+   "ttft": 611,
+   "expected": 489.7895,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 6070,
+   "load": 2,
+   "ttft": 1227,
+   "expected": 1264.5479,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 5078,
+   "load": 2,
+   "ttft": 737,
+   "expected": 489.7895,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 6425,
+   "load": 2,
+   "ttft": 1633,
+   "expected": 1918.5,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 6070,
+   "load": 2,
+   "ttft": 1694,
+   "expected": 1264.5479,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 6425,
+   "load": 2,
+   "ttft": 2281,
+   "expected": 1918.5,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 5078,
+   "load": 2,
+   "ttft": 603,
+   "expected": 489.7895,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 6070,
+   "load": 2,
+   "ttft": 1239,
+   "expected": 1264.5479,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 5078,
+   "load": 2,
+   "ttft": 726,
+   "expected": 489.7895,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 6425,
+   "load": 2,
+   "ttft": 1627,
+   "expected": 1918.5,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 6070,
+   "load": 2,
+   "ttft": 1673,
+   "expected": 1264.5479,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 6425,
+   "load": 2,
+   "ttft": 2292,
+   "expected": 1918.5,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 5078,
+   "load": 2,
+   "ttft": 570,
+   "expected": 489.7895,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 6070,
+   "load": 2,
+   "ttft": 1257,
+   "expected": 1264.5479,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 5078,
+   "load": 2,
+   "ttft": 715,
+   "expected": 489.7895,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 6425,
+   "load": 2,
+   "ttft": 1627,
+   "expected": 1918.5,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 6070,
+   "load": 2,
+   "ttft": 1688,
+   "expected": 1264.5479,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 6425,
+   "load": 2,
+   "ttft": 2302,
+   "expected": 1918.5,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 5078,
+   "load": 2,
+   "ttft": 633,
+   "expected": 489.7895,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 6070,
+   "load": 2,
+   "ttft": 1231,
+   "expected": 1264.5479,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 5078,
+   "load": 2,
+   "ttft": 743,
+   "expected": 489.7895,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 6425,
+   "load": 2,
+   "ttft": 1606,
+   "expected": 1918.5,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 6070,
+   "load": 2,
+   "ttft": 1714,
+   "expected": 1264.5479,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 6425,
+   "load": 2,
+   "ttft": 2304,
+   "expected": 1918.5,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 5199,
+   "load": 2,
+   "ttft": 674,
+   "expected": 489.7895,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 6191,
+   "load": 2,
+   "ttft": 1252,
+   "expected": 1264.5479,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 5199,
+   "load": 2,
+   "ttft": 780,
+   "expected": 489.7895,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 6546,
+   "load": 2,
+   "ttft": 1586,
+   "expected": 1918.5,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 6191,
+   "load": 2,
+   "ttft": 1600,
+   "expected": 1264.5479,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 6546,
+   "load": 2,
+   "ttft": 2199,
+   "expected": 1918.5,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 5199,
+   "load": 2,
+   "ttft": 643,
+   "expected": 489.7895,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 6191,
+   "load": 2,
+   "ttft": 1231,
+   "expected": 1264.5479,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 5199,
+   "load": 2,
+   "ttft": 731,
+   "expected": 489.7895,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 6546,
+   "load": 2,
+   "ttft": 1530,
+   "expected": 1918.5,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 6191,
+   "load": 2,
+   "ttft": 1607,
+   "expected": 1264.5479,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 6546,
+   "load": 2,
+   "ttft": 2198,
+   "expected": 1918.5,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 5199,
+   "load": 2,
+   "ttft": 656,
+   "expected": 489.7895,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 6191,
+   "load": 2,
+   "ttft": 1211,
+   "expected": 1264.5479,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 5199,
+   "load": 2,
+   "ttft": 724,
+   "expected": 489.7895,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 6546,
+   "load": 2,
+   "ttft": 1561,
+   "expected": 1918.5,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 6191,
+   "load": 2,
+   "ttft": 1572,
+   "expected": 1264.5479,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 6546,
+   "load": 2,
+   "ttft": 2213,
+   "expected": 1918.5,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 5199,
+   "load": 2,
+   "ttft": 635,
+   "expected": 489.7895,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 6191,
+   "load": 2,
+   "ttft": 1191,
+   "expected": 1264.5479,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "liquidai/lfm2.5-1.2b-instruct",
+   "tokens": 5199,
+   "load": 2,
+   "ttft": 717,
+   "expected": 489.7895,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 6546,
+   "load": 2,
+   "ttft": 1565,
+   "expected": 1918.5,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "h2o-danube2-1.8b-chat",
+   "tokens": 6191,
+   "load": 2,
+   "ttft": 1630,
+   "expected": 1264.5479,
+   "verdict": "NORMAL"
+  },
+  {
+   "model": "falcon-h1-1.5b-instruct",
+   "tokens": 6546,
+   "load": 2,
+   "ttft": 2247,
+   "expected": 1918.5,
+   "verdict": "NORMAL"
+  }
+ ]
+}

@@ -112,8 +112,27 @@ def fit(rows):
                    if r["model"] == m and r["load"] >= 2 and r["tokens"] == sz]
             if two and by_size[sz]:
                 facs.append(statistics.median(two) / statistics.median(by_size[sz]))
+        # Cluster near-identical sizes before making knots. The SMALL bucket
+        # splits into token counts a few apart (h2o 59 and 61) whose medians
+        # differ by sampling noise, producing a segment with a local slope of
+        # ~7 ms/token against a real 0.15. That is noise encoded as policy, and
+        # it makes the expectation jagged exactly where prompts are cheapest.
+        # Sizes within 10% of each other are the same workload; pool them.
+        clusters = []
+        for sz in sizes:
+            if clusters and sz <= clusters[-1][-1] * 1.10:
+                clusters[-1].append(sz)
+            else:
+                clusters.append([sz])
+        knots = []
+        for c in clusters:
+            pooled = []
+            for sz in c:
+                pooled += by_size[sz]
+            knots.append((int(round(sum(c) / float(len(c)))),
+                          statistics.median(pooled)))
         out[m] = {
-            "knots": [(sz, statistics.median(by_size[sz])) for sz in sizes],
+            "knots": knots,
             "intercept": icept,
             "per_token": slope,
             "contention": statistics.median(facs) if facs else 1.0,

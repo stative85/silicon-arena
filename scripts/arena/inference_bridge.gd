@@ -41,6 +41,7 @@ const T := preload("res://scripts/arena/bridge_ticket.gd")
 const M := preload("res://scripts/arena/bridge_model.gd")
 const R := preload("res://scripts/arena/bridge_receipt.gd")
 const ST := preload("res://scripts/arena/bridge_stream.gd")
+const HL := preload("res://scripts/arena/bridge_health.gd")
 
 var policy: BridgePolicy
 var models: Dictionary = {}          ## model_id -> BridgeModel
@@ -54,6 +55,11 @@ var _started: bool = false
 var _last_resident: Array = []
 var _inflight: Dictionary = {}   ## request_id -> live receipt
 
+## Size-conditioned health. Starts in SHADOW MODE: classifications are computed
+## and recorded, recovery actions suppressed, so the frozen policy can be
+## compared against live traffic before it is allowed to unload anything.
+var health: BridgeHealth
+
 ## Injected so the self-test can drive the bridge without LM Studio. Must
 ## return {ok, text, tokens, ttft_ms} and is the ONLY place payload is read.
 var transport: Callable = Callable()
@@ -66,6 +72,8 @@ func _ready() -> void:
 	if not errs.is_empty():
 		push_error("bridge policy invalid: " + str(errs))
 		return
+	if health == null:
+		health = HL.new()
 	for mid in policy.known_models():
 		models[mid] = M.make(mid)
 	for mid in policy.hot_set:
@@ -291,10 +299,29 @@ func _run(ticket: BridgeTicket, slot: int, rec: Dictionary) -> void:
 
 	# Health is judged from measured first-CONTENT TTFT, never from whether the
 	# call returned. A degraded model returns successfully every time.
+	#
+	# THE CAUSALITY RULE. This runs strictly AFTER completion, because exact
+	# prompt_tokens arrives in the server's usage frame at stream end. It is a
+	# post-call classifier and must never influence whether the call should
+	# have been abandoned earlier -- the transport's connect/TTFT/idle timeouts
+	# own that, and they are a separate, deliberately generous ceiling. A token
+	# count from the end of a request cannot reach back to its beginning.
+	var hv := health.classify(ticket.model_id,
+		int(sealed.get("prompt_tokens", -1)),
+		int(sealed.get("max_active_during", 1)),
+		int(sealed["ttft_ms"]))
+	sealed["health_verdict"] = str(hv["verdict"])
+	sealed["health_residual"] = float(hv["residual"])
+	sealed["health_expected_ms"] = float(hv["expected_ms"])
+	sealed["health_streak"] = int(hv["streak"])
+	sealed["health_actionable"] = bool(hv["actionable"])
+	sealed["health_shadow"] = health.shadow
+
+	# Legacy TTFT/decode verdict retained for comparison during shadow mode.
 	var verdict := M.classify(int(sealed["ttft_ms"]),
 		float(sealed["decode_estimate"]), int(sealed["generated_tokens"]),
 		policy)
-	sealed["health_verdict"] = str(verdict["verdict"])
+	sealed["legacy_verdict"] = str(verdict["verdict"])
 
 	if kind == "WEDGE" or status == ST.CONNECT_TIMEOUT 			or status == ST.TTFT_TIMEOUT:
 		# Connected but never generated, or never connected at all.
@@ -302,12 +329,10 @@ func _run(ticket: BridgeTicket, slot: int, rec: Dictionary) -> void:
 	elif kind == "STALL":
 		# Generation began then froze. Distinct pathology, distinct label.
 		_transition(bm, M.DEGRADED, "timeout class: " + status)
-	elif bool(verdict["hard_degraded"]):
-		bm.strikes += 1
-		if bm.strikes >= policy.degraded_strikes:
-			_transition(bm, M.DEGRADED, "TTFT breach x%d" % bm.strikes)
-	elif bool(verdict["supporting"]):
-		pass  # Supporting evidence alone never condemns a model.
+	elif bool(sealed["health_actionable"]):
+		# Only a DEGRADED (3 consecutive suspect) or CATASTROPHE verdict is
+		# actionable, and only outside shadow mode.
+		_transition(bm, M.DEGRADED, "health: " + str(hv["reason"]))
 	else:
 		bm.strikes = 0
 

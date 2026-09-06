@@ -18,6 +18,7 @@ const M := preload("res://scripts/arena/bridge_model.gd")
 const R := preload("res://scripts/arena/bridge_receipt.gd")
 const B := preload("res://scripts/arena/inference_bridge.gd")
 const SS := preload("res://scripts/arena/bridge_stream.gd")
+const HL := preload("res://scripts/arena/bridge_health.gd")
 
 var _checks := 0
 var _failures: Array[String] = []
@@ -78,6 +79,8 @@ func _run() -> void:
 	await _health()
 	await _concurrency()
 	await _hysteresis()
+	await _health_policy()
+	await _health_agreement()
 	await _stream_timing()
 	await _receipts()
 	await _states()
@@ -430,3 +433,187 @@ func _report() -> void:
 		for f in _failures:
 			print("  FAIL: %s" % f)
 		quit(1)
+
+
+## The frozen health policy, and five sabotage teeth proving each part of it
+## is load-bearing. A test that cannot go red is not a test.
+func _health_policy() -> void:
+	print("\n frozen health policy: ks=1.8 kh=20 n=3, size-conditioned")
+	var h := HL.new()
+	h.shadow = false
+
+	_check("   frozen constants", h.ks == 1.8 and h.kh == 20.0
+		and h.streak_n == 3, "%f/%f/%d" % [h.ks, h.kh, h.streak_n])
+
+	var m := "falcon-h1-1.5b-instruct"
+	var e_small := HL.expected_ttft(m, 58, 1)
+	var e_med := HL.expected_ttft(m, 804, 1)
+	var e_large := HL.expected_ttft(m, 6184, 1)
+	_check("   expectation rises with prompt size",
+		e_small < e_med and e_med < e_large,
+		"%.0f %.0f %.0f" % [e_small, e_med, e_large])
+	_check("   contention raises expectation",
+		HL.expected_ttft(m, 804, 2) > HL.expected_ttft(m, 804, 1))
+	_check("   clamped below the smallest knot",
+		HL.expected_ttft(m, 1, 1) == e_small)
+	_check("   clamped above the largest knot",
+		HL.expected_ttft(m, 999999, 1) == e_large)
+	_check("   unknown model has no expectation",
+		HL.expected_ttft("no-such-model", 100, 1) < 0.0)
+
+	# THE CAUSALITY RULE: no exact token count means no classification.
+	var no_tok := h.classify(m, -1, 1, 5000)
+	_check("   without exact prompt_tokens it refuses to classify",
+		str(no_tok["verdict"]) == HL.NORMAL
+			and str(no_tok["reason"]).find("not classifiable") != -1,
+		"guessing size would reimport the tokenizer error")
+	var no_ttft := h.classify(m, 804, 1, -1)
+	_check("   without first-content TTFT it defers to the transport",
+		str(no_ttft["reason"]).find("transport") != -1)
+
+	# Healthy large contended falcon -- the exact case the old tooth killed.
+	h.reset()
+	var healthy := h.classify(m, 6184, 2, 1780)
+	_check("   healthy falcon LARGE contended 1780ms is NORMAL",
+		str(healthy["verdict"]) == HL.NORMAL,
+		"the retired 1500ms tooth flagged this healthy call")
+
+	# Degraded LFM on a small prompt -- the case the old tooth could not see.
+	h.reset()
+	var lfm := "liquidai/lfm2.5-1.2b-instruct"
+	var v1 := h.classify(lfm, 47, 1, 310)
+	var v2 := h.classify(lfm, 47, 1, 310)
+	var v3 := h.classify(lfm, 47, 1, 310)
+	_check("   LFM 4x degraded on a small prompt reaches DEGRADED",
+		str(v1["verdict"]) == HL.SUSPECT and str(v2["verdict"]) == HL.SUSPECT
+			and str(v3["verdict"]) == HL.DEGRADED,
+		"310ms is invisible to any absolute threshold")
+
+	# A single spike is recorded and NOT acted on.
+	h.reset()
+	var spike := h.classify(lfm, 47, 1, 400)
+	h.classify(lfm, 47, 1, 93)
+	h.classify(lfm, 47, 1, 93)
+	var back3 := h.classify(lfm, 47, 1, 93)
+	_check("   a single spike is SUSPECT, never DEGRADED",
+		str(spike["verdict"]) == HL.SUSPECT
+			and not bool(spike["actionable"]))
+	_check("   and the streak resets on the next healthy call",
+		h.streak_for(lfm) == 0 and str(back3["verdict"]) == HL.NORMAL,
+		"a lone transient must not accumulate toward recovery")
+
+	# Catastrophe short-circuits the streak.
+	h.reset()
+	var cat := h.classify(lfm, 47, 1, 9300)
+	_check("   100x is CATASTROPHE without waiting for a streak",
+		str(cat["verdict"]) == HL.CATASTROPHE and bool(cat["actionable"]))
+
+	# SHADOW MODE suppresses action but not classification.
+	var hs := HL.new()
+	hs.shadow = true
+	_check("   SABOTAGE APPLIED: shadow mode on", hs.shadow)
+	var s1 := hs.classify(lfm, 47, 1, 310)
+	hs.classify(lfm, 47, 1, 310)
+	var s3 := hs.classify(lfm, 47, 1, 310)
+	_check("   shadow still classifies DEGRADED",
+		str(s3["verdict"]) == HL.DEGRADED)
+	_check("   but nothing is actionable in shadow",
+		not bool(s1["actionable"]) and not bool(s3["actionable"]),
+		"shadow must never unload a model")
+	_check("   and shadow records the events",
+		int(hs.summary()["events"]) >= 3)
+
+	print("\n sabotage: each part of the policy must be load-bearing")
+
+	# 1. ks -> 1.5, the candidate the held-out test rejected.
+	var loose := HL.new()
+	loose.shadow = false
+	loose.ks = 1.5
+	_check("   SABOTAGE 1 APPLIED: ks lowered to 1.5", loose.ks == 1.5)
+	loose.reset()
+	h.reset()
+	_check("   ks=1.5 flags a 1.6x call that ks=1.8 calls normal",
+		str(loose.classify(lfm, 47, 1, 149)["verdict"]) == HL.SUSPECT
+			and str(h.classify(lfm, 47, 1, 149)["verdict"]) == HL.NORMAL,
+		"1.5 produced held-out false positives; 1.8 did not")
+
+	# 2. n -> 1 must fire on a transient spike.
+	var twitchy := HL.new()
+	twitchy.shadow = false
+	twitchy.streak_n = 1
+	_check("   SABOTAGE 2 APPLIED: n lowered to 1", twitchy.streak_n == 1)
+	_check("   n=1 wrongly recovers on a single spike",
+		str(twitchy.classify(lfm, 47, 1, 400)["verdict"]) == HL.DEGRADED,
+		"this is the reload thrashing the streak exists to prevent")
+
+	# 3. Remove size conditioning.
+	var e_sm := HL.expected_ttft(lfm, 47, 1)
+	var e_lg := HL.expected_ttft(lfm, 4837, 1)
+	_check("   SABOTAGE 3 APPLIED: expectations differ by size",
+		e_lg > e_sm * 3.0, "%.0f vs %.0f" % [e_sm, e_lg])
+	_check("   a healthy LARGE call judged against SMALL would be condemned",
+		(423.0 / e_sm) >= 1.8,
+		"dropping size conditioning misclassifies healthy large prompts")
+	_check("   a 4x degraded SMALL call judged against LARGE would be missed",
+		(372.0 / e_lg) < 1.8,
+		"dropping size conditioning hides real degradation")
+
+	# 4. Remove load conditioning.
+	var e_solo := HL.expected_ttft(m, 6184, 1)
+	var e_two := HL.expected_ttft(m, 6184, 2)
+	_check("   SABOTAGE 4 APPLIED: load changes expectation",
+		e_two > e_solo * 1.2, "%.0f vs %.0f" % [e_solo, e_two])
+	_check("   ignoring load inflates the residual of healthy contended calls",
+		(1780.0 / e_solo) > (1780.0 / e_two))
+
+	# 5. Bucket-estimated tokens instead of exact per-model tokens.
+	var e_exact := HL.expected_ttft(lfm, 4837, 1)
+	var e_guess := HL.expected_ttft(lfm, 3455, 1)
+	_check("   SABOTAGE 5 APPLIED: bucket estimate differs from exact",
+		absf(e_exact - e_guess) > 20.0, "%.0f vs %.0f" % [e_exact, e_guess])
+	_check("   a shared size estimate shifts the expectation materially",
+		e_guess < e_exact,
+		"tokenizers diverge 35% on identical text; one estimate is not enough")
+
+
+## The GDScript implementation must agree with the offline harness that chose
+## the policy. Otherwise the evidence belongs to a different rule than the one
+## actually running.
+func _health_agreement() -> void:
+	print("\n implementation agrees with the offline harness")
+	var path := "res://scripts/arena/fixtures/health_vectors.json"
+	if not FileAccess.file_exists(path):
+		_check("   fixture present", false, path)
+		return
+	var parsed = JSON.parse_string(FileAccess.get_file_as_string(path))
+	if typeof(parsed) != TYPE_DICTIONARY:
+		_check("   fixture parses", false)
+		return
+	var vectors: Array = (parsed as Dictionary).get("vectors", [])
+	_check("   fixture carries vectors", vectors.size() > 500,
+		str(vectors.size()))
+
+	var h := HL.new()
+	h.shadow = false
+	var exp_bad := 0
+	var ver_bad := 0
+	var first := ""
+	for v in vectors:
+		var d: Dictionary = v
+		var e := HL.expected_ttft(str(d["model"]), int(d["tokens"]),
+			int(d["load"]))
+		if absf(e - float(d["expected"])) > 0.5:
+			exp_bad += 1
+			if first == "":
+				first = "expected %.3f vs %.3f" % [e, float(d["expected"])]
+		var got := str(h.classify(str(d["model"]), int(d["tokens"]),
+			int(d["load"]), int(d["ttft"]))["verdict"])
+		if got != str(d["verdict"]):
+			ver_bad += 1
+			if first == "":
+				first = "verdict %s vs %s" % [got, str(d["verdict"])]
+	_check("   expectation matches the harness on all %d vectors"
+			% vectors.size(), exp_bad == 0,
+		"%d mismatches, first: %s" % [exp_bad, first])
+	_check("   verdicts match the harness on all %d vectors" % vectors.size(),
+		ver_bad == 0, "%d mismatches, first: %s" % [ver_bad, first])
