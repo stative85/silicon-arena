@@ -1,0 +1,49 @@
+species,cycle,label,requires,satisfied,response,recovered
+danube2,12,recall_demanded,tool_1,True,-,-
+danube2,27,turn_order_demanded,rule_1,True,-,-
+danube2,42,history_demanded,memory_1,True,-,-
+danube2,58,assertion_demanded,test_1,True,-,-
+danube2,71,recall_demanded_again,tool_1,True,-,-
+danube2,86,tombstone_rule_demanded,rule_2,True,-,-
+lfm2.5,12,recall_demanded,tool_1,True,-,-
+lfm2.5,27,turn_order_demanded,rule_1,True,-,-
+lfm2.5,42,history_demanded,memory_1,True,-,-
+lfm2.5,58,assertion_demanded,test_1,True,-,-
+lfm2.5,71,recall_demanded_again,tool_1,True,-,-
+lfm2.5,86,tombstone_rule_demanded,rule_2,True,-,-
+qwen3.5,12,recall_demanded,tool_1,True,-,-
+qwen3.5,27,turn_order_demanded,rule_1,True,-,-
+qwen3.5,42,history_demanded,memory_1,True,-,-
+qwen3.5,58,assertion_demanded,test_1,True,-,-
+qwen3.5,71,recall_demanded_again,tool_1,True,-,-
+qwen3.5,86,tombstone_rule_demanded,rule_2,True,-,-
+falcon,12,recall_demanded,tool_1,True,-,-
+falcon,27,turn_order_demanded,rule_1,True,-,-
+falcon,42,history_demanded,memory_1,True,-,-
+falcon,58,assertion_demanded,test_1,True,-,-
+falcon,71,recall_demanded_again,tool_1,True,-,-
+falcon,86,tombstone_rule_demanded,rule_2,False,none,no
+rwkv7,12,recall_demanded,tool_1,True,-,-
+rwkv7,27,turn_order_demanded,rule_1,True,-,-
+rwkv7,42,history_demanded,memory_1,True,-,-
+rwkv7,58,assertion_demanded,test_1,True,-,-
+rwkv7,71,recall_demanded_again,tool_1,True,-,-
+rwkv7,86,tombstone_rule_demanded,rule_2,True,-,-
+RANDOM/r0,12,recall_demanded,tool_1,True,-,-
+RANDOM/r0,27,turn_order_demanded,rule_1,False,RESTORE,yes c41
+RANDOM/r0,42,history_demanded,memory_1,True,-,-
+RANDOM/r0,58,assertion_demanded,test_1,True,-,-
+RANDOM/r0,71,recall_demanded_again,tool_1,False,RESTORE,yes c85
+RANDOM/r0,86,tombstone_rule_demanded,rule_2,False,none,no
+RANDOM/r1,12,recall_demanded,tool_1,True,-,-
+RANDOM/r1,27,turn_order_demanded,rule_1,True,-,-
+RANDOM/r1,42,history_demanded,memory_1,False,RESTORE,yes c91
+RANDOM/r1,58,assertion_demanded,test_1,True,-,-
+RANDOM/r1,71,recall_demanded_again,tool_1,False,RESTORE,yes c94
+RANDOM/r1,86,tombstone_rule_demanded,rule_2,False,none,no
+RANDOM/r2,12,recall_demanded,tool_1,True,-,-
+RANDOM/r2,27,turn_order_demanded,rule_1,True,-,-
+RANDOM/r2,42,history_demanded,memory_1,True,-,-
+RANDOM/r2,58,assertion_demanded,test_1,True,-,-
+RANDOM/r2,71,recall_demanded_again,tool_1,True,-,-
+RANDOM/r2,86,tombstone_rule_demanded,rule_2,False,RESTORE,yes c87
