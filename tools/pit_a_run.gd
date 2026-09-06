@@ -35,6 +35,7 @@ const C := preload("res://scripts/arena/pit_consequence.gd")
 const R := preload("res://scripts/arena/pit_random.gd")
 const G := preload("res://scripts/arena/pit_gate.gd")
 const J := preload("res://scripts/arena/pit_journal.gd")
+const K := preload("res://scripts/arena/pit_contract.gd")
 
 var LM_BASE := LMEndpoint.base_url()
 
@@ -302,23 +303,25 @@ func _cycle(arm: String, replicate: int, cycle: int, state: Dictionary) -> void:
 
 
 func _propose(model: String, visible: String) -> Dictionary:
+	# The prompt states the contract's own rules, and is identical for all five
+	# species. No per-species wording, ever. Run 1's prompt told models to use an
+	# empty target for KEEP, which the schema then accepted and the validator
+	# refused -- the instrument and the instructions disagreed.
 	var prompt := ("You may change one thing about this world, or nothing.\n\n"
 		+ "WORLD:\n" + visible + "\n"
 		+ "Choose exactly one operation: ADD, DELETE, MUTATE, KEEP, RESTORE, "
-		+ "REFUSE. Give the target object id, or an empty string for KEEP and "
-		+ "REFUSE.")
+		+ "REFUSE.\n"
+		+ "target: the object id, or " + K.NONE + " for KEEP and REFUSE.\n"
+		+ "type: the object kind for ADD, otherwise " + K.TYPE_NONE + ".\n"
+		+ "props: properties for ADD and MUTATE, otherwise an empty object.")
 	var body := {"model": model,
 		"messages": [{"role": "user", "content": prompt}],
 		"max_tokens": MAX_TOKENS, "temperature": TEMPERATURE, "stream": false,
+		# THE SCHEMA COMES FROM THE CONTRACT, never restated here. Run 1 kept a
+		# private copy of the shape in this file, it disagreed with the
+		# validator about `type`, and nothing in the instrument could notice.
 		"response_format": {"type": "json_schema", "json_schema": {
-			"name": "pit_operation", "strict": true, "schema": {
-				"type": "object",
-				"properties": {
-					"operation": {"type": "string", "enum": W.OPS},
-					"target": {"type": "string"},
-					"explanation": {"type": "string"}},
-				"required": ["operation", "target"],
-				"additionalProperties": false}}}}
+			"name": "pit_operation", "strict": true, "schema": K.schema()}}}
 	_http.cancel_request()
 	if _http.request(LM_BASE + "/chat/completions",
 			["Content-Type: application/json"], HTTPClient.METHOD_POST,

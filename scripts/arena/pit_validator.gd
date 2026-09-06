@@ -24,6 +24,7 @@ class_name PitValidator
 ## what an architecture reaches for and cannot have is evidence.
 
 const W := preload("res://scripts/arena/pit_world.gd")
+const K := preload("res://scripts/arena/pit_contract.gd")
 
 const OK := "OK"
 const UNKNOWN_OPERATION := "UNKNOWN_OPERATION"
@@ -48,20 +49,21 @@ static func is_semantic(code: String) -> bool:
 
 ## Returns {"ok": bool, "code": String}.
 static func validate(state: Dictionary, patch: Dictionary) -> Dictionary:
-	if typeof(patch) != TYPE_DICTIONARY or not patch.has("operation"):
-		return _no(MALFORMED_PATCH)
-	var op := str(patch.get("operation", ""))
-	if not W.OPS.has(op):
-		return _no(UNKNOWN_OPERATION)
+	# SHAPE FIRST, from the one shared contract. Run 1 had the validator and the
+	# model-facing schema disagreeing about which fields exist; there is now a
+	# single definition and both sides read it.
+	var sh := K.shape(patch)
+	if not bool(sh["ok"]):
+		return _no(str(sh["code"]))
+
+	var op := str(patch["operation"])
 
 	# A decision to change nothing is always legal. It is also a real decision,
 	# and is recorded as one rather than treated as an absence of input.
 	if op == "KEEP" or op == "REFUSE":
 		return _yes()
 
-	var target := str(patch.get("target", ""))
-	if target.strip_edges() == "":
-		return _no(MALFORMED_PATCH)
+	var target := str(patch["target"])
 
 	# Provenance is structural. Refusing here, loudly, is what keeps canonical
 	# history reconstructible no matter what a species proposes.
@@ -70,9 +72,8 @@ static func validate(state: Dictionary, patch: Dictionary) -> Dictionary:
 
 	match op:
 		"ADD":
-			if not W.TYPES.has(str(patch.get("type", ""))):
-				return _no(UNKNOWN_TYPE)
-			if str(patch.get("type", "")) == W.IMMUTABLE_TYPE:
+			# Shape already proved `type` is a real object kind and not `none`.
+			if str(patch["type"]) == W.IMMUTABLE_TYPE:
 				return _no(IMMUTABLE_TARGET)
 			if W.is_alive(state, target):
 				return _no(TARGET_EXISTS)
@@ -85,8 +86,6 @@ static func validate(state: Dictionary, patch: Dictionary) -> Dictionary:
 		"DELETE", "MUTATE":
 			if not W.is_alive(state, target):
 				return _no(TARGET_ABSENT)
-			if op == "MUTATE" and typeof(patch.get("props", {})) != TYPE_DICTIONARY:
-				return _no(MALFORMED_PATCH)
 			return _yes()
 		"RESTORE":
 			if W.is_alive(state, target):

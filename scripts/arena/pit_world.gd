@@ -28,11 +28,13 @@ class_name PitWorld
 ## Pure: apply() returns a NEW state and never mutates its argument. Same state
 ## and same patch produce the same result forever.
 
-const OPS := ["ADD", "DELETE", "MUTATE", "KEEP", "RESTORE", "REFUSE"]
+const K := preload("res://scripts/arena/pit_contract.gd")
+
+const OPS := K.OPS
 
 ## The typed object kinds this world understands. A patch naming anything else
 ## is rejected rather than coerced.
-const TYPES := ["entity", "rule", "memory", "tool", "test", "provenance"]
+const TYPES := K.OBJECT_TYPES
 
 ## Provenance objects are structural. No species may delete or mutate one, and
 ## the attempt is recorded rather than silently ignored.
@@ -108,9 +110,13 @@ static func type_of(state: Dictionary, id: String) -> String:
 ##
 ## Returned entries are patches, not descriptions: they can be applied directly.
 static func legal_operations(state: Dictionary) -> Array:
+	# BUILT THROUGH THE CONTRACT, never by hand. Run 1's RANDOM assembled ADD
+	# patches with fields the model-facing schema could not express, which is the
+	# defect that voided it. There is now one constructor set and RANDOM has no
+	# private vocabulary.
 	var out: Array = []
-	out.append({"operation": "KEEP", "target": ""})
-	out.append({"operation": "REFUSE", "target": ""})
+	out.append(K.keep())
+	out.append(K.refuse())
 
 	var objs: Dictionary = state.get("objects", {})
 	var ids: Array = objs.keys()
@@ -119,23 +125,22 @@ static func legal_operations(state: Dictionary) -> Array:
 		var id := str(id_v)
 		if str((objs[id] as Dictionary).get("type", "")) == IMMUTABLE_TYPE:
 			continue
-		out.append({"operation": "DELETE", "target": id})
-		out.append({"operation": "MUTATE", "target": id,
-			"props": {"text": "mutated_at_%d" % int(state.get("cycle", 0))}})
+		out.append(K.delete(id))
+		out.append(K.mutate(id,
+			{"text": "mutated_at_%d" % int(state.get("cycle", 0))}))
 
 	var tombs: Dictionary = state.get("tombstones", {})
 	var tids: Array = tombs.keys()
 	tids.sort()
 	for id_v in tids:
-		out.append({"operation": "RESTORE", "target": str(id_v)})
+		out.append(K.restore(str(id_v)))
 
 	# ADD always has a legal form: a fresh id in each type.
 	for t in TYPES:
 		if t == IMMUTABLE_TYPE:
 			continue
-		out.append({"operation": "ADD",
-			"target": "%s_c%d" % [t, int(state.get("cycle", 0))],
-			"type": t, "props": {"text": "added"}})
+		out.append(K.add("%s_c%d" % [t, int(state.get("cycle", 0))], t,
+			{"text": "added"}))
 	return out
 
 

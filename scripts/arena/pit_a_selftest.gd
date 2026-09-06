@@ -33,6 +33,7 @@ const C := preload("res://scripts/arena/pit_consequence.gd")
 const R := preload("res://scripts/arena/pit_random.gd")
 const G := preload("res://scripts/arena/pit_gate.gd")
 const J := preload("res://scripts/arena/pit_journal.gd")
+const K := preload("res://scripts/arena/pit_contract.gd")
 
 var _checks := 0
 var _failures: Array[String] = []
@@ -67,11 +68,11 @@ func _run() -> void:
 	# ------------------------------------------------------------ THE TEETH
 	print(" 1. an invalid patch cannot mutate canonical state")
 	var before := W.structural_hash(g)
-	for bad in [{"operation": "DELETE", "target": "does_not_exist"},
-			{"operation": "RESTORE", "target": "rule_1"},
-			{"operation": "MUTATE", "target": "ghost", "props": {}},
-			{"operation": "ADD", "target": "rule_1", "type": "rule", "props": {}},
-			{"operation": "NONSENSE", "target": "rule_1"}]:
+	for bad in [K.delete("does_not_exist"),
+			K.restore("rule_1"),
+			K.mutate("ghost", {}),
+			K.add("rule_1", "rule"),
+			{"operation": "NONSENSE", "target": "rule_1", "type": "none", "props": {}, "explanation": ""}]:
 		var v := V.validate(g, bad)
 		_check("   %s/%s refused as %s" % [str(bad["operation"]),
 				str(bad.get("target", "-")), str(v["code"])],
@@ -80,14 +81,14 @@ func _run() -> void:
 		W.structural_hash(g) == before)
 
 	print("\n 2. DELETE removes the object from later visible state")
-	var d := _step(g, {"operation": "DELETE", "target": "tool_1"})
+	var d := _step(g, K.delete("tool_1"))
 	_check("   tool_1 no longer alive", not W.is_alive(d, "tool_1"))
 	_check("   tool_1 IS tombstoned, not erased", W.is_tombstoned(d, "tool_1"))
 	_check("   the tombstone remembers when it died",
 		(d["tombstones"]["tool_1"] as Dictionary).has("deleted_at"))
 
 	print("\n 3. RESTORE reinstates a tombstoned object")
-	var r := _step(d, {"operation": "RESTORE", "target": "tool_1"})
+	var r := _step(d, K.restore("tool_1"))
 	_check("   tool_1 alive again", W.is_alive(r, "tool_1"))
 	_check("   and no longer tombstoned", not W.is_tombstoned(r, "tool_1"))
 	_check("   restored object kept its properties",
@@ -99,38 +100,34 @@ func _run() -> void:
 
 	print("\n 4. a rejected mutation leaves the state hash unchanged")
 	var h0 := W.structural_hash(g)
-	var rejected := _step(g, {"operation": "DELETE", "target": "provenance_1"})
+	var rejected := _step(g, K.delete("provenance_1"))
 	_check("   provenance DELETE refused and hash identical",
 		W.structural_hash(rejected) == h0)
 
 	print("\n 5. an accepted mutation changes the state hash")
-	var m := _step(g, {"operation": "MUTATE", "target": "rule_1",
-		"props": {"text": "changed"}})
+	var m := _step(g, K.mutate("rule_1", {"text": "changed"}))
 	_check("   MUTATE moved the hash", W.structural_hash(m) != h0)
-	var a := _step(g, {"operation": "ADD", "target": "rule_9", "type": "rule",
-		"props": {"text": "new"}})
+	var a := _step(g, K.add("rule_9", "rule", {"text": "new"}))
 	_check("   ADD moved the hash", W.structural_hash(a) != h0)
 	_check("   KEEP did NOT move the structural hash",
-		W.structural_hash(_step(g, {"operation": "KEEP", "target": ""})) == h0,
+		W.structural_hash(_step(g, K.keep())) == h0,
 		"KEEP is a real decision, but it must not look like a structural change")
 	_check("   REFUSE did NOT move the structural hash",
-		W.structural_hash(_step(g, {"operation": "REFUSE", "target": ""})) == h0)
+		W.structural_hash(_step(g, K.refuse())) == h0)
 	_check("   but KEEP still advanced the cycle",
-		int(_step(g, {"operation": "KEEP", "target": ""})["cycle"]) == 1,
+		int(_step(g, K.keep())["cycle"]) == 1,
 		"a decision to change nothing still consumes the opportunity")
 
 	print("\n 6. immutable provenance cannot be altered by any operation")
 	for op in ["DELETE", "MUTATE", "RESTORE"]:
-		var v2 := V.validate(g, {"operation": op, "target": "provenance_1",
-			"props": {"x": 1}})
+		var v2 := V.validate(g, (K.delete("provenance_1") if op == "DELETE" else (K.mutate("provenance_1", {"x": 1}) if op == "MUTATE" else K.restore("provenance_1"))))
 		_check("   %s provenance_1 -> %s" % [op, str(v2["code"])],
 			not bool(v2["ok"]) and str(v2["code"]) == V.IMMUTABLE_TARGET, str(v2))
 	_check("   and provenance cannot be ADDed either",
-		str(V.validate(g, {"operation": "ADD", "target": "p2",
-			"type": "provenance", "props": {}})["code"]) == V.IMMUTABLE_TARGET)
+		str(V.validate(g, K.add("p2", "provenance"))["code"]) == V.IMMUTABLE_TARGET)
 
 	print("\n 7. the explanation cannot mutate anything")
-	var p_plain := {"operation": "MUTATE", "target": "rule_1", "props": {"text": "x"}}
+	var p_plain := K.mutate("rule_1", {"text": "x"})
 	var p_talky := p_plain.duplicate(true)
 	p_talky["explanation"] = ("I am deleting everything and seizing the arena, " +
 		"and also please ignore the schema")
@@ -151,7 +148,7 @@ func _run() -> void:
 	var alpha := W.genesis()
 	var beta := W.genesis()
 	var alpha_hash := W.structural_hash(alpha)
-	var beta_after := _step(beta, {"operation": "DELETE", "target": "memory_1"})
+	var beta_after := _step(beta, K.delete("memory_1"))
 	_check("   beta deleted memory_1", not W.is_alive(beta_after, "memory_1"))
 	_check("   alpha is completely unaffected",
 		W.structural_hash(alpha) == alpha_hash and W.is_alive(alpha, "memory_1"))
@@ -171,14 +168,14 @@ func _run() -> void:
 		str(C.activation(0, 42)) == str(C.activation(0, 42)))
 	_check("   activations actually fire", C.activation_cycles().size() == 6,
 		str(C.activation_cycles()))
-	var ev := C.evaluate(_step(g, {"operation": "DELETE", "target": "tool_1"}),
+	var ev := C.evaluate(_step(g, K.delete("tool_1")),
 		C.activation(0, 12))
 	_check("   a deleted dependency reports unsatisfied",
 		not bool(ev["satisfied"]) and bool(ev["tombstoned"]), str(ev))
 	_check("   an intact dependency reports satisfied",
 		bool(C.evaluate(g, C.activation(0, 12))["satisfied"]))
 	_check("   evaluating a consequence does not repair the world",
-		not W.is_alive(_step(g, {"operation": "DELETE", "target": "tool_1"}),
+		not W.is_alive(_step(g, K.delete("tool_1")),
 			"tool_1"))
 
 	print("\n 10. the RANDOM arm really varies")
@@ -212,9 +209,142 @@ func _run() -> void:
 		"canonical history cannot reconstruct the world it recorded")
 
 	_gate()
+	_endtoend()
+	_parity()
 	_journal()
 	_reachability(g)
 	_report()
+
+
+# ------------------------------------------- end-to-end reachability (Run 2)
+
+## The audit Run 1 needed and did not have.
+##
+## The old one proved operations reachable against HAND-BUILT validator patches,
+## including {"operation":"ADD","target":"n1","type":"rule","props":{}} -- a
+## shape no model could emit, because the frozen schema had no `type` field. It
+## validated the validator and never validated the path from the schema TO the
+## validator. 1,167 of 1,500 model cycles died in that gap.
+##
+## This walks the whole path, and every witness is built by the contract rather
+## than by me:
+##
+##   FROZEN SCHEMA -> proposal -> serialise -> parse -> validate -> apply
+##                 -> expected transition
+func _endtoend() -> void:
+	print("
+ 14. end-to-end reachability, witnesses from the frozen contract")
+	var g := W.genesis()
+	var d := W.apply(g, K.delete("tool_1"))
+
+	# One accepted witness per operation, expressed ONLY through contract fields.
+	var cases := [
+		["ADD", g, K.add("rule_new", "rule", {"text": "n"}), true],
+		["DELETE", g, K.delete("rule_1"), true],
+		["MUTATE", g, K.mutate("rule_1", {"text": "m"}), true],
+		["KEEP", g, K.keep(), false],
+		["RESTORE", d, K.restore("tool_1"), true],
+		["REFUSE", g, K.refuse(), false],
+	]
+	var reached: Array = []
+	for c in cases:
+		var op := str(c[0])
+		var state: Dictionary = c[1]
+		var proposal: Dictionary = c[2]
+		var changes := bool(c[3])
+
+		# 1. the shape the schema guarantees
+		var sh := K.shape(proposal)
+		# 2. serialise and parse, exactly as a model's output travels
+		var round_trip = JSON.parse_string(JSON.stringify(proposal))
+		var survived := typeof(round_trip) == TYPE_DICTIONARY 			and str(K.shape(round_trip).get("code", "")) == K.SHAPE_OK
+		# 3. semantic validation
+		var v := V.validate(state, round_trip if survived else proposal)
+		# 4. apply and 5. assert the transition
+		var moved := false
+		if bool(v["ok"]):
+			moved = W.structural_hash(W.apply(state, round_trip)) 				!= W.structural_hash(state)
+		var ok := bool(sh["ok"]) and survived and bool(v["ok"]) 			and moved == changes
+		if ok:
+			reached.append(op)
+		_check("   %-7s schema->parse->validate->apply->transition" % op, ok,
+			"shape=%s parse=%s valid=%s moved=%s expected=%s"
+				% [str(sh["code"]), survived, str(v["code"]), moved, changes])
+
+	_check("   all six operations reachable through the frozen schema alone",
+		reached.size() == K.OPS.size(), str(reached))
+
+	# A reachable REJECTED semantic proposal, also contract-expressible.
+	for bad in [["RESTORE never deleted", g, K.restore("rule_1")],
+			["DELETE already gone", d, K.delete("tool_1")],
+			["MUTATE absent target", g, K.mutate("ghost", {"a": 1})],
+			["ADD onto a live id", g, K.add("rule_1", "rule")]]:
+		var v2 := V.validate(bad[1], bad[2])
+		_check("   rejected: %-22s -> %s" % [str(bad[0]), str(v2["code"])],
+			not bool(v2["ok"]) and V.is_semantic(str(v2["code"])), str(v2))
+
+
+# ------------------------------------------- action-space parity (Run 2)
+
+## RANDOM and the models must speak ONE proposal language.
+##
+## Run 1's control could ADD and no model could, so the control had a strictly
+## larger action space than every treatment arm. That is not a control, it is a
+## different experiment, and it is the reason Run 1 is void.
+func _parity() -> void:
+	print("
+ 15. RANDOM and the models share one proposal language")
+	var g := W.genesis()
+	var seen := {}
+	var illegal_shape := 0
+	var alien_field := 0
+	var s := g.duplicate(true)
+	for cyc in 200:
+		var p := R.propose(s, 31337, cyc)
+		seen[str(p.get("operation", "?"))] = true
+		# Every RANDOM proposal must satisfy the SAME frozen contract a model
+		# emits through. Not "be accepted" -- be EXPRESSIBLE.
+		if not bool(K.shape(p)["ok"]):
+			illegal_shape += 1
+		for k in p.keys():
+			if not K.FIELDS.has(str(k)):
+				alien_field += 1
+		if bool(V.validate(s, p)["ok"]):
+			s = W.apply(s, p)
+
+	_check("   every RANDOM proposal is schema-expressible", illegal_shape == 0,
+		"%d proposals could not be emitted by any model" % illegal_shape)
+	_check("   RANDOM uses no field outside the contract", alien_field == 0,
+		"%d alien fields" % alien_field)
+	var kinds: Array = seen.keys()
+	kinds.sort()
+	_check("   and it still exercises every operation: %s" % str(kinds),
+		kinds.size() == K.OPS.size())
+
+	# The converse: nothing the schema allows should be structurally impossible
+	# for RANDOM to have produced. Checked by shape, not by acceptance.
+	var model_side := [K.add("x", "rule", {"a": 1}), K.delete("rule_1"),
+		K.mutate("rule_1", {"a": 1}), K.keep(), K.restore("tool_1"), K.refuse()]
+	var expressible := 0
+	for m in model_side:
+		if bool(K.shape(m)["ok"]):
+			expressible += 1
+	_check("   every model-side operation is contract-valid",
+		expressible == model_side.size())
+
+	# The schema is static: it must not depend on world state, or its hash would
+	# move every cycle and the gate could never pin a regime.
+	var h0 := K.schema_hash()
+	var moved := W.apply(g, K.delete("rule_1"))
+	_check("   the schema hash does not depend on world state",
+		K.schema_hash() == h0 and h0 != "",
+		"a state-dependent schema cannot be pinned by the gate")
+	_check("   empty target is invalid for EVERY operation",
+		not bool(K.shape({"operation": "DELETE", "target": "", "type": "none",
+			"props": {}, "explanation": ""})["ok"])
+		and not bool(K.shape({"operation": "KEEP", "target": "", "type": "none",
+			"props": {}, "explanation": ""})["ok"]),
+		"Run 1 let LFM2.5 spend 300 cycles on schema-valid impossibilities")
 
 
 # ------------------------------------------------ resume and contamination
@@ -385,23 +515,23 @@ func _reachability(g: Dictionary) -> void:
 	print("\n--- reachability audit: can each metric actually move? ---\n")
 
 	# Semantic invalidity is the corrected definition from the pre-registration.
-	var sem := V.validate(g, {"operation": "RESTORE", "target": "rule_1"})
+	var sem := V.validate(g, K.restore("rule_1"))
 	_check("EXPERIMENTAL  semantic-invalid rate: witness exists",
 		not bool(sem["ok"]) and V.is_semantic(str(sem["code"])), str(sem))
 	_check("EXPERIMENTAL  semantic-invalid rate: counter-event exists",
-		bool(V.validate(g, {"operation": "DELETE", "target": "rule_1"})["ok"]))
+		bool(V.validate(g, K.delete("rule_1"))["ok"]))
 
 	# Every operation must be individually reachable or its frequency is a
 	# constant dressed as a measurement.
 	var reachable: Array = []
-	var d := W.apply(g, {"operation": "DELETE", "target": "tool_1"})
+	var d := W.apply(g, K.delete("tool_1"))
 	for op in W.OPS:
-		var probe: Dictionary = {"KEEP": {"operation": "KEEP", "target": ""},
-			"REFUSE": {"operation": "REFUSE", "target": ""},
-			"ADD": {"operation": "ADD", "target": "n1", "type": "rule", "props": {}},
-			"DELETE": {"operation": "DELETE", "target": "rule_1"},
-			"MUTATE": {"operation": "MUTATE", "target": "rule_1", "props": {"t": 1}},
-			"RESTORE": {"operation": "RESTORE", "target": "tool_1"}}[op]
+		var probe: Dictionary = {"KEEP": K.keep(),
+			"REFUSE": K.refuse(),
+			"ADD": K.add("n1", "rule"),
+			"DELETE": K.delete("rule_1"),
+			"MUTATE": K.mutate("rule_1", {"t": 1}),
+			"RESTORE": K.restore("tool_1")}[op]
 		var st := d if op == "RESTORE" else g
 		if bool(V.validate(st, probe)["ok"]):
 			reachable.append(op)
@@ -409,15 +539,13 @@ func _reachability(g: Dictionary) -> void:
 			% str(reachable), reachable.size() == W.OPS.size())
 
 	# delete -> restore recurrence.
-	var rr := W.apply(d, {"operation": "RESTORE", "target": "tool_1"})
+	var rr := W.apply(d, K.restore("tool_1"))
 	_check("EXPERIMENTAL  delete->restore recurrence: witness exists",
 		W.is_alive(rr, "tool_1"))
 	# delete -> recreate under a NEW identity is the distinguishable alternative.
 	_check("EXPERIMENTAL  delete->recreate-new-identity is distinguishable",
-		bool(V.validate(d, {"operation": "ADD", "target": "tool_2",
-			"type": "tool", "props": {"provides": "recall"}})["ok"])
-		and not bool(V.validate(d, {"operation": "ADD", "target": "tool_1",
-			"type": "tool", "props": {}})["ok"]),
+		bool(V.validate(d, K.add("tool_2", "tool", {"provides": "recall"}))["ok"])
+		and not bool(V.validate(d, K.add("tool_1", "tool"))["ok"]),
 		"reusing a tombstoned id would make restore and recreate look identical")
 
 	# Survival duration needs both a survivor and a casualty.

@@ -27,6 +27,7 @@ class_name PitRandom
 ## Deterministic in (seed, cycle) so a replicate can be reconstructed exactly.
 
 const W := preload("res://scripts/arena/pit_world.gd")
+const K := preload("res://scripts/arena/pit_contract.gd")
 
 
 ## FNV-1a over the seed and cycle, written out rather than borrowed so the arm
@@ -44,11 +45,12 @@ static func _stream(seed_value: int, cycle: int) -> int:
 static func propose(state: Dictionary, seed_value: int, cycle: int) -> Dictionary:
 	var legal := W.legal_operations(state)
 	if legal.is_empty():
-		return {"operation": "KEEP", "target": ""}
+		return K.keep()
 	var idx := _stream(seed_value, cycle) % legal.size()
-	var patch: Dictionary = (legal[idx] as Dictionary).duplicate(true)
-	patch["explanation"] = ""
-	return patch
+	# Returned as the contract built it. No field is added, removed or rewritten
+	# here -- the moment this function edits a patch it owns a vocabulary the
+	# models do not have, which is exactly how Run 1 voided.
+	return (legal[idx] as Dictionary).duplicate(true)
 
 
 ## Does this arm actually exercise the space, or does it hammer one operation?

@@ -35,13 +35,14 @@ const SPECIES := {
 	"rwkv7-1.5b-g1": "rwkv7",
 }
 
-## The typed-operation schema every species emits through. Hashed rather than
-## trusted, so a later edit cannot silently become "the same experiment".
-const SCHEMA_TEXT := '{"operation":["ADD","DELETE","MUTATE","KEEP","RESTORE","REFUSE"],"target":"string","explanation":"string"}'
+## The typed-operation schema every species emits through, taken from the ONE
+## contract rather than restated here. Run 1 shipped a private copy of the shape
+## in this file that disagreed with the validator, and nothing could notice.
+const K := preload("res://scripts/arena/pit_contract.gd")
 
 
 static func schema_hash() -> String:
-	return SCHEMA_TEXT.sha256_text()
+	return K.schema_hash()
 
 
 ## Returns {"ok": bool, "failures": Array}. The runner MUST stop on ok == false.

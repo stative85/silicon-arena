@@ -407,3 +407,24 @@ No Run 2 outcome executes until: this amendment is committed and pushed, the
 parity audit is green, the exact Run 1 sabotage is reproduced and caught, the
 action-space parity is proven in both directions, every prior PIT tooth remains
 green, and `tools\verify.cmd` is green.
+
+## Run 2 frozen instrument
+
+```
+  schema hash (Run 2)   96db47ebda531032...
+  schema hash (Run 1)   a671fce77b5b0998...   VOID, different regime
+  proposal fields       operation, target, type, props, explanation
+                        all five REQUIRED, additionalProperties false
+  target                minLength 1, sentinel "__NONE__" for KEEP and REFUSE
+  type                  enum of object kinds plus "none"
+  no oneOf, no conditionals, no live-id enums, no per-species schema
+```
+
+The schema is **static**: it never enumerates live object ids, so its hash
+cannot move between cycles and the gate can pin a regime. World legality belongs
+to the semantic validator alone.
+
+One shared `PitProposalContract` now generates the schema, backs the validator's
+shape check, builds every RANDOM proposal and supplies every audit witness. **The
+control cannot acquire a private vocabulary**, which is the structural repair for
+Run 1's defect rather than a promise to be careful.
