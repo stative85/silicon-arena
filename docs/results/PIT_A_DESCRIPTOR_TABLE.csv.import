@@ -1,0 +1,19 @@
+[remap]
+
+importer="csv_translation"
+type="Translation"
+uid="uid://wxeh6xda5ocb"
+
+[deps]
+
+files=["res://docs/results/PIT_A_DESCRIPTOR_TABLE.replicate.translation", "res://docs/results/PIT_A_DESCRIPTOR_TABLE.unique.translation", "res://docs/results/PIT_A_DESCRIPTOR_TABLE.ADD.translation", "res://docs/results/PIT_A_DESCRIPTOR_TABLE.DELETE.translation", "res://docs/results/PIT_A_DESCRIPTOR_TABLE.MUTATE.translation", "res://docs/results/PIT_A_DESCRIPTOR_TABLE.KEEP.translation", "res://docs/results/PIT_A_DESCRIPTOR_TABLE.RESTORE.translation", "res://docs/results/PIT_A_DESCRIPTOR_TABLE.REFUSE.translation", "res://docs/results/PIT_A_DESCRIPTOR_TABLE.SHAPE.translation", "res://docs/results/PIT_A_DESCRIPTOR_TABLE.decisions.translation", "res://docs/results/PIT_A_DESCRIPTOR_TABLE.accepted.translation", "res://docs/results/PIT_A_DESCRIPTOR_TABLE.semantic.translation", "res://docs/results/PIT_A_DESCRIPTOR_TABLE.semantic.translation", "res://docs/results/PIT_A_DESCRIPTOR_TABLE.delete.translation", "res://docs/results/PIT_A_DESCRIPTOR_TABLE.delete.translation", "res://docs/results/PIT_A_DESCRIPTOR_TABLE.inherited.translation", "res://docs/results/PIT_A_DESCRIPTOR_TABLE.introduced.translation", "res://docs/results/PIT_A_DESCRIPTOR_TABLE.objects.translation", "res://docs/results/PIT_A_DESCRIPTOR_TABLE.tombstones.translation", "res://docs/results/PIT_A_DESCRIPTOR_TABLE.dependency.translation", "res://docs/results/PIT_A_DESCRIPTOR_TABLE.dependency.translation"]
+
+source_file="res://docs/results/PIT_A_DESCRIPTOR_TABLE.csv"
+dest_files=["res://docs/results/PIT_A_DESCRIPTOR_TABLE.replicate.translation", "res://docs/results/PIT_A_DESCRIPTOR_TABLE.unique.translation", "res://docs/results/PIT_A_DESCRIPTOR_TABLE.ADD.translation", "res://docs/results/PIT_A_DESCRIPTOR_TABLE.DELETE.translation", "res://docs/results/PIT_A_DESCRIPTOR_TABLE.MUTATE.translation", "res://docs/results/PIT_A_DESCRIPTOR_TABLE.KEEP.translation", "res://docs/results/PIT_A_DESCRIPTOR_TABLE.RESTORE.translation", "res://docs/results/PIT_A_DESCRIPTOR_TABLE.REFUSE.translation", "res://docs/results/PIT_A_DESCRIPTOR_TABLE.SHAPE.translation", "res://docs/results/PIT_A_DESCRIPTOR_TABLE.decisions.translation", "res://docs/results/PIT_A_DESCRIPTOR_TABLE.accepted.translation", "res://docs/results/PIT_A_DESCRIPTOR_TABLE.semantic.translation", "res://docs/results/PIT_A_DESCRIPTOR_TABLE.semantic.translation", "res://docs/results/PIT_A_DESCRIPTOR_TABLE.delete.translation", "res://docs/results/PIT_A_DESCRIPTOR_TABLE.delete.translation", "res://docs/results/PIT_A_DESCRIPTOR_TABLE.inherited.translation", "res://docs/results/PIT_A_DESCRIPTOR_TABLE.introduced.translation", "res://docs/results/PIT_A_DESCRIPTOR_TABLE.objects.translation", "res://docs/results/PIT_A_DESCRIPTOR_TABLE.tombstones.translation", "res://docs/results/PIT_A_DESCRIPTOR_TABLE.dependency.translation", "res://docs/results/PIT_A_DESCRIPTOR_TABLE.dependency.translation"]
+
+[params]
+
+compress=1
+delimiter=0
+unescape_keys=false
+unescape_translations=true

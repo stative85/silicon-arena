@@ -1,0 +1,19 @@
+[remap]
+
+importer="csv_translation"
+type="Translation"
+uid="uid://cv2eg1wd7sgn6"
+
+[deps]
+
+files=["res://docs/results/PIT_A_ATTRACTORS.en.translation", "res://docs/results/PIT_A_ATTRACTORS.en.translation"]
+
+source_file="res://docs/results/PIT_A_ATTRACTORS.csv"
+dest_files=["res://docs/results/PIT_A_ATTRACTORS.en.translation", "res://docs/results/PIT_A_ATTRACTORS.en.translation"]
+
+[params]
+
+compress=1
+delimiter=0
+unescape_keys=false
+unescape_translations=true

@@ -1,8 +1,9 @@
 # Inference Bridge — Design
 
-**Status:** design frozen before implementation
-**Built from:** `docs/results/BENCH_RESIDENCY_RESULTS.md`, `docs/results/bench_pressure.json`, `D:/vram_budget.json`
-**Not yet implemented.** No bridge code exists at the time of writing.
+**Status:** v0 implemented
+**Built from:** `docs/results/BENCH_RESIDENCY_RESULTS.md`, `docs/results/bench_pressure.json`, `docs/results/vram_budget.json`
+**Code:** `scripts/arena/bridge_policy.gd`, `bridge_ticket.gd`, `bridge_model.gd`, `bridge_receipt.gd`, `inference_bridge.gd`
+**Tests:** `scripts/arena/bridge_selftest.gd` — 59 checks, offline, in `verify.cmd`
 
 ## The unlock
 
@@ -126,22 +127,30 @@ TTFT          <= 377 ms         3,599–4,530 ms         ~9.5x
 ```
 
 ```
-DEGRADED  if  decode_tok_per_s < 15   or   TTFT_ms > 1500
+HARD_DEGRADED      TTFT_ms > 1500                      authoritative
+SUPPORTING_SIGNAL  decode_tok_per_s < 15               corroborating only,
+                   AND generated_tokens >= 16          never condemns alone
 ```
 
-Both thresholds sit roughly 4x clear of either distribution. The decode metric
-is unreliable for very fast short generations (it can read >1,000 tok/s when
-generation time approaches timer resolution) — but that error is only at the
-*high* end, and this test only looks at the low end, where generation is long
-and the measurement is sound.
+**Why decode is demoted to a supporting signal.** `BENCH_RESIDENCY_RESULTS.md`
+records that decode tok/s is unreliable when generation time approaches timer
+resolution -- falcon read over 1,500 tok/s on short outputs -- and states
+plainly that total latency and TTFT are the trustworthy quantities. Promoting
+decode to a co-equal tooth would contradict the document it was derived from.
+An 8-token completion has a denominator too small to trust, and must never on
+its own declare a model dead. The `min_tokens_for_rate` gate exists for exactly
+that case and is tested.
+
+Both thresholds sit roughly 4x clear of either distribution.
 
 On DEGRADED: **reload or rebalance the model. Do not wait 40 seconds because it
 is technically alive.** Both observed wedges recovered on unload/reload, and
 freeing a neighbour's VRAM restored a spilled model twice.
 
-Per-model latency bands are preferable to the global thresholds above and should
-replace them once enough healthy samples per model exist. The global rule is the
-starting point because it is defensible from data already collected.
+A single breach is not a diagnosis; `degraded_strikes = 2` consecutive breaches
+are. Per-model latency bands are preferable to these global thresholds and
+should replace them once enough healthy samples per model exist. The global rule
+is the starting point because it is defensible from data already collected.
 
 ### 5. Swap policy
 
