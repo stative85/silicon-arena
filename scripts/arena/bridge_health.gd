@@ -90,9 +90,18 @@ var kh: float = 20.0
 var streak_n: int = 3
 
 ## SHADOW MODE. Classifications are computed and recorded; recovery actions are
-## suppressed. The policy runs against live traffic and is compared with the
-## offline harness before it is allowed to unload anything.
-var shadow: bool = true
+## suppressed.
+##
+## Now DEFAULTS TO FALSE -- recovery is enabled. It was held true through the
+## 1,080-vector agreement test against the offline harness, a live shadow run,
+## and a 1,080-call low-end validation covering the small-prompt regime the
+## arena actually uses (~17-45 tokens), where the unchanged policy produced
+## zero false positives and zero SUSPECT verdicts.
+##
+## Set it true when introducing a new model, a new context length, or a machine
+## whose knots have not been measured: classification continues, recovery does
+## not.
+var shadow: bool = false
 
 var _streak: Dictionary = {}
 var events: Array = []

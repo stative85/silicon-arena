@@ -1,6 +1,6 @@
 # Bridge Health Policy — FROZEN
 
-**Status:** frozen and implemented, running in **shadow mode**
+**Status:** frozen, implemented, low-end validated, **recovery enabled**
 **Code:** `scripts/arena/bridge_health.gd`
 **Tests:** `scripts/arena/bridge_selftest.gd` — 110 checks including five
 sabotage teeth and a 1,080-vector agreement test against the offline harness
@@ -81,6 +81,24 @@ Exact `prompt_tokens` arrives in the server's **usage frame at stream
 completion**. This detector is therefore a **post-call classifier and nothing
 else.**
 
+**`HARD_CATASTROPHE` is not immediate in wall-clock terms.** It cannot be: the
+exact `prompt_tokens` it divides by arrives at stream completion. A 20x
+residual is an immediate *post-call classification* that can trigger recovery
+**before the next dispatch** — it does not, and cannot, shorten the call that
+produced it. The genuinely immediate failure path is and remains:
+
+```
+CONNECT_TIMEOUT       no connection or response headers
+TTFT_TIMEOUT          connected, generation never began
+STREAM_IDLE_TIMEOUT   generation began, then froze
+TOTAL_TIMEOUT         absolute ceiling
+```
+
+Those are transport clocks that fire during the call. The residual classifier
+is a verdict on a call that already finished. Two different mechanisms, and
+conflating them is how someone later invents time travel in
+`inference_bridge.gd`.
+
 It must never be consulted to decide whether a call should have been abandoned
 earlier. That decision belongs to the transport's own connect / TTFT / idle
 timeouts, which are a separate and deliberately generous safety ceiling. A
@@ -135,15 +153,82 @@ the same expectation and the same verdict as the Python harness that chose the
 policy, on every vector. Otherwise the evidence belongs to a different rule than
 the one actually running.
 
+## Low-end validation
+
+Live arena traffic measured 20-22 tokens, below the smallest knot (47-60),
+where the expectation clamps. Clamping is conservative against false positives
+*and* against detection, so the region the arena actually uses was measured
+directly: 1,080 calls at ~17-45 tokens, three models, both load conditions,
+60 per cell, unique prompts.
+
+**The low end is flat.** Below ~45 tokens, fixed connection and runtime
+overhead dominates and token count barely registers:
+
+```
+          tokens        ttft medians      spread    slope
+lfm2.5    17 -> 34      93 / 93 / 93       0.0%     0.000 ms/tok
+h2o       24 -> 44      92 / 93 / 91       2.7%    -0.051 ms/tok
+falcon    23 -> 41     186 / 201 / 188     7.8%     0.083 ms/tok
+```
+
+There is a startup floor, so **clamping is structurally the correct policy** and
+no low-end knot is needed. The clamp values also turn out to be right already:
+
+```
+              measured floor    knot[0]        
+lfm2.5             93 ms        [47, 93.0]     exact
+h2o                92 ms        [60, 92.0]     exact
+falcon        186-201 ms        [58, 202.0]    within noise
+```
+
+The **unchanged** frozen policy was then run against all 1,080 low-end calls:
+
+```
+false positives (DEGRADED/CATASTROPHE)   0
+SUSPECT                                  0
+residual  median 0.90   p95 1.03   p99 1.17   max 1.58
+```
+
+Max residual 1.58 sits below `ks = 1.8` with margin. **No constant changed and
+no knot was added.**
+
+### Contention is size-dependent, and weaker at the low end
+
+```
+          low-end measured    frozen (fitted at high end)
+falcon         1.24x                  1.48x
+h2o            1.03x                  1.33x
+lfm2.5         1.02x                  1.16x
+```
+
+Contention cost scales with prefill work, and a tiny prompt has almost none.
+Applying the high-end factor to a small contended call inflates its expectation,
+which is why the median low-end residual is 0.90 rather than 1.00.
+
+**Consequence, stated plainly:** a low-end call must be about **2.01x** its own
+normal to register SUSPECT, rather than the nominal 1.8x. That is a ~12% loss
+of sensitivity in the small-prompt regime, and it errs toward *not* firing.
+
+This is left uncorrected deliberately. Making the contention factor
+size-conditioned would change the expectation surface and require re-validating
+the entire harness, for a 12% sensitivity gain in the direction that is already
+safe. It is recorded so a future reader knows it is a known approximation, not
+an oversight.
+
 ## Shadow mode
 
-`BridgeHealth.shadow` defaults to **true**. Classifications are computed and
-recorded; `actionable` is forced false, so no recovery can fire. Verified live:
-six real calls classified NORMAL with residuals 0.41-1.22 and zero events.
+`BridgeHealth.shadow` **now defaults to false — recovery is enabled.**
 
-Enabling recovery is a one-line change (`health.shadow = false`) and should
-follow a period of shadow operation confirming the classifications match
-expectations on real arena traffic.
+It was held true through: the 1,080-vector agreement test, a live shadow run,
+and the 1,080-call low-end validation above. Recovery was enabled only after
+the policy had been shown to produce zero false positives on every corpus it
+has been run against, including the small-prompt regime the arena actually
+uses.
+
+Setting `shadow = true` remains available and still suppresses all recovery
+while continuing to classify and record — the right setting when introducing a
+new model, a new context length, or a machine whose knots have not been
+measured.
 
 ## Limits
 

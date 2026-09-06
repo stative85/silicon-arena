@@ -509,6 +509,10 @@ func _health_policy() -> void:
 		str(cat["verdict"]) == HL.CATASTROPHE and bool(cat["actionable"]))
 
 	# SHADOW MODE suppresses action but not classification.
+	var fresh := HL.new()
+	_check("   recovery is ENABLED by default after low-end validation",
+		not fresh.shadow,
+		"shadow=true would silently suppress every recovery")
 	var hs := HL.new()
 	hs.shadow = true
 	_check("   SABOTAGE APPLIED: shadow mode on", hs.shadow)

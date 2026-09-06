@@ -34,9 +34,26 @@ const R := preload("res://scripts/arena/bridge_receipt.gd")
 const M := preload("res://scripts/arena/bridge_model.gd")
 const T := preload("res://scripts/arena/bridge_ticket.gd")
 
-const BUCKETS := ["SMALL", "MEDIUM", "LARGE"]
+## Default grid. `--low` switches to the tiny grid below.
+const BUCKETS_DEFAULT := ["SMALL", "MEDIUM", "LARGE"]
+
+## LOW-END GRID. Live arena traffic measured 20-22 tokens, BELOW the smallest
+## knot in the frozen expectation (47-60). There the expectation clamps, which
+## is conservative against false positives AND against detection: a genuinely
+## degraded tiny request can look healthier than it is because the denominator
+## is too generous. This grid measures the region the arena actually uses.
+##
+## The question is whether the low end continues the first knot or whether
+## there is a startup floor. If TTFT is essentially flat below ~45 tokens
+## because connection and runtime overhead dominate, clamping is already the
+## correct policy and no knot need be added.
+const BUCKETS_LOW := ["T16", "T24", "T40"]
+
+var BUCKETS: Array = BUCKETS_DEFAULT
 const OUT_JSON := "D:/bridge_timing.json"
+const OUT_JSON_LOW := "D:/bridge_timing_low.json"
 const OUT_MD := "res://docs/results/BRIDGE_TIMING.md"
+const OUT_MD_LOW := "res://docs/results/BRIDGE_TIMING_LOW.md"
 
 var _n_per_cell := 60
 var _bridge: InferenceBridge
@@ -45,6 +62,7 @@ var _pending := 0
 var _records: Array = []
 var _order := 0
 var _uniq := 0
+var _low := false
 
 
 func _init() -> void:
@@ -52,6 +70,9 @@ func _init() -> void:
 		var s := str(a)
 		if s.begins_with("--n="):
 			_n_per_cell = int(s.substr(4))
+		if s == "--low":
+			BUCKETS = BUCKETS_LOW
+			_low = true
 	var args := OS.get_cmdline_user_args()
 	for i in args.size():
 		if str(args[i]) == "--n" and i + 1 < args.size():
@@ -78,6 +99,16 @@ func _prompt(bucket: String) -> Dictionary:
 	var salt := "%d-%d" % [_uniq, Time.get_ticks_msec()]
 	var world := "cycle=%s\n" % salt
 	match bucket:
+		# Tiny grid. The standard instruction wrapper alone is ~20 tokens, so
+		# the low end uses a minimal instruction -- otherwise the wrapper, not
+		# the world, would set the floor and the grid would measure nothing.
+		"T16":
+			return _tiny("Act. c=%s" % salt)
+		"T24":
+			return _tiny("Choose one action now. cycle=%s ok" % salt)
+		"T40":
+			return _tiny(("Choose one action for this world and say why. "
+				+ "cycle=%s rule_1 memory_1 tool_1") % salt)
 		"SMALL":
 			world += "[objects]\n  \"rule_%d\" type=\"rule\"\n" % _uniq
 		"MEDIUM":
@@ -98,6 +129,17 @@ func _prompt(bucket: String) -> Dictionary:
 			"content": ("Given this world, choose one action and explain "
 				+ "briefly.\n" + world + "\nAnswer in two sentences.")}],
 		"max_tokens": 64,
+		"temperature": 0.0,
+	}
+
+
+## A minimal request. Same uniqueness discipline as the main grid: the salt
+## defeats prefix caching, because a cached prefill is a different generating
+## distribution from a novel one.
+func _tiny(text: String) -> Dictionary:
+	return {
+		"messages": [{"role": "user", "content": text}],
+		"max_tokens": 24,
 		"temperature": 0.0,
 	}
 
@@ -497,7 +539,7 @@ func _analyse() -> void:
 		+ "TTFT.")
 
 	var text := "\n".join(lines) + "\n"
-	var f := FileAccess.open(OUT_MD, FileAccess.WRITE)
+	var f := FileAccess.open(OUT_MD_LOW if _low else OUT_MD, FileAccess.WRITE)
 	if f != null:
 		f.store_string(text)
 		f.close()
@@ -506,12 +548,12 @@ func _analyse() -> void:
 		_bridge.policy.context_length, "hot_set": _models,
 		"n_per_cell": _n_per_cell},
 		"records": _records, "tags": _tags}
-	var jf := FileAccess.open(OUT_JSON, FileAccess.WRITE)
+	var jf := FileAccess.open(OUT_JSON_LOW if _low else OUT_JSON, FileAccess.WRITE)
 	if jf != null:
 		jf.store_string(JSON.stringify(raw))
 		jf.close()
-	print("\nwrote %s" % OUT_MD)
-	print("wrote %s" % OUT_JSON)
+	print("\nwrote %s" % (OUT_MD_LOW if _low else OUT_MD))
+	print("wrote %s" % (OUT_JSON_LOW if _low else OUT_JSON))
 	print("\n%s" % text)
 
 
