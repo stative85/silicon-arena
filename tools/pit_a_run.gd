@@ -36,6 +36,8 @@ const R := preload("res://scripts/arena/pit_random.gd")
 const G := preload("res://scripts/arena/pit_gate.gd")
 const J := preload("res://scripts/arena/pit_journal.gd")
 const K := preload("res://scripts/arena/pit_contract.gd")
+const CN := preload("res://scripts/arena/pit_canonical.gd")
+const IX := preload("res://scripts/arena/pit_interaction.gd")
 
 var LM_BASE := LMEndpoint.base_url()
 
@@ -168,10 +170,14 @@ func _startup_then_run() -> void:
 
 func _manifest(observed: Dictionary, genesis_hash: String) -> Dictionary:
 	return {
+		"run": 3,
 		"pit_prereg_commit": "15f30e9",
-		"pit_amendment_commit": "e4faf3e",
-		"instrument_commit": "c1688d7",
-		"probe_journal_commit": "673a750",
+		"run1_void_commit": "2750d17",
+		"run2_void_commit": "2a77fd4",
+		"contract_commit": "e9a074a",
+		"canonical_hash": CN.canonical_hash(),
+		"interaction_fields": ["cycle_index", "last_operation", "last_outcome",
+			"last_reason_code", "rejection_streak"],
 		"head_commit": _git_head(),
 		"runtime": str(observed["runtime"]),
 		"backend": "lmstudio-openai-compatible",
@@ -234,8 +240,17 @@ func _trajectory(arm: String, replicate: int, manifest: Dictionary) -> void:
 		_abort("4 load", "could not load %s" % arm)
 		return
 
+	# Interaction state is reconstructed from the journal, never carried in
+	# memory across a resume. Every recorded row advanced it exactly once.
+	var inter := IX.genesis()
+	for r in rows:
+		inter = IX.advance(inter, str((r as Dictionary).get("last_operation",
+			str((r as Dictionary).get("operation", "")))),
+			str((r as Dictionary).get("outcome", IX.REJECTED)),
+			str((r as Dictionary).get("reason_code", "")))
+
 	for cycle in range(start, CYCLES):
-		await _cycle(arm, replicate, cycle, state)
+		inter = await _cycle(arm, replicate, cycle, state, inter)
 		var reloaded := J.load_rows(arm, replicate)
 		if not bool(reloaded["ok"]):
 			_abort("journal", "%s r%d became unreadable mid-run: %s"
@@ -247,17 +262,23 @@ func _trajectory(arm: String, replicate: int, manifest: Dictionary) -> void:
 
 # ------------------------------------------------------------- one cycle
 
-func _cycle(arm: String, replicate: int, cycle: int, state: Dictionary) -> void:
+func _cycle(arm: String, replicate: int, cycle: int, state: Dictionary,
+		inter: Dictionary) -> Dictionary:
 	var pre := W.state_hash(state)
 
 	# THE PRE-STATE IS COMMITTED BEFORE ANY TOKEN IS REQUESTED.
 	_write_marker(arm, replicate, {"cycle": cycle, "pre_state_hash": pre,
 		"phase": "OPENED"})
 
-	var visible := W.canonical_text(state)
+	# PRODUCER-VISIBLE OBSERVATION = canonical world + interaction state. The
+	# second half is what makes a consumed opportunity advance even when the
+	# world does not, which is the Run 2 fixed point.
+	var visible := W.canonical_text(state) + IX.visible_text(inter)
 	var patch := {}
 	var raw := ""
 	var failed := false
+	var shape_failed := false
+	var normalised: Array = []
 	var t0 := Time.get_ticks_msec()
 
 	if arm == RANDOM_ARM:
@@ -270,20 +291,47 @@ func _cycle(arm: String, replicate: int, cycle: int, state: Dictionary) -> void:
 			failed = true
 		else:
 			var parsed = JSON.parse_string(raw)
-			patch = parsed if typeof(parsed) == TYPE_DICTIONARY else {}
+			if typeof(parsed) != TYPE_DICTIONARY:
+				shape_failed = true
+			else:
+				# CANONICALISE before validating. Fields the operation does not
+				# read are normalised; fields it does read are never repaired.
+				var c := CN.canonicalise(parsed)
+				if not bool(c["ok"]):
+					if str(c["code"]) == K.SHAPE_MALFORMED 							or str(c["code"]) == K.SHAPE_UNKNOWN_OPERATION:
+						shape_failed = true
+					else:
+						patch = {}
+						normalised = []
+					if not shape_failed:
+						patch = parsed
+				else:
+					patch = c["patch"]
+					normalised = c["normalised"]
 	var ms := Time.get_ticks_msec() - t0
 
 	var reason := "REQUEST_FAILED"
+	var outcome := IX.REJECTED
 	var accepted := false
 	var post := pre
-	if not failed:
+	if shape_failed:
+		reason = K.SHAPE_MALFORMED
+		outcome = IX.SHAPE_FAILED
+	elif not failed:
 		var v := V.validate(state, patch)
 		reason = str(v["code"])
 		accepted = bool(v["ok"])
+		outcome = IX.ACCEPTED if accepted else IX.REJECTED
 		if accepted:
 			post = W.state_hash(W.apply(state, patch))
 
 	var next_state := W.apply(state, patch) if accepted else state
+	# REQUEST_FAILED is infrastructure and never enters interaction state.
+	var next_inter := inter
+	if not failed:
+		next_inter = IX.advance(inter,
+			"" if shape_failed else str(patch.get("operation", "")),
+			outcome, reason)
 	var act := C.activation(replicate, cycle)
 	var dep := C.evaluate(next_state, act)
 
@@ -294,12 +342,16 @@ func _cycle(arm: String, replicate: int, cycle: int, state: Dictionary) -> void:
 		"operation": str(patch.get("operation", "")),
 		"target": str(patch.get("target", "")),
 		"reason_code": reason, "accepted": accepted,
-		"request_failed": failed,
+		"request_failed": failed, "shape_failed": shape_failed,
+		"outcome": outcome, "normalised_fields": normalised,
+		"interaction": next_inter,
+		"observation_hash": IX.observation_hash(W.canonical_text(state), inter),
 		"post_state_hash": post,
 		"scheduled_consequence": act, "dependency_result": dep,
 		"latency_ms": ms, "phase": "COMMITTED",
 	})
 	_clear_marker(arm, replicate)
+	return next_inter
 
 
 func _propose(model: String, visible: String) -> Dictionary:

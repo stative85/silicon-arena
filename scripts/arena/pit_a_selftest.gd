@@ -338,6 +338,47 @@ func _livelock() -> void:
 		W.structural_hash(g) == before_w and not IX.is_structural(),
 		"interaction must never enter attractor equivalence")
 
+	# SHAPE FAILURE is its own outcome. Not a decision, not infrastructure.
+	print("   -- shape failures --")
+	var sf := IX.advance(i0, "", IX.SHAPE_FAILED, "MALFORMED_PATCH")
+	_check("   shape failure consumes exactly one opportunity",
+		int(sf["cycle_index"]) - int(i0["cycle_index"]) == 1)
+	_check("   world hash is untouched by a shape failure",
+		W.structural_hash(g) == W.structural_hash(g))
+	_check("   observation still advances",
+		IX.observation_hash(world_text, i0)
+			!= IX.observation_hash(world_text, sf))
+	_check("   no typed operation is fabricated from malformed output",
+		str(sf["last_operation"]) == IX.NONE,
+		"inventing a decision the model did not make is the whole failure mode")
+	_check("   and it is never recorded as KEEP",
+		str(sf["last_operation"]) != "KEEP"
+			and str(sf["last_outcome"]) != IX.ACCEPTED)
+	_check("   the exact shape code is preserved",
+		str(sf["last_reason_code"]) == "MALFORMED_PATCH")
+
+	# rejection_streak belongs to semantic rejection ALONE.
+	var after_two := IX.advance(IX.advance(i0, "ADD", IX.REJECTED, "X"),
+		"ADD", IX.REJECTED, "X")
+	var then_shape := IX.advance(after_two, "", IX.SHAPE_FAILED, "MALFORMED_PATCH")
+	_check("   a shape failure does NOT increment the rejection streak",
+		int(then_shape["rejection_streak"]) == int(after_two["rejection_streak"]),
+		"unparseable output must not masquerade as an invalid world decision")
+	_check("   nor does it reset the streak",
+		int(then_shape["rejection_streak"]) == 2,
+		"resetting would reward a model for emitting garbage")
+	_check("   an accepted move still clears it",
+		int(IX.advance(then_shape, "KEEP", IX.ACCEPTED, "OK")["rejection_streak"]) == 0)
+
+	# 100 consecutive shape failures must still be 100 distinct observations.
+	var shseen := {}
+	var shcur := i0
+	for _n in 100:
+		shcur = IX.advance(shcur, "", IX.SHAPE_FAILED, "MALFORMED_PATCH")
+		shseen[IX.observation_hash(world_text, shcur)] = true
+	_check("   100 shape failures give 100 distinct observations",
+		shseen.size() == 100, "%d distinct" % shseen.size())
+
 	# 6-7: substrate-owned, and never structural.
 	var patched := CN.canonicalise(K.mutate("rule_1", {"cycle_index": 999}))
 	_check("   a model patch cannot reach interaction state",

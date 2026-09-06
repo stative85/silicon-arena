@@ -49,6 +49,16 @@ const NONE := "NONE"
 const ACCEPTED := "ACCEPTED"
 const REJECTED := "REJECTED"
 
+## Output that did not parse, or did not satisfy the frozen shape. It is NOT a
+## semantic decision and NOT infrastructure. The producer probe saw 7 of these
+## across 100 schema-constrained calls, so `json_schema` is not an absolute
+## guarantee and the outcome needs a name of its own.
+##
+## No operation is fabricated from malformed output, nothing is retried, and it
+## is never recorded as KEEP -- inventing a decision the model did not make is
+## the failure mode this whole experiment keeps finding in itself.
+const SHAPE_FAILED := "SHAPE_FAILED"
+
 
 static func genesis() -> Dictionary:
 	return {
@@ -60,15 +70,21 @@ static func genesis() -> Dictionary:
 	}
 
 
-## Advance after a consumed opportunity. `outcome` is ACCEPTED or REJECTED;
-## REQUEST_FAILED is infrastructure and is never routed through here, because
-## converting an HTTP failure into a model decision would hand one species a
-## behaviour it never chose.
+## Advance after a consumed opportunity. `outcome` is ACCEPTED, REJECTED or
+## SHAPE_FAILED. REQUEST_FAILED is infrastructure and is never routed through
+## here, because converting an HTTP failure into a model decision would hand one
+## species a behaviour it never chose.
 static func advance(prev: Dictionary, operation: String, outcome: String,
 		reason_code: String) -> Dictionary:
 	var streak := int(prev.get("rejection_streak", 0))
 	if outcome == REJECTED:
 		streak += 1
+	elif outcome == SHAPE_FAILED:
+		# UNCHANGED, deliberately. rejection_streak counts invalid WORLD
+		# decisions. A shape failure is not a decision at all, and letting it
+		# increment would make unparseable output masquerade as a bad move --
+		# or letting it reset would reward the model for emitting garbage.
+		pass
 	else:
 		streak = 0
 	return {

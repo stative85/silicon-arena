@@ -428,3 +428,87 @@ One shared `PitProposalContract` now generates the schema, backs the validator's
 shape check, builds every RANDOM proposal and supplies every audit witness. **The
 control cannot acquire a private vocabulary**, which is the structural repair for
 Run 1's defect rather than a promise to be careful.
+
+---
+
+# Amendment: PIT A Run 3
+
+**Written after Run 2 was declared VOID and before any Run 3 outcome exists.**
+Runs 1 and 2 are preserved, referenced and never overwritten
+([Run 1](results/PIT_A_RUN1_VOID.md), [Run 2](results/PIT_A_RUN2_VOID.md)).
+Run 3 is a **distinct regime** and no descriptor may be compared across runs.
+
+## What stays frozen
+
+Hypothesis, five species and their IDs, runtime 2.14.0, Q4_K_M, 8192 context,
+genesis world, consequence schedule, sampling regime, **100 cycles**, **three
+replicates**, and the analysis plan. Genesis is **not** enriched and the run is
+**not** shortened — see the two protections below.
+
+## The repair, in three parts
+
+**1. Canonicalisation.** Fields irrelevant to an operation are normalised, never
+punished. `DELETE` reads `operation` and `target`; `type` and `props` are noise.
+`KEEP` and `REFUSE` read only the operation. Canonicalisation may **never**
+supply or repair a field the operation actually reads — ADD onto a live id,
+MUTATE with no target and RESTORE without a tombstone all remain invalid.
+
+**2. Interaction state.** Bounded, substrate-owned, separate from canonical
+world memory. Three roles, documented and tested separately:
+
+```
+  ANTI-LIVELOCK       cycle_index
+  ACTUATOR FEEDBACK   last_operation, last_outcome, last_reason_code
+  SHORT-TERM STATE    rejection_streak     <- a memory variable, labelled as one
+```
+
+`cycle_index` alone is proven sufficient to defeat the livelock. The invariant:
+
+> **Every consumed opportunity advances producer-visible observation, even when
+> the canonical world hash does not move.**
+
+It is model-visible, journalled, reconstructible on resume, and included in the
+observation hash. It is **never** patchable, never part of `PitWorld`, and never
+enters structural or attractor equivalence.
+
+**3. `SHAPE_FAILED`.** Output that does not parse or does not satisfy the frozen
+shape is neither a semantic decision nor infrastructure. It consumes one
+opportunity, advances the clock, records the exact shape code, fabricates no
+operation, is never recorded as KEEP, is never retried, and **does not touch
+`rejection_streak`** — that counter belongs to invalid *world decisions* alone.
+The producer probe saw 7 such responses in 100 schema-constrained calls, so
+`json_schema` is not an absolute guarantee.
+
+## Two protections against future-us
+
+> **Operation diversity is not a success criterion.** No minimum mutation,
+> transition, or operation-coverage requirement is imposed on any species.
+> Persistent KEEP, REFUSE, or semantic-invalid behaviour is a valid possible
+> outcome and must not be read as the experiment having failed.
+
+> **The producer-space probe established interface validity only.** Its observed
+> operation tendencies are not PIT A evidence and establish no expected Run 3
+> distribution. They may not be cited as a prior, a baseline, or a comparison.
+
+Genesis is deliberately unchanged. The probe already presented **20 mechanically
+distinct worlds** — tombstones available, memory-rich, dependencies missing,
+objects added and removed — and the narrow operation tendencies persisted across
+all of them. "Seven genesis objects is too few" is therefore already weakened as
+an explanation, and enriching the world because the models decline to DELETE
+would be tuning the terrarium until the lizards dance.
+
+## What the probe established, and only this
+
+```
+  19-20 distinct proposals per species across 20 distinct worlds
+        (Run 2 produced 6 across 1,500 calls)
+  16 proposals rescued by canonicalisation that Run 2 would have killed
+     on a field the operation never reads
+  every remaining rejection names an AUTHORITATIVE field:
+     NOT_TOMBSTONED  TARGET_ABSENT  TARGET_REQUIRED
+     TARGET_EXISTS   TYPE_REQUIRED  ALREADY_ALIVE
+```
+
+**An invalid move now means the model made an invalid move.** That is the
+threshold two void runs were spent reaching, and it is the entire justification
+for Run 3.
