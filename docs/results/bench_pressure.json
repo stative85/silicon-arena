@@ -1,0 +1,110 @@
+{
+ "regime": "EXPLICIT_RESIDENCY_MODE",
+ "context": 8192,
+ "prompt_max_tokens": 64,
+ "alone": {
+  "h2o": {
+   "ok": 5,
+   "failed": 0,
+   "total_ms_median": 289.6522999944864,
+   "ttft_ms_median": 53.72039999929257,
+   "tps_median": 257.6504811709573,
+   "tokens_median": 63,
+   "vram_mib": 2272.0
+  },
+  "lfm2.5": {
+   "ok": 5,
+   "failed": 0,
+   "total_ms_median": 77.95080001233146,
+   "ttft_ms_median": 54.73889999848325,
+   "tps_median": 400.3987970688655,
+   "tokens_median": 10,
+   "vram_mib": 1634.0
+  },
+  "qwen3.5": {
+   "ok": 5,
+   "failed": 0,
+   "total_ms_median": 362.0548000035342,
+   "ttft_ms_median": 95.95329999865498,
+   "tps_median": 144.1285080085488,
+   "tokens_median": 38,
+   "vram_mib": 2578.0
+  },
+  "falcon": {
+   "ok": 5,
+   "failed": 0,
+   "total_ms_median": 110.29070000222418,
+   "ttft_ms_median": 105.00949999550357,
+   "tps_median": 1514.8072388509374,
+   "tokens_median": 8,
+   "vram_mib": 2156.0
+  },
+  "rwkv7": {
+   "ok": 5,
+   "failed": 0,
+   "total_ms_median": 509.1532000078587,
+   "ttft_ms_median": 165.29010000522248,
+   "tps_median": 182.45342514535207,
+   "tokens_median": 63,
+   "vram_mib": 1774.0
+  }
+ },
+ "full": {
+  "h2o": {
+   "ok": 5,
+   "failed": 0,
+   "total_ms_median": 326.04350001201965,
+   "ttft_ms_median": 52.02980000467505,
+   "tps_median": 234.73338758771897,
+   "tokens_median": 63,
+   "vram_mib": 7674.0
+  },
+  "lfm2.5": {
+   "ok": 5,
+   "failed": 0,
+   "total_ms_median": 91.37469998677261,
+   "ttft_ms_median": 63.61069998820312,
+   "tps_median": 529.8967761779253,
+   "tokens_median": 10,
+   "vram_mib": 7674.0
+  },
+  "qwen3.5": {
+   "ok": 5,
+   "failed": 0,
+   "total_ms_median": 380.00010000541806,
+   "ttft_ms_median": 120.60599999676924,
+   "tps_median": 145.67904452904537,
+   "tokens_median": 38,
+   "vram_mib": 7674.0
+  },
+  "falcon": {
+   "ok": 5,
+   "failed": 0,
+   "total_ms_median": 128.67090001236647,
+   "ttft_ms_median": 123.31220001215115,
+   "tps_median": 1488.3720908311975,
+   "tokens_median": 8,
+   "vram_mib": 7674.0
+  },
+  "rwkv7": {
+   "ok": 5,
+   "failed": 0,
+   "total_ms_median": 1347.7682000084314,
+   "ttft_ms_median": 276.6795000061393,
+   "tps_median": 58.786331002027964,
+   "tokens_median": 63,
+   "vram_mib": 7674.0
+  }
+ },
+ "penalty": {
+  "h2o": 1.13,
+  "lfm2.5": 1.17,
+  "qwen3.5": 1.05,
+  "falcon": 1.17,
+  "rwkv7": 2.65
+ },
+ "spread": {
+  "alone": 6.5,
+  "full": 14.7
+ }
+}
