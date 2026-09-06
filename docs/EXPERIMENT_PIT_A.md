@@ -306,3 +306,104 @@ still refuses any species whose reported architecture or quantisation drifts.
 Recorded rather than silently corrected, because a roster entry changing between
 pre-registration and execution is exactly the kind of edit that has to be
 visible in history.
+
+---
+
+# Amendment: PIT A Run 2, and the parity invariant Run 1 lacked
+
+**Written after Run 1 was declared VOID and before any Run 2 outcome exists.**
+Run 1 is preserved and is referenced, never overwritten
+([PIT_A_RUN1_VOID](results/PIT_A_RUN1_VOID.md)).
+
+Run 2 is a **distinct regime**. New schema hash, fresh genesis, fresh journals,
+its own manifest. **No descriptor may be compared across the two runs.**
+
+## What stays frozen
+
+The hypothesis, the five species and their IDs, runtime 2.14.0, Q4_K_M, 8192
+context, the world, the consequence schedule, the sampling regime, 100 cycles,
+three replicates, and the entire analysis plan. **The repair is confined to the
+model-output contract and the instrumentation that should have caught its
+failure.**
+
+## The new invariant: SCHEMA-VALIDATOR ACTION-SPACE PARITY
+
+> For every operation available to RANDOM, there must exist at least one
+> proposal **expressible through the exact frozen model-facing schema** that
+> parses through the common constrained-output instrument, passes the validator
+> in some reachable world, and performs the intended state transition.
+>
+> And conversely: **RANDOM may not construct any operation using fields or
+> values that cannot be represented through that same schema.**
+
+The control and the treatment arms share one typed proposal language. Run 1
+failed because they did not, and nothing in the instrument was capable of
+noticing.
+
+## Schema repair
+
+ADD must be able to express every field the validator requires — `operation`,
+`target`, `type`, `props`, `explanation`. **Missing fields are never injected
+after generation.** A post-hoc fill would mean the harness authoring part of the
+proposal and attributing it to the species.
+
+Target legality is represented in the contract rather than left to the
+validator alone: a target-dependent operation may not be satisfied by an empty
+string. KEEP and REFUSE keep their frozen target semantics and are **not** given
+fabricated object dependencies merely to satisfy a schema shape.
+
+An operation-discriminated schema is preferred **only if the common llama.cpp
+`json_schema` instrument supports it identically across all five species**. If
+conditional or `oneOf` features are not honoured consistently, the repair stops
+and a simpler common typed representation is designed before Run 2 freezes.
+**No per-species schemas, under any circumstance.**
+
+## The new reachability audit, end-to-end
+
+The old audit is insufficient by construction: it hand-built validator patches.
+The replacement derives its witnesses from the **frozen proposal contract** and
+walks the whole path:
+
+```
+  FROZEN SCHEMA -> schema-expressible proposal -> parser -> PitValidator
+                -> PitWorld.apply -> expected state transition
+```
+
+For each of ADD, DELETE, MUTATE, KEEP, RESTORE and REFUSE: an accepted witness
+using **only fields the frozen schema can express**, plus a reachable rejected
+semantic proposal where applicable.
+
+## Sabotage teeth for Run 2
+
+Each must turn the audit red:
+
+```
+  `type` removed from the schema                    <- the exact Run 1 failure
+  `props` removed when an ADD witness requires it
+  target unable to represent a valid target
+  schema permits only an empty target for a target-dependent operation
+  validator requires a field absent from the schema
+  RANDOM constructs a field unavailable to model proposals
+  RANDOM uses an operation variant the schema cannot express
+  schema and validator disagree on allowed object types
+  post-generation code silently fills a required field
+  a valid proposal transformed differently per species
+```
+
+The first is the one that matters most. **Removing `type` from the frozen schema
+must make the audit go red**, because that is precisely what Run 1 did silently
+for 1,800 cycles.
+
+## Control parity
+
+`PitRandom` is refactored to select from the **same canonical proposal
+constructors** the model-facing contract uses. It may choose among legal values
+for schema-expressible fields; it may not own a richer private vocabulary, and
+it may not bypass the proposal language.
+
+## Run 2 gating
+
+No Run 2 outcome executes until: this amendment is committed and pushed, the
+parity audit is green, the exact Run 1 sabotage is reproduced and caught, the
+action-space parity is proven in both directions, every prior PIT tooth remains
+green, and `toolserify.cmd` is green.
