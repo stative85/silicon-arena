@@ -145,6 +145,13 @@ func _locality() -> void:
 	_check("   the payload is still intact for dispatch",
 		JSON.stringify(t.payload()).find("SECRET INTENT") != -1)
 
+	# Input-size telemetry is recorded on the RECEIPT, never exposed to
+	# scheduling. Measuring something is not a reason to let the scheduler
+	# use it -- size becomes a scheduling input only by deliberate decision.
+	for k in ["prompt_chars", "prompt_bytes", "prompt_tokens"]:
+		_check("   %s is NOT in the scheduling view" % k, not view.has(k),
+			"size telemetry must not leak into scheduling")
+
 
 func _health() -> void:
 	print("\n health classification: TTFT is hard, decode is supporting")

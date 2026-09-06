@@ -211,6 +211,15 @@ func _dispatch(ticket: BridgeTicket, slot: int) -> void:
 	# load, and a bridge that actually dispatched serially, would otherwise
 	# produce a "contended" distribution containing uncontended samples.
 	rec["active_at_dispatch"] = _busy.size() + 1
+	# Input size telemetry. Measured here because dispatch holds the payload;
+	# it is deliberately NOT added to BridgeTicket.scheduling_view(). The
+	# transport must know the prompt in order to send it, and the receipt must
+	# record its size to make residual health computable -- neither is a reason
+	# to let the scheduler see it. Size becomes a scheduling input only if that
+	# is decided deliberately, not as a side effect of measuring it.
+	var sz := _measure_input(ticket.payload())
+	rec["prompt_chars"] = int(sz["chars"])
+	rec["prompt_bytes"] = int(sz["bytes"])
 	_busy[ticket.request_id] = slot
 	# active_at_dispatch alone understates contention: the FIRST request of a
 	# concurrent pair is always dispatched alone, then overlapped for most of
@@ -259,7 +268,13 @@ func _run(ticket: BridgeTicket, slot: int, rec: Dictionary) -> void:
 		# Tokens are not reported by the streaming API, so content events are
 		# used as the token proxy and NAMED as an estimate rather than passed
 		# off as a count.
-		tokens = st.content_events
+		# Prefer the server's exact completion count; fall back to content
+		# events only when usage was not supplied, and record which was used
+		# so a reader is never guessing at the provenance of a rate.
+		if st.completion_tokens >= 0:
+			tokens = st.completion_tokens
+		else:
+			tokens = st.content_events
 		status = R.STATUS_OK if ok else st.status
 		timings = st.timings()
 		kind = st.failure_kind()
@@ -313,6 +328,11 @@ func _stream_call(ticket: BridgeTicket, slot: int) -> BridgeStream:
 	var body := ticket.payload()
 	body["model"] = ticket.model_id
 	body["stream"] = true
+	# Exact prompt and completion token counts, per the model's OWN tokenizer.
+	# Character counts are not interchangeable across tokenizers, so the same
+	# prompt is different work for different models -- and decode rate becomes
+	# a measurement instead of a content-event proxy.
+	body["stream_options"] = {"include_usage": true}
 	st.begin(policy.endpoint, "/chat/completions", body, _now())
 	while true:
 		if st.poll(_now()):
@@ -320,6 +340,17 @@ func _stream_call(ticket: BridgeTicket, slot: int) -> BridgeStream:
 		await get_tree().process_frame
 	_slots[slot] = null
 	return st
+
+
+## Exact character and byte counts of everything sent as input. Bytes and
+## chars differ for non-ASCII content, and both are recorded rather than one
+## being inferred from the other.
+func _measure_input(payload: Dictionary) -> Dictionary:
+	var text := ""
+	for m in payload.get("messages", []):
+		if typeof(m) == TYPE_DICTIONARY:
+			text += str((m as Dictionary).get("content", ""))
+	return {"chars": text.length(), "bytes": text.to_utf8_buffer().size()}
 
 
 func _transition(bm: BridgeModel, next: String, reason: String) -> void:

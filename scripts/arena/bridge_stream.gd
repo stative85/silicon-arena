@@ -65,6 +65,13 @@ var event_count: int = 0
 var content_events: int = 0
 var http_code: int = 0
 
+## Exact token counts, when the server supplies them. LM Studio returns these
+## through the streaming path with stream_options.include_usage, so decode
+## rate can be a measurement rather than a proxy. -1 means "not supplied":
+## a caller must be able to tell an absent count from a zero one.
+var prompt_tokens: int = -1
+var completion_tokens: int = -1
+
 ## Timeout budget, ms. Supplied by policy.
 var connect_timeout_ms: int = 10000
 var ttft_timeout_ms: int = 30000
@@ -189,6 +196,14 @@ func _consume(ev: Dictionary, now_ms: int) -> void:
 	event_count += 1
 	if first_event_at_ms == 0:
 		first_event_at_ms = now_ms
+	# The usage frame arrives with an empty choices array, after the content.
+	var j = ev.get("json", null)
+	if typeof(j) == TYPE_DICTIONARY:
+		var u = (j as Dictionary).get("usage", null)
+		if typeof(u) == TYPE_DICTIONARY:
+			prompt_tokens = int((u as Dictionary).get("prompt_tokens", -1))
+			completion_tokens = int((u as Dictionary).get(
+				"completion_tokens", -1))
 	if bool(ev.get("done", false)):
 		_finish(OK_STATUS, now_ms)
 		return
@@ -296,6 +311,8 @@ func timings() -> Dictionary:
 			if completed_at_ms > 0 else -1),
 		"stream_event_count": event_count,
 		"content_event_count": content_events,
+		"prompt_tokens": prompt_tokens,
+		"completion_tokens": completion_tokens,
 		"status": status,
 		"failure_kind": failure_kind(),
 	}

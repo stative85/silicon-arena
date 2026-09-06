@@ -1,6 +1,12 @@
 # Bridge Timing — Findings
 
-Interpretation of `BRIDGE_TIMING.md`. That file is machine-generated data;
+**These findings describe COLLECTION 1** (`bridge_timing_run1.json`), taken
+before prompt-size telemetry existed, so its prompt sizes are approximated from
+bucket. Collection 2 added exact per-model `prompt_tokens` and its numbers
+differ — see `HEALTH_DETECTOR_HARNESS.md`. The conclusions below about the
+1500 ms tooth hold in both runs (88 and 90 false positives respectively).
+
+Interpretation of the timing collection. That file is machine-generated data;
 this one is the reading of it, kept separate so regenerating the data cannot
 silently rewrite the conclusions.
 

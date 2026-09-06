@@ -53,6 +53,15 @@ static func make(ticket: BridgeTicket) -> Dictionary:
 		"failure_kind": "",
 		"active_at_dispatch": 0,
 		"max_active_during": 0,
+		# Input size. prompt_tokens is the model's OWN tokenizer count when the
+		# server supplies it, -1 when it does not -- an absent count must be
+		# distinguishable from a zero one, and chars are never silently
+		# substituted for tokens.
+		"prompt_chars": 0,
+		"prompt_bytes": 0,
+		"prompt_tokens": -1,
+		"completion_tokens": -1,
+		"token_source": "",
 		"attempts": ticket.attempts,
 		"model_state_before": "",
 		"model_state_after": "",
@@ -99,6 +108,8 @@ static func seal_stream(r: Dictionary, status: String) -> Dictionary:
 		out["queue_ms"] = maxi(
 			int(out["dispatched_at_ms"]) - int(out["submitted_at_ms"]), 0)
 		out["queue_delay_ms"] = out["queue_ms"]
+	out["token_source"] = ("usage" if int(out.get("completion_tokens", -1)) >= 0
+		else "content_events")
 	var gen_ms := int(out.get("generation_after_first_ms", -1))
 	var tokens := int(out.get("generated_tokens", 0))
 	if gen_ms > 0 and tokens > 0:
