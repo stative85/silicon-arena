@@ -406,4 +406,4 @@ it may not bypass the proposal language.
 No Run 2 outcome executes until: this amendment is committed and pushed, the
 parity audit is green, the exact Run 1 sabotage is reproduced and caught, the
 action-space parity is proven in both directions, every prior PIT tooth remains
-green, and `toolserify.cmd` is green.
+green, and `tools\verify.cmd` is green.
