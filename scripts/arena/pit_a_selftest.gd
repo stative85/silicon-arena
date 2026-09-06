@@ -34,6 +34,8 @@ const R := preload("res://scripts/arena/pit_random.gd")
 const G := preload("res://scripts/arena/pit_gate.gd")
 const J := preload("res://scripts/arena/pit_journal.gd")
 const K := preload("res://scripts/arena/pit_contract.gd")
+const CN := preload("res://scripts/arena/pit_canonical.gd")
+const IX := preload("res://scripts/arena/pit_interaction.gd")
 
 var _checks := 0
 var _failures: Array[String] = []
@@ -209,11 +211,220 @@ func _run() -> void:
 		"canonical history cannot reconstruct the world it recorded")
 
 	_gate()
+	_livelock()
+	_canon()
 	_endtoend()
 	_parity()
 	_journal()
 	_reachability(g)
 	_report()
+
+
+# ----------------------------------------- anti-livelock (Run 3 invariant)
+
+## EVERY CONSUMED OPPORTUNITY MUST ADVANCE PRODUCER-VISIBLE OBSERVATION.
+##
+## Run 2 gave five species 100 cycles each and got SIX distinct proposals in
+## 1,500 calls. A rejected move left the world unchanged, so the next prompt was
+## byte-identical, so at temperature 0 the same move came back forever. KEEP and
+## REFUSE do it too.
+##
+## SABOTAGE: make PitInteraction.advance() stop incrementing cycle_index, or
+## drop the interaction block from visible_text(). Either must turn this red.
+func _livelock() -> void:
+	print("
+ 16. every consumed opportunity advances the observation")
+	var g := W.genesis()
+	var world_text := W.canonical_text(g)
+	var i0 := IX.genesis()
+
+	# 1-3: rejection, KEEP and REFUSE all leave the world alone and must still
+	# move the observation.
+	var rejected := IX.advance(i0, "ADD", IX.REJECTED, "TARGET_EXISTS")
+	_check("   rejected move: world unchanged, observation ADVANCES",
+		IX.observation_hash(world_text, i0)
+			!= IX.observation_hash(world_text, rejected))
+	var kept := IX.advance(i0, "KEEP", IX.ACCEPTED, "OK")
+	_check("   KEEP: world may be unchanged, observation ADVANCES",
+		IX.observation_hash(world_text, i0)
+			!= IX.observation_hash(world_text, kept))
+	var refused := IX.advance(i0, "REFUSE", IX.ACCEPTED, "OK")
+	_check("   REFUSE: world may be unchanged, observation ADVANCES",
+		IX.observation_hash(world_text, i0)
+			!= IX.observation_hash(world_text, refused))
+
+	# 4: the exact Run 2 fixed point. Two IDENTICAL consecutive rejections must
+	# still produce different observations.
+	var r1 := IX.advance(i0, "ADD", IX.REJECTED, "TARGET_EXISTS")
+	var r2 := IX.advance(r1, "ADD", IX.REJECTED, "TARGET_EXISTS")
+	_check("   two identical consecutive rejections differ observationally",
+		IX.observation_hash(world_text, r1)
+			!= IX.observation_hash(world_text, r2),
+		"this is the Run 2 fixed point and it must be impossible")
+	_check("   and the streak is visible to the producer",
+		int(r2["rejection_streak"]) == 2 and int(r1["rejection_streak"]) == 1)
+	_check("   an accepted move clears the streak",
+		int(IX.advance(r2, "DELETE", IX.ACCEPTED, "OK")["rejection_streak"]) == 0)
+
+	# A hundred consecutive rejections must be a hundred DISTINCT observations.
+	var seen := {}
+	var cur := i0
+	for _n in 100:
+		cur = IX.advance(cur, "ADD", IX.REJECTED, "TARGET_EXISTS")
+		seen[IX.observation_hash(world_text, cur)] = true
+	_check("   100 identical rejections give 100 distinct observations",
+		seen.size() == 100, "%d distinct" % seen.size())
+
+	# AND THE SAME FOR ACCEPTED NO-OPS. An earlier version of this tooth only
+	# swept rejections, so freezing cycle_index passed: rejection_streak was
+	# still advancing and masked it. Repeated accepted KEEPs move no streak, no
+	# operation and no reason -- if the clock stops, they are byte-identical and
+	# the livelock is back wearing a success code.
+	var kseen := {}
+	var kcur := i0
+	for _n in 100:
+		kcur = IX.advance(kcur, "KEEP", IX.ACCEPTED, "OK")
+		kseen[IX.observation_hash(world_text, kcur)] = true
+	_check("   100 identical accepted KEEPs give 100 distinct observations",
+		kseen.size() == 100, "%d distinct -- the clock is not advancing"
+			% kseen.size())
+	var rseen := {}
+	var rcur := i0
+	for _n in 50:
+		rcur = IX.advance(rcur, "REFUSE", IX.ACCEPTED, "OK")
+		rseen[IX.observation_hash(world_text, rcur)] = true
+	_check("   50 identical accepted REFUSEs give 50 distinct observations",
+		rseen.size() == 50, "%d distinct" % rseen.size())
+	_check("   the cycle index is what advances, not just the streak",
+		int(kcur["cycle_index"]) == 100 and int(kcur["rejection_streak"]) == 0,
+		"cycle=%s streak=%s" % [str(kcur["cycle_index"]),
+			str(kcur["rejection_streak"])])
+
+	# THE ROLES ARE SEPARABLE, and each claim is tested rather than assumed.
+	# cycle_index ALONE must defeat the livelock; the feedback fields carry
+	# meaning, not anti-livelock duty.
+	var clock_only := {"cycle_index": 0, "last_operation": IX.NONE,
+		"last_outcome": IX.NONE, "last_reason_code": "", "rejection_streak": 0}
+	var clock_seen := {}
+	for n in 50:
+		clock_only["cycle_index"] = n
+		clock_seen[IX.observation_hash(world_text, clock_only)] = true
+	_check("   cycle_index ALONE gives distinct observations",
+		clock_seen.size() == 50,
+		"the anti-livelock duty belongs to the clock, not the feedback")
+
+	# rejection_streak is a MEMORY variable and is labelled as one, because
+	# calling the whole structure "not a memory mechanism" was too strong.
+	var s1 := IX.advance(i0, "ADD", IX.REJECTED, "X")
+	var s2 := IX.advance(s1, "ADD", IX.REJECTED, "X")
+	_check("   rejection_streak carries state across more than one step",
+		int(s2["rejection_streak"]) > int(s1["rejection_streak"]),
+		"this is memory, small but real, and the docs now say so")
+
+	# One consumed opportunity advances the clock EXACTLY once.
+	_check("   one opportunity advances the cycle exactly once",
+		int(IX.advance(i0, "KEEP", IX.ACCEPTED, "OK")["cycle_index"])
+			- int(i0["cycle_index"]) == 1)
+
+	# A rejected proposal cannot move the canonical world.
+	var before_w := W.structural_hash(g)
+	var rej := V.validate(g, K.delete("nope"))
+	_check("   a rejected proposal cannot advance the canonical world",
+		not bool(rej["ok"]) and W.structural_hash(g) == before_w)
+
+	# Structural/attractor equivalence must be identical whether interaction
+	# state exists or is stripped entirely.
+	_check("   structural hash is unchanged by any interaction state",
+		W.structural_hash(g) == before_w and not IX.is_structural(),
+		"interaction must never enter attractor equivalence")
+
+	# 6-7: substrate-owned, and never structural.
+	var patched := CN.canonicalise(K.mutate("rule_1", {"cycle_index": 999}))
+	_check("   a model patch cannot reach interaction state",
+		not (patched["patch"] as Dictionary).has("cycle_index")
+			and not (patched["patch"] as Dictionary).has("rejection_streak"))
+	_check("   interaction state is excluded from structural hashes",
+		not IX.is_structural()
+			and W.structural_hash(g) == W.structural_hash(g),
+		"a shared rejection streak must never look like convergence")
+
+	# 8: resume reconstructs it exactly.
+	var rebuilt := IX.genesis()
+	for _n in 7:
+		rebuilt = IX.advance(rebuilt, "ADD", IX.REJECTED, "TARGET_EXISTS")
+	var replayed := IX.genesis()
+	for _n in 7:
+		replayed = IX.advance(replayed, "ADD", IX.REJECTED, "TARGET_EXISTS")
+	_check("   interaction state is reconstructible on resume",
+		str(rebuilt) == str(replayed))
+
+
+# ------------------------------------- canonicalisation (Run 3 invariant)
+
+## Fields irrelevant to an action must not be able to invalidate that action --
+## and canonicalisation must never repair a field the action DOES read.
+func _canon() -> void:
+	print("
+ 17. irrelevant fields are normalised, authoritative ones are not")
+	var g := W.genesis()
+
+	# 10-11: metamorphic. Arbitrary garbage in irrelevant fields must produce
+	# IDENTICAL semantics. This is the test Run 2 lacked entirely.
+	var deletes: Array = []
+	for ty in K.OBJECT_TYPES + [K.TYPE_NONE]:
+		for props in [{}, {"a": 1}, {"target": "elsewhere"}, {"x": {"y": 2}}]:
+			deletes.append({"operation": "DELETE", "target": "rule_1",
+				"type": ty, "props": props, "explanation": "whatever"})
+	var canon_forms := {}
+	for d in deletes:
+		var c := CN.canonicalise(d)
+		if bool(c["ok"]):
+			canon_forms[str(c["patch"])] = true
+	_check("   %d DELETE variants -> one canonical form" % deletes.size(),
+		canon_forms.size() == 1, str(canon_forms.keys()))
+
+	var keeps: Array = []
+	for tgt in ["__NONE__", "rule_1", "object id", "anything at all"]:
+		for ty in ["none", "memory", "tool"]:
+			keeps.append({"operation": "KEEP", "target": tgt, "type": ty,
+				"props": {"target": "__NONE__"}, "explanation": "x"})
+	var keep_forms := {}
+	for kp in keeps:
+		var c2 := CN.canonicalise(kp)
+		if bool(c2["ok"]):
+			keep_forms[str(c2["patch"])] = true
+	_check("   %d KEEP variants -> one canonical form" % keeps.size(),
+		keep_forms.size() == 1, str(keep_forms.keys()))
+
+	# 9 + 12: authoritative fields are NEVER repaired. These are the exact
+	# Run 2 failures that were genuine and must stay genuine.
+	for bad in [["ADD onto a live id", K.add("rule_1", "rule")],
+			["ADD with type none", {"operation": "ADD", "target": "z",
+				"type": "none", "props": {}, "explanation": ""}],
+			["MUTATE with no target", {"operation": "MUTATE",
+				"target": "__NONE__", "type": "none", "props": {"a": 1},
+				"explanation": ""}],
+			["RESTORE without tombstone", K.restore("rule_1")],
+			["DELETE absent target", K.delete("nope")]]:
+		var c3 := CN.canonicalise(bad[1])
+		var still_bad := (not bool(c3["ok"])) 			or (not bool(V.validate(g, c3["patch"])["ok"]))
+		_check("   still invalid: %s" % str(bad[0]), still_bad,
+			"canonicalisation repaired an authoritative field")
+
+	# The Run 2 coupling failures, reproduced, must now pass.
+	for good in [["falcon-h1 MUTATE with a stray type",
+				{"operation": "MUTATE", "target": "rule_1", "type": "rule",
+					"props": {"text": "x"}, "explanation": ""}],
+			["lfm2.5 KEEP with a stray target",
+				{"operation": "KEEP", "target": "object id", "type": "memory",
+					"props": {"target": "__NONE__"}, "explanation": ""}],
+			["DELETE with stray props",
+				{"operation": "DELETE", "target": "rule_1", "type": "none",
+					"props": {"junk": 1}, "explanation": ""}]]:
+		var c4 := CN.canonicalise(good[1])
+		var ok := bool(c4["ok"]) and bool(V.validate(g, c4["patch"])["ok"])
+		_check("   now accepted: %s" % str(good[0]), ok,
+			"a sound decision is still dying on an irrelevant field")
 
 
 # ------------------------------------------- end-to-end reachability (Run 2)
