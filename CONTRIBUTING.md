@@ -103,7 +103,7 @@ VERIFY OK
 
 CI runs the same thing on Linux for every push and pull request.
 
-### Twelve rules that are not negotiable
+### Thirteen rules that are not negotiable
 
 **1. A new test must be shown to fail.** Reintroduce the defect it guards,
 watch it go red, restore, watch it go green. A suite that can only pass is not
@@ -260,6 +260,24 @@ Corollary that follows from both: structure must be unforgeable from inside a
 value. Ids and types that originate in producer output are escaped before they
 reach any text a producer later reads, or a model can emit a target containing a
 newline and invent a line the substrate never wrote.
+
+**13. A probe cannot infer substrate behaviour from behaviour the probe itself
+commanded.** Observed behaviour is not evidence of a substrate constraint when
+the harness directly imposed the same behaviour.
+
+Not hypothetical. The METABOLISM probe recorded "the runtime does not co-reside,
+it evicts" as a hardware finding, and used it to conclude the compute arbiter
+was conservative about a constraint its substrate did not enforce. Both were
+false: `metabolism_run.gd::_load_species()` called `_unload_all()` before every
+load. A direct re-test with unloading disabled held **five models resident
+simultaneously at 8192 context, 7,675 of 8,151 MiB, all generating without a
+swap** (`docs/EXPERIMENT_METABOLISM.md`, correction 2026-09-06).
+
+This is the most dangerous shape of instrument error in this repository, because
+unlike the others it produced a **false positive** rather than a blocked run.
+Nothing failed. Nothing complained. The finding simply arrived, plausible and
+wrong. Before recording any observation as a property of the world, ask which
+part of it your own harness caused.
 
 **10. A threshold derived under a simplifying assumption may only judge data
 generated under that same assumption.** If the assumption changes the

@@ -681,3 +681,74 @@ field, and the residency-event classification. The dominant real cost is
 visible already: **a class change costs a full model load, 35 seconds for
 HEAVY.** That is the metabolism's true price on this card, and no arithmetic
 predicted it.
+
+---
+
+# CORRECTION — 2026-09-06: the co-residency finding is RETRACTED
+
+## Prior recorded finding
+
+> *"The runtime does not co-reside. It evicts."*
+
+**RETRACTED. It was false.**
+
+## Root cause
+
+`tools/metabolism_run.gd::_load_species()` explicitly called `_unload_all()`
+before every model load. The one-model-at-a-time residency sequence
+`[HEAVY] -> [NORMAL] -> [SMALL]` was **imposed by the probe harness** and then
+incorrectly attributed to LM Studio.
+
+The probe observed the behaviour it had itself commanded, and I wrote it into
+this document as a property of the substrate.
+
+## Direct re-test, with unloading disabled
+
+```
+  five PIT A species resident SIMULTANEOUSLY
+  context   8192 each
+  VRAM      7,675 / 8,151 MiB
+
+  liquidai/lfm2.5-1.2b-instruct     249 ms
+  rwkv7-1.5b-g1                     493 ms
+  qwen3.5-2b                      1,901 ms
+  falcon-h1-1.5b-instruct         3,522 ms
+  h2o-danube2-1.8b-chat           4,228 ms
+```
+
+All five generated **without a single model swap**.
+
+## Therefore
+
+* Runtime co-residency is **demonstrated** for this specific five-model,
+  8192-context configuration on this machine.
+* The claim that the runtime necessarily evicts rather than co-resides is
+  **false**.
+* The inference that the compute arbiter was *"conservative about a constraint
+  its substrate does not enforce"* is **withdrawn**. The arbiter models
+  co-residency; **the arbiter was right and the probe was wrong.**
+* The arbiter's arithmetic supporting co-residency is not contradicted by the
+  corrected observation.
+
+## This does NOT establish
+
+```
+  arbitrary-model co-residency
+  concurrent generation throughput
+  stable VRAM at long populated contexts
+  absence of eviction under memory pressure
+  behaviour with more than these five models
+```
+
+Five sequential calls on an idle card is what was measured. Nothing more.
+
+## The rule this earns
+
+> **A probe cannot infer substrate behaviour from behaviour the probe itself
+> commanded.** Observed behaviour is not evidence of a substrate constraint when
+> the harness directly imposed the same behaviour.
+
+`_unload_all()` manufactured the eviction finding. This is the fifth
+self-inflicted instrument error in this project and the **first to produce a
+false positive finding** rather than a blocked run — which makes it the most
+dangerous of the five, because nothing failed and nothing complained.
