@@ -1,5 +1,31 @@
 # Bridge Health Policy — FROZEN
 
+> ## CLOSED INFRASTRUCTURE
+>
+> ```
+> BRIDGE HEALTH
+> commit: 93f3897
+>
+> STATUS: PRODUCTION INFRASTRUCTURE
+>
+> DO NOT RETUNE because:
+>   - a new experiment behaves strangely
+>   - one architecture seems slower
+>   - an emergence run produces weird timing
+>   - somebody dislikes a graph
+>
+> REOPEN ONLY IF:
+>   - a new measured failure mode
+>   - new hardware or runtime regime
+>   - a new model outside the calibrated regime
+>   - changed context or loading configuration
+>   - the detector demonstrably misclassifies live traffic
+> ```
+>
+> An experiment producing a surprising result is not evidence that the health
+> policy is wrong. Retuning a validated detector to make an experiment look
+> better is how an instrument becomes a story about itself.
+
 **Status:** frozen, implemented, low-end validated, **recovery enabled**
 **Code:** `scripts/arena/bridge_health.gd`
 **Tests:** `scripts/arena/bridge_selftest.gd` — 110 checks including five
