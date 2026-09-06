@@ -620,3 +620,172 @@ ONLY application ordering differs
 ```
 **If any model is called during arm 4, the arm is contaminated and void.** It
 replays already-produced action envelopes.
+
+---
+
+# Amendment 4: release rules locked, ordering transform frozen
+
+**Written before the harness exists. Arm 3 is the dangerous one and is
+specified first.**
+
+## Tick base
+
+```
+TICK_MS = 250        frozen. The world advances one tick per 250 ms wall time.
+```
+
+A request submitted at tick T with wall-clock completion W applies at
+`ceil(W / TICK_MS)`.
+
+## Arm 3 — EQUALIZED, ex ante, never a barrier
+
+**Latency-equalized must not mean "wait until everyone finishes, then release
+together."** That is a barrier: it converts asynchrony into batch
+synchronisation, and the arm would no longer be asynchronous at all. It equally
+must not use the slowest completion in the current cycle as the equalizer,
+because that **peeks at future completions** — information the substrate cannot
+have at release time.
+
+The only safe form is an **ex ante delay schedule, frozen before the run**:
+
+```
+EQUALIZED_DELAY_TICKS = 3      frozen (750 ms at TICK_MS = 250)
+
+for every request:
+    observed at tick T
+    the model finishes whenever it finishes
+    the action MAY NOT release before T + EQUALIZED_DELAY_TICKS
+```
+
+So arm 3 means *all agents experience the same cognition delay regardless of
+model speed* — not *everybody waits for the slowest one*.
+
+### The leak, and the tooth that catches it
+
+If a model finishes **later** than `T + EQUALIZED_DELAY_TICKS`, its real latency
+has leaked back in and the arm is no longer isolating speed. Such completions
+are classified separately as `EQUALIZER_BREACH`, and **any breach voids the
+arm.**
+
+3 ticks (750 ms) is chosen against the measured small-prompt envelope: total
+latencies for prompts of this size measured roughly 190-580 ms across the three
+models, so 750 ms clears the slowest with margin. If breaches occur, the healthy
+envelope has moved and that is itself information — the delay is **not** silently
+enlarged. Changing it requires an amendment.
+
+### A property of equalization, stated rather than hidden
+
+Equalization can only level **upward** without peeking at the future. Arm 3's
+uniform delay therefore exceeds the mean natural delay, so arm 3 has somewhat
+**greater absolute staleness exposure** than arm 2.
+
+This is not a confound for the question being asked. Q2 compares the
+**between-agent difference within each arm**, and equalization removes
+between-agent variance in delay. A difference in absolute rate between arms 2
+and 3 is expected and is not evidence of anything by itself.
+
+## Arm 4 — ORDER_REPLAY, paired replicate-by-replicate
+
+Arm 4 is paired to a specific arm 2 replicate, not to arm 2 in aggregate.
+
+```
+FROM the natural replicate:   action envelopes
+                              observation provenance
+                              completion order
+
+ARM 4 USES:                   the same genesis
+                              the same action envelopes
+                              the same observation provenance
+                              the same action bytes
+                              a different application ordering
+
+ARM 4 MUST NOT:               call any model
+                              regenerate any observation
+                              reconstruct provenance from current world state
+```
+
+### The ordering transform, frozen now
+
+```
+LATENCY-RANK INVERSION
+    fastest natural arrival  ->  applied LAST
+    slowest natural arrival  ->  applied FIRST
+```
+
+Chosen before any result, and chosen because it asks the question directly: did
+the natural ordering itself matter? It is a mechanical queue inversion with no
+semantic decision anywhere in it. Ties break by request_id for determinism.
+
+An identity permutation must reproduce arm 2 exactly; that check is a void
+condition already recorded in Amendment 1.
+
+## Envelope immutability
+
+```
+observation_version
+observation_hash
+visible_target_ids
+visible_target_generations
+chosen_target
+chosen_target_generation
+```
+
+**Immutable after submission.** No arm regenerates them. No replay reconstructs
+them from current world state.
+
+The action envelope is **evidence**, not a suggestion. Treating it as
+reconstructible would let arm 4 quietly re-derive a provenance that agrees with
+whatever the replayed world happens to look like, which would make the arm
+unfalsifiable. The harness asserts immutability rather than trusting itself.
+
+## LATENCY_TOUCHED, and the reporting set
+
+The generation fix created a second way for reality to move under an action, so
+the two are reported separately and also together:
+
+```
+LATENCY_TOUCHED = STALE_CONFLICT + STALE_REVALIDATED
+```
+
+They are different outcomes and are never merged into one number, but together
+they answer: *how often did reality change underneath an action between
+observation and application?*
+
+Every arm reports:
+
+```
+stale_eligible     / all_actions        does the world create the situation?
+stale_conflict     / stale_eligible     do agents walk into it?
+stale_revalidated  / stale_eligible     do agents accidentally survive it?
+latency_touched    / all_actions        how often did reality move at all?
+contention_lost    / all_actions        same-time competition, NOT latency
+```
+
+`STALE_REVALIDATED` is the strange one and is worth naming plainly: *the agent
+was wrong, the world changed again, and the agent became right by accident.* A
+simpler instrument erases that case entirely by scoring it as an ordinary
+success.
+
+`CONTENTION_LOST` is retained in every arm as a **negative control**. It is
+same-time competition and must not depend on latency. If `CONTENTION_LOST` and
+`STALE_CONFLICT` start moving together, the harness is inspected before any
+story is told.
+
+## Harness architecture
+
+```
+AsyncRequestEnvelope     observation provenance, visible target generations,
+                         selected target, immutable payload
+
+TimingPolicy             SERIAL | NATURAL | EQUALIZED | ORDER_REPLAY
+                         the ONLY thing that differs between arms
+
+AsyncWorld               one implementation, all arms
+
+OutcomeClassifier        ACCEPTED | CONTENTION_LOST | STALE_CONFLICT
+                         | STALE_REVALIDATED | SEMANTIC_INVALID | SHAPE_FAILED
+```
+
+One experiment engine, four clocks. The harness is deliberately boring: if
+ASYNC-A produces something strange, the strangeness must come from time
+interacting with agents, not from a clever harness bug.
