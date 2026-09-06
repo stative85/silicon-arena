@@ -789,3 +789,152 @@ OutcomeClassifier        ACCEPTED | CONTENTION_LOST | STALE_CONFLICT
 One experiment engine, four clocks. The harness is deliberately boring: if
 ASYNC-A produces something strange, the strangeness must come from time
 interacting with agents, not from a clever harness bug.
+
+---
+
+# Amendment 5: agent lifecycle, clock mapping, and the action contract
+
+**Written before the run loop exists.** Amendment 4 fixed *when an action is
+released*. That is not sufficient to equalize cognition.
+
+## The basement window
+
+A fixed release tick equalizes when actions **land**. It does not equalize how
+often an agent gets to **think**:
+
+```
+Agent A observes at tick 10, finishes at 10.4, released at 13
+Agent B observes at tick 10, finishes at 12.2, released at 13
+```
+
+Both release at 13, so arm 3 looks equalized. But if A may begin its next
+cognition the moment it *completes* at 10.4, A is already working on request #2
+while B is still finishing request #1. Over 200 cycles the faster model
+accumulates more observations, more submissions, and more chances to take
+resources — **and model speed is back in the experiment**, having entered
+through cadence rather than release.
+
+## ONE OUTSTANDING COGNITION PER AGENT
+
+```
+observe
+   |
+submit
+   |
+complete
+   |
+WAIT FOR TIMING POLICY RELEASE     <-- the gate
+   |
+apply / close envelope
+   |
+ONLY THEN may that agent observe again
+```
+
+The next observation is gated on **envelope close**, never on completion. One
+outstanding cognition per agent, always, in every arm.
+
+What this yields per arm:
+
+```
+ARM 1 SERIAL       trivially one at a time
+ARM 2 NATURAL      real latency changes when the envelope closes, so it
+                   naturally changes cognition cadence -- which is the effect
+                   under study, not a leak
+ARM 3 EQUALIZED    every envelope closes on the equalized schedule, so model
+                   speed cannot create hidden extra thinking opportunities
+ARM 4 REPLAY       no cognition at all
+```
+
+Arm 2 *should* have speed-dependent cadence. Arm 3 must not. That difference is
+the experiment.
+
+### Required sabotage test
+
+```
+gate the next request on COMPLETION instead of RELEASE
+    -> the faster synthetic agent obtains more observations and submissions
+    -> the test MUST go red
+```
+
+If that sabotage does not go red, the gate is not load-bearing and the arm-3
+result means nothing.
+
+## Wall clock to world tick: one frozen mapping
+
+There are now two clocks — real bridge milliseconds and world ticks — and
+exactly one mapping between them:
+
+```
+TICK_MS = 250                                   frozen
+
+tick_of(ms)      = floor((ms - run_start_ms) / TICK_MS)
+tick_start_ms(t) = run_start_ms + t * TICK_MS
+```
+
+**World time is never derived from frame rate.** A headless machine running at
+900 FPS must not produce a different ecology from one where the OS pauses to
+think about something else. `_process()` may drive the *loop*, but the world
+clock is computed from wall time.
+
+### The breach predicate, in milliseconds
+
+The 3-tick equalizer is 750 ms, and the relationship is explicit rather than
+implied:
+
+```
+3 ticks x 250 ms/tick = 750 ms
+
+release_deadline_ms = tick_start_ms(observed_tick) + 750
+completion_ms > release_deadline_ms   =>  EQUALIZER_BREACH  =>  VOID
+```
+
+Milliseconds compared with milliseconds. No approximate comparison between a
+tick counter and wall time.
+
+## The action contract
+
+Exactly **one** model-controlled field:
+
+```json
+{"target_id": "r_07"}
+```
+
+No explanation. No operation type. No confidence. No prose. No reason.
+
+```
+type                  object
+required              ["target_id"]
+additionalProperties  false
+target_id             string
+```
+
+Dramatically smaller than PIT A's typed-operation contract, which is
+deliberate: PIT A's semantic-invalid rates of 0.41-0.99 meant its descriptors
+largely measured whether a model could satisfy the contract at all.
+
+### The schema must NOT enumerate the visible target ids
+
+**Load-bearing.** If the JSON schema constrains `target_id` to an enum of the
+currently visible ids, the runtime may make it impossible for a model to emit
+an invalid target — and `SEMANTIC_INVALID` would be mechanically removed as an
+observable outcome.
+
+That is not a safety improvement. It is the silent deletion of a control
+variable: the whole point of separating `SEMANTIC_INVALID` from
+`STALE_CONFLICT` is that a model's hallucination rate must not be able to
+masquerade as a latency effect. If hallucination cannot occur, that separation
+can never be checked against real behaviour.
+
+`target_id` is therefore a free string, and validity is judged after the fact
+against the sealed observation.
+
+## Classification, complete
+
+```
+JSON parse or schema failure                       -> SHAPE_FAILED
+well-shaped target_id not in the observed set      -> SEMANTIC_INVALID
+in observed set, current incarnation gone, age > 0 -> STALE_CONFLICT
+in observed set, gone, age == 0                    -> CONTENTION_LOST
+same id regenerated (generation changed)           -> ACCEPTED + STALE_REVALIDATED
+still current and available                        -> ACCEPTED
+```

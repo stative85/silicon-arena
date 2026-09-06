@@ -13,6 +13,8 @@ extends SceneTree
 const W := preload("res://scripts/arena/async_world.gd")
 const E := preload("res://scripts/arena/async_envelope.gd")
 const T := preload("res://scripts/arena/async_timing.gd")
+const AG := preload("res://scripts/arena/async_agent.gd")
+const C := preload("res://scripts/arena/async_contract.gd")
 
 var _checks := 0
 var _failures: Array[String] = []
@@ -21,7 +23,7 @@ var _failures: Array[String] = []
 ## still report OK. Each section registers itself and must mark completion, so
 ## an aborted section fails the run instead of vanishing from it.
 var _expected_sections := ["envelope", "clocks", "equalizer", "inversion",
-	"serial_tooth"]
+	"serial_tooth", "lifecycle", "contract"]
 var _completed_sections: Array[String] = []
 
 
@@ -49,6 +51,8 @@ func _run() -> void:
 	_equalizer()
 	_inversion()
 	_serial_tooth()
+	_lifecycle()
+	_contract()
 	_report()
 
 
@@ -116,27 +120,33 @@ func _clocks() -> void:
 	_check("   EQUALIZED is not a barrier", a == b,
 		"waiting for the slowest would make this batch synchronisation")
 
-	_check("   completion tick rounds up from wall time",
-		T.completion_tick(0, T.TICK_MS + 1) == 2
-			and T.completion_tick(0, T.TICK_MS) == 1)
-	_check("   an instant completion still lands in the next tick",
-		T.completion_tick(5, 1) == 6)
+	# World time comes from wall time through one frozen mapping, never
+	# from frame rate.
+	_check("   tick_of maps wall time to world ticks",
+		T.tick_of(1000, 1000) == 0 and T.tick_of(1000 + T.TICK_MS, 1000) == 1
+			and T.tick_of(1000 + T.TICK_MS * 3 + 10, 1000) == 3)
+	_check("   tick_start_ms is its inverse",
+		T.tick_start_ms(3, 1000) == 1000 + 3 * T.TICK_MS)
+	_check("   the equalizer deadline is explicit in milliseconds",
+		T.equalized_deadline_ms(10, 0)
+			== 10 * T.TICK_MS + T.EQUALIZED_DELAY_TICKS * T.TICK_MS,
+		"3 ticks x 250 ms = 750 ms, stated not implied")
 	_done("clocks")
 
 
 func _equalizer() -> void:
 	print("\n the equalizer leak tooth")
-	var within := T.EQUALIZED_DELAY_TICKS
+	var deadline := T.equalized_deadline_ms(10, 0)
 	_check("   a completion inside the frozen delay is no breach",
-		not T.is_equalizer_breach(T.EQUALIZED, 10, 10 + within))
-	_check("   SABOTAGE APPLIED: a completion past the frozen delay",
-		10 + within + 1 > 10 + T.EQUALIZED_DELAY_TICKS)
+		not T.is_equalizer_breach(T.EQUALIZED, 10, deadline - 1, 0))
+	_check("   SABOTAGE APPLIED: a completion past the deadline",
+		deadline + 1 > deadline)
 	_check("   a late completion IS a breach",
-		T.is_equalizer_breach(T.EQUALIZED, 10, 10 + within + 1),
+		T.is_equalizer_breach(T.EQUALIZED, 10, deadline + 1, 0),
 		"real latency leaking back in means the arm stops isolating speed")
 	_check("   breaches are meaningless outside EQUALIZED",
-		not T.is_equalizer_breach(T.NATURAL, 10, 99)
-			and not T.is_equalizer_breach(T.SERIAL, 10, 99))
+		not T.is_equalizer_breach(T.NATURAL, 10, deadline + 9999, 0)
+			and not T.is_equalizer_breach(T.SERIAL, 10, deadline + 9999, 0))
 	_done("equalizer")
 
 
@@ -224,6 +234,122 @@ func _serial_tooth() -> void:
 	_check("   and the run actually did something",
 		ages.size() >= 100, str(ages.size()))
 	_done("serial_tooth")
+
+
+
+## THE BASEMENT WINDOW. A fixed release tick equalizes when actions LAND. It
+## does not equalize how often an agent gets to THINK.
+func _lifecycle() -> void:
+	print("\n one outstanding cognition per agent")
+	var w: AsyncWorld = W.make(8, 4)
+	var a: AsyncAgentState = AG.make("fast", "m_fast")
+	_check("   a fresh agent may observe", a.may_observe())
+	a.begin(_mk("x1", "fast", w, "r_00"))
+	_check("   an agent with cognition outstanding may NOT observe",
+		not a.may_observe() and a.state == AG.PENDING)
+	a.complete(5)
+	_check("   COMPLETING does not free the agent",
+		not a.may_observe() and a.state == AG.AWAITING_RELEASE,
+		"freeing on completion is exactly the leak")
+	_check("   not releasable before the release tick",
+		not a.ready_to_release(4))
+	_check("   releasable at the release tick", a.ready_to_release(5))
+	a.close()
+	_check("   only closing the envelope frees the agent",
+		a.may_observe() and a.closes == 1)
+
+	# The leak, simulated: two agents of different speed under EQUALIZED.
+	var correct := _cadence(false)
+	_check("   gated on RELEASE: fast and slow agents observe equally often",
+		int(correct["fast"]) == int(correct["slow"]),
+		"fast %d vs slow %d" % [int(correct["fast"]), int(correct["slow"])])
+
+	var leaked := _cadence(true)
+	_check("   SABOTAGE APPLIED: gate moved to completion",
+		int(leaked["fast"]) != int(correct["fast"])
+			or int(leaked["fast"]) != int(leaked["slow"]))
+	_check("   gated on COMPLETION: the fast agent thinks more often",
+		int(leaked["fast"]) > int(leaked["slow"]),
+		"fast %d vs slow %d -- model speed re-enters through cadence"
+			% [int(leaked["fast"]), int(leaked["slow"])])
+	_done("lifecycle")
+
+
+## Count observations for a fast and a slow agent under the EQUALIZED clock,
+## over a fixed wall-clock horizon.
+##
+## Cadence is modelled in MILLISECONDS. Modelling it in ticks deadlocks: a fast
+## agent completing inside its own tick maps back to the same tick and never
+## advances -- which this test did on its first run.
+func _cadence(gate_on_completion: bool) -> Dictionary:
+	var run_start := 0
+	var horizon_ms := 20000
+	var counts := {"fast": 0, "slow": 0}
+	for name in ["fast", "slow"]:
+		var lat := 100 if name == "fast" else 700
+		var now_ms := 0
+		var n := 0
+		while now_ms < horizon_ms:
+			n += 1
+			var observed_tick := T.tick_of(now_ms, run_start)
+			var done_ms := now_ms + lat
+			if gate_on_completion:
+				# LEAK: free to observe again the moment cognition finished.
+				now_ms = done_ms
+			else:
+				# CORRECT: free only when the envelope closes, which under
+				# EQUALIZED is the fixed release deadline.
+				now_ms = maxi(
+					T.equalized_deadline_ms(observed_tick, run_start), done_ms)
+		counts[name] = n
+	return counts
+
+
+func _contract() -> void:
+	print("\n the action contract")
+	var sch := C.schema()
+	_check("   exactly one field is required",
+		(sch["required"] as Array).size() == 1
+			and (sch["required"] as Array)[0] == C.FIELD)
+	_check("   additional properties are forbidden",
+		not bool(sch["additionalProperties"]))
+	var props: Dictionary = sch["properties"]
+	var tgt: Dictionary = props[C.FIELD]
+	_check("   target_id is a free string, NOT an enum",
+		str(tgt["type"]) == "string" and not tgt.has("enum"),
+		"an enum of visible ids would delete SEMANTIC_INVALID as an outcome")
+
+	var ok := C.parse("{\"target_id\":\"r_07\"}")
+	_check("   a well-formed reply parses",
+		bool(ok["ok"]) and str(ok["target_id"]) == "r_07")
+	_check("   invalid JSON is a shape failure",
+		not bool(C.parse("{not json")["ok"]))
+	_check("   a missing field is a shape failure",
+		not bool(C.parse("{}")["ok"]))
+	_check("   extra properties are a shape failure",
+		not bool(C.parse("{\"target_id\":\"r_00\",\"why\":\"x\"}")["ok"]),
+		"no explanation, no reason, no confidence")
+	_check("   a non-string target is a shape failure",
+		not bool(C.parse("{\"target_id\":7}")["ok"]))
+	_check("   an empty target is a shape failure",
+		not bool(C.parse("{\"target_id\":\"\"}")["ok"]))
+
+	# A hallucinated id must remain EXPRESSIBLE, so it can be classified.
+	var ghost := C.parse("{\"target_id\":\"r_99_nonexistent\"}")
+	_check("   a hallucinated id parses cleanly and stays observable",
+		bool(ghost["ok"]) and str(ghost["target_id"]) == "r_99_nonexistent",
+		"it must reach the classifier to be scored SEMANTIC_INVALID")
+
+	var w: AsyncWorld = W.make(4, 9)
+	var out := w.apply("a", "r_99_nonexistent", w.observe())
+	_check("   and the world scores it SEMANTIC_INVALID",
+		str(out["outcome"]) == W.SEMANTIC_INVALID)
+
+	_check("   the prompt lists the visible ids",
+		C.prompt(["r_00", "r_01"]).find("r_01") != -1)
+	_check("   the schema hash is stable",
+		C.schema_hash() == C.schema_hash() and C.schema_hash() != "")
+	_done("contract")
 
 
 func _report() -> void:

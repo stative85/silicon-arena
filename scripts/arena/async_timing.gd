@@ -21,9 +21,26 @@ const TICK_MS := 250
 const EQUALIZED_DELAY_TICKS := 3
 
 
-static func completion_tick(observed_tick: int, elapsed_ms: int) -> int:
-	## Wall-clock completion mapped onto world ticks.
-	return observed_tick + int(ceil(float(elapsed_ms) / float(TICK_MS)))
+## WORLD TIME IS NEVER DERIVED FROM FRAME RATE. A headless machine running at
+## 900 FPS must not produce a different ecology from one where the OS pauses to
+## think about something else. `_process()` may drive the loop; the world clock
+## is computed from wall time through exactly this mapping.
+static func tick_of(ms: int, run_start_ms: int) -> int:
+	return int(floor(float(ms - run_start_ms) / float(TICK_MS)))
+
+
+static func tick_start_ms(t: int, run_start_ms: int) -> int:
+	return run_start_ms + t * TICK_MS
+
+
+## Deadline for the equalized arm, in MILLISECONDS. The 3-tick equalizer is
+## 750 ms and the relationship is explicit rather than implied, so the breach
+## test compares milliseconds with milliseconds instead of a tick counter with
+## wall time.
+static func equalized_deadline_ms(observed_tick: int,
+		run_start_ms: int) -> int:
+	return tick_start_ms(observed_tick, run_start_ms) \
+		+ EQUALIZED_DELAY_TICKS * TICK_MS
 
 
 ## When may this action be applied?
@@ -65,10 +82,10 @@ static func release_tick(arm: String, observed_tick: int,
 ## the delay is not silently enlarged, because that would be tuning the
 ## instrument to the models it is measuring.
 static func is_equalizer_breach(arm: String, observed_tick: int,
-		completion_t: int) -> bool:
+		completion_ms: int, run_start_ms: int) -> bool:
 	if arm != EQUALIZED:
 		return false
-	return completion_t > observed_tick + EQUALIZED_DELAY_TICKS
+	return completion_ms > equalized_deadline_ms(observed_tick, run_start_ms)
 
 
 ## LATENCY-RANK INVERSION, frozen in Amendment 4 before any result.
