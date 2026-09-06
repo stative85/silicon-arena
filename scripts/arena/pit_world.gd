@@ -29,6 +29,7 @@ class_name PitWorld
 ## and same patch produce the same result forever.
 
 const K := preload("res://scripts/arena/pit_contract.gd")
+const CT := preload("res://scripts/arena/pit_canon_text.gd")
 
 const OPS := K.OPS
 
@@ -72,11 +73,12 @@ static func canonical_text(state: Dictionary) -> String:
 		for id in ids:
 			var obj: Dictionary = d[id]
 			out += "  %s type=%s" % [str(id), str(obj.get("type", "?"))]
-			var props: Dictionary = obj.get("props", {})
-			var keys: Array = props.keys()
-			keys.sort()
-			for k in keys:
-				out += " %s=%s" % [str(k), str(props[k])]
+			# RECURSIVE canonicalisation. The previous version sorted these
+			# keys and then used str() on the values, which preserves insertion
+			# order for nested dictionaries -- so a journal round-trip could
+			# reorder them and change the world's identity. That killed Run 3 at
+			# cycle 2 (docs/results/PIT_A_RUN3_VOID.md).
+			out += " props=" + CT.canonical(obj.get("props", {}))
 			if obj.has("deleted_at"):
 				out += " deleted_at=%d" % int(obj["deleted_at"])
 			out += "\n"
