@@ -1,0 +1,783 @@
+{
+ "desktop_baseline_mib": 596.0,
+ "total_mib": 8151.0,
+ "marginal_mib": {
+  "h2o": 1694.0,
+  "lfm2.5": 1055.0,
+  "qwen3.5": 1999.0,
+  "falcon": 1577.0,
+  "rwkv7": 767.0
+ },
+ "pool_used_mib": 7688.0,
+ "models_total_mib": 7092.0,
+ "context": 8192,
+ "sets": {
+  "600": {
+   "4": [
+    {
+     "models": [
+      "h2o",
+      "lfm2.5",
+      "falcon",
+      "rwkv7"
+     ],
+     "mib": 5689.0
+    },
+    {
+     "models": [
+      "lfm2.5",
+      "qwen3.5",
+      "falcon",
+      "rwkv7"
+     ],
+     "mib": 5994.0
+    },
+    {
+     "models": [
+      "h2o",
+      "lfm2.5",
+      "qwen3.5",
+      "rwkv7"
+     ],
+     "mib": 6111.0
+    },
+    {
+     "models": [
+      "h2o",
+      "qwen3.5",
+      "falcon",
+      "rwkv7"
+     ],
+     "mib": 6633.0
+    },
+    {
+     "models": [
+      "h2o",
+      "lfm2.5",
+      "qwen3.5",
+      "falcon"
+     ],
+     "mib": 6921.0
+    }
+   ],
+   "3": [
+    {
+     "models": [
+      "lfm2.5",
+      "falcon",
+      "rwkv7"
+     ],
+     "mib": 3995.0
+    },
+    {
+     "models": [
+      "h2o",
+      "lfm2.5",
+      "rwkv7"
+     ],
+     "mib": 4112.0
+    },
+    {
+     "models": [
+      "lfm2.5",
+      "qwen3.5",
+      "rwkv7"
+     ],
+     "mib": 4417.0
+    },
+    {
+     "models": [
+      "h2o",
+      "falcon",
+      "rwkv7"
+     ],
+     "mib": 4634.0
+    },
+    {
+     "models": [
+      "h2o",
+      "lfm2.5",
+      "falcon"
+     ],
+     "mib": 4922.0
+    },
+    {
+     "models": [
+      "qwen3.5",
+      "falcon",
+      "rwkv7"
+     ],
+     "mib": 4939.0
+    },
+    {
+     "models": [
+      "h2o",
+      "qwen3.5",
+      "rwkv7"
+     ],
+     "mib": 5056.0
+    },
+    {
+     "models": [
+      "lfm2.5",
+      "qwen3.5",
+      "falcon"
+     ],
+     "mib": 5227.0
+    },
+    {
+     "models": [
+      "h2o",
+      "lfm2.5",
+      "qwen3.5"
+     ],
+     "mib": 5344.0
+    },
+    {
+     "models": [
+      "h2o",
+      "qwen3.5",
+      "falcon"
+     ],
+     "mib": 5866.0
+    }
+   ],
+   "2": [
+    {
+     "models": [
+      "lfm2.5",
+      "rwkv7"
+     ],
+     "mib": 2418.0
+    },
+    {
+     "models": [
+      "falcon",
+      "rwkv7"
+     ],
+     "mib": 2940.0
+    },
+    {
+     "models": [
+      "h2o",
+      "rwkv7"
+     ],
+     "mib": 3057.0
+    },
+    {
+     "models": [
+      "lfm2.5",
+      "falcon"
+     ],
+     "mib": 3228.0
+    },
+    {
+     "models": [
+      "h2o",
+      "lfm2.5"
+     ],
+     "mib": 3345.0
+    },
+    {
+     "models": [
+      "qwen3.5",
+      "rwkv7"
+     ],
+     "mib": 3362.0
+    },
+    {
+     "models": [
+      "lfm2.5",
+      "qwen3.5"
+     ],
+     "mib": 3650.0
+    },
+    {
+     "models": [
+      "h2o",
+      "falcon"
+     ],
+     "mib": 3867.0
+    },
+    {
+     "models": [
+      "qwen3.5",
+      "falcon"
+     ],
+     "mib": 4172.0
+    },
+    {
+     "models": [
+      "h2o",
+      "qwen3.5"
+     ],
+     "mib": 4289.0
+    }
+   ]
+  },
+  "1024": {
+   "4": [
+    {
+     "models": [
+      "h2o",
+      "lfm2.5",
+      "falcon",
+      "rwkv7"
+     ],
+     "mib": 5689.0
+    },
+    {
+     "models": [
+      "lfm2.5",
+      "qwen3.5",
+      "falcon",
+      "rwkv7"
+     ],
+     "mib": 5994.0
+    },
+    {
+     "models": [
+      "h2o",
+      "lfm2.5",
+      "qwen3.5",
+      "rwkv7"
+     ],
+     "mib": 6111.0
+    },
+    {
+     "models": [
+      "h2o",
+      "qwen3.5",
+      "falcon",
+      "rwkv7"
+     ],
+     "mib": 6633.0
+    },
+    {
+     "models": [
+      "h2o",
+      "lfm2.5",
+      "qwen3.5",
+      "falcon"
+     ],
+     "mib": 6921.0
+    }
+   ],
+   "3": [
+    {
+     "models": [
+      "lfm2.5",
+      "falcon",
+      "rwkv7"
+     ],
+     "mib": 3995.0
+    },
+    {
+     "models": [
+      "h2o",
+      "lfm2.5",
+      "rwkv7"
+     ],
+     "mib": 4112.0
+    },
+    {
+     "models": [
+      "lfm2.5",
+      "qwen3.5",
+      "rwkv7"
+     ],
+     "mib": 4417.0
+    },
+    {
+     "models": [
+      "h2o",
+      "falcon",
+      "rwkv7"
+     ],
+     "mib": 4634.0
+    },
+    {
+     "models": [
+      "h2o",
+      "lfm2.5",
+      "falcon"
+     ],
+     "mib": 4922.0
+    },
+    {
+     "models": [
+      "qwen3.5",
+      "falcon",
+      "rwkv7"
+     ],
+     "mib": 4939.0
+    },
+    {
+     "models": [
+      "h2o",
+      "qwen3.5",
+      "rwkv7"
+     ],
+     "mib": 5056.0
+    },
+    {
+     "models": [
+      "lfm2.5",
+      "qwen3.5",
+      "falcon"
+     ],
+     "mib": 5227.0
+    },
+    {
+     "models": [
+      "h2o",
+      "lfm2.5",
+      "qwen3.5"
+     ],
+     "mib": 5344.0
+    },
+    {
+     "models": [
+      "h2o",
+      "qwen3.5",
+      "falcon"
+     ],
+     "mib": 5866.0
+    }
+   ],
+   "2": [
+    {
+     "models": [
+      "lfm2.5",
+      "rwkv7"
+     ],
+     "mib": 2418.0
+    },
+    {
+     "models": [
+      "falcon",
+      "rwkv7"
+     ],
+     "mib": 2940.0
+    },
+    {
+     "models": [
+      "h2o",
+      "rwkv7"
+     ],
+     "mib": 3057.0
+    },
+    {
+     "models": [
+      "lfm2.5",
+      "falcon"
+     ],
+     "mib": 3228.0
+    },
+    {
+     "models": [
+      "h2o",
+      "lfm2.5"
+     ],
+     "mib": 3345.0
+    },
+    {
+     "models": [
+      "qwen3.5",
+      "rwkv7"
+     ],
+     "mib": 3362.0
+    },
+    {
+     "models": [
+      "lfm2.5",
+      "qwen3.5"
+     ],
+     "mib": 3650.0
+    },
+    {
+     "models": [
+      "h2o",
+      "falcon"
+     ],
+     "mib": 3867.0
+    },
+    {
+     "models": [
+      "qwen3.5",
+      "falcon"
+     ],
+     "mib": 4172.0
+    },
+    {
+     "models": [
+      "h2o",
+      "qwen3.5"
+     ],
+     "mib": 4289.0
+    }
+   ]
+  },
+  "1536": {
+   "4": [
+    {
+     "models": [
+      "h2o",
+      "lfm2.5",
+      "falcon",
+      "rwkv7"
+     ],
+     "mib": 5689.0
+    },
+    {
+     "models": [
+      "lfm2.5",
+      "qwen3.5",
+      "falcon",
+      "rwkv7"
+     ],
+     "mib": 5994.0
+    },
+    {
+     "models": [
+      "h2o",
+      "lfm2.5",
+      "qwen3.5",
+      "rwkv7"
+     ],
+     "mib": 6111.0
+    }
+   ],
+   "3": [
+    {
+     "models": [
+      "lfm2.5",
+      "falcon",
+      "rwkv7"
+     ],
+     "mib": 3995.0
+    },
+    {
+     "models": [
+      "h2o",
+      "lfm2.5",
+      "rwkv7"
+     ],
+     "mib": 4112.0
+    },
+    {
+     "models": [
+      "lfm2.5",
+      "qwen3.5",
+      "rwkv7"
+     ],
+     "mib": 4417.0
+    },
+    {
+     "models": [
+      "h2o",
+      "falcon",
+      "rwkv7"
+     ],
+     "mib": 4634.0
+    },
+    {
+     "models": [
+      "h2o",
+      "lfm2.5",
+      "falcon"
+     ],
+     "mib": 4922.0
+    },
+    {
+     "models": [
+      "qwen3.5",
+      "falcon",
+      "rwkv7"
+     ],
+     "mib": 4939.0
+    },
+    {
+     "models": [
+      "h2o",
+      "qwen3.5",
+      "rwkv7"
+     ],
+     "mib": 5056.0
+    },
+    {
+     "models": [
+      "lfm2.5",
+      "qwen3.5",
+      "falcon"
+     ],
+     "mib": 5227.0
+    },
+    {
+     "models": [
+      "h2o",
+      "lfm2.5",
+      "qwen3.5"
+     ],
+     "mib": 5344.0
+    },
+    {
+     "models": [
+      "h2o",
+      "qwen3.5",
+      "falcon"
+     ],
+     "mib": 5866.0
+    }
+   ],
+   "2": [
+    {
+     "models": [
+      "lfm2.5",
+      "rwkv7"
+     ],
+     "mib": 2418.0
+    },
+    {
+     "models": [
+      "falcon",
+      "rwkv7"
+     ],
+     "mib": 2940.0
+    },
+    {
+     "models": [
+      "h2o",
+      "rwkv7"
+     ],
+     "mib": 3057.0
+    },
+    {
+     "models": [
+      "lfm2.5",
+      "falcon"
+     ],
+     "mib": 3228.0
+    },
+    {
+     "models": [
+      "h2o",
+      "lfm2.5"
+     ],
+     "mib": 3345.0
+    },
+    {
+     "models": [
+      "qwen3.5",
+      "rwkv7"
+     ],
+     "mib": 3362.0
+    },
+    {
+     "models": [
+      "lfm2.5",
+      "qwen3.5"
+     ],
+     "mib": 3650.0
+    },
+    {
+     "models": [
+      "h2o",
+      "falcon"
+     ],
+     "mib": 3867.0
+    },
+    {
+     "models": [
+      "qwen3.5",
+      "falcon"
+     ],
+     "mib": 4172.0
+    },
+    {
+     "models": [
+      "h2o",
+      "qwen3.5"
+     ],
+     "mib": 4289.0
+    }
+   ]
+  },
+  "2048": {
+   "4": [
+    {
+     "models": [
+      "h2o",
+      "lfm2.5",
+      "falcon",
+      "rwkv7"
+     ],
+     "mib": 5689.0
+    },
+    {
+     "models": [
+      "lfm2.5",
+      "qwen3.5",
+      "falcon",
+      "rwkv7"
+     ],
+     "mib": 5994.0
+    }
+   ],
+   "3": [
+    {
+     "models": [
+      "lfm2.5",
+      "falcon",
+      "rwkv7"
+     ],
+     "mib": 3995.0
+    },
+    {
+     "models": [
+      "h2o",
+      "lfm2.5",
+      "rwkv7"
+     ],
+     "mib": 4112.0
+    },
+    {
+     "models": [
+      "lfm2.5",
+      "qwen3.5",
+      "rwkv7"
+     ],
+     "mib": 4417.0
+    },
+    {
+     "models": [
+      "h2o",
+      "falcon",
+      "rwkv7"
+     ],
+     "mib": 4634.0
+    },
+    {
+     "models": [
+      "h2o",
+      "lfm2.5",
+      "falcon"
+     ],
+     "mib": 4922.0
+    },
+    {
+     "models": [
+      "qwen3.5",
+      "falcon",
+      "rwkv7"
+     ],
+     "mib": 4939.0
+    },
+    {
+     "models": [
+      "h2o",
+      "qwen3.5",
+      "rwkv7"
+     ],
+     "mib": 5056.0
+    },
+    {
+     "models": [
+      "lfm2.5",
+      "qwen3.5",
+      "falcon"
+     ],
+     "mib": 5227.0
+    },
+    {
+     "models": [
+      "h2o",
+      "lfm2.5",
+      "qwen3.5"
+     ],
+     "mib": 5344.0
+    },
+    {
+     "models": [
+      "h2o",
+      "qwen3.5",
+      "falcon"
+     ],
+     "mib": 5866.0
+    }
+   ],
+   "2": [
+    {
+     "models": [
+      "lfm2.5",
+      "rwkv7"
+     ],
+     "mib": 2418.0
+    },
+    {
+     "models": [
+      "falcon",
+      "rwkv7"
+     ],
+     "mib": 2940.0
+    },
+    {
+     "models": [
+      "h2o",
+      "rwkv7"
+     ],
+     "mib": 3057.0
+    },
+    {
+     "models": [
+      "lfm2.5",
+      "falcon"
+     ],
+     "mib": 3228.0
+    },
+    {
+     "models": [
+      "h2o",
+      "lfm2.5"
+     ],
+     "mib": 3345.0
+    },
+    {
+     "models": [
+      "qwen3.5",
+      "rwkv7"
+     ],
+     "mib": 3362.0
+    },
+    {
+     "models": [
+      "lfm2.5",
+      "qwen3.5"
+     ],
+     "mib": 3650.0
+    },
+    {
+     "models": [
+      "h2o",
+      "falcon"
+     ],
+     "mib": 3867.0
+    },
+    {
+     "models": [
+      "qwen3.5",
+      "falcon"
+     ],
+     "mib": 4172.0
+    },
+    {
+     "models": [
+      "h2o",
+      "qwen3.5"
+     ],
+     "mib": 4289.0
+    }
+   ]
+  }
+ }
+}
