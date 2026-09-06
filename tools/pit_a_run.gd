@@ -451,6 +451,14 @@ func _lms() -> String:
 	return OS.get_environment("USERPROFILE") + "/.lmstudio/bin/lms.exe"
 
 
+## EXPLICIT_RESIDENCY_MODE, with a deliberate unload. PIT A wants exactly one
+## species resident so a trajectory cannot be affected by another model's
+## memory pressure, so _unload_all() below is intentional and load-bearing.
+##
+## It is ALSO why no residency claim may be read out of a PIT A run: the harness
+## commands single residency, and behaviour a harness commands is never evidence
+## about the substrate (CONTRIBUTING rule 13). Explicit loading without this
+## unload holds five species at 8192 simultaneously.
 func _load_species(id: String) -> bool:
 	var out: Array = []
 	_unload_all()

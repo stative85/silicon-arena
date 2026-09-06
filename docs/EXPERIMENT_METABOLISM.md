@@ -752,3 +752,87 @@ Five sequential calls on an idle card is what was measured. Nothing more.
 self-inflicted instrument error in this project and the **first to produce a
 false positive finding** rather than a blocked run — which makes it the most
 dangerous of the five, because nothing failed and nothing complained.
+
+---
+
+# CORRECTION TO THE CORRECTION — 2026-09-06
+
+The retraction above was **right to retract and wrong about why.** Three things
+are corrected here in one place rather than quietly edited.
+
+## 1. The root cause was misattributed
+
+The retraction blamed `tools/metabolism_run.gd::_load_species()` calling
+`_unload_all()`.
+
+**That function does not exist in that file.** `_load_species()` lives in
+`tools/pit_a_run.gd`. The metabolism probe **never unloaded anything** — it
+obtained every model through `_ask()`, i.e. pure JIT loading via an API request.
+
+I invoked the right rule and attached it to a cause I had not verified.
+
+## 2. The behaviour is path-dependent, and BOTH observations are real
+
+```
+  JIT PATH        API request alone, justInTimeModelLoading = true
+                  request lfm2.5  -> resident [lfm2.5]
+                  request rwkv7   -> resident [rwkv7]      lfm2.5 EVICTED
+                  ONE JIT-loaded model at a time.
+
+  EXPLICIT PATH   lms load
+                  five species resident simultaneously
+                  8192 context each, 7,675 / 8,151 MiB
+                  all five generate with NO swap.
+```
+
+**"LM Studio co-resides" and "LM Studio evicts" are both true.** The missing
+variable was never in the runtime — it was *how the model got resident*.
+
+So the original probe measured its regime correctly. What was false was
+generalising a **path-specific observation into a substrate-wide constraint**.
+
+## 3. The arbiter language is revised
+
+Previously: *"the arbiter was conservative about a constraint its substrate does
+not enforce."* Then, in the retraction: *"the arbiter was right and the probe was
+wrong."* Both are too coarse. The accurate statement:
+
+> **The arbiter's co-residency model is feasible under explicit residency, but
+> the original metabolism probe evaluated a JIT regime that did not exercise
+> that capability.**
+
+## Regime labels, so this cannot be re-confused
+
+Any residency claim in this project must carry one of these:
+
+```
+  JIT_RESIDENCY_MODE        single JIT-loaded model observed; a new JIT request
+                            evicts the previous one
+  EXPLICIT_RESIDENCY_MODE   multi-model co-residency demonstrated, five species
+                            at 8192 on an 8 GB card
+```
+
+A JIT probe and an explicit-load benchmark are **not comparable**, and comparing
+them would make the runtime look like it had developed a personality disorder.
+
+## A false claim in commit 1f35722
+
+That commit's message states *"The offending call site now carries the warning
+too."* **It does not.** The edit failed on an assertion and the claim was pushed
+anyway — inside the very commit arguing that false positives arrive plausible
+and unannounced. Recorded here rather than amended away.
+
+## The rule, restated accurately
+
+Rule 13's example was wrong; the rule survives in a sharper form:
+
+> **A runtime property must be qualified by the loading and execution regime
+> under which it was observed.** Behaviour the harness's own strategy selected is
+> not a substrate constraint.
+
+## Consequence for the inference bridge
+
+The bridge must use **explicit preloading and residency management, not pure
+JIT**, if it wants the five-brain resident pool. Under JIT it would get one
+model and a swap on every species change — which is precisely the cost the
+bridge exists to eliminate.

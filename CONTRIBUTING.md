@@ -265,13 +265,22 @@ newline and invent a line the substrate never wrote.
 commanded.** Observed behaviour is not evidence of a substrate constraint when
 the harness directly imposed the same behaviour.
 
-Not hypothetical. The METABOLISM probe recorded "the runtime does not co-reside,
-it evicts" as a hardware finding, and used it to conclude the compute arbiter
-was conservative about a constraint its substrate did not enforce. Both were
-false: `metabolism_run.gd::_load_species()` called `_unload_all()` before every
-load. A direct re-test with unloading disabled held **five models resident
-simultaneously at 8192 context, 7,675 of 8,151 MiB, all generating without a
-swap** (`docs/EXPERIMENT_METABOLISM.md`, correction 2026-09-06).
+Sharper form: **a runtime property must be qualified by the loading and
+execution regime under which it was observed.**
+
+Not hypothetical, and the first attempt at recording it got its own example
+wrong. The METABOLISM probe recorded "the runtime does not co-reside, it evicts"
+as a hardware finding. Under JIT loading — an API request with
+`justInTimeModelLoading` on — that is exactly what happens: a new request evicts
+the previously JIT-loaded model. Under explicit `lms load`, **five models sit
+resident simultaneously at 8192 context, 7,675 of 8,151 MiB, all generating
+without a swap**. Both observations are real; the error was generalising a
+path-specific one into a substrate-wide constraint.
+
+The first correction then blamed `_unload_all()` in a file that does not contain
+it, which is the same mistake twice — asserting a cause without verifying it
+(`docs/EXPERIMENT_METABOLISM.md`, correction and correction-to-the-correction,
+2026-09-06).
 
 This is the most dangerous shape of instrument error in this repository, because
 unlike the others it produced a **false positive** rather than a blocked run.

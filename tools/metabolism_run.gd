@@ -181,10 +181,11 @@ func _probe() -> void:
 	print("\n  runtime residency right now: %s" % str(await _resident()))
 
 	# Measured ABOVE THE RESTING BASELINE, not as a delta from the previous
-	# model. A delta is unreadable here, because this runtime unloads the
-	# previous model before loading the next -- so the difference is (new load
-	# minus old unload) and comes out NEGATIVE for anything smaller than its
-	# predecessor. The first probe reported NORMAL at -1.98 GB for exactly that
+	# model. A delta is unreadable here, because UNDER JIT_RESIDENCY_MODE a new
+	# request evicts the previously JIT-loaded model -- so the difference is
+	# (new load minus old unload) and comes out NEGATIVE for anything smaller
+	# than its predecessor. That eviction is a property of this loading path,
+	# NOT of the runtime: explicit `lms load` co-resides five species. The first probe reported NORMAL at -1.98 GB for exactly that
 	# reason, which is not shrinkage, it is an eviction hiding inside a
 	# subtraction.
 	print("\n  calibration, one model at a time. PREDICTED vs ACTUAL RESIDENT:")
@@ -411,6 +412,14 @@ func _ask(model: String, text: String) -> String:
 	return str(r.get("text", ""))
 
 
+## JIT_RESIDENCY_MODE. Every model in this probe is obtained by API request
+## alone, with justInTimeModelLoading on, and a new request EVICTS the
+## previously JIT-loaded model. That is a property of THIS PATH, not of the
+## runtime: explicit `lms load` holds five species resident simultaneously at
+## 8192 context (docs/EXPERIMENT_METABOLISM.md, correction-to-the-correction).
+##
+## Any residency observation taken here is scoped to JIT_RESIDENCY_MODE and may
+## not be compared with an explicit-load benchmark.
 func _ask_full(model: String, prompt: String) -> Dictionary:
 	var payload := {"model": model,
 		"messages": [{"role": "user", "content": prompt}],
