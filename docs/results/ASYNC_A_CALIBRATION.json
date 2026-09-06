@@ -1,0 +1,83 @@
+{
+  "agents": 3,
+  "chosen_step": 1,
+  "cycles": 200,
+  "evaluated": [
+    {
+      "hold": 6,
+      "in_window": false,
+      "median_rate": 0.546666666666667,
+      "resources": 12,
+      "step": 2,
+      "totals": {
+        "actions": 1800,
+        "contention_lost": 0,
+        "contention_opportunity": 287,
+        "stale_conflict": 983,
+        "stale_eligible": 983
+      }
+    },
+    {
+      "hold": 4,
+      "in_window": true,
+      "median_rate": 0.381666666666667,
+      "resources": 16,
+      "step": 1,
+      "totals": {
+        "actions": 1800,
+        "contention_lost": 0,
+        "contention_opportunity": 166,
+        "stale_conflict": 687,
+        "stale_eligible": 687
+      }
+    }
+  ],
+  "hold_ticks": 4,
+  "negative_control_runs": 27,
+  "negative_control_stale_conflicts": 0,
+  "replicates": 3,
+  "resources": 16,
+  "sequence": [
+    [
+      20,
+      4
+    ],
+    [
+      16,
+      4
+    ],
+    [
+      12,
+      6
+    ],
+    [
+      10,
+      6
+    ],
+    [
+      8,
+      6
+    ],
+    [
+      8,
+      9
+    ],
+    [
+      6,
+      9
+    ],
+    [
+      6,
+      12
+    ],
+    [
+      4,
+      12
+    ]
+  ],
+  "start_index": 2,
+  "window": {
+    "ceiling": 0.4,
+    "floor": 0.05
+  }
+}
