@@ -121,3 +121,14 @@ static func observation_hash(world_text: String, inter: Dictionary) -> String:
 ## mistaken for two architectures independently building the same thing.
 static func is_structural() -> bool:
 	return false
+
+
+## The interaction policy's fingerprint: the fields, their order, and the
+## outcomes. Adding a field or an outcome is a changed regime.
+static func policy_hash() -> String:
+	return ("fields=cycle_index,last_operation,last_outcome,last_reason_code,"
+		+ "rejection_streak
+outcomes=%s,%s,%s,%s
+"
+		% [NONE, ACCEPTED, REJECTED, SHAPE_FAILED]).sha256_text()
+

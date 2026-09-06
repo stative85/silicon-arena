@@ -171,12 +171,15 @@ func _startup_then_run() -> void:
 
 func _manifest(observed: Dictionary, genesis_hash: String) -> Dictionary:
 	return {
-		"run": 3,
+		"run": 4,
 		"pit_prereg_commit": "15f30e9",
 		"run1_void_commit": "2750d17",
 		"run2_void_commit": "2a77fd4",
 		"contract_commit": "e9a074a",
 		"canonical_hash": CN.canonical_hash(),
+		"interaction_policy_hash": IX.policy_hash(),
+		"observation_policy_hash": OB.policy_hash(),
+		"run3_void_commit": "f113f2f",
 		"interaction_fields": ["cycle_index", "last_operation", "last_outcome",
 			"last_reason_code", "rejection_streak"],
 		"head_commit": _git_head(),

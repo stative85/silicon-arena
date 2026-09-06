@@ -547,3 +547,117 @@ this project has produced. They are **not** a PIT A architectural finding.
 > convergence from any of them is evidence about any architecture.
 
 That distinction is the whole reason the void records exist.
+
+---
+
+# Amendment: PIT A Run 4
+
+**Written after Runs 1, 2 and 3 were declared VOID and before any Run 4 outcome
+exists.** All three are preserved, referenced, and never overwritten.
+
+> **Run 4 is not a redesigned experiment. It is the first execution under an
+> instrument that has passed producer-space, persistence, semantic, consequence,
+> interaction and observation-projection validation.**
+
+Run 4 differs from the original PIT A design **only where the void runs proved
+the instrument defective.** The experimental pressure is untouched.
+
+## Unchanged, deliberately
+
+```
+  GENESIS WORLD        7 objects, identical content       UNCHANGED
+  CONSEQUENCE SCHEDULE 39a34975b48d265889c8607b2f566ae5   UNCHANGED
+  CYCLES               100 per trajectory                 UNCHANGED
+  REPLICATES           3 per arm                          UNCHANGED
+  ARMS                 5 architectures + RANDOM           UNCHANGED
+  MODELS               the five frozen IDs                UNCHANGED
+  CONTEXT              8192                               UNCHANGED
+  QUANTISATION         Q4_K_M                             UNCHANGED
+  RUNTIME              llama.cpp CUDA 2.14.0              UNCHANGED
+  TEMPERATURE          0                                  UNCHANGED
+```
+
+### One correction to that list, and it matters
+
+**The genesis WORLD is unchanged. Its HASH is not.**
+
+```
+  was  5e7a696d4176e40d...     under the Run 1-3 serialiser
+  now  28a7dbc0309917c1...     under the repaired serialiser
+```
+
+Same seven objects, same types, same properties, same content. The hash moved
+because **the serialiser was repaired** — recursive canonicalisation for the Run
+3 defect, and escaped ids and types for the injection hole the observation fuzz
+found. A different number here is not a different world; it is the same world
+described correctly for the first time.
+
+Recording it this way rather than quietly restating the old value, because a
+hash that changes without explanation is exactly what a frozen regime is
+supposed to make impossible.
+
+The consequence schedule hash is genuinely untouched at `39a34975`, which is
+what a real invariant looks like next to a repaired one.
+
+## The Run 4 instrument regime
+
+```
+  schema                96db47ebda531032ad5a4f016cbc1bef
+  canonicalisation      d98b05870e7b65b787bd6db08bd2e37f
+  interaction policy    1bdc87f69e0b4f0d876c5a2ebfebf5f3
+  observation policy    dc9b2b1f562cfa14fab45c5493057a8e
+  consequence schedule  39a34975b48d265889c8607b2f566ae5
+  genesis world         28a7dbc0309917c142903ce4f578ae50
+```
+
+What the instrument gained across three void runs:
+
+```
+  canonical field authority          irrelevant fields cannot invalidate an action
+  bounded interaction state          cycle_index, one-step feedback, streak
+  SHAPE_FAILED outcome               not a decision, not infrastructure
+  recursive canonical identity       representation-invariant, order-independent
+  producer-space validated semantics 183 real proposals as regression seeds
+  hostile journal/replay validation  fails closed WITH a reason
+  consequence fuzz validation        outcome tracks the declared dependency only
+  observation projection             deterministic budget, declared truncation
+  unforgeable rendered structure     ids and types escaped before rendering
+```
+
+## The three void runs
+
+```
+  Run 1 VOID   contract inexpressibility
+               the schema had no `type`; the validator required it
+  Run 2 VOID   cross-field semantic coupling + deterministic livelock
+               flat schema, coupled validator; 1,500 calls, 6 distinct proposals
+  Run 3 VOID   non-recursive canonical identity / replay divergence
+               nested props reordered through the journal; aborted at cycle 2
+```
+
+## Two prohibitions
+
+> **No result from Runs 1-3 establishes a prior expectation for Run 4
+> architectural behaviour.** Their outputs were used exclusively as
+> instrument-diagnostic and regression-test material. The 183 producer specimens
+> now in the test suite are fixtures, not findings. "The models previously tended
+> to X" may not become a hypothesis about a run that was declared void.
+
+> **The pre-run hardening phase is CLOSED.** No additional instrument
+> modification is permitted before Run 4 without a concrete demonstrated failure
+> of a frozen invariant. A hypothetical surface is not a reason to keep
+> hardening.
+
+## First look after completion
+
+Mechanical only, before any analysis phase exists:
+
+```
+  1,800 cycles, all journals complete      chain breaks
+  REQUEST_FAILED                           SHAPE_FAILED
+  open markers                             state replay exact
+  interaction replay exact                 observation progression
+  distinct proposals per arm               all six frozen hashes match
+```
+
+Only then does Phase 1 exist.

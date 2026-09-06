@@ -73,3 +73,15 @@ static func prompt(visible: String, none_sentinel: String,
 ## the same bytes are detectable after the fact rather than never.
 static func prompt_hash(prompt_text: String) -> String:
 	return prompt_text.sha256_text()
+
+
+## The observation policy's own fingerprint: budget, marker and prompt shape.
+## A changed projection is a changed regime, and the gate must be able to see it.
+static func policy_hash() -> String:
+	return ("budget=%d
+marker=%s
+prompt=%s
+"
+		% [VISIBLE_CHAR_BUDGET, TRUNCATED,
+			prompt("<W>", "<N>", "<T>")]).sha256_text()
+
