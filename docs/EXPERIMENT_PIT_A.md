@@ -512,3 +512,38 @@ would be tuning the terrarium until the lizards dance.
 **An invalid move now means the model made an invalid move.** That is the
 threshold two void runs were spent reaching, and it is the entire justification
 for Run 3.
+
+---
+
+# Stopping rule for pre-run hardening
+
+**Frozen now, so that instrument purification cannot become the project.**
+
+Five surfaces have been fuzzed with producer-shaped hostile input and sabotage:
+
+```
+  1  canonical identity        10,000 values, depth 6, order + JSON invariance
+  2  canonicaliser + validator 183 real proposals, 1,000 metamorphic variants
+  3  journal                   hostile rows fail closed WITH a reason
+  4  consequence evaluator     400 noisy worlds, identity vs equivalence
+  5  observation projection    context boundary, injection, byte distinguishability
+```
+
+> **After the observation-projection fuzz passes, rerun every gate. If green,
+> PIT A Run 4 may be pre-registered. No further pre-run hardening surface is
+> added without a CONCRETE DEMONSTRATED FAILURE MODE.**
+
+A hypothetical sixth surface is not a reason to keep hardening. A reproduced
+failure is. The project has moved from under-testing into the opposite danger,
+and at some point the bastard has to run.
+
+## What the three void runs establish, stated precisely
+
+The four instrument failures are the strongest **instrument-engineering** result
+this project has produced. They are **not** a PIT A architectural finding.
+
+> **PIT A has produced zero valid architectural results.** Runs 1, 2 and 3 are
+> void. No operation frequency, trajectory, survival curve, recurrence or
+> convergence from any of them is evidence about any architecture.
+
+That distinction is the whole reason the void records exist.

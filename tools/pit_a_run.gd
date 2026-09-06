@@ -38,6 +38,7 @@ const J := preload("res://scripts/arena/pit_journal.gd")
 const K := preload("res://scripts/arena/pit_contract.gd")
 const CN := preload("res://scripts/arena/pit_canonical.gd")
 const IX := preload("res://scripts/arena/pit_interaction.gd")
+const OB := preload("res://scripts/arena/pit_observation.gd")
 
 var LM_BASE := LMEndpoint.base_url()
 
@@ -273,7 +274,10 @@ func _cycle(arm: String, replicate: int, cycle: int, state: Dictionary,
 	# PRODUCER-VISIBLE OBSERVATION = canonical world + interaction state. The
 	# second half is what makes a consumed opportunity advance even when the
 	# world does not, which is the Run 2 fixed point.
-	var visible := W.canonical_text(state) + IX.visible_text(inter)
+	# PROJECTED THROUGH THE SHARED MODULE, never assembled here. A private copy
+	# of the rendering is how the schema drifted from the validator in Run 2.
+	var budgeted := OB.budget(OB.project(W.canonical_text(state), inter))
+	var visible := str(budgeted["text"])
 	var patch := {}
 	var raw := ""
 	var failed := false
@@ -346,6 +350,9 @@ func _cycle(arm: String, replicate: int, cycle: int, state: Dictionary,
 		"outcome": outcome, "normalised_fields": normalised,
 		"interaction": next_inter,
 		"observation_hash": IX.observation_hash(W.canonical_text(state), inter),
+		"prompt_hash": OB.prompt_hash(visible),
+		"truncated": bool(budgeted["truncated"]),
+		"visible_full_length": int(budgeted["full_length"]),
 		"post_state_hash": post,
 		"scheduled_consequence": act, "dependency_result": dep,
 		"latency_ms": ms, "phase": "COMMITTED",

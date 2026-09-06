@@ -72,7 +72,12 @@ static func canonical_text(state: Dictionary) -> String:
 		ids.sort()
 		for id in ids:
 			var obj: Dictionary = d[id]
-			out += "  %s type=%s" % [str(id), str(obj.get("type", "?"))]
+			# IDS AND TYPES ARE CANONICALISED, NOT INTERPOLATED RAW. A target
+			# comes from model output, so an id containing a newline or the
+			# literal " type=" could forge an extra object line in this text --
+			# and therefore in the observation the next model reads. Quoting and
+			# escaping them makes structure unforgeable from inside a value.
+			out += "  " + CT.canonical(str(id)) + " type=" 				+ CT.canonical(str(obj.get("type", "?")))
 			# RECURSIVE canonicalisation. The previous version sorted these
 			# keys and then used str() on the values, which preserves insertion
 			# order for nested dictionaries -- so a journal round-trip could

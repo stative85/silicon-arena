@@ -103,7 +103,7 @@ VERIFY OK
 
 CI runs the same thing on Linux for every push and pull request.
 
-### Ten rules that are not negotiable
+### Twelve rules that are not negotiable
 
 **1. A new test must be shown to fail.** Reintroduce the defect it guards,
 watch it go red, restore, watch it go green. A suite that can only pass is not
@@ -226,6 +226,40 @@ If a value cannot appear in that set, no sample size will produce it.
 This bites anywhere the decision rests on small-integer counts, medians of
 them, ordinal scores, rounded percentages, or numbers of violations. Floating
 point will happily report a threshold that reality is forbidden to produce.
+
+**11. An interface is validated against what the PRODUCER can emit, not against
+hand-constructed witnesses.** An action is reachable only if the thing that will
+actually produce it can express it through the frozen interface, and the
+complete path can execute it. Reachability is end-to-end, never component-local.
+
+Not hypothetical, and it cost 3,600 generations across three void runs of PIT A.
+Run 1: the model-facing schema had no `type` field while the validator required
+one, so 1,167 of 1,500 cycles died at the contract boundary and the control arm
+had a strictly larger action space than every treatment arm. Run 2: the schema
+was flat and the validator enforced cross-field coupling a flat schema cannot
+state, so five species failed five different ways, 300 times each. Run 3:
+canonical text sorted keys one level deep and stringified nested values, so a
+journal round-trip reordered them and the same world hashed two ways.
+
+Every one was found by the models within minutes of being allowed to speak, and
+every audit had passed beforehand -- because every audit built its witnesses
+with the harness's own constructors. Seed the tests with what the producers
+actually emitted (`scripts/arena/fixtures/producer_specimens.json`), then fuzz.
+
+**12. Canonical identity must be representation-invariant, and distinct
+observations must stay distinct at the bytes.** For any state that gets
+serialised: insertion order, JSON round-trip, journal round-trip, and
+live-versus-replay must all produce identical identity. `str(Dictionary)` may
+never appear inside identity computation. And the projection to whatever the
+producer actually reads must not collapse two distinct states -- through
+truncation, delimiter collision or interpolation. If truncation is policy, it is
+deterministic, declared, and carries the full content's hash so two observations
+sharing a prefix still differ.
+
+Corollary that follows from both: structure must be unforgeable from inside a
+value. Ids and types that originate in producer output are escaped before they
+reach any text a producer later reads, or a model can emit a target containing a
+newline and invent a line the substrate never wrote.
 
 **10. A threshold derived under a simplifying assumption may only judge data
 generated under that same assumption.** If the assumption changes the
