@@ -40,6 +40,7 @@ const P := preload("res://scripts/arena/bridge_policy.gd")
 const T := preload("res://scripts/arena/bridge_ticket.gd")
 const M := preload("res://scripts/arena/bridge_model.gd")
 const R := preload("res://scripts/arena/bridge_receipt.gd")
+const ST := preload("res://scripts/arena/bridge_stream.gd")
 
 var policy: BridgePolicy
 var models: Dictionary = {}          ## model_id -> BridgeModel
@@ -78,11 +79,20 @@ func _now() -> int:
 
 
 func _make_slots() -> void:
+	# Each slot owns its own connection. Cancelling a wedged Danube request
+	# must never murder the in-flight LFM and Falcon requests -- that shared
+	# cancellation is exactly what this bridge exists to escape.
 	for i in policy.max_active_burst:
-		var h := HTTPRequest.new()
-		h.timeout = float(policy.wedge_timeout_ms) / 1000.0
-		add_child(h)
-		_slots.append(h)
+		_slots.append(null)
+
+
+func _new_stream() -> BridgeStream:
+	var st := ST.new()
+	st.connect_timeout_ms = policy.connect_timeout_ms
+	st.ttft_timeout_ms = policy.ttft_timeout_ms
+	st.idle_timeout_ms = policy.idle_timeout_ms
+	st.total_timeout_ms = policy.total_timeout_ms
+	return st
 
 
 # --------------------------------------------------------------- submission
@@ -202,78 +212,98 @@ func _dispatch(ticket: BridgeTicket, slot: int) -> void:
 
 func _run(ticket: BridgeTicket, slot: int, rec: Dictionary) -> void:
 	var bm: BridgeModel = models[ticket.model_id]
-	var result: Dictionary
-	if transport.is_valid():
-		result = await transport.call(ticket.model_id, ticket.payload())
-	else:
-		result = await _http_call(ticket, slot)
+	var timings: Dictionary = {}
+	var ok := false
+	var text := ""
+	var tokens := 0
+	var status := R.STATUS_HTTP_ERROR
+	var kind := ""
 
-	rec["first_token_at_ms"] = int(result.get("first_token_at_ms", 0))
+	if transport.is_valid():
+		# Injected transport, used by the offline self-test. It reports the
+		# same shape the stream does so both paths seal identically.
+		var res: Dictionary = await transport.call(ticket.model_id,
+			ticket.payload())
+		ok = bool(res.get("ok", false))
+		text = str(res.get("text", ""))
+		tokens = int(res.get("tokens", 0))
+		status = R.STATUS_OK if ok else str(res.get("status", status))
+		timings = {
+			"ttft_ms": int(res.get("ttft_ms", -1)),
+			"connect_ms": int(res.get("connect_ms", -1)),
+			"generation_after_first_ms": int(res.get("gen_ms", -1)),
+			"total_ms": int(res.get("total_ms", -1)),
+			"stream_event_count": int(res.get("events", 0)),
+			"content_event_count": int(res.get("content_events", 0)),
+			"failure_kind": str(res.get("failure_kind", "")),
+		}
+	else:
+		var st := await _stream_call(ticket, slot)
+		ok = st.ok()
+		text = st.text
+		# Tokens are not reported by the streaming API, so content events are
+		# used as the token proxy and NAMED as an estimate rather than passed
+		# off as a count.
+		tokens = st.content_events
+		status = R.STATUS_OK if ok else st.status
+		timings = st.timings()
+		kind = st.failure_kind()
+
 	rec["finished_at_ms"] = _now()
-	rec["generated_tokens"] = int(result.get("tokens", 0))
-	var ok := bool(result.get("ok", false))
-	var sealed := R.seal(rec, R.STATUS_OK if ok else
-		str(result.get("status", R.STATUS_HTTP_ERROR)))
+	rec["generated_tokens"] = tokens
+	for k in timings:
+		rec[k] = timings[k]
+	var sealed := R.seal_stream(rec, status)
 
 	bm.in_flight = maxi(bm.in_flight - 1, 0)
 	_busy.erase(ticket.request_id)
 
-	# Health is judged from the receipt, never from whether the call returned.
+	# Health is judged from measured first-CONTENT TTFT, never from whether the
+	# call returned. A degraded model returns successfully every time.
 	var verdict := M.classify(int(sealed["ttft_ms"]),
-		float(sealed["decode_tps"]), int(sealed["generated_tokens"]), policy)
+		float(sealed["decode_estimate"]), int(sealed["generated_tokens"]),
+		policy)
 	sealed["health_verdict"] = str(verdict["verdict"])
 
-	if not ok and str(sealed["status"]) == R.STATUS_TIMEOUT:
-		_transition(bm, M.WEDGED, "request timed out")
+	if kind == "WEDGE" or status == ST.CONNECT_TIMEOUT 			or status == ST.TTFT_TIMEOUT:
+		# Connected but never generated, or never connected at all.
+		_transition(bm, M.WEDGED, "timeout class: " + status)
+	elif kind == "STALL":
+		# Generation began then froze. Distinct pathology, distinct label.
+		_transition(bm, M.DEGRADED, "timeout class: " + status)
 	elif bool(verdict["hard_degraded"]):
 		bm.strikes += 1
 		if bm.strikes >= policy.degraded_strikes:
 			_transition(bm, M.DEGRADED, "TTFT breach x%d" % bm.strikes)
 	elif bool(verdict["supporting"]):
-		# Supporting evidence alone never condemns a model. It is recorded.
-		pass
+		pass  # Supporting evidence alone never condemns a model.
 	else:
 		bm.strikes = 0
 
 	sealed["model_state_after"] = bm.state
 	receipts.append(sealed)
-	completed.emit(ticket.request_id, ok, str(result.get("text", "")), sealed)
+	completed.emit(ticket.request_id, ok, text, sealed)
 
 	if bm.state == M.WEDGED or bm.state == M.DEGRADED:
 		await _recover(bm)
 	_pump()
 
 
-func _http_call(ticket: BridgeTicket, slot: int) -> Dictionary:
-	var http: HTTPRequest = _slots[slot]
+## Stream on this slot's own connection, polled to completion. Returns the
+## stream object so the caller can read real timings rather than an estimate.
+func _stream_call(ticket: BridgeTicket, slot: int) -> BridgeStream:
+	var st := _new_stream()
+	_slots[slot] = st
 	var body := ticket.payload()
 	body["model"] = ticket.model_id
-	body["stream"] = false
-	var err := http.request(policy.endpoint + "/chat/completions",
-		["Content-Type: application/json"], HTTPClient.METHOD_POST,
-		JSON.stringify(body))
-	if err != OK:
-		return {"ok": false, "status": R.STATUS_HTTP_ERROR}
-	var res: Array = await http.request_completed
-	var first := _now()
-	if int(res[0]) != HTTPRequest.RESULT_SUCCESS:
-		var st := (R.STATUS_TIMEOUT
-			if int(res[0]) == HTTPRequest.RESULT_TIMEOUT
-			else R.STATUS_HTTP_ERROR)
-		return {"ok": false, "status": st}
-	if int(res[1]) != 200:
-		return {"ok": false, "status": R.STATUS_HTTP_ERROR}
-	var parsed = JSON.parse_string(
-		(res[3] as PackedByteArray).get_string_from_utf8())
-	if typeof(parsed) != TYPE_DICTIONARY or not parsed.has("choices"):
-		return {"ok": false, "status": R.STATUS_HTTP_ERROR}
-	var text := str(parsed["choices"][0]["message"].get("content", ""))
-	var tokens := int((parsed.get("usage", {}) as Dictionary).get(
-		"completion_tokens", 0))
-	# Non-streaming: TTFT is not separable from total. Recorded as the
-	# completion instant so the derived value is honest rather than invented.
-	return {"ok": true, "text": text, "tokens": tokens,
-		"first_token_at_ms": first}
+	body["stream"] = true
+	st.begin(policy.endpoint, "/chat/completions", body, _now())
+	while true:
+		if st.poll(_now()):
+			break
+		await get_tree().process_frame
+	_slots[slot] = null
+	return st
 
 
 func _transition(bm: BridgeModel, next: String, reason: String) -> void:

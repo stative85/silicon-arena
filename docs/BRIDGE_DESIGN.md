@@ -1,9 +1,10 @@
 # Inference Bridge — Design
 
-**Status:** v0 implemented
+**Status:** v1 implemented — streaming, real TTFT, per-slot connections
 **Built from:** `docs/results/BENCH_RESIDENCY_RESULTS.md`, `docs/results/bench_pressure.json`, `docs/results/vram_budget.json`
-**Code:** `scripts/arena/bridge_policy.gd`, `bridge_ticket.gd`, `bridge_model.gd`, `bridge_receipt.gd`, `inference_bridge.gd`
-**Tests:** `scripts/arena/bridge_selftest.gd` — 59 checks, offline, in `verify.cmd`
+**Code:** `scripts/arena/bridge_policy.gd`, `bridge_ticket.gd`, `bridge_model.gd`, `bridge_receipt.gd`, `sse_parser.gd`, `bridge_stream.gd`, `inference_bridge.gd`
+**Tests:** `bridge_selftest.gd` (76 checks) + `sse_parser_selftest.gd` (29 checks), offline, both in `verify.cmd`
+**Live check:** `tools/bridge_live.gd` (needs LM Studio; not in verify)
 
 ## The unlock
 
@@ -188,3 +189,88 @@ From three of five models entering a bad state during a single run:
 - Whether rwkv7's queue sensitivity and its recurrent architecture are related.
   Observed together; causation not established.
 - Scaling on a larger card. Not extrapolated from these measurements.
+
+## v1 — streaming
+
+v0's `ttft_ms` was politely lying: the non-streaming transport recorded the
+completion instant, so TTFT and total latency were the same number. Since TTFT
+is the authoritative health signal, every health decision rested on an
+approximation. v1 removes it.
+
+### Per-slot connections
+
+Each active slot owns a private `HTTPClient` (`bridge_stream.gd`). The v0
+pattern — one shared `HTTPRequest` with `cancel_request()` — cannot survive
+concurrency: cancelling a wedged danube request would also kill the in-flight
+lfm2.5 and falcon requests. Independent cancellation is the point.
+
+### The SSE parser
+
+`sse_parser.gd` buffers **bytes, never text**, because a multi-byte UTF-8
+character can be split across TCP packets and decoding a partial chunk would
+corrupt it before parsing began. A complete event is decoded exactly once,
+whole. Tested by replaying a stream split at every one of 168 byte offsets, and
+again one byte at a time, requiring identical output each way — plus the same
+sweep over a multi-byte payload.
+
+**The first SSE event is not the first token.** A server may open with a
+role-only delta carrying no content. Timestamping that as TTFT would understate
+prefill by however long generation actually takes to begin, so `first_event`
+and `first_content` are recorded separately and only `first_content` feeds the
+health classifier.
+
+A malformed frame is flagged and the stream continues; one bad event must not
+kill a live generation.
+
+### Four timeout classes
+
+```
+CONNECT_TIMEOUT       no connection or response headers   -> WEDGE
+TTFT_TIMEOUT          connected, generation never began   -> WEDGE
+STREAM_IDLE_TIMEOUT   generation began, then froze        -> STALL
+TOTAL_TIMEOUT         absolute ceiling                    -> STALL
+```
+
+One giant timeout would collapse three different pathologies into one useless
+label. These map onto failures already observed: a wedge that never responds, a
+spilled model responding 100x slowly, and a generation that starts then stops.
+Recovery keys off the mechanical class, not a guess.
+
+A stream closing without `[DONE]` is `TRUNCATED`, not OK — a half generation
+must never be recorded as a healthy call.
+
+### Receipts
+
+Now carry `connected_at_ms`, `first_event_at_ms`, `first_content_at_ms`,
+`connect_ms`, `ttft_ms`, `generation_after_first_ms`, `total_ms`, `queue_ms`,
+`stream_event_count`, `content_event_count`, `failure_kind`.
+
+`decode_estimate` is named an estimate deliberately: the streaming API reports
+no token count, so content events stand in for tokens. Calling it `decode_tps`
+would imply a precision that is not there — and it remains a supporting signal
+only, gated on `min_tokens_for_rate`.
+
+### Measured live
+
+Against the resident hot set, three sequential then three concurrent requests:
+
+```
+lfm2.5   ttft 213 ms   gen  96 ms   total 309 ms
+danube2  ttft 199 ms   gen 104 ms   total 303 ms
+falcon   ttft 269 ms   gen 172 ms   total 441 ms
+```
+
+TTFT is now a distinct measurement rather than a copy of total. The concurrency
+cap was observed working: with `max_active = 2`, the third concurrent request
+queued for 186 ms.
+
+**Not verified live:** LM Studio emitted no role-only opening frame in these
+runs, so `first_event != first_content` was exercised only in unit tests.
+
+### Deliberately not done yet
+
+**Per-model latency bands.** The thresholds stay global until the bridge has
+collected real TTFT distributions through its own streaming path across a few
+hundred healthy calls. Deriving bands now would mean thresholds arriving from
+imagination wearing a lab coat — the receipts exist precisely so the bands can
+come from measurement instead.

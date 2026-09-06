@@ -17,6 +17,7 @@ const T := preload("res://scripts/arena/bridge_ticket.gd")
 const M := preload("res://scripts/arena/bridge_model.gd")
 const R := preload("res://scripts/arena/bridge_receipt.gd")
 const B := preload("res://scripts/arena/inference_bridge.gd")
+const SS := preload("res://scripts/arena/bridge_stream.gd")
 
 var _checks := 0
 var _failures: Array[String] = []
@@ -48,11 +49,15 @@ func _transport(model_id: String, _payload: Dictionary) -> Dictionary:
 	await get_root().get_tree().process_frame
 	var now := Time.get_ticks_msec()
 	if not ok:
-		return {"ok": false, "status": str(b.get("status", R.STATUS_TIMEOUT))}
-	# first_token_at_ms is expressed as an offset the receipt will difference
-	# against dispatch; the bridge seals it into ttft_ms.
+		return {"ok": false, "status": str(b.get("status", "TIMEOUT")),
+			"failure_kind": str(b.get("failure_kind", ""))}
+	# The injected transport reports the same shape a real stream does, so
+	# both paths seal through seal_stream() identically.
 	return {"ok": true, "text": "x", "tokens": tokens,
-		"first_token_at_ms": now + ttft}
+		"ttft_ms": ttft, "connect_ms": 3,
+		"gen_ms": int(b.get("gen_ms", 200)),
+		"total_ms": ttft + int(b.get("gen_ms", 200)),
+		"events": tokens + 1, "content_events": tokens}
 
 
 func _make_bridge() -> InferenceBridge:
@@ -73,6 +78,7 @@ func _run() -> void:
 	await _health()
 	await _concurrency()
 	await _hysteresis()
+	await _stream_timing()
 	await _receipts()
 	await _states()
 	_report()
@@ -243,6 +249,107 @@ func _hysteresis() -> void:
 	_check("   SABOTAGE APPLIED: request in flight", fresh.in_flight == 1)
 	_check("   a model with work in flight is never demoted",
 		not fresh.may_demote(now + 999999, pol))
+
+
+func _stream_timing() -> void:
+	print("
+ stream: url split, timeout classes, failure kinds")
+	var u := SS.split_url("http://127.0.0.1:1234/v1")
+	_check("   url host", str(u["host"]) == "127.0.0.1", str(u))
+	_check("   url port", int(u["port"]) == 1234)
+	_check("   url path", str(u["path"]) == "/v1")
+	_check("   url ssl false", not bool(u["ssl"]))
+	var u2 := SS.split_url("https://example.com/v1")
+	_check("   https defaults to port 443",
+		int(u2["port"]) == 443 and bool(u2["ssl"]))
+
+	# Each timeout class must be reachable and distinguishable. One giant
+	# timeout would collapse all of these into a single useless label.
+	var st := SS.new()
+	st.connect_timeout_ms = 100
+	st.ttft_timeout_ms = 500
+	st.idle_timeout_ms = 300
+	st.total_timeout_ms = 10000
+	st.started_at_ms = 0
+	_check("   not connected past connect budget -> CONNECT_TIMEOUT",
+		st._check_timeouts(150) and st.status == SS.CONNECT_TIMEOUT, st.status)
+
+	var st2 := SS.new()
+	st2.connect_timeout_ms = 100
+	st2.ttft_timeout_ms = 500
+	st2.idle_timeout_ms = 300
+	st2.total_timeout_ms = 10000
+	st2.started_at_ms = 0
+	st2.connected_at_ms = 50
+	_check("   connected but no content -> TTFT_TIMEOUT",
+		st2._check_timeouts(700) and st2.status == SS.TTFT_TIMEOUT, st2.status)
+
+	var st3 := SS.new()
+	st3.connect_timeout_ms = 100
+	st3.ttft_timeout_ms = 500
+	st3.idle_timeout_ms = 300
+	st3.total_timeout_ms = 10000
+	st3.started_at_ms = 0
+	st3.connected_at_ms = 50
+	st3.first_content_at_ms = 100
+	st3.last_data_at_ms = 100
+	_check("   generation began then froze -> STREAM_IDLE_TIMEOUT",
+		st3._check_timeouts(500) and st3.status == SS.STREAM_IDLE_TIMEOUT,
+		st3.status)
+
+	var st4 := SS.new()
+	st4.connect_timeout_ms = 100000
+	st4.ttft_timeout_ms = 100000
+	st4.idle_timeout_ms = 100000
+	st4.total_timeout_ms = 200
+	st4.started_at_ms = 0
+	st4.connected_at_ms = 10
+	st4.first_content_at_ms = 20
+	st4.last_data_at_ms = 20
+	_check("   absolute ceiling -> TOTAL_TIMEOUT",
+		st4._check_timeouts(300) and st4.status == SS.TOTAL_TIMEOUT, st4.status)
+
+	# The classes must map onto recovery categories, not prose.
+	_check("   CONNECT/TTFT timeouts are WEDGE-kind",
+		st.failure_kind() == "WEDGE" and st2.failure_kind() == "WEDGE")
+	_check("   idle/total timeouts are STALL-kind",
+		st3.failure_kind() == "STALL" and st4.failure_kind() == "STALL",
+		"a generation that started and stopped is a different pathology")
+
+	# A stream that ends without [DONE] is truncated, not successful.
+	var st5 := SS.new()
+	st5.started_at_ms = 0
+	st5._parser = preload("res://scripts/arena/sse_parser.gd").new()
+	st5._on_close(100)
+	_check("   close without [DONE] is TRUNCATED, not OK",
+		st5.status == SS.TRUNCATED and not st5.ok(),
+		"a half generation must never be recorded as healthy")
+
+	# SABOTAGE: prove the truncation check is load-bearing.
+	var st6 := SS.new()
+	st6.started_at_ms = 0
+	st6._parser = preload("res://scripts/arena/sse_parser.gd").new()
+	st6._parser.feed("data: [DONE]
+
+".to_utf8_buffer())
+	_check("   SABOTAGE APPLIED: parser saw DONE", st6._parser.saw_done)
+	st6._on_close(100)
+	_check("   with [DONE] the same path reports OK",
+		st6.status == SS.OK_STATUS and st6.ok(), st6.status)
+
+	# first EVENT is not first CONTENT.
+	var st7 := SS.new()
+	st7.started_at_ms = 0
+	st7._consume({"content": "", "done": false}, 100)
+	_check("   a content-free event sets first_event only",
+		st7.first_event_at_ms == 100 and st7.first_content_at_ms == 0,
+		"TTFT from the first event would understate prefill")
+	st7._consume({"content": "hi", "done": false}, 250)
+	_check("   the first content event sets first_content",
+		st7.first_content_at_ms == 250 and st7.text == "hi")
+	var tm := st7.timings()
+	_check("   timings report TTFT from first CONTENT",
+		int(tm["ttft_ms"]) == 250, str(tm["ttft_ms"]))
 
 
 func _receipts() -> void:

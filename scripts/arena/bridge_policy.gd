@@ -68,8 +68,23 @@ var min_tokens_for_rate: int = 16
 ## A single slow reply is not a diagnosis. Consecutive breaches are.
 var degraded_strikes: int = 2
 
-## No response at all within this window is a wedge, not slow work. The slowest
-## legitimate solo request measured ~5 s.
+## FOUR TIMEOUT CLASSES. One giant timeout erases the distinction between
+## failures that need different responses, so each phase gets its own clock:
+##
+##   connect  no connection or response headers -> the server is not there
+##   ttft     connected, generation never begins -> wedged model
+##   idle     generation began, then froze mid-stream -> stalled generation
+##   total    absolute ceiling
+##
+## These map onto pathologies already observed in the benchmark: a wedge that
+## never responds, a spilled model responding 100x slowly, and a generation
+## that starts then stops. Recovery keys off the mechanical class.
+var connect_timeout_ms: int = 10000
+var ttft_timeout_ms: int = 30000
+var idle_timeout_ms: int = 20000
+var total_timeout_ms: int = 120000
+
+## Retained name for the absolute ceiling used when sizing slot budgets.
 var wedge_timeout_ms: int = 120000
 
 ## ------------------------------------------------------- swap  hysteresis
