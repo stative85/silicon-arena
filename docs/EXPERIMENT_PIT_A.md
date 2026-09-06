@@ -661,3 +661,82 @@ Mechanical only, before any analysis phase exists:
 ```
 
 Only then does Phase 1 exist.
+
+---
+
+# Amendment: Run 4 analysis treatment, before Phase 1 exists
+
+**Written after Run 4 completed its mechanical integrity pass and before any
+analysis phase was performed.**
+
+Run 4 is **not void**. All eleven startup gates passed, all six frozen hashes
+match the manifest, 1,800 cycles completed with 0 chain breaks, 0
+`REQUEST_FAILED`, 0 open markers, and 87 `SHAPE_FAILED` correctly classified as
+neither decisions nor infrastructure.
+
+## The replicate finding
+
+**Every model species produced ONE trajectory, executed three times.**
+
+```
+  ARM                            trajectory identity   independent replicates
+  h2o-danube2-1.8b-chat          identical                    1
+  liquidai/lfm2.5-1.2b-instruct  identical                    1
+  qwen3.5-2b                     identical                    1
+  falcon-h1-1.5b-instruct        identical                    1
+  rwkv7-1.5b-g1                  identical                    1
+  RANDOM                         3 distinct                   3
+```
+
+Identity is over decisions, targets, reason codes and raw model output. At
+temperature 0, from an identical genesis, under an identical consequence
+schedule and a deterministic observation progression, a species cannot diverge
+between replicates. RANDOM differs only because it seeds on `90000 + replicate`.
+
+This is the same photocopy problem that voided Run 2, one level up: it was
+killed at the *cycle* level by `cycle_index` and went unnoticed at the
+*replicate* level. It is recorded as a design defect discovered post-hoc.
+
+## The treatment, fixed now
+
+**Phases 1 and 3-7 analyse ONE unique trajectory per model species**, plus
+RANDOM's three genuinely distinct ones.
+
+```
+  Danube2
+    r0 == r1 == r2 byte-for-byte trajectory
+    unique model trajectories for analysis   1
+    executed copies                          3
+    independent behavioural replicates       1
+```
+
+The same for all five species. The descriptor table carries an explicit
+`unique_trajectory_id`, and **aggregates must never multiply counts by three.**
+If Danube2 performed `ADD 12 / KEEP 71 / RESTORE 17`, the finding is *12/71/17
+over one 100-cycle deterministic trajectory* — never *36/213/51 over 300
+decisions*, which would report one history three times as though three had
+occurred.
+
+**RANDOM keeps all three replicates.** They genuinely differ, the
+pre-registration uses the control distribution, and deduplicating it to make the
+table symmetrical would discard real variation.
+
+## Phase 2
+
+> **NOT ESTIMABLE.** Under temperature 0, an identical initial world, an
+> identical consequence schedule, identical model and runtime configuration, and
+> deterministic observation progression, all three executed copies for each
+> model species produced identical trajectories. The planned within-species
+> replicate-variation analysis therefore has no independent variation to
+> measure. **Equality of the three copies is an execution-reproducibility
+> observation, not evidence of behavioural stability under perturbation.**
+
+That distinction is the whole point of recording it this way.
+
+## What is NOT done
+
+**Run 4 is not redesigned.** No temperature is added post-hoc to manufacture
+replicates. Run 4 is what it is. A future PIT-A2 may deliberately vary seeds or
+sampling to test whether architectural signatures are robust to perturbation —
+that is a new experiment with its own pre-registration, not a patch to this
+one.
