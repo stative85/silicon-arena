@@ -1,0 +1,168 @@
+
+================================================================
+ARM SERIAL   (2400 envelopes)
+================================================================
+
+SELECTION PROFILE — SERIAL
+--------------------------
+  lfm2.5   n= 800
+      by id    r_00:200, r_01:200, r_02:200, r_03:200
+      by rank  0:800
+      top-1 share   id 0.250   rank 1.000
+  qwen3.5  n= 800
+      by id    r_00:200, r_06:200, r_08:200, r_02:199
+      by rank  0:400, 2:398, 4:1, 3:1
+      top-1 share   id 0.250   rank 0.500
+  falcon   n= 800
+      by id    r_05:200, r_07:200, r_09:200, r_12:200
+      by rank  2:397, 5:201, 3:200, 4:2
+      top-1 share   id 0.250   rank 0.496
+
+TRANSITION MATRIX — SERIAL
+--------------------------
+  lfm2.5   800 steps, 4 distinct states, 1.00 successors/state
+      r_00->r_01:200, r_01->r_02:200, r_02->r_03:200, r_03->r_00:199
+  qwen3.5  800 steps, 5 distinct states, 1.40 successors/state
+      r_00->r_06:200, r_06->r_02:199, r_02->r_08:199, r_08->r_00:198, r_06->r_08:1, r_08->r_03:1
+  falcon   800 steps, 4 distinct states, 1.00 successors/state
+      r_05->r_07:200, r_07->r_09:200, r_09->r_12:200, r_12->r_05:199
+
+CONTENTION GRAPH — SERIAL
+-------------------------
+  pair                      simul collisions       rate
+  lfm2.5-qwen3.5              800        400      50.0%
+  lfm2.5-falcon               800          0       0.0%
+  qwen3.5-falcon              800          0       0.0%
+
+STALE MECHANISM - SERIAL
+------------------------
+  stale events                        0
+  explained by 'same target, taken first'    0 =   0.0%
+  unexplained                             0
+
+COLLISION RESOLUTION — SERIAL
+-----------------------------
+  simultaneous same-target groups  400
+  agent           won     lost
+  lfm2.5          400        0
+  qwen3.5           0      400
+  falcon            0        0
+
+================================================================
+ARM NATURAL   (1082 envelopes)
+================================================================
+
+SELECTION PROFILE — NATURAL
+---------------------------
+  lfm2.5   n= 544
+      by id    r_00:174, r_01:164, r_02:160, r_03:45
+      by rank  0:544
+      top-1 share   id 0.320   rank 1.000
+  qwen3.5  n= 268
+      by id    r_00:65, r_01:61, r_09:58, r_02:46
+      by rank  0:174, 6:40, 4:30, 5:17
+      top-1 share   id 0.243   rank 0.649
+  falcon   n= 270
+      by id    r_08:126, r_07:120, r_09:20, r_05:3
+      by rank  5:191, 4:38, 6:37, 3:2
+      top-1 share   id 0.467   rank 0.707
+
+TRANSITION MATRIX — NATURAL
+---------------------------
+  lfm2.5   544 steps, 5 distinct states, 2.80 successors/state
+      r_01->r_00:97, r_00->r_02:94, r_02->r_01:74, r_00->r_01:64, r_02->r_00:64, r_01->r_02:58
+  qwen3.5  268 steps, 8 distinct states, 4.50 successors/state
+      r_09->r_01:25, r_00->r_01:20, r_01->r_02:19, r_01->r_00:18, r_01->r_09:17, r_09->r_00:17
+  falcon   270 steps, 5 distinct states, 2.60 successors/state
+      r_08->r_07:115, r_07->r_08:106, r_09->r_08:19, r_07->r_09:11, r_08->r_09:9, r_05->r_07:2
+
+CONTENTION GRAPH — NATURAL
+--------------------------
+  pair                      simul collisions       rate
+  lfm2.5-qwen3.5               77         38      49.4%
+  lfm2.5-falcon               213          0       0.0%
+  qwen3.5-falcon               38          3       7.9%
+
+STALE MECHANISM - NATURAL
+-------------------------
+  stale events                        198
+  explained by 'same target, taken first'  198 = 100.0%
+  unexplained                             0
+  agent that took the resource first:
+      lfm2.5    165  (83.3% of explained)
+      falcon     22  (11.1% of explained)
+      qwen3.5    11  (5.6% of explained)
+
+COLLISION RESOLUTION — NATURAL
+------------------------------
+  simultaneous same-target groups  41
+  agent           won     lost
+  lfm2.5           38        0
+  qwen3.5           2       39
+  falcon            1        2
+
+================================================================
+ARM EQUALIZED   (600 envelopes)
+================================================================
+
+SELECTION PROFILE — EQUALIZED
+-----------------------------
+  lfm2.5   n= 200
+      by id    r_00:100, r_01:100
+      by rank  0:200
+      top-1 share   id 0.500   rank 1.000
+  qwen3.5  n= 200
+      by id    r_00:99, r_01:99, r_06:1, r_08:1
+      by rank  0:198, 4:1, 5:1
+      top-1 share   id 0.495   rank 0.990
+  falcon   n= 200
+      by id    r_07:100, r_08:98, r_05:1, r_09:1
+      by rank  6:198, 5:2
+      top-1 share   id 0.500   rank 0.990
+
+TRANSITION MATRIX — EQUALIZED
+-----------------------------
+  lfm2.5   200 steps, 2 distinct states, 1.00 successors/state
+      r_00->r_01:100, r_01->r_00:99
+  qwen3.5  200 steps, 4 distinct states, 1.25 successors/state
+      r_01->r_00:98, r_00->r_01:98, r_00->r_06:1, r_06->r_08:1, r_08->r_01:1
+  falcon   200 steps, 4 distinct states, 1.25 successors/state
+      r_07->r_08:98, r_08->r_07:98, r_05->r_07:1, r_07->r_09:1, r_09->r_07:1
+
+CONTENTION GRAPH — EQUALIZED
+----------------------------
+  pair                      simul collisions       rate
+  lfm2.5-qwen3.5              200        198      99.0%
+  lfm2.5-falcon               200          0       0.0%
+  qwen3.5-falcon              200          0       0.0%
+
+STALE MECHANISM - EQUALIZED
+---------------------------
+  stale events                        198
+  explained by 'same target, taken first'  198 = 100.0%
+  unexplained                             0
+  agent that took the resource first:
+      qwen3.5   104  (52.5% of explained)
+      lfm2.5     94  (47.5% of explained)
+
+COLLISION RESOLUTION — EQUALIZED
+--------------------------------
+  simultaneous same-target groups  198
+  agent           won     lost
+  lfm2.5           94      104
+  qwen3.5         104       94
+  falcon            0        0
+
+IDENTIFIER PREFERENCE vs LIST-POSITION PREFERENCE
+-------------------------------------------------
+             top-1 RANK share by arm      top-1 ID share by arm       
+  lfm2.5     1.00 1.00 1.00               0.25 0.32 0.50              
+  qwen3.5    0.50 0.65 0.99               0.25 0.24 0.49              
+  falcon     0.50 0.71 0.99               0.25 0.47 0.50              
+
+  A model that holds a RANK constant while the ids under it change
+  is position-driven. One that holds IDS constant while their rank
+  moves is identifier-driven. Reported, not adjudicated: this is
+  observational separation across three arms, not a manipulation.
+
+wrote docs\results\ASYNC_A3_TOPOLOGY.json

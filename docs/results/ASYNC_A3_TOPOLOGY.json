@@ -1,0 +1,517 @@
+{
+  "SERIAL": {
+    "selection": {
+      "lfm2.5": {
+        "by_id": {
+          "r_00": 200,
+          "r_01": 200,
+          "r_02": 200,
+          "r_03": 200
+        },
+        "by_rank": {
+          "0": 800
+        },
+        "top1_id_share": 0.25,
+        "top1_rank_share": 1.0
+      },
+      "qwen3.5": {
+        "by_id": {
+          "r_00": 200,
+          "r_06": 200,
+          "r_08": 200,
+          "r_03": 1,
+          "r_02": 199
+        },
+        "by_rank": {
+          "0": 400,
+          "4": 1,
+          "3": 1,
+          "2": 398
+        },
+        "top1_id_share": 0.25,
+        "top1_rank_share": 0.5
+      },
+      "falcon": {
+        "by_id": {
+          "r_05": 200,
+          "r_07": 200,
+          "r_09": 200,
+          "r_12": 200
+        },
+        "by_rank": {
+          "5": 201,
+          "4": 2,
+          "2": 397,
+          "3": 200
+        },
+        "top1_id_share": 0.25,
+        "top1_rank_share": 0.49625
+      }
+    },
+    "transitions": {
+      "lfm2.5": {
+        "steps": 800,
+        "states": 4,
+        "successors_per_state": 1.0,
+        "top": [
+          [
+            "r_00->r_01",
+            200
+          ],
+          [
+            "r_01->r_02",
+            200
+          ],
+          [
+            "r_02->r_03",
+            200
+          ],
+          [
+            "r_03->r_00",
+            199
+          ]
+        ]
+      },
+      "qwen3.5": {
+        "steps": 800,
+        "states": 5,
+        "successors_per_state": 1.4,
+        "top": [
+          [
+            "r_00->r_06",
+            200
+          ],
+          [
+            "r_06->r_02",
+            199
+          ],
+          [
+            "r_02->r_08",
+            199
+          ],
+          [
+            "r_08->r_00",
+            198
+          ],
+          [
+            "r_06->r_08",
+            1
+          ],
+          [
+            "r_08->r_03",
+            1
+          ]
+        ]
+      },
+      "falcon": {
+        "steps": 800,
+        "states": 4,
+        "successors_per_state": 1.0,
+        "top": [
+          [
+            "r_05->r_07",
+            200
+          ],
+          [
+            "r_07->r_09",
+            200
+          ],
+          [
+            "r_09->r_12",
+            200
+          ],
+          [
+            "r_12->r_05",
+            199
+          ]
+        ]
+      }
+    },
+    "graph": {
+      "lfm2.5-qwen3.5": {
+        "simultaneous": 800,
+        "collisions": 400,
+        "rate": 0.5
+      },
+      "lfm2.5-falcon": {
+        "simultaneous": 800,
+        "collisions": 0,
+        "rate": 0.0
+      },
+      "qwen3.5-falcon": {
+        "simultaneous": 800,
+        "collisions": 0,
+        "rate": 0.0
+      }
+    },
+    "stale": {
+      "stale": 0,
+      "acquisition_driven": 0,
+      "unexplained": 0,
+      "explained_rate": 0.0,
+      "winner": {}
+    },
+    "resolution": {
+      "groups": 400,
+      "won": {
+        "lfm2.5": 400,
+        "qwen3.5": 0,
+        "falcon": 0
+      },
+      "lost": {
+        "lfm2.5": 0,
+        "qwen3.5": 400,
+        "falcon": 0
+      }
+    }
+  },
+  "NATURAL": {
+    "selection": {
+      "lfm2.5": {
+        "by_id": {
+          "r_00": 174,
+          "r_01": 164,
+          "r_02": 160,
+          "r_03": 45,
+          "r_04": 1
+        },
+        "by_rank": {
+          "0": 544
+        },
+        "top1_id_share": 0.31985294117647056,
+        "top1_rank_share": 1.0
+      },
+      "qwen3.5": {
+        "by_id": {
+          "r_00": 65,
+          "r_06": 15,
+          "r_08": 18,
+          "r_09": 58,
+          "r_01": 61,
+          "r_02": 46,
+          "r_07": 3,
+          "r_03": 2
+        },
+        "by_rank": {
+          "0": 174,
+          "4": 30,
+          "6": 40,
+          "5": 17,
+          "3": 6,
+          "7": 1
+        },
+        "top1_id_share": 0.24253731343283583,
+        "top1_rank_share": 0.6492537313432836
+      },
+      "falcon": {
+        "by_id": {
+          "r_05": 3,
+          "r_07": 120,
+          "r_08": 126,
+          "r_09": 20,
+          "r_06": 1
+        },
+        "by_rank": {
+          "5": 191,
+          "4": 38,
+          "6": 37,
+          "3": 2,
+          "not-visible": 2
+        },
+        "top1_id_share": 0.4666666666666667,
+        "top1_rank_share": 0.7074074074074074
+      }
+    },
+    "transitions": {
+      "lfm2.5": {
+        "steps": 544,
+        "states": 5,
+        "successors_per_state": 2.8,
+        "top": [
+          [
+            "r_01->r_00",
+            97
+          ],
+          [
+            "r_00->r_02",
+            94
+          ],
+          [
+            "r_02->r_01",
+            74
+          ],
+          [
+            "r_00->r_01",
+            64
+          ],
+          [
+            "r_02->r_00",
+            64
+          ],
+          [
+            "r_01->r_02",
+            58
+          ]
+        ]
+      },
+      "qwen3.5": {
+        "steps": 268,
+        "states": 8,
+        "successors_per_state": 4.5,
+        "top": [
+          [
+            "r_09->r_01",
+            25
+          ],
+          [
+            "r_00->r_01",
+            20
+          ],
+          [
+            "r_01->r_02",
+            19
+          ],
+          [
+            "r_01->r_00",
+            18
+          ],
+          [
+            "r_01->r_09",
+            17
+          ],
+          [
+            "r_09->r_00",
+            17
+          ]
+        ]
+      },
+      "falcon": {
+        "steps": 270,
+        "states": 5,
+        "successors_per_state": 2.6,
+        "top": [
+          [
+            "r_08->r_07",
+            115
+          ],
+          [
+            "r_07->r_08",
+            106
+          ],
+          [
+            "r_09->r_08",
+            19
+          ],
+          [
+            "r_07->r_09",
+            11
+          ],
+          [
+            "r_08->r_09",
+            9
+          ],
+          [
+            "r_05->r_07",
+            2
+          ]
+        ]
+      }
+    },
+    "graph": {
+      "lfm2.5-qwen3.5": {
+        "simultaneous": 77,
+        "collisions": 38,
+        "rate": 0.4935064935064935
+      },
+      "lfm2.5-falcon": {
+        "simultaneous": 213,
+        "collisions": 0,
+        "rate": 0.0
+      },
+      "qwen3.5-falcon": {
+        "simultaneous": 38,
+        "collisions": 3,
+        "rate": 0.07894736842105263
+      }
+    },
+    "stale": {
+      "stale": 198,
+      "acquisition_driven": 198,
+      "unexplained": 0,
+      "explained_rate": 1.0,
+      "winner": {
+        "lfm2.5": 165,
+        "qwen3.5": 11,
+        "falcon": 22
+      }
+    },
+    "resolution": {
+      "groups": 41,
+      "won": {
+        "lfm2.5": 38,
+        "qwen3.5": 2,
+        "falcon": 1
+      },
+      "lost": {
+        "lfm2.5": 0,
+        "qwen3.5": 39,
+        "falcon": 2
+      }
+    }
+  },
+  "EQUALIZED": {
+    "selection": {
+      "lfm2.5": {
+        "by_id": {
+          "r_00": 100,
+          "r_01": 100
+        },
+        "by_rank": {
+          "0": 200
+        },
+        "top1_id_share": 0.5,
+        "top1_rank_share": 1.0
+      },
+      "qwen3.5": {
+        "by_id": {
+          "r_00": 99,
+          "r_06": 1,
+          "r_08": 1,
+          "r_01": 99
+        },
+        "by_rank": {
+          "0": 198,
+          "4": 1,
+          "5": 1
+        },
+        "top1_id_share": 0.495,
+        "top1_rank_share": 0.99
+      },
+      "falcon": {
+        "by_id": {
+          "r_05": 1,
+          "r_07": 100,
+          "r_09": 1,
+          "r_08": 98
+        },
+        "by_rank": {
+          "5": 2,
+          "6": 198
+        },
+        "top1_id_share": 0.5,
+        "top1_rank_share": 0.99
+      }
+    },
+    "transitions": {
+      "lfm2.5": {
+        "steps": 200,
+        "states": 2,
+        "successors_per_state": 1.0,
+        "top": [
+          [
+            "r_00->r_01",
+            100
+          ],
+          [
+            "r_01->r_00",
+            99
+          ]
+        ]
+      },
+      "qwen3.5": {
+        "steps": 200,
+        "states": 4,
+        "successors_per_state": 1.25,
+        "top": [
+          [
+            "r_01->r_00",
+            98
+          ],
+          [
+            "r_00->r_01",
+            98
+          ],
+          [
+            "r_00->r_06",
+            1
+          ],
+          [
+            "r_06->r_08",
+            1
+          ],
+          [
+            "r_08->r_01",
+            1
+          ]
+        ]
+      },
+      "falcon": {
+        "steps": 200,
+        "states": 4,
+        "successors_per_state": 1.25,
+        "top": [
+          [
+            "r_07->r_08",
+            98
+          ],
+          [
+            "r_08->r_07",
+            98
+          ],
+          [
+            "r_05->r_07",
+            1
+          ],
+          [
+            "r_07->r_09",
+            1
+          ],
+          [
+            "r_09->r_07",
+            1
+          ]
+        ]
+      }
+    },
+    "graph": {
+      "lfm2.5-qwen3.5": {
+        "simultaneous": 200,
+        "collisions": 198,
+        "rate": 0.99
+      },
+      "lfm2.5-falcon": {
+        "simultaneous": 200,
+        "collisions": 0,
+        "rate": 0.0
+      },
+      "qwen3.5-falcon": {
+        "simultaneous": 200,
+        "collisions": 0,
+        "rate": 0.0
+      }
+    },
+    "stale": {
+      "stale": 198,
+      "acquisition_driven": 198,
+      "unexplained": 0,
+      "explained_rate": 1.0,
+      "winner": {
+        "lfm2.5": 94,
+        "qwen3.5": 104
+      }
+    },
+    "resolution": {
+      "groups": 198,
+      "won": {
+        "lfm2.5": 94,
+        "qwen3.5": 104,
+        "falcon": 0
+      },
+      "lost": {
+        "lfm2.5": 104,
+        "qwen3.5": 94,
+        "falcon": 0
+      }
+    }
+  }
+}
