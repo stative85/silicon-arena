@@ -122,3 +122,47 @@ static func invert_by_latency(envelopes: Array) -> Array:
 ## must reproduce arm 2 exactly.
 static func identity_order(envelopes: Array) -> Array:
 	return envelopes.duplicate()
+
+
+## WITHIN-TICK ORDERING. Wall time maps into 250 ms ticks, so genuinely
+## different completions land in the same tick. How due envelopes are ordered
+## inside a tick is therefore part of the timing policy, not an implementation
+## detail.
+##
+## NATURAL preserves real arrival ordering exactly, because that ordering is
+## the subject of the arm.
+##
+## EQUALIZED must NOT consult completion_ms at all. Every due envelope shares
+## the same release tick by construction, so ordering them by completion time
+## would let model speed leak straight back in -- the same leak Amendment 5
+## closed at the cadence, arriving instead through within-tick order.
+##
+## Raw request_id order is rejected for EQUALIZED: request_id encodes agent and
+## cycle, so it would apply agent 0 before agent 1 in EVERY same-tick
+## collision. That is not a speed leak but it is a systematic acquisition
+## advantage by agent index, and per-agent acquisition is exactly what Q2
+## measures. A hash of request_id is a function of request_id alone,
+## deterministic, and not systematically favourable to any agent.
+static func order_due(arm: String, due: Array) -> Array:
+	var work: Array = due.duplicate()
+	match arm:
+		NATURAL:
+			work.sort_custom(func(a, b):
+				var ea: AsyncEnvelope = a
+				var eb: AsyncEnvelope = b
+				if ea.completed_ms != eb.completed_ms:
+					return ea.completed_ms < eb.completed_ms
+				return ea.request_id < eb.request_id)
+		EQUALIZED:
+			work.sort_custom(func(a, b):
+				return _order_key(a) < _order_key(b))
+		_:
+			# SERIAL has at most one applicable envelope; ORDER_REPLAY receives
+			# an order already imposed by the frozen inversion.
+			pass
+	return work
+
+
+static func _order_key(e) -> String:
+	var env: AsyncEnvelope = e
+	return env.request_id.sha256_text()

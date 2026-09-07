@@ -23,7 +23,7 @@ var _failures: Array[String] = []
 ## still report OK. Each section registers itself and must mark completion, so
 ## an aborted section fails the run instead of vanishing from it.
 var _expected_sections := ["envelope", "clocks", "equalizer", "inversion",
-	"serial_tooth", "lifecycle", "contract"]
+	"serial_tooth", "lifecycle", "contract", "within_tick"]
 var _completed_sections: Array[String] = []
 
 
@@ -53,6 +53,7 @@ func _run() -> void:
 	_serial_tooth()
 	_lifecycle()
 	_contract()
+	_within_tick()
 	_report()
 
 
@@ -350,6 +351,91 @@ func _contract() -> void:
 	_check("   the schema hash is stable",
 		C.schema_hash() == C.schema_hash() and C.schema_hash() != "")
 	_done("contract")
+
+
+
+## Within-tick ordering. Wall time maps into 250 ms ticks, so genuinely
+## different completions land in the same tick, and how they are ordered there
+## is part of the timing policy.
+func _within_tick() -> void:
+	print("\n within-tick ordering")
+	var w: AsyncWorld = W.make(8, 4)
+
+	var a := _mk("c01_a0", "fast", w, "r_00")
+	a.submitted_ms = 0
+	a.completed_ms = 611
+	var b := _mk("c01_a1", "mid", w, "r_01")
+	b.submitted_ms = 0
+	b.completed_ms = 734
+	var c := _mk("c01_a2", "slow", w, "r_02")
+	c.submitted_ms = 0
+	c.completed_ms = 690
+
+	var due := [a, b, c]
+
+	# NATURAL preserves the real arrival ordering.
+	var nat := T.order_due(T.NATURAL, due)
+	_check("   NATURAL orders by exact completion_ms",
+		(nat[0] as AsyncEnvelope).request_id == "c01_a0"
+			and (nat[1] as AsyncEnvelope).request_id == "c01_a2"
+			and (nat[2] as AsyncEnvelope).request_id == "c01_a1",
+		"611, 690, 734 -- all in the same tick")
+
+	# SABOTAGE: swap completion times, order MUST follow.
+	var sa := _mk("c01_a0", "fast", w, "r_00")
+	sa.completed_ms = 734
+	var sb := _mk("c01_a1", "mid", w, "r_01")
+	sb.completed_ms = 611
+	_check("   SABOTAGE APPLIED: completion times swapped",
+		sa.completed_ms > sb.completed_ms)
+	var nat2 := T.order_due(T.NATURAL, [sa, sb])
+	_check("   NATURAL order swaps with them",
+		(nat2[0] as AsyncEnvelope).request_id == "c01_a1",
+		"if it did not, the runner discards the arrival information the arm "
+		+ "exists to study")
+
+	# EQUALIZED must be blind to completion_ms.
+	var eq_before := T.order_due(T.EQUALIZED, due)
+	var ids_before: Array = []
+	for e in eq_before:
+		ids_before.append((e as AsyncEnvelope).request_id)
+
+	# SABOTAGE: permute every completion time. Order MUST NOT move.
+	a.completed_ms = 999
+	b.completed_ms = 100
+	c.completed_ms = 500
+	_check("   SABOTAGE APPLIED: completion times permuted",
+		a.completed_ms == 999 and b.completed_ms == 100)
+	var eq_after := T.order_due(T.EQUALIZED, due)
+	var ids_after: Array = []
+	for e in eq_after:
+		ids_after.append((e as AsyncEnvelope).request_id)
+	_check("   EQUALIZED order is unchanged by completion times",
+		str(ids_before) == str(ids_after),
+		"speed leaking into arm 3 through within-tick order: %s vs %s"
+			% [str(ids_before), str(ids_after)])
+
+	# And it must not simply be agent-index order, which would hand agent 0
+	# every same-tick collision. Checked across many cycles below rather than
+	# by one comparison -- a single ordering could match agent order by chance.
+	var seen := {}
+	for cyc in 40:
+		var e0 := _mk("c%02d_a0" % cyc, "a0", w, "r_00")
+		var e1 := _mk("c%02d_a1" % cyc, "a1", w, "r_01")
+		var e2 := _mk("c%02d_a2" % cyc, "a2", w, "r_02")
+		var o := T.order_due(T.EQUALIZED, [e0, e1, e2])
+		var first := str((o[0] as AsyncEnvelope).request_id).right(2)
+		seen[first] = int(seen.get(first, 0)) + 1
+	_check("   no single agent takes first position every tick",
+		seen.size() > 1,
+		"a fixed agent order is a systematic acquisition advantage: %s"
+			% str(seen))
+
+	# Determinism.
+	_check("   EQUALIZED ordering is deterministic",
+		str(ids_after) == str(T.order_due(T.EQUALIZED, due).map(
+			func(e): return (e as AsyncEnvelope).request_id)))
+	_done("within_tick")
 
 
 func _report() -> void:

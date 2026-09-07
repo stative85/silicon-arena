@@ -1111,3 +1111,113 @@ natural delay by more than before. Q2 compares **between-agent differences
 within each arm**, so this is not a confound for the question asked — but the
 absolute staleness rate in arm 3 is expected to exceed arm 2's, and that
 difference is not evidence of anything by itself.
+
+---
+
+# Amendment 8: within-tick ordering, and the 4-tick resonance
+
+**Written before the step engine exists.**
+
+## The seam
+
+Wall time is mapped into 250 ms ticks, so genuinely different completions land
+in the same tick:
+
+```
+falcon completes  611 ms
+danube completes  734 ms
+both -> completion_tick = 2
+```
+
+If due envelopes are then applied by submission order or request id, **NATURAL
+has silently discarded the real arrival ordering it exists to study.**
+
+And the inverse bug is worse. Under EQUALIZED every due envelope shares the
+same release tick by construction. If the runner orders those by
+`completion_ms`, **model speed leaks straight back into the equalized arm**
+even though the release ticks are identical. Amendment 5 closed the cadence
+window; this is the same leak arriving through within-tick ordering.
+
+## Frozen within-tick ordering
+
+```
+SERIAL         at most one applicable envelope; ordering is moot
+
+NATURAL        1. exact completion_ms
+               2. request_id tie-break
+               real arrival ordering is the subject, so it is preserved exactly
+
+EQUALIZED      ordered by a deterministic function of request_id ONLY
+               completion_ms MUST NOT affect order
+
+ORDER_REPLAY   the frozen latency-rank inversion from the paired arm 2
+               replicate
+```
+
+### Why not raw request_id order for EQUALIZED
+
+`request_id` encodes agent and cycle, so sorting by it directly would apply
+agent 0 before agent 1 in **every** same-tick collision. That is not a speed
+leak, but it is a systematic acquisition advantage by agent index — and
+per-agent acquisition is exactly what Q2 measures.
+
+EQUALIZED therefore orders by `sha256(request_id)`, which is a function of
+request_id alone (so completion time cannot enter), deterministic and
+reproducible, and not systematically favourable to any agent.
+
+### Required teeth
+
+```
+EQUALIZED   same envelopes, same release tick, PERMUTE completion_ms
+            -> application order MUST be identical
+            if it changes, speed is still hiding inside arm 3
+
+NATURAL     same envelopes, SWAP completion_ms
+            -> application order MUST swap
+            if it does not, the runner is discarding the arrival information
+            the arm exists to study
+```
+
+## The 4-tick resonance, recorded not corrected
+
+```
+WORLD HOLD           = 4 ticks
+EQUALIZED_DELAY      = 4 ticks
+```
+
+These became equal independently: hold 4 came from the world calibration's
+first-passing configuration, and the equalizer delay came from Gate 1's first
+feasible value. Neither was chosen with reference to the other.
+
+This does not automatically invalidate anything — resource release is
+event-relative, keyed to when each resource was taken, not a global periodic
+oscillator. But it creates a specific possibility:
+
+```
+T      A observes resource X
+T+k    another agent takes X
+T+4    A's equalized action arrives, and X may be reaching its hold/release
+       horizon at around the same time
+```
+
+That could systematically raise `STALE_REVALIDATED` in arm 3, or otherwise make
+arm 3 interact with the world's regeneration timescale in addition to removing
+between-model latency differences.
+
+**The constant is NOT changed.** Both values were fixed by first-feasible rules
+with no non-resonance criterion preregistered, and altering one now to avoid an
+aesthetic coincidence would be exactly the post-hoc shaping those rules exist to
+prevent.
+
+Recorded instead, before any outcome exists:
+
+> `EQUALIZED_DELAY_TICKS == HOLD_DURATION_TICKS == 4`. Arm 3 may therefore
+> interact with the resource regeneration timescale in addition to removing
+> between-model latency differences. `STALE_REVALIDATED` is reported separately
+> from `STALE_CONFLICT` so that interaction is observable rather than absorbed.
+
+**Pre-committed reading.** If arm 3 shows `STALE_CONFLICT` down and
+`STALE_REVALIDATED` sharply up, the first hypothesis is that the equalizer
+landed near the world's regeneration horizon — **not** that equalization made
+agents better at anything. Because ABA is now explicitly measurable, this is
+checkable rather than a matter of opinion.
