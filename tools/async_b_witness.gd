@@ -63,6 +63,8 @@ func _run() -> void:
 	_map_teeth()
 	_identity_witness()
 	_structural_invariant()
+	_orthogonality()
+	_factor_independence()
 	_sabotage()
 
 	print("\n[SUMMARY]")
@@ -244,6 +246,113 @@ func _structural_invariant() -> void:
 	_end("STRUCTURAL INVARIANT")
 
 
+# ------------------------------------------------------------- orthogonality
+
+func _orthogonality() -> void:
+	_section("ORDER/LABEL ORTHOGONALITY")
+	## ORDER must survive LABELING. The nasty failure is a renderer that applies
+	## a private order, applies labels, and then sorts the aliases for tidy
+	## prompt formatting -- which silently erases PRIVATE_ORDER while every
+	## other check still passes.
+	##
+	## Two representations that share a label map but carry deliberately
+	## OPPOSITE order maps must render the same available set as exact reverses
+	## of each other, at the level of the final displayed alias sequence.
+	var ids := R.canonical_ids()
+	var fwd := R.identity("agent_0")
+	var rev := R.identity("agent_1")
+	for i in R.N:
+		rev.order[i] = R.N - 1 - int(fwd.order[i])
+	# same label map on both, so ONLY order differs
+	var lab := R.make(0, "agent_0", true, true).label
+	fwd.label = lab.duplicate()
+	rev.label = lab.duplicate()
+
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 31337
+	var reversed_ok := true
+	var trials := 0
+	for t in 100:
+		var avail: Array = []
+		for id in ids:
+			if rng.randf() < 0.7:
+				avail.append(id)
+		if avail.size() < 2:
+			continue
+		trials += 1
+		var a: Array = fwd.render(avail)
+		var b: Array = rev.render(avail)
+		var b_rev: Array = b.duplicate()
+		b_rev.reverse()
+		if a != b_rev:
+			reversed_ok = false
+			break
+	_ok("opposite order maps produce reversed alias sequences", reversed_ok,
+		"a post-label sort would break this")
+	_ok("orthogonality tooth actually ran", trials > 50,
+		"only %d usable trials" % trials)
+
+	## And the displayed sequence must genuinely depend on order: two different
+	## private orders over the same labels must not render identically.
+	var differ := 0
+	for t in 50:
+		var avail2: Array = []
+		for id in ids:
+			if rng.randf() < 0.7:
+				avail2.append(id)
+		if avail2.size() < 2:
+			continue
+		if fwd.render(avail2) != rev.render(avail2):
+			differ += 1
+	_ok("order changes the displayed sequence", differ > 0)
+	_end("ORDER/LABEL ORTHOGONALITY")
+
+
+# -------------------------------------------------------- factor independence
+
+func _factor_independence() -> void:
+	_section("FACTOR INDEPENDENCE")
+	## The 2x2 requires ORDER and LABEL to be structurally independent, not
+	## merely called independent in the analysis. Deriving both from one PRNG
+	## stream -- seed once, draw order, draw labels -- couples the two factors by
+	## construction. They are drawn from DOMAIN-SEPARATED keys instead:
+	##
+	##     H(seed, "ORDER", agent_id | "SHARED")
+	##     H(seed, "LABEL", agent_id | "SHARED")
+	##
+	## so neither factor can carry information about the other.
+	var same := 0
+	var total := 0
+	for s in SEEDS:
+		for cell in CELLS:
+			var f: Array = CELLS[cell]
+			for a in AGENTS:
+				var r = R.make(int(s), a, bool(f[0]), bool(f[1]))
+				total += 1
+				if r.order == r.label:
+					same += 1
+				# The two maps must not even be hash-equal.
+				_ok("order/label maps distinct",
+					r.order_hash() != r.label_hash(),
+					"seed %d cell %s agent %s" % [s, cell, a])
+	_ok("no agent received identical order and label maps", same == 0,
+		"%d of %d coincided" % [same, total])
+
+	## Private frames must also differ from the SHARED frame they replace,
+	## otherwise a "private" cell is silently a shared one.
+	for s in SEEDS:
+		for a in AGENTS:
+			var priv = R.make(int(s), a, false, false)
+			var shared = R.make(int(s), a, true, true)
+			var do := R.hamming(priv.order, shared.order)
+			var dl := R.hamming(priv.label, shared.label)
+			_ok("private order != shared order", do >= MIN_SEPARATION,
+				"seed %d agent %s hamming %d" % [s, a, do])
+			_ok("private labels != shared labels", dl >= MIN_SEPARATION,
+				"seed %d agent %s hamming %d" % [s, a, dl])
+	_end("FACTOR INDEPENDENCE")
+
+
 # ------------------------------------------------------------------- sabotage
 
 func _sabotage() -> void:
@@ -299,6 +408,32 @@ func _sabotage() -> void:
 	var s6 := R.make(3, "agent_0", false, false)
 	var raw := C.prompt(ids)
 	var via := C.prompt(s6.render(ids))
+	# S7. post-label sort erases PRIVATE_ORDER
+	var s7a := R.identity("agent_0")
+	var s7b := R.identity("agent_1")
+	for i in R.N:
+		s7b.order[i] = R.N - 1 - int(s7a.order[i])
+	var lab7 := R.make(5, "agent_0", true, true).label
+	s7a.label = lab7.duplicate()
+	s7b.label = lab7.duplicate()
+	var av7 := ids.slice(0, 10)
+	var r7a: Array = s7a.render(av7)
+	var r7b: Array = s7b.render(av7)
+	r7a.sort()                              # the sabotage: sort after labelling
+	r7b.sort()
+	_ok("S7 post-label sort caught", r7a == r7b,
+		"sorting after labelling must make two OPPOSITE orders identical, "
+		+ "which is exactly why the orthogonality tooth exists")
+
+	# S8. ORDER and LABEL drawn from the same permutation
+	var s8 := R.make(6, "agent_0", false, false)
+	var coupled := R.identity("agent_0")
+	coupled.order = s8.order.duplicate()
+	coupled.label = s8.order.duplicate()    # same permutation in both slots
+	_ok("S8 coupled order/label caught",
+		coupled.order_hash() == coupled.label_hash(),
+		"the independence tooth must reject this")
+
 	_ok("S6 non-identity map changes the prompt",
 		raw.to_utf8_buffer() != via.to_utf8_buffer(),
 		"a private frame rendered identically to canonical -- the identity "
