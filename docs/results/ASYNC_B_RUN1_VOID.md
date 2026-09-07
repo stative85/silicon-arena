@@ -5,10 +5,18 @@ Frozen Latin schedule, 8 representation seeds x 4 cells, SERIAL only, 200 ticks
 per cell, `arm_baseline` before every cell.
 
 ```text
-ASYNC-B RUN 1
+ASYNC-B RUN 1:
+VOID / NO RESULT
 
-PRIMARY 2x2 TEST:
-NO RESULT
+REPRESENTATION INSTRUMENT:
+PASSED
+
+PRIMARY 2x2:
+NOT ESTIMABLE
+
+BLOCKING INFRASTRUCTURE QUESTIONS:
+1. short-prompt health-surface validity
+2. recovery-neighbour coupling
 
 32 cells run
 12 VOID (38%)
@@ -132,11 +140,53 @@ here — but it is now a strong regularity rather than an anecdote. Recorded in
 Each of those would be the move the closed-infrastructure wall exists to
 prevent, and each would be made *after* seeing which cells died.
 
-## Status and what ASYNC-B needs
+## TWO blockers, not one
 
-ASYNC-B as specified **cannot be measured on this pool** until the qwen/falcon
-recovery coupling is understood. The coupling investigation is the blocker, not
-a side quest, and it already has a named scope.
+An earlier version of this record named recovery coupling as *the* blocker. That
+was wrong, and the correction matters because it changes what has to be fixed
+first.
 
-The prereg itself is untouched and remains valid. What failed is the substrate
-it has to run on.
+**The health verdict precedes every reload.** In 12 of 12 cells that produced
+runtime events, the first event is `qwen3.5-2b -> DEGRADED`. Recovery is
+downstream. Repairing the coupling tomorrow would not have saved one cell,
+because qwen would still trip the detector in the short-list regime and void
+B/C/D selectively.
+
+```text
+BLOCKER 1
+Is Qwen genuinely degrading in the short-list regime,
+or is the frozen expected-TTFT surface miscalibrated there?
+    -> docs/EXPERIMENT_HEALTH_SHORT.md
+
+BLOCKER 2
+When Qwen recovery/reload occurs,
+does that operation itself destabilize Falcon?
+    -> docs/EXPERIMENT_RECOVERY_COUPLING.md
+```
+
+They are separate questions requiring separate controlled instruments, and
+neither can be answered by reinterpreting this run's artifacts.
+
+## The uncomfortable possibility
+
+ASYNC-B may have found the regime where **the treatment changes the detector's
+denominator without changing the underlying runtime enough to justify it**.
+
+If HEALTH-SHORT confirms that, the run did not merely fail. It found an
+interaction between **ecology state and observability infrastructure**: the
+experimental manipulation altered the world in a way that moved the measuring
+instrument's expectations, and the instrument then removed exactly the cells
+where the manipulation worked best.
+
+That is a real result about instrumentation, and it is only visible because
+every other part of the pipeline was made hard to lie with first.
+
+## What ASYNC-B2 will and will not change
+
+Not designed yet, and deliberately not started. When it exists it stays
+**scientifically identical** to `e53e684`: same question, same 2x2, same 8
+seeds, same Latin schedule, same world, same maps, same metrics.
+
+Only infrastructure qualification changes. No scarcity tweak, no new roster, no
+dropping qwen because it was inconvenient, and no making A/B/C/D easier on the
+detector.
