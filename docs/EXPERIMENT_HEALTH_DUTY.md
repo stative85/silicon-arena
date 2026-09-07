@@ -155,3 +155,94 @@ contention-factor change. No `OUT_OF_PROFILE` implementation. No repair. No
 RECOVERY-COUPLING. No ASYNC-B2.
 
 HEALTH-DUTY discriminates mechanisms. It does not fix anything.
+
+
+---
+
+# Amendment 1 — what B_LIKE is NOT, telemetry, and a resolved inconsistency
+
+Frozen before implementation and before any model call.
+
+## The factor is a CLIENT session, not a fresh runtime
+
+Renamed for honesty:
+
+```text
+SESSION STRUCTURE
+    LONG_CONTINUOUS
+    CELL-LIKE CLIENT SESSION
+```
+
+Stated explicitly, because the shorter name invites a claim the design cannot
+support:
+
+```text
+CELL_LIKE  =  fresh CLIENT process + arm_baseline + per-regime isolation
+
+CELL_LIKE !=  fresh LM Studio model process
+CELL_LIKE !=  cleared model-side cache
+CELL_LIKE !=  reset runtime history
+```
+
+A new Godot process resets the client. It does **not** reset LM Studio's process
+lifetime, its caches, resident duration, or GPU scheduling state. Those persist
+across the whole experiment.
+
+**No reload is added to manufacture freshness.** Doing so would inject the
+recovery-coupling event — Blocker 2 — directly into a Blocker 1 diagnostic,
+which is the mistake Amendment 2 of HEALTH-SHORT exists to prevent.
+
+The two histories are therefore kept separate in every claim:
+
+```text
+CLIENT HISTORY            MODEL / RUNTIME HISTORY
+Godot process lifetime    LM Studio process lifetime
+request cadence           cache state
+round index               resident duration
+HTTP/session lifetime     memory pressure, GPU scheduling state
+```
+
+HEALTH-DUTY manipulates the first and leaves the second untouched. If the
+contrast lands, the finding is about client session structure only, and the
+runtime-history half remains an open variable.
+
+## Session structure is a bundle; record its parts
+
+Recorded per call as telemetry, **not** as outcomes and with no thresholds
+attached. If the contrast lands, these may say which part of the bundle moved:
+
+```text
+round_index
+process_elapsed_ms
+burst_position                  order within the 3-call simultaneous burst
+first_call_in_process           bool
+ms_since_previous_request_for_this_model
+```
+
+## Resolved inconsistency in the frozen text
+
+The factor definition said `B_LIKE` runs "200 rounds, exactly as a B cell", while
+the Design block specified "120 per regime per arm". That is a contradiction in
+my own prereg and is resolved here rather than silently at runtime.
+
+**120 rounds governs, in both arms.** Matched prompt material across arms is a
+stated requirement, and unequal n would break the comparison the experiment
+exists to make. The cost is recorded: `CELL_LIKE` reproduces process freshness,
+the pre-cell baseline, and per-regime isolation, but its session is 120 rounds
+rather than the cell's 200. Session *length* is therefore only partially
+matched; session *structure* is matched.
+
+If the contrast is null, that shortfall is one of the first things a follow-up
+should vary — and it is named now so the follow-up cannot present it as a new
+idea after seeing the result.
+
+## Reframing kept explicit
+
+HEALTH-DUTY is not "is continuous operation worse?". It is:
+
+> Which session-level feature explains the contradiction between a synthetic
+> health harness and the production experimental path?
+
+The cell-A contradiction is the target. If neither arm brings qwen anywhere near
+cell A's effective health regime at length 10, the missing variable has not been
+isolated and **no surface may be fitted.**
