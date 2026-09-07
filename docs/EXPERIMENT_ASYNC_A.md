@@ -1490,3 +1490,138 @@ world_final_hash    diagnostic
 The journal hash decides. The other two exist so that a failure can be
 diagnosed by looking at what differs, rather than by staring at two SHA strings
 in the hope of insight.
+
+---
+
+# Amendment 11: run horizon 200 -> 800 ticks, and settle is drainage
+
+**Written from pre-outcome instrument behaviour only. No live arm has run.**
+
+## The observation
+
+Dry synthetic validation of the final runner, 200 ticks, three agents:
+
+```
+SERIAL       600 actions / 200 ticks = 3.000 actions per tick
+NATURAL      367 actions / 200 ticks = 1.835
+EQUALIZED    150 actions / 200 ticks = 0.750
+```
+
+The cadence gate is working exactly as designed — one outstanding cognition per
+agent, released at `observed_tick + 4` under EQUALIZED — so an agent acts about
+once every four ticks instead of every tick. Not a bug.
+
+But arm 3 would have carried roughly a quarter of arm 1's actions, and the
+preregistered scale was ~600 actions per replicate. The weakest arm would have
+been the one carrying the least information.
+
+## The correction
+
+```
+RUN HORIZON
+800 observation ticks for SERIAL, NATURAL and EQUALIZED.
+```
+
+Reason: the equalized lifecycle yields ~0.75 actions per tick population-wide,
+so 800 ticks restores ~600 EQUALIZED actions per replicate — the originally
+preregistered action scale — **while every live arm still experiences the same
+amount of world time.**
+
+Rough dry expectations at 800 ticks:
+
+```
+SERIAL      ~2400 actions per replicate
+NATURAL     ~1468
+EQUALIZED    ~600
+```
+
+SERIAL and NATURAL receive more observations than strictly necessary. That is
+accepted.
+
+## Action counts are NOT equalized
+
+The alternative — run each arm until it reaches ~600 actions — is rejected, and
+the reason is causal rather than aesthetic:
+
+```
+timing regime  ->  cognition cadence  ->  actions completed
+```
+
+Action throughput is a **downstream consequence of the treatment**, so
+equalizing it would condition on an outcome. Worse, EQUALIZED would then run
+roughly four times as much world history as SERIAL, and regeneration, resource
+cycles and environmental history would become different exposures. That solves a
+denominator problem by creating a much nastier time confound.
+
+Throughput stays an outcome, and is reported:
+
+```
+actions / tick
+actions / agent
+observation_opportunities / tick
+NO_OPPORTUNITY / observation_opportunity
+```
+
+The 4x throughput difference between arms is potentially itself an ASYNC-A
+result. It is not normalised out of existence.
+
+## Settle is drainage, not experimental time
+
+```
+ticks 0 .. 799        observations and new cognition allowed
+after tick 799        NO new observations, NO new submissions
+settle phase          the world advances only as required; already-open
+                      envelopes complete, release and apply
+                      drain until every lifecycle is closed
+```
+
+**Every counted action must originate from an observation made inside the
+800-tick acquisition horizon.** Otherwise NATURAL and EQUALIZED would gain extra
+cognition opportunities merely because they take longer to empty the pipe — a
+speed advantage handed out by the tail of the run.
+
+The manifest distinguishes all three, so nothing is ambiguous later:
+
+```
+observation_horizon_ticks = 800
+settle_ticks              = N
+final_world_tick          = 800 + N
+```
+
+## ORDER_REPLAY
+
+Arm 4 uses the **complete NATURAL envelope corpus from its paired 800-tick
+replicate**, and the pairing is recorded:
+
+```
+source = paired NATURAL replicate
+model_calls = 0
+source_envelope_corpus_hash MUST equal replay_input_corpus_hash
+
+identical: request_id, agent_id, observation provenance, chosen target,
+           chosen target generation, action bytes
+changed:   application ordering only
+```
+
+## The runner-level deterministic witness
+
+The final runner is **not** required to match the Gate 2 calibration fixture.
+Gate 2 reproduces the calibration, whose synthetic actors submitted every cycle
+with no lifecycle gate; the runner enforces one outstanding cognition per agent.
+Identical hashes would therefore prove the **lifecycle gate was absent**, which
+is backwards.
+
+Instead, a small independent inline orchestration reference drives the same
+`AsyncWorld`, `AsyncStepEngine`, `AsyncAgentState` and `TimingPolicy` with the
+same deterministic synthetic choices and completion schedule, and must match the
+final runner on all three witnesses:
+
+```
+journal_hash        authoritative
+final_world_hash    diagnostic
+outcome counts      diagnostic
+```
+
+That fixture is frozen before live inference. **One runner phase-order
+operation is sabotaged to confirm the witness goes red** — otherwise it is a
+ceremonial hash shrine rather than a test.

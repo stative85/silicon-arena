@@ -1,0 +1,62 @@
+{
+  "actions_returned": 600,
+  "agents": 3,
+  "arm": "EQUALIZED",
+  "arm_type": "LIVE",
+  "contract_schema_hash": "f5a2aaf89dfa6ffa",
+  "counts": {
+    "actions": 600,
+    "by_outcome": {
+      "ACCEPTED": 559,
+      "STALE_CONFLICT": 41
+    },
+    "contention_opportunity": 0,
+    "no_opportunity": 0,
+    "stale_eligible": 41,
+    "stale_revalidated": 0
+  },
+  "equalized_delay_ticks": 4,
+  "equalizer_breaches": 0,
+  "final_world_hash": "19b036d10de09c3c",
+  "final_world_tick": 801,
+  "hold_ticks": 4,
+  "journal_hash": "25f644d8e6b980ac3bd77be58a9b7da58e89fb88cc85a42c1bdaed9680fd4293",
+  "model_calls": 0,
+  "observation_horizon_ticks": 800,
+  "replicate_id": "EQUALIZED_r0",
+  "resources": 16,
+  "runtime": {
+    "end_model_states": {
+
+    },
+    "end_resident_hash": "e3b0c44298fc1c14",
+    "end_resident_set": [],
+    "expected_resident": [],
+    "expected_resident_hash": "e3b0c44298fc1c14",
+    "observed_resident_hashes": [
+      "e3b0c44298fc1c14"
+    ],
+    "replicate_id": "EQUALIZED_r0",
+    "runtime_events": [],
+    "start_model_states": {
+
+    },
+    "start_resident_hash": "e3b0c44298fc1c14",
+    "start_resident_set": [],
+    "suspects": [],
+    "void_reason": ""
+  },
+  "settle_ticks": 1,
+  "shape_failed": 0,
+  "synthetic": true,
+  "throughput": {
+    "actions_per_agent": 200.0,
+    "actions_per_tick": 0.75,
+    "no_opportunity_rate": 0.0,
+    "observation_opportunities": 600,
+    "opportunities_per_tick": 0.75
+  },
+  "tick_ms": 250,
+  "void": false,
+  "void_reasons": []
+}

@@ -1,0 +1,62 @@
+{
+  "actions_returned": 2400,
+  "agents": 3,
+  "arm": "SERIAL",
+  "arm_type": "LIVE",
+  "contract_schema_hash": "f5a2aaf89dfa6ffa",
+  "counts": {
+    "actions": 2400,
+    "by_outcome": {
+      "ACCEPTED": 2111,
+      "CONTENTION_LOST": 289
+    },
+    "contention_opportunity": 0,
+    "no_opportunity": 0,
+    "stale_eligible": 289,
+    "stale_revalidated": 0
+  },
+  "equalized_delay_ticks": 4,
+  "equalizer_breaches": 0,
+  "final_world_hash": "0dda093d0fd6a2dc",
+  "final_world_tick": 800,
+  "hold_ticks": 4,
+  "journal_hash": "72c8a2a1e6feb090b1b9542dc4030a301f604a7e267cb95b3b9ed72cf806eb56",
+  "model_calls": 0,
+  "observation_horizon_ticks": 800,
+  "replicate_id": "SERIAL_r0",
+  "resources": 16,
+  "runtime": {
+    "end_model_states": {
+
+    },
+    "end_resident_hash": "e3b0c44298fc1c14",
+    "end_resident_set": [],
+    "expected_resident": [],
+    "expected_resident_hash": "e3b0c44298fc1c14",
+    "observed_resident_hashes": [
+      "e3b0c44298fc1c14"
+    ],
+    "replicate_id": "SERIAL_r0",
+    "runtime_events": [],
+    "start_model_states": {
+
+    },
+    "start_resident_hash": "e3b0c44298fc1c14",
+    "start_resident_set": [],
+    "suspects": [],
+    "void_reason": ""
+  },
+  "settle_ticks": 0,
+  "shape_failed": 0,
+  "synthetic": true,
+  "throughput": {
+    "actions_per_agent": 800.0,
+    "actions_per_tick": 3.0,
+    "no_opportunity_rate": 0.0,
+    "observation_opportunities": 2400,
+    "opportunities_per_tick": 3.0
+  },
+  "tick_ms": 250,
+  "void": false,
+  "void_reasons": []
+}

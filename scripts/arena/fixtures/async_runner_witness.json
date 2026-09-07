@@ -1,0 +1,43 @@
+{
+ "note": "Frozen dry-run witnesses for the FINAL runner path. An independent inline orchestration must reproduce these exactly.",
+ "horizon_ticks": 800,
+ "agents": 3,
+ "resources": 16,
+ "hold": 4,
+ "seed_base": 990000,
+ "arms": {
+  "SERIAL": {
+   "journal_hash": "72c8a2a1e6feb090b1b9542dc4030a301f604a7e267cb95b3b9ed72cf806eb56",
+   "final_world_hash": "0dda093d0fd6a2dc",
+   "actions": 2400,
+   "by_outcome": {
+    "ACCEPTED": 2111,
+    "CONTENTION_LOST": 289
+   },
+   "settle_ticks": 0,
+   "final_world_tick": 800
+  },
+  "NATURAL": {
+   "journal_hash": "92598a9f07e7d1fbba13fbb39f4f1fd24bc4dad85dad56a759e4d0a73b4ec02a",
+   "final_world_hash": "4f2a9b120ef4f0e2",
+   "actions": 1467,
+   "by_outcome": {
+    "ACCEPTED": 1281,
+    "STALE_CONFLICT": 186
+   },
+   "settle_ticks": 2,
+   "final_world_tick": 802
+  },
+  "EQUALIZED": {
+   "journal_hash": "25f644d8e6b980ac3bd77be58a9b7da58e89fb88cc85a42c1bdaed9680fd4293",
+   "final_world_hash": "19b036d10de09c3c",
+   "actions": 600,
+   "by_outcome": {
+    "ACCEPTED": 559,
+    "STALE_CONFLICT": 41
+   },
+   "settle_ticks": 1,
+   "final_world_tick": 801
+  }
+ }
+}
