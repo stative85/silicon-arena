@@ -215,3 +215,63 @@ Crossing the 2 GB floor remains **the observable**, not a void condition, as
 already frozen. The only permitted stops are the genuine machine-safety and
 runtime failures already listed in the void conditions. "This graph looks
 conclusive" is not a stopping rule.
+
+---
+
+# Amendment 3 — arm order is a limitation, never a covariate
+
+Frozen while arm A is still running and before any arm has reported.
+
+## No post-hoc adjustment
+
+The four arms are sequential and arm identity is perfectly confounded with
+position and wall-clock. With four arms and no replication of position, there is
+nothing honest to estimate there.
+
+```text
+NEVER: "we adjusted for arm order"
+NEVER: regression, normalisation, detrending, or baseline subtraction
+       applied to make arms comparable
+```
+
+The correct response to a shifted start witness is to **cap the claim**, not to
+launder the difference through arithmetic. This project's own history is the
+reason the rule is written down: post-hoc normalisation gets more seductive the
+more the apparatus drifts, and the drift is exactly when it is least defensible.
+
+## Integrity logic, frozen
+
+```text
+start witnesses comparable
+  -> workload contrasts interpretable, within the stated sequential-order
+     limitation
+
+start witness materially shifted
+  -> that arm's contrast is DOWNGRADED and its limit stated explicitly
+
+start witness clearly outside the qualified envelope
+  -> that arm may be INTEGRITY-COMPROMISED and is reported as such
+```
+
+"Materially shifted" is assessed on the witness fields already frozen — host free
+RAM, LM Studio RSS, VRAM used, residency count map, runtime version, health
+surface hash — and reported as the observed differences, not as a score.
+
+## Mechanistic hierarchy, in order
+
+```text
+1. Does the shape reproduce?
+2. Which workload arm produces it?
+3. Does disconnect release it?
+4. Does backend restart release what disconnect does not?
+5. Only then, plausible mechanism -- and only as far as four arms identify it.
+```
+
+Shape before magnitude. "Which arm used more RAM" is a leak question;
+`healthy -> collapse -> sustained depression -> spontaneous recovery` is a
+stateful retention process with a timescale, and only the second tells us
+anything about designing a sustainable execution regime.
+
+If all four arms behave differently AND their start witnesses also differ, the
+honest answer is that the sequential design cannot separate workload from arm
+position. That is a reportable outcome, not a failure to analyse harder.
