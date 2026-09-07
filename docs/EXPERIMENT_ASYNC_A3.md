@@ -109,6 +109,34 @@ infeasible at this cold-start cost and the candidate list is **not** extended.
 
 **The 1000 ms constant is not disproven by A2.** The qualification procedure is.
 
+**Result, 2026-09-07.** 40 fresh-start bursts, 120 cold completions, 93 s.
+
+```
+tick-0 observation -> completion, cold:
+  median 648 ms   p95 702 ms   max 772 ms
+
+  delay_ms   breaches
+  750               1   1 cold completion exceeds it
+  1000              0   <- PASS, taken
+
+FROZEN EQUALIZER DELAY: 1000 ms = 4 ticks   (UNCHANGED)
+```
+
+`EQUALIZED_DELAY_TICKS` stays 4. The first-passing rule stopped at 1000 ms and
+no further candidate was examined.
+
+Two things worth recording from the corpus:
+
+- **The clock anchor is confirmed empirically.** Submit offset from the run
+  start is now 0-22 ms across all 120 completions, against the 407-418 ms A2
+  measured with the clock unanchored. Repair 4 does what it claims.
+- **The cold burst splits by model, not by queue position.** Per agent, median
+  observation-to-completion is 254 ms / 667 ms / 664 ms. If `max_active = 2`
+  queueing dominated, the third submitter would be slowest; instead one agent is
+  consistently fast and two are consistently slow, which tracks the models
+  rather than the slot order. Recorded, not investigated -- the gate's job is
+  feasibility, not attribution.
+
 ---
 
 ## Repair 3 — identical runtime re-baseline before every live arm
