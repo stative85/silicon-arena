@@ -1,0 +1,99 @@
+{
+  "actions_returned": 600,
+  "agents": 3,
+  "arm": "EQUALIZED",
+  "arm_type": "LIVE",
+  "contract_schema_hash": "f5a2aaf89dfa6ffa",
+  "counts": {
+    "actions": 600,
+    "by_outcome": {
+      "ACCEPTED": 402,
+      "STALE_CONFLICT": 198
+    },
+    "contention_opportunity": 0,
+    "no_opportunity": 0,
+    "stale_eligible": 198,
+    "stale_revalidated": 0
+  },
+  "equalized_delay_ticks": 4,
+  "equalizer_breaches": 2,
+  "experiment": "A2",
+  "final_world_hash": "32946492ef086ad7",
+  "final_world_tick": 802,
+  "hold_ticks": 4,
+  "journal_hash": "1288bf15a9b5883b6df950466ad8049b03f47046a134d7d1cbf668e71443d6cc",
+  "model_calls": 600,
+  "model_calls_by_agent": {
+    "agent_0": 200,
+    "agent_1": 200,
+    "agent_2": 200
+  },
+  "observation_calls": 600,
+  "observation_horizon_ticks": 800,
+  "replay": {
+
+  },
+  "replicate_id": "A2_EQUALIZED_r0",
+  "resources": 16,
+  "runtime": {
+    "end_model_states": {
+
+    },
+    "end_resident_hash": "e3b0c44298fc1c14",
+    "end_resident_set": [],
+    "expected_resident": [
+      "liquidai/lfm2.5-1.2b-instruct",
+      "qwen3.5-2b",
+      "falcon-h1-1.5b-instruct"
+    ],
+    "expected_resident_hash": "daadde8d4dd9cb37",
+    "observed_resident_hashes": [
+      "daadde8d4dd9cb37"
+    ],
+    "replicate_id": "A2_EQUALIZED_r0",
+    "runtime_events": [],
+    "start_model_states": {
+      "falcon-h1-1.5b-instruct": "HOT",
+      "liquidai/lfm2.5-1.2b-instruct": "HOT",
+      "qwen3.5-2b": "HOT"
+    },
+    "start_resident_hash": "daadde8d4dd9cb37",
+    "start_resident_set": [
+      "liquidai/lfm2.5-1.2b-instruct",
+      "qwen3.5-2b",
+      "falcon-h1-1.5b-instruct"
+    ],
+    "suspects": [
+      {
+        "model_id": "qwen3.5-2b",
+        "request_id": "req_000203",
+        "residual": 1.80551089005974,
+        "world_tick": 271
+      }
+    ],
+    "void_reason": ""
+  },
+  "settle_ticks": 2,
+  "shape_failed": 0,
+  "shape_failed_by_agent": {
+
+  },
+  "shape_failed_rates": {
+    "agent_0": 0.0,
+    "agent_1": 0.0,
+    "agent_2": 0.0
+  },
+  "synthetic": false,
+  "throughput": {
+    "actions_per_agent": 200.0,
+    "actions_per_tick": 0.75,
+    "no_opportunity_rate": 0.0,
+    "observation_opportunities": 600,
+    "opportunities_per_tick": 0.75
+  },
+  "tick_ms": 250,
+  "void": true,
+  "void_reasons": [
+    "2 equalizer breaches"
+  ]
+}

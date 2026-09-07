@@ -38,6 +38,11 @@ const AGENTS := 3              ## preregistered
 const CYCLES := 800
 const AGENT_IDS := ["agent_0", "agent_1", "agent_2"]
 
+## Experiment tag. ASYNC-A2 writes to its own namespace so it cannot overwrite
+## ASYNC-A Run 1's VOID artifacts, which are quarantined evidence. It also
+## enters the sterile request_id, so identities from the two experiments can
+## never collide.
+var _exp := "A2"
 var _arm := T.NATURAL
 var _replicate := 0
 var _synthetic := false
@@ -83,13 +88,15 @@ func _init() -> void:
 			_replicate = int(s.substr(12))
 		elif s.begins_with("--cycles="):
 			_cycles = int(s.substr(9))
+		elif s.begins_with("--exp="):
+			_exp = s.substr(6)
 		elif s == "--dry":
 			_synthetic = true
 	_run.call_deferred()
 
 
 func replicate_id() -> String:
-	return "%s_r%d" % [_arm, _replicate]
+	return "%s_%s_r%d" % [_exp, _arm, _replicate]
 
 
 # ------------------------------------------------------------------- PRE-RUN
@@ -507,7 +514,7 @@ func _post_run() -> Dictionary:
 			print("  VOID: %s" % str(p))
 
 	var manifest := {
-		"replicate_id": replicate_id(), "arm": _arm,
+		"experiment": _exp, "replicate_id": replicate_id(), "arm": _arm,
 		"arm_type": ("COUNTERFACTUAL_REPLAY" if _arm == T.ORDER_REPLAY
 			else "LIVE"),
 		"synthetic": _synthetic,
@@ -711,10 +718,10 @@ func _run() -> void:
 		quit(1)
 		return
 	if _arm == T.ORDER_REPLAY:
-		var src := "res://docs/results/ASYNC_A_NATURAL_r%d%s_corpus.json" % [
-			_replicate, "_dry" if _synthetic else ""]
+		var src := "res://docs/results/ASYNC_%s_NATURAL_r%d%s_corpus.json" % [
+			_exp, _replicate, "_dry" if _synthetic else ""]
 		_replay["source_arm"] = T.NATURAL
-		_replay["source_replicate"] = "NATURAL_r%d" % _replicate
+		_replay["source_replicate"] = "%s_NATURAL_r%d" % [_exp, _replicate]
 		_replay["ordering_transform"] = "LATENCY_RANK_INVERSION"
 		if not _run_replay(src):
 			quit(1)  # reason printed by _run_replay
@@ -722,15 +729,16 @@ func _run() -> void:
 	else:
 		await _run_ticks()
 	var manifest := _post_run()
-	var path := "res://docs/results/ASYNC_A_%s%s.json" % [
-		replicate_id(), "_dry" if _synthetic else ""]
+	var path := "res://docs/results/ASYNC_%s.json" % [
+		replicate_id() + ("_dry" if _synthetic else "")]
 	# The envelope corpus is arm 4's input, so it is written for every LIVE
 	# arm rather than reconstructed later.
 	if _arm != T.ORDER_REPLAY:
 		# Written in JOURNAL order, which IS the source application order.
 		var corpus: Array = _eng.journal.duplicate()
-		var cf := FileAccess.open("res://docs/results/ASYNC_A_%s%s_corpus.json"
-			% [replicate_id(), "_dry" if _synthetic else ""], FileAccess.WRITE)
+		var cf := FileAccess.open("res://docs/results/ASYNC_%s_corpus.json"
+			% [replicate_id() + ("_dry" if _synthetic else "")],
+			FileAccess.WRITE)
 		if cf != null:
 			cf.store_string(JSON.stringify({"corpus": corpus,
 				"corpus_hash": _rows_hash(corpus)}, "  "))
