@@ -5,17 +5,51 @@ falcon, world 16 resources / hold 4, 3 agents, 800 observation ticks, 250 ms
 tick, 1000 ms equalizer (4 ticks), contract hash `f5a2aaf89dfa6ffa`, genesis
 hash `c16b1d7ae8e2fd50` identical across all four arms.
 
-Nothing was tuned, retried, or repaired during the run. Two arms voided. They
-are recorded as void.
+Nothing was tuned, retried, or repaired during the run.
+
+## Classification
+
+```text
+ASYNC-A2 RUN 1
+
+PRIMARY ASYNC-A TEST:
+NO RESULT / INCONCLUSIVE
+
+SERIAL:
+VOID - runtime health event
+
+EQUALIZED:
+VOID - preregistered equalizer breaches
+
+NATURAL:
+mechanically completed, but RUNTIME INTEGRITY INCOMPLETE
+not confirmatory evidence
+
+ORDER_REPLAY:
+mechanically completed,
+inherits NATURAL's runtime-integrity uncertainty
+exploratory counterfactual only
+```
+
+**Why NATURAL is not called valid.** Part of the preregistered
+runtime-integrity instrument was never exercised (see the Gate 4 defect below).
+A missing check cannot become evidence because independent evidence makes us
+feel confident nothing happened. `lms ps` showing the pool resident afterwards
+is reassurance, not time travel: a transient eviction and restore that the live
+runner never recorded cannot be retroactively observed. NATURAL and
+ORDER_REPLAY therefore completed **mechanically**, and neither is confirmatory.
+
+A2 is preserved exactly as it happened. The repairs below are ASYNC-A3, not a
+re-run of A2.
 
 ## Arm outcomes
 
 | arm | verdict | actions | ACCEPTED | STALE_CONFLICT | SEM_INVALID | CONT_LOST |
 |---|---|---|---|---|---|---|
 | SERIAL | **VOID** (runtime) | 2400 | 2000 | 0 | 0 | 400 |
-| NATURAL | valid, teeth OK | 1080 | 881 | 194 | 4 | 1 |
+| NATURAL | completed, integrity incomplete | 1080 | 881 | 194 | 4 | 1 |
 | EQUALIZED | **VOID** (2 equalizer breaches) | 600 | 402 | 198 | 0 | 0 |
-| ORDER_REPLAY | valid, teeth OK | 1080 | 881 | 193 | 5 | 1 |
+| ORDER_REPLAY | completed, exploratory only | 1080 | 881 | 193 | 5 | 1 |
 
 Shape failures: **0** in every arm, all three agents. The roster qualification
 gate did what it was for — the interface pathology that voided ASYNC-A Run 1
@@ -28,7 +62,9 @@ three live arms are void. **The main comparison cannot be made from this run**,
 and no partial version of it is reported: comparing NATURAL against a void
 SERIAL would be exactly the rescue the protocol forbids.
 
-What survives is one valid live arm and one valid counterfactual built from it.
+What remains is one mechanically completed live arm whose runtime integrity
+was not fully instrumented, and one counterfactual built from it that inherits
+that uncertainty.
 
 ## SERIAL — void by Gate 4 at tick 508
 
@@ -75,25 +111,54 @@ observation -> completion, 600 envelopes
 ```
 
 There is a 333 ms gap between the highest steady-state completion (679 ms) and
-the lowest breach (1012 ms). This is not a distribution tail. It is a separate
-population of two, and both members are cold-start.
+the lowest breach (1012 ms) -- a separate population of two, not a tail. Both
+members are the tick-0 burst, and the reason turns out not to be latency.
 
-**Why the Gate 1 calibration did not predict this.** `tools/async_equalizer_check.gd`
-runs a warmup burst and discards it (`_burst.clear()` after the warmup loop)
-before collecting its 200 bursts. The live runner has no warmup — tick 0 is
-measured. The calibration therefore excluded, by construction, the exact
-condition that produced both breaches: three agents submitting simultaneously
-into a cold `max_active = 2` bridge, where the third waits for a slot.
+**THE BREACHES ARE AN INSTRUMENT ARTIFACT.** Found after the run, by tracing
+why `end_resident_set` was empty and then checking the other clock assumptions.
 
-That is a defect in the **gate**, not evidence that 1000 ms is the wrong
-constant. It is recorded here and **not acted on**. Changing the equalizer
-constant, adding a warmup to the live arm, or excluding tick 0 from the breach
-check are all amendments, and the standing rule is that a fired gate wins. This
-is the second consecutive experiment in which EQUALIZED voided on breaches
-(ASYNC-A Run 1: 1 breach at the same deadline), which makes it a decision worth
-making deliberately rather than reflexively.
+`_run_start_ms` was declared, documented at its own declaration as "set when the
+tick loop actually begins", and **never assigned**. It stayed 0 for the whole
+run, which anchors world time to *engine start*. Measured directly from the A2
+corpora, `submitted_ms - tick*250`:
 
-## ORDER_REPLAY vs NATURAL — the one contrast that survives
+```
+                tick 0        after tick 400
+NATURAL         417-418 ms    6 ms
+EQUALIZED       407-418 ms    7 ms
+```
+
+Godot boot plus the bridge residency handshake takes ~410 ms, so tick 0's
+deadline had already passed before the first observation existed; the clock then
+silently resynchronised once real time caught up with it.
+
+Against the submission instant rather than the unanchored clock:
+
+```
+agent    submitted   completed   from submission   from the unanchored clock
+agent_0    407 ms      605 ms        198 ms              605 ms
+agent_1    408 ms     1012 ms        604 ms             1012 ms   BREACH
+agent_2    418 ms     1068 ms        650 ms             1068 ms   BREACH
+```
+
+Both breaches completed **604 ms and 650 ms after they were submitted**,
+comfortably inside the 1000 ms equalizer. They breached only because the
+deadline was measured from a moment 410 ms before the run began.
+
+The cold-start queueing is nevertheless real and visible in the same numbers:
+198 ms for the first agent against 604 and 650 ms for the two that waited behind
+`max_active = 2`. It just was not, on its own, enough to breach.
+
+**The Gate 1 calibration could not have caught either problem.**
+`tools/async_equalizer_check.gd` fires a warmup burst and discards it before
+collecting, so it excluded the cold-start regime by construction -- and being
+bridge-only, it never exercised the world clock at all.
+
+Two defects, then, and the reportable consequence is the same:
+**the 1000 ms constant is not disproven; the procedure that qualified it is.**
+Nothing was changed during the run. The gate fired, and a fired gate wins.
+
+## ORDER_REPLAY vs NATURAL — exploratory counterfactual
 
 Counterfactual replay over NATURAL's envelope corpus, latency-rank inversion
 within simultaneity groups. The source corpus was not mutated:
@@ -140,9 +205,14 @@ action between two outcomes that both decline to grant a resource.
 
 ### What this does and does not support
 
-Supported, for this world and this replicate: **within-tick ordering of
-near-simultaneous actions is very nearly outcome-neutral here.** 186 pairwise
-inversions moved one action out of 1080.
+Supported, and the claim is kept deliberately tiny:
+
+> In this one NATURAL trajectory, under this fairly resource-rich world, the
+> frozen ordering inversion changed history but barely affected mechanically
+> successful allocation.
+
+Not "ordering does not matter". Sixteen resources against three agents gives
+ordering plenty of chances to be irrelevant.
 
 Not supported:
 
@@ -179,8 +249,12 @@ Scope of the damage, kept honest:
   That is reassurance about this run, not a substitute for the check.
 
 Not fixed mid-run — wiring the guard between arms would have changed the
-instrument partway through. Whether the two valid arms stand under a retrofitted
-guard is a protocol decision, not a code fix.
+instrument partway through.
+
+**The guard is NOT retrofitted to rescue these arms.** Wiring it now and then
+declaring NATURAL valid would be exactly backwards: the check would run against
+a replicate whose transient residency events, if any, were never recorded. The
+integration lands in ASYNC-A3 and applies only to runs made after it.
 
 ## Between-arm condition change, recorded
 
@@ -197,13 +271,31 @@ The jump after SERIAL is almost certainly a consequence of its two recovery
 reloads. Arms were therefore not run under identical host conditions. Recorded;
 not adjusted for, not corrected.
 
-## Status
+## Status: NO CONFIRMATORY RESULT
 
 - SERIAL r0 — **VOID** (runtime health). Artifacts preserved.
-- NATURAL r0 — valid.
+- NATURAL r0 — completed, runtime integrity incomplete. Not confirmatory.
 - EQUALIZED r0 — **VOID** (equalizer breach). Artifacts preserved.
-- ORDER_REPLAY r0 — valid.
-- Primary three-arm comparison — **not available from this run**.
+- ORDER_REPLAY r0 — completed, exploratory counterfactual only.
+- Primary three-arm comparison — **no result**.
+
+A2 is closed. It is not re-run; the repairs become ASYNC-A3.
+
+### Four findings this run earned
+
+1. **Gate 4 integration defect** — residency guard never wired to the live
+   runner. Repair in A3.
+2. **Equalizer qualification defect** — the gate warmed up and so excluded the
+   cold-start regime that later voided the arm. The 1000 ms constant is **not
+   disproven**; the procedure that qualified it is. Repair in A3.
+3. **Recovery-neighbour coupling** — a new measured bridge failure mode, which
+   legitimately opens the closed-infrastructure wall for investigation. See
+   `docs/results/RECOVERY_COUPLING.md`.
+4. **Unanchored world clock** — `_run_start_ms` never assigned, anchoring world
+   time to engine start and manufacturing the EQUALIZED void. Repair in A3.
+
+All four are repaired or tracked in `docs/EXPERIMENT_ASYNC_A3.md`. None of them
+makes A2 confirmatory.
 
 Nothing was deleted. Nothing was retuned. No prompt rescue, no per-species
 patching, no metric surgery.

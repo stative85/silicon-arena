@@ -68,6 +68,20 @@ var _shape_by_agent: Dictionary = {}
 var _calls_by_agent: Dictionary = {}
 var _equalizer_breaches := 0
 var _settle_ticks := 0
+
+## GATE 4 RESIDENCY POLL. ASYNC-A2 shipped with `on_residency_poll()` and
+## `finish()` implemented, self-tested, and NEVER CALLED BY THIS RUNNER. The
+## live path witnessed the pool once at R0 and then never again, which is
+## weaker than the endpoint-only witnessing the design doc calls insufficient.
+## A transient eviction and restore would have gone unrecorded, and no amount of
+## checking `lms ps` afterwards can retroactively observe it.
+##
+## The poll is FIRE-AND-FORGET on purpose. `refresh_residency()` awaits an HTTP
+## round trip; awaiting it inside the tick loop would inject that latency into
+## world time and change the thing being measured. Started without `await`, the
+## coroutine runs on its own and reports to the guard when it lands.
+const RESIDENCY_POLL_TICKS := 40   ## 10 s at a 250 ms tick
+var _poll_busy := false
 var _observation_calls := 0
 var _replay: Dictionary = {}
 var _all_envelopes: Array = []
@@ -197,9 +211,26 @@ func _pre_run() -> bool:
 
 func _run_ticks() -> void:
 	print("\n[RUN]")
+	# ANCHOR THE WORLD CLOCK. `_run_start_ms` was declared, documented at its
+	# declaration as "set when the tick loop actually begins", and then NEVER
+	# ASSIGNED -- it stayed 0 for the whole run, which anchors world time to
+	# ENGINE START. Godot boot plus the bridge residency handshake takes ~410 ms,
+	# so tick 0's deadline was already 410 ms in the past before the first
+	# observation existed. Measured directly in ASYNC-A2: submitted_ms minus
+	# tick*250 was 407-418 ms at tick 0 and 6-7 ms after tick 400, i.e. the clock
+	# silently resynchronised once real time caught up with it.
+	#
+	# That is what voided the EQUALIZED arm. Its two breaches completed 604 ms
+	# and 650 ms after they were SUBMITTED, comfortably inside the 1000 ms
+	# equalizer; they only breached because the deadline was measured from a
+	# moment 410 ms before the run began.
+	_run_start_ms = Time.get_ticks_msec()
 	for c in _cycles:
 		var tick := _world.tick
 		_guard.world_tick = tick
+
+		if not _synthetic and tick > 0 and tick % RESIDENCY_POLL_TICKS == 0:
+			_poll_residency()   # deliberately not awaited
 
 		# 1-4. apply due envelopes; 5. close their agents
 		var applied := _eng.step_apply(tick)
@@ -521,6 +552,7 @@ func _post_run() -> Dictionary:
 		"resources": RESOURCES, "hold_ticks": HOLD, "agents": AGENTS,
 		"observation_horizon_ticks": _cycles,
 		"settle_ticks": _settle_ticks,
+		"run_start_ms": _run_start_ms,
 		"final_world_tick": _world.tick,
 		"tick_ms": T.TICK_MS,
 		"equalized_delay_ticks": T.EQUALIZED_DELAY_TICKS,
@@ -712,6 +744,33 @@ func _corpus_hash(envs: Array) -> String:
 	return ("|".join(PackedStringArray(parts))).sha256_text()
 
 
+## Witness the resident pool mid-replicate. Never awaited by the caller, so a
+## slow or failed probe cannot stretch a tick.
+func _poll_residency() -> void:
+	if _poll_busy or _bridge == null or _guard == null:
+		return
+	_poll_busy = true
+	var resident: Array = await _bridge.refresh_residency()
+	_guard.on_residency_poll(resident)
+	_poll_busy = false
+
+
+## The end-of-replicate witness. Awaited, because nothing is being timed here.
+func _finish_guard() -> void:
+	if _guard == null:
+		return
+	if _synthetic or _bridge == null:
+		_guard.finish([], {})
+		return
+	var resident: Array = await _bridge.refresh_residency()
+	var states := {}
+	for mid in _models:
+		var bm: BridgeModel = _bridge.models.get(mid)
+		if bm != null:
+			states[mid] = bm.state
+	_guard.finish(resident, states)
+
+
 func _run() -> void:
 	print("=== ASYNC-A runner ===\n")
 	if not await _pre_run():
@@ -728,6 +787,7 @@ func _run() -> void:
 			return
 	else:
 		await _run_ticks()
+	await _finish_guard()
 	var manifest := _post_run()
 	var path := "res://docs/results/ASYNC_%s.json" % [
 		replicate_id() + ("_dry" if _synthetic else "")]

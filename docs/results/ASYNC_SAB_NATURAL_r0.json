@@ -1,0 +1,1127 @@
+{
+  "actions_returned": 170,
+  "agents": 3,
+  "arm": "NATURAL",
+  "arm_type": "LIVE",
+  "contract_schema_hash": "f5a2aaf89dfa6ffa",
+  "counts": {
+    "actions": 182,
+    "by_outcome": {
+      "ACCEPTED": 162,
+      "PASSED": 12,
+      "STALE_CONFLICT": 8
+    },
+    "contention_opportunity": 0,
+    "no_opportunity": 0,
+    "stale_eligible": 8,
+    "stale_revalidated": 0
+  },
+  "equalized_delay_ticks": 4,
+  "equalizer_breaches": 0,
+  "experiment": "SAB",
+  "final_world_hash": "9a8e9ee24b45c99a",
+  "final_world_tick": 140,
+  "hold_ticks": 4,
+  "journal_hash": "8e3bbc815aca958e2f0666029ead8d9c965b10089d5df21b95c445c302d47e28",
+  "model_calls": 183,
+  "model_calls_by_agent": {
+    "agent_0": 111,
+    "agent_1": 11,
+    "agent_2": 61
+  },
+  "observation_calls": 183,
+  "observation_horizon_ticks": 140,
+  "replay": {
+
+  },
+  "replicate_id": "SAB_NATURAL_r0",
+  "resources": 16,
+  "run_start_ms": 1400,
+  "runtime": {
+    "end_model_states": {
+      "falcon-h1-1.5b-instruct": "HOT",
+      "liquidai/lfm2.5-1.2b-instruct": "HOT",
+      "qwen3.5-2b": "EVICTED"
+    },
+    "end_resident_hash": "daadde8d4dd9cb37",
+    "end_resident_set": [
+      "liquidai/lfm2.5-1.2b-instruct",
+      "falcon-h1-1.5b-instruct",
+      "qwen3.5-2b"
+    ],
+    "expected_resident": [
+      "liquidai/lfm2.5-1.2b-instruct",
+      "qwen3.5-2b",
+      "falcon-h1-1.5b-instruct"
+    ],
+    "expected_resident_hash": "daadde8d4dd9cb37",
+    "observed_resident_hashes": [
+      "daadde8d4dd9cb37",
+      "0f295e4a8322efb8"
+    ],
+    "replicate_id": "SAB_NATURAL_r0",
+    "runtime_events": [
+      {
+        "event_type": "model_state_changed",
+        "model_id": "qwen3.5-2b",
+        "note": "missing from resident set",
+        "state_after": "EVICTED",
+        "state_before": "HOT",
+        "timestamp_ms": 11442,
+        "world_tick": 40
+      },
+      {
+        "event_type": "residency_poll_mismatch",
+        "model_id": "",
+        "note": "",
+        "state_after": "0f295e4a8322efb8",
+        "state_before": "daadde8d4dd9cb37",
+        "timestamp_ms": 11442,
+        "world_tick": 40
+      },
+      {
+        "event_type": "resident_mismatch",
+        "model_id": "",
+        "note": "from receipt req_000049",
+        "state_after": "0f295e4a8322efb8",
+        "state_before": "daadde8d4dd9cb37",
+        "timestamp_ms": 12098,
+        "world_tick": 42
+      },
+      {
+        "event_type": "resident_mismatch",
+        "model_id": "",
+        "note": "from receipt req_000050",
+        "state_after": "0f295e4a8322efb8",
+        "state_before": "daadde8d4dd9cb37",
+        "timestamp_ms": 12281,
+        "world_tick": 43
+      },
+      {
+        "event_type": "resident_mismatch",
+        "model_id": "",
+        "note": "from receipt req_000051",
+        "state_after": "0f295e4a8322efb8",
+        "state_before": "daadde8d4dd9cb37",
+        "timestamp_ms": 12774,
+        "world_tick": 45
+      },
+      {
+        "event_type": "resident_mismatch",
+        "model_id": "",
+        "note": "from receipt req_000052",
+        "state_after": "0f295e4a8322efb8",
+        "state_before": "daadde8d4dd9cb37",
+        "timestamp_ms": 12973,
+        "world_tick": 46
+      },
+      {
+        "event_type": "resident_mismatch",
+        "model_id": "",
+        "note": "from receipt req_000053",
+        "state_after": "0f295e4a8322efb8",
+        "state_before": "daadde8d4dd9cb37",
+        "timestamp_ms": 13411,
+        "world_tick": 47
+      },
+      {
+        "event_type": "resident_mismatch",
+        "model_id": "",
+        "note": "from receipt req_000054",
+        "state_after": "0f295e4a8322efb8",
+        "state_before": "daadde8d4dd9cb37",
+        "timestamp_ms": 13621,
+        "world_tick": 48
+      },
+      {
+        "event_type": "resident_mismatch",
+        "model_id": "",
+        "note": "from receipt req_000055",
+        "state_after": "0f295e4a8322efb8",
+        "state_before": "daadde8d4dd9cb37",
+        "timestamp_ms": 14116,
+        "world_tick": 50
+      },
+      {
+        "event_type": "resident_mismatch",
+        "model_id": "",
+        "note": "from receipt req_000056",
+        "state_after": "0f295e4a8322efb8",
+        "state_before": "daadde8d4dd9cb37",
+        "timestamp_ms": 14313,
+        "world_tick": 51
+      },
+      {
+        "event_type": "resident_mismatch",
+        "model_id": "",
+        "note": "from receipt req_000057",
+        "state_after": "0f295e4a8322efb8",
+        "state_before": "daadde8d4dd9cb37",
+        "timestamp_ms": 14803,
+        "world_tick": 53
+      },
+      {
+        "event_type": "resident_mismatch",
+        "model_id": "",
+        "note": "from receipt req_000058",
+        "state_after": "0f295e4a8322efb8",
+        "state_before": "daadde8d4dd9cb37",
+        "timestamp_ms": 14998,
+        "world_tick": 54
+      },
+      {
+        "event_type": "resident_mismatch",
+        "model_id": "",
+        "note": "from receipt req_000059",
+        "state_after": "0f295e4a8322efb8",
+        "state_before": "daadde8d4dd9cb37",
+        "timestamp_ms": 15423,
+        "world_tick": 56
+      },
+      {
+        "event_type": "resident_mismatch",
+        "model_id": "",
+        "note": "from receipt req_000060",
+        "state_after": "0f295e4a8322efb8",
+        "state_before": "daadde8d4dd9cb37",
+        "timestamp_ms": 15524,
+        "world_tick": 56
+      },
+      {
+        "event_type": "resident_mismatch",
+        "model_id": "",
+        "note": "from receipt req_000062",
+        "state_after": "0f295e4a8322efb8",
+        "state_before": "daadde8d4dd9cb37",
+        "timestamp_ms": 15842,
+        "world_tick": 57
+      },
+      {
+        "event_type": "resident_mismatch",
+        "model_id": "",
+        "note": "from receipt req_000063",
+        "state_after": "0f295e4a8322efb8",
+        "state_before": "daadde8d4dd9cb37",
+        "timestamp_ms": 16097,
+        "world_tick": 58
+      },
+      {
+        "event_type": "resident_mismatch",
+        "model_id": "",
+        "note": "from receipt req_000064",
+        "state_after": "0f295e4a8322efb8",
+        "state_before": "daadde8d4dd9cb37",
+        "timestamp_ms": 16123,
+        "world_tick": 58
+      },
+      {
+        "event_type": "resident_mismatch",
+        "model_id": "",
+        "note": "from receipt req_000065",
+        "state_after": "0f295e4a8322efb8",
+        "state_before": "daadde8d4dd9cb37",
+        "timestamp_ms": 16375,
+        "world_tick": 59
+      },
+      {
+        "event_type": "resident_mismatch",
+        "model_id": "",
+        "note": "from receipt req_000066",
+        "state_after": "0f295e4a8322efb8",
+        "state_before": "daadde8d4dd9cb37",
+        "timestamp_ms": 16610,
+        "world_tick": 60
+      },
+      {
+        "event_type": "resident_mismatch",
+        "model_id": "",
+        "note": "from receipt req_000067",
+        "state_after": "0f295e4a8322efb8",
+        "state_before": "daadde8d4dd9cb37",
+        "timestamp_ms": 16647,
+        "world_tick": 60
+      },
+      {
+        "event_type": "resident_mismatch",
+        "model_id": "",
+        "note": "from receipt req_000068",
+        "state_after": "0f295e4a8322efb8",
+        "state_before": "daadde8d4dd9cb37",
+        "timestamp_ms": 16876,
+        "world_tick": 61
+      },
+      {
+        "event_type": "resident_mismatch",
+        "model_id": "",
+        "note": "from receipt req_000069",
+        "state_after": "0f295e4a8322efb8",
+        "state_before": "daadde8d4dd9cb37",
+        "timestamp_ms": 17109,
+        "world_tick": 62
+      },
+      {
+        "event_type": "resident_mismatch",
+        "model_id": "",
+        "note": "from receipt req_000070",
+        "state_after": "0f295e4a8322efb8",
+        "state_before": "daadde8d4dd9cb37",
+        "timestamp_ms": 17111,
+        "world_tick": 62
+      },
+      {
+        "event_type": "resident_mismatch",
+        "model_id": "",
+        "note": "from receipt req_000071",
+        "state_after": "0f295e4a8322efb8",
+        "state_before": "daadde8d4dd9cb37",
+        "timestamp_ms": 17379,
+        "world_tick": 63
+      },
+      {
+        "event_type": "resident_mismatch",
+        "model_id": "",
+        "note": "from receipt req_000072",
+        "state_after": "0f295e4a8322efb8",
+        "state_before": "daadde8d4dd9cb37",
+        "timestamp_ms": 17635,
+        "world_tick": 64
+      },
+      {
+        "event_type": "resident_mismatch",
+        "model_id": "",
+        "note": "from receipt req_000073",
+        "state_after": "0f295e4a8322efb8",
+        "state_before": "daadde8d4dd9cb37",
+        "timestamp_ms": 17635,
+        "world_tick": 64
+      },
+      {
+        "event_type": "resident_mismatch",
+        "model_id": "",
+        "note": "from receipt req_000074",
+        "state_after": "0f295e4a8322efb8",
+        "state_before": "daadde8d4dd9cb37",
+        "timestamp_ms": 17872,
+        "world_tick": 65
+      },
+      {
+        "event_type": "resident_mismatch",
+        "model_id": "",
+        "note": "from receipt req_000075",
+        "state_after": "0f295e4a8322efb8",
+        "state_before": "daadde8d4dd9cb37",
+        "timestamp_ms": 18136,
+        "world_tick": 66
+      },
+      {
+        "event_type": "resident_mismatch",
+        "model_id": "",
+        "note": "from receipt req_000076",
+        "state_after": "0f295e4a8322efb8",
+        "state_before": "daadde8d4dd9cb37",
+        "timestamp_ms": 18147,
+        "world_tick": 66
+      },
+      {
+        "event_type": "resident_mismatch",
+        "model_id": "",
+        "note": "from receipt req_000077",
+        "state_after": "0f295e4a8322efb8",
+        "state_before": "daadde8d4dd9cb37",
+        "timestamp_ms": 18391,
+        "world_tick": 67
+      },
+      {
+        "event_type": "resident_mismatch",
+        "model_id": "",
+        "note": "from receipt req_000078",
+        "state_after": "0f295e4a8322efb8",
+        "state_before": "daadde8d4dd9cb37",
+        "timestamp_ms": 18601,
+        "world_tick": 68
+      },
+      {
+        "event_type": "resident_mismatch",
+        "model_id": "",
+        "note": "from receipt req_000079",
+        "state_after": "0f295e4a8322efb8",
+        "state_before": "daadde8d4dd9cb37",
+        "timestamp_ms": 18623,
+        "world_tick": 68
+      },
+      {
+        "event_type": "resident_mismatch",
+        "model_id": "",
+        "note": "from receipt req_000080",
+        "state_after": "0f295e4a8322efb8",
+        "state_before": "daadde8d4dd9cb37",
+        "timestamp_ms": 18880,
+        "world_tick": 69
+      },
+      {
+        "event_type": "resident_mismatch",
+        "model_id": "",
+        "note": "from receipt req_000081",
+        "state_after": "0f295e4a8322efb8",
+        "state_before": "daadde8d4dd9cb37",
+        "timestamp_ms": 19117,
+        "world_tick": 70
+      },
+      {
+        "event_type": "resident_mismatch",
+        "model_id": "",
+        "note": "from receipt req_000082",
+        "state_after": "0f295e4a8322efb8",
+        "state_before": "daadde8d4dd9cb37",
+        "timestamp_ms": 19130,
+        "world_tick": 70
+      },
+      {
+        "event_type": "resident_mismatch",
+        "model_id": "",
+        "note": "from receipt req_000083",
+        "state_after": "0f295e4a8322efb8",
+        "state_before": "daadde8d4dd9cb37",
+        "timestamp_ms": 19378,
+        "world_tick": 71
+      },
+      {
+        "event_type": "resident_mismatch",
+        "model_id": "",
+        "note": "from receipt req_000084",
+        "state_after": "0f295e4a8322efb8",
+        "state_before": "daadde8d4dd9cb37",
+        "timestamp_ms": 19607,
+        "world_tick": 72
+      },
+      {
+        "event_type": "resident_mismatch",
+        "model_id": "",
+        "note": "from receipt req_000085",
+        "state_after": "0f295e4a8322efb8",
+        "state_before": "daadde8d4dd9cb37",
+        "timestamp_ms": 19620,
+        "world_tick": 72
+      },
+      {
+        "event_type": "resident_mismatch",
+        "model_id": "",
+        "note": "from receipt req_000086",
+        "state_after": "0f295e4a8322efb8",
+        "state_before": "daadde8d4dd9cb37",
+        "timestamp_ms": 19856,
+        "world_tick": 73
+      },
+      {
+        "event_type": "resident_mismatch",
+        "model_id": "",
+        "note": "from receipt req_000087",
+        "state_after": "0f295e4a8322efb8",
+        "state_before": "daadde8d4dd9cb37",
+        "timestamp_ms": 20125,
+        "world_tick": 74
+      },
+      {
+        "event_type": "resident_mismatch",
+        "model_id": "",
+        "note": "from receipt req_000088",
+        "state_after": "0f295e4a8322efb8",
+        "state_before": "daadde8d4dd9cb37",
+        "timestamp_ms": 20149,
+        "world_tick": 74
+      },
+      {
+        "event_type": "resident_mismatch",
+        "model_id": "",
+        "note": "from receipt req_000089",
+        "state_after": "0f295e4a8322efb8",
+        "state_before": "daadde8d4dd9cb37",
+        "timestamp_ms": 20373,
+        "world_tick": 75
+      },
+      {
+        "event_type": "resident_mismatch",
+        "model_id": "",
+        "note": "from receipt req_000090",
+        "state_after": "0f295e4a8322efb8",
+        "state_before": "daadde8d4dd9cb37",
+        "timestamp_ms": 20653,
+        "world_tick": 76
+      },
+      {
+        "event_type": "resident_mismatch",
+        "model_id": "",
+        "note": "from receipt req_000091",
+        "state_after": "0f295e4a8322efb8",
+        "state_before": "daadde8d4dd9cb37",
+        "timestamp_ms": 20653,
+        "world_tick": 76
+      },
+      {
+        "event_type": "resident_mismatch",
+        "model_id": "",
+        "note": "from receipt req_000092",
+        "state_after": "0f295e4a8322efb8",
+        "state_before": "daadde8d4dd9cb37",
+        "timestamp_ms": 20863,
+        "world_tick": 77
+      },
+      {
+        "event_type": "resident_mismatch",
+        "model_id": "",
+        "note": "from receipt req_000093",
+        "state_after": "0f295e4a8322efb8",
+        "state_before": "daadde8d4dd9cb37",
+        "timestamp_ms": 21134,
+        "world_tick": 78
+      },
+      {
+        "event_type": "resident_mismatch",
+        "model_id": "",
+        "note": "from receipt req_000094",
+        "state_after": "0f295e4a8322efb8",
+        "state_before": "daadde8d4dd9cb37",
+        "timestamp_ms": 21134,
+        "world_tick": 78
+      },
+      {
+        "event_type": "resident_mismatch",
+        "model_id": "",
+        "note": "from receipt req_000095",
+        "state_after": "0f295e4a8322efb8",
+        "state_before": "daadde8d4dd9cb37",
+        "timestamp_ms": 21378,
+        "world_tick": 79
+      },
+      {
+        "event_type": "residency_poll_mismatch",
+        "model_id": "",
+        "note": "",
+        "state_after": "0f295e4a8322efb8",
+        "state_before": "daadde8d4dd9cb37",
+        "timestamp_ms": 21428,
+        "world_tick": 80
+      },
+      {
+        "event_type": "resident_mismatch",
+        "model_id": "",
+        "note": "from receipt req_000096",
+        "state_after": "0f295e4a8322efb8",
+        "state_before": "daadde8d4dd9cb37",
+        "timestamp_ms": 21630,
+        "world_tick": 80
+      },
+      {
+        "event_type": "resident_mismatch",
+        "model_id": "",
+        "note": "from receipt req_000097",
+        "state_after": "0f295e4a8322efb8",
+        "state_before": "daadde8d4dd9cb37",
+        "timestamp_ms": 21630,
+        "world_tick": 80
+      },
+      {
+        "event_type": "resident_mismatch",
+        "model_id": "",
+        "note": "from receipt req_000098",
+        "state_after": "0f295e4a8322efb8",
+        "state_before": "daadde8d4dd9cb37",
+        "timestamp_ms": 21861,
+        "world_tick": 81
+      },
+      {
+        "event_type": "resident_mismatch",
+        "model_id": "",
+        "note": "from receipt req_000099",
+        "state_after": "0f295e4a8322efb8",
+        "state_before": "daadde8d4dd9cb37",
+        "timestamp_ms": 22126,
+        "world_tick": 82
+      },
+      {
+        "event_type": "resident_mismatch",
+        "model_id": "",
+        "note": "from receipt req_000100",
+        "state_after": "0f295e4a8322efb8",
+        "state_before": "daadde8d4dd9cb37",
+        "timestamp_ms": 22126,
+        "world_tick": 82
+      },
+      {
+        "event_type": "resident_mismatch",
+        "model_id": "",
+        "note": "from receipt req_000101",
+        "state_after": "0f295e4a8322efb8",
+        "state_before": "daadde8d4dd9cb37",
+        "timestamp_ms": 22373,
+        "world_tick": 83
+      },
+      {
+        "event_type": "resident_mismatch",
+        "model_id": "",
+        "note": "from receipt req_000103",
+        "state_after": "0f295e4a8322efb8",
+        "state_before": "daadde8d4dd9cb37",
+        "timestamp_ms": 22423,
+        "world_tick": 84
+      },
+      {
+        "event_type": "resident_mismatch",
+        "model_id": "",
+        "note": "from receipt req_000102",
+        "state_after": "0f295e4a8322efb8",
+        "state_before": "daadde8d4dd9cb37",
+        "timestamp_ms": 22558,
+        "world_tick": 84
+      },
+      {
+        "event_type": "resident_mismatch",
+        "model_id": "",
+        "note": "from receipt req_000104",
+        "state_after": "0f295e4a8322efb8",
+        "state_before": "daadde8d4dd9cb37",
+        "timestamp_ms": 22670,
+        "world_tick": 85
+      },
+      {
+        "event_type": "resident_mismatch",
+        "model_id": "",
+        "note": "from receipt req_000105",
+        "state_after": "0f295e4a8322efb8",
+        "state_before": "daadde8d4dd9cb37",
+        "timestamp_ms": 22670,
+        "world_tick": 85
+      },
+      {
+        "event_type": "resident_mismatch",
+        "model_id": "",
+        "note": "from receipt req_000106",
+        "state_after": "0f295e4a8322efb8",
+        "state_before": "daadde8d4dd9cb37",
+        "timestamp_ms": 22918,
+        "world_tick": 86
+      },
+      {
+        "event_type": "resident_mismatch",
+        "model_id": "",
+        "note": "from receipt req_000107",
+        "state_after": "0f295e4a8322efb8",
+        "state_before": "daadde8d4dd9cb37",
+        "timestamp_ms": 22919,
+        "world_tick": 86
+      },
+      {
+        "event_type": "resident_mismatch",
+        "model_id": "",
+        "note": "from receipt req_000108",
+        "state_after": "0f295e4a8322efb8",
+        "state_before": "daadde8d4dd9cb37",
+        "timestamp_ms": 23163,
+        "world_tick": 87
+      },
+      {
+        "event_type": "resident_mismatch",
+        "model_id": "",
+        "note": "from receipt req_000109",
+        "state_after": "0f295e4a8322efb8",
+        "state_before": "daadde8d4dd9cb37",
+        "timestamp_ms": 23163,
+        "world_tick": 87
+      },
+      {
+        "event_type": "resident_mismatch",
+        "model_id": "",
+        "note": "from receipt req_000110",
+        "state_after": "0f295e4a8322efb8",
+        "state_before": "daadde8d4dd9cb37",
+        "timestamp_ms": 23417,
+        "world_tick": 88
+      },
+      {
+        "event_type": "resident_mismatch",
+        "model_id": "",
+        "note": "from receipt req_000111",
+        "state_after": "0f295e4a8322efb8",
+        "state_before": "daadde8d4dd9cb37",
+        "timestamp_ms": 23417,
+        "world_tick": 88
+      },
+      {
+        "event_type": "resident_mismatch",
+        "model_id": "",
+        "note": "from receipt req_000112",
+        "state_after": "0f295e4a8322efb8",
+        "state_before": "daadde8d4dd9cb37",
+        "timestamp_ms": 23678,
+        "world_tick": 89
+      },
+      {
+        "event_type": "resident_mismatch",
+        "model_id": "",
+        "note": "from receipt req_000113",
+        "state_after": "0f295e4a8322efb8",
+        "state_before": "daadde8d4dd9cb37",
+        "timestamp_ms": 23678,
+        "world_tick": 89
+      },
+      {
+        "event_type": "resident_mismatch",
+        "model_id": "",
+        "note": "from receipt req_000114",
+        "state_after": "0f295e4a8322efb8",
+        "state_before": "daadde8d4dd9cb37",
+        "timestamp_ms": 24128,
+        "world_tick": 90
+      },
+      {
+        "event_type": "resident_mismatch",
+        "model_id": "",
+        "note": "from receipt req_000115",
+        "state_after": "0f295e4a8322efb8",
+        "state_before": "daadde8d4dd9cb37",
+        "timestamp_ms": 24359,
+        "world_tick": 91
+      },
+      {
+        "event_type": "resident_mismatch",
+        "model_id": "",
+        "note": "from receipt req_000116",
+        "state_after": "0f295e4a8322efb8",
+        "state_before": "daadde8d4dd9cb37",
+        "timestamp_ms": 24396,
+        "world_tick": 91
+      },
+      {
+        "event_type": "resident_mismatch",
+        "model_id": "",
+        "note": "from receipt req_000117",
+        "state_after": "0f295e4a8322efb8",
+        "state_before": "daadde8d4dd9cb37",
+        "timestamp_ms": 24605,
+        "world_tick": 92
+      },
+      {
+        "event_type": "resident_mismatch",
+        "model_id": "",
+        "note": "from receipt req_000119",
+        "state_after": "0f295e4a8322efb8",
+        "state_before": "daadde8d4dd9cb37",
+        "timestamp_ms": 24881,
+        "world_tick": 93
+      },
+      {
+        "event_type": "resident_mismatch",
+        "model_id": "",
+        "note": "from receipt req_000118",
+        "state_after": "0f295e4a8322efb8",
+        "state_before": "daadde8d4dd9cb37",
+        "timestamp_ms": 24896,
+        "world_tick": 93
+      },
+      {
+        "event_type": "resident_mismatch",
+        "model_id": "",
+        "note": "from receipt req_000120",
+        "state_after": "0f295e4a8322efb8",
+        "state_before": "daadde8d4dd9cb37",
+        "timestamp_ms": 25127,
+        "world_tick": 94
+      },
+      {
+        "event_type": "resident_mismatch",
+        "model_id": "",
+        "note": "from receipt req_000121",
+        "state_after": "0f295e4a8322efb8",
+        "state_before": "daadde8d4dd9cb37",
+        "timestamp_ms": 25345,
+        "world_tick": 95
+      },
+      {
+        "event_type": "resident_mismatch",
+        "model_id": "",
+        "note": "from receipt req_000122",
+        "state_after": "0f295e4a8322efb8",
+        "state_before": "daadde8d4dd9cb37",
+        "timestamp_ms": 25361,
+        "world_tick": 95
+      },
+      {
+        "event_type": "resident_mismatch",
+        "model_id": "",
+        "note": "from receipt req_000123",
+        "state_after": "0f295e4a8322efb8",
+        "state_before": "daadde8d4dd9cb37",
+        "timestamp_ms": 25617,
+        "world_tick": 96
+      },
+      {
+        "event_type": "resident_mismatch",
+        "model_id": "",
+        "note": "from receipt req_000124",
+        "state_after": "0f295e4a8322efb8",
+        "state_before": "daadde8d4dd9cb37",
+        "timestamp_ms": 25815,
+        "world_tick": 97
+      },
+      {
+        "event_type": "resident_mismatch",
+        "model_id": "",
+        "note": "from receipt req_000125",
+        "state_after": "0f295e4a8322efb8",
+        "state_before": "daadde8d4dd9cb37",
+        "timestamp_ms": 25873,
+        "world_tick": 97
+      },
+      {
+        "event_type": "resident_mismatch",
+        "model_id": "",
+        "note": "from receipt req_000126",
+        "state_after": "0f295e4a8322efb8",
+        "state_before": "daadde8d4dd9cb37",
+        "timestamp_ms": 26139,
+        "world_tick": 98
+      },
+      {
+        "event_type": "resident_mismatch",
+        "model_id": "",
+        "note": "from receipt req_000127",
+        "state_after": "0f295e4a8322efb8",
+        "state_before": "daadde8d4dd9cb37",
+        "timestamp_ms": 26366,
+        "world_tick": 99
+      },
+      {
+        "event_type": "resident_mismatch",
+        "model_id": "",
+        "note": "from receipt req_000128",
+        "state_after": "0f295e4a8322efb8",
+        "state_before": "daadde8d4dd9cb37",
+        "timestamp_ms": 26378,
+        "world_tick": 99
+      },
+      {
+        "event_type": "resident_mismatch",
+        "model_id": "",
+        "note": "from receipt req_000129",
+        "state_after": "0f295e4a8322efb8",
+        "state_before": "daadde8d4dd9cb37",
+        "timestamp_ms": 26618,
+        "world_tick": 100
+      },
+      {
+        "event_type": "resident_mismatch",
+        "model_id": "",
+        "note": "from receipt req_000131",
+        "state_after": "0f295e4a8322efb8",
+        "state_before": "daadde8d4dd9cb37",
+        "timestamp_ms": 26885,
+        "world_tick": 101
+      },
+      {
+        "event_type": "resident_mismatch",
+        "model_id": "",
+        "note": "from receipt req_000130",
+        "state_after": "0f295e4a8322efb8",
+        "state_before": "daadde8d4dd9cb37",
+        "timestamp_ms": 26917,
+        "world_tick": 102
+      },
+      {
+        "event_type": "resident_mismatch",
+        "model_id": "",
+        "note": "from receipt req_000132",
+        "state_after": "0f295e4a8322efb8",
+        "state_before": "daadde8d4dd9cb37",
+        "timestamp_ms": 27121,
+        "world_tick": 102
+      },
+      {
+        "event_type": "resident_mismatch",
+        "model_id": "",
+        "note": "from receipt req_000133",
+        "state_after": "0f295e4a8322efb8",
+        "state_before": "daadde8d4dd9cb37",
+        "timestamp_ms": 27347,
+        "world_tick": 103
+      },
+      {
+        "event_type": "resident_mismatch",
+        "model_id": "",
+        "note": "from receipt req_000134",
+        "state_after": "0f295e4a8322efb8",
+        "state_before": "daadde8d4dd9cb37",
+        "timestamp_ms": 27598,
+        "world_tick": 104
+      },
+      {
+        "event_type": "resident_mismatch",
+        "model_id": "",
+        "note": "from receipt req_000135",
+        "state_after": "0f295e4a8322efb8",
+        "state_before": "daadde8d4dd9cb37",
+        "timestamp_ms": 27613,
+        "world_tick": 104
+      },
+      {
+        "event_type": "resident_mismatch",
+        "model_id": "",
+        "note": "from receipt req_000136",
+        "state_after": "0f295e4a8322efb8",
+        "state_before": "daadde8d4dd9cb37",
+        "timestamp_ms": 27869,
+        "world_tick": 105
+      },
+      {
+        "event_type": "resident_mismatch",
+        "model_id": "",
+        "note": "from receipt req_000138",
+        "state_after": "0f295e4a8322efb8",
+        "state_before": "daadde8d4dd9cb37",
+        "timestamp_ms": 28125,
+        "world_tick": 106
+      },
+      {
+        "event_type": "resident_mismatch",
+        "model_id": "",
+        "note": "from receipt req_000137",
+        "state_after": "0f295e4a8322efb8",
+        "state_before": "daadde8d4dd9cb37",
+        "timestamp_ms": 28138,
+        "world_tick": 106
+      },
+      {
+        "event_type": "resident_mismatch",
+        "model_id": "",
+        "note": "from receipt req_000139",
+        "state_after": "0f295e4a8322efb8",
+        "state_before": "daadde8d4dd9cb37",
+        "timestamp_ms": 28345,
+        "world_tick": 107
+      },
+      {
+        "event_type": "resident_mismatch",
+        "model_id": "",
+        "note": "from receipt req_000140",
+        "state_after": "0f295e4a8322efb8",
+        "state_before": "daadde8d4dd9cb37",
+        "timestamp_ms": 28625,
+        "world_tick": 108
+      },
+      {
+        "event_type": "resident_mismatch",
+        "model_id": "",
+        "note": "from receipt req_000141",
+        "state_after": "0f295e4a8322efb8",
+        "state_before": "daadde8d4dd9cb37",
+        "timestamp_ms": 28638,
+        "world_tick": 108
+      },
+      {
+        "event_type": "resident_mismatch",
+        "model_id": "",
+        "note": "from receipt req_000142",
+        "state_after": "0f295e4a8322efb8",
+        "state_before": "daadde8d4dd9cb37",
+        "timestamp_ms": 28873,
+        "world_tick": 109
+      },
+      {
+        "event_type": "resident_mismatch",
+        "model_id": "",
+        "note": "from receipt req_000143",
+        "state_after": "0f295e4a8322efb8",
+        "state_before": "daadde8d4dd9cb37",
+        "timestamp_ms": 29120,
+        "world_tick": 110
+      },
+      {
+        "event_type": "resident_mismatch",
+        "model_id": "",
+        "note": "from receipt req_000144",
+        "state_after": "0f295e4a8322efb8",
+        "state_before": "daadde8d4dd9cb37",
+        "timestamp_ms": 29148,
+        "world_tick": 110
+      },
+      {
+        "event_type": "resident_mismatch",
+        "model_id": "",
+        "note": "from receipt req_000145",
+        "state_after": "0f295e4a8322efb8",
+        "state_before": "daadde8d4dd9cb37",
+        "timestamp_ms": 29364,
+        "world_tick": 111
+      },
+      {
+        "event_type": "resident_mismatch",
+        "model_id": "",
+        "note": "from receipt req_000147",
+        "state_after": "0f295e4a8322efb8",
+        "state_before": "daadde8d4dd9cb37",
+        "timestamp_ms": 29642,
+        "world_tick": 112
+      },
+      {
+        "event_type": "resident_mismatch",
+        "model_id": "",
+        "note": "from receipt req_000146",
+        "state_after": "0f295e4a8322efb8",
+        "state_before": "daadde8d4dd9cb37",
+        "timestamp_ms": 29643,
+        "world_tick": 112
+      },
+      {
+        "event_type": "resident_mismatch",
+        "model_id": "",
+        "note": "from receipt req_000148",
+        "state_after": "0f295e4a8322efb8",
+        "state_before": "daadde8d4dd9cb37",
+        "timestamp_ms": 29871,
+        "world_tick": 113
+      },
+      {
+        "event_type": "resident_mismatch",
+        "model_id": "",
+        "note": "from receipt req_000150",
+        "state_after": "0f295e4a8322efb8",
+        "state_before": "daadde8d4dd9cb37",
+        "timestamp_ms": 30170,
+        "world_tick": 115
+      },
+      {
+        "event_type": "resident_mismatch",
+        "model_id": "",
+        "note": "from receipt req_000149",
+        "state_after": "0f295e4a8322efb8",
+        "state_before": "daadde8d4dd9cb37",
+        "timestamp_ms": 30186,
+        "world_tick": 115
+      },
+      {
+        "event_type": "resident_mismatch",
+        "model_id": "",
+        "note": "from receipt req_000151",
+        "state_after": "0f295e4a8322efb8",
+        "state_before": "daadde8d4dd9cb37",
+        "timestamp_ms": 30597,
+        "world_tick": 116
+      },
+      {
+        "event_type": "resident_mismatch",
+        "model_id": "",
+        "note": "from receipt req_000152",
+        "state_after": "0f295e4a8322efb8",
+        "state_before": "daadde8d4dd9cb37",
+        "timestamp_ms": 30855,
+        "world_tick": 117
+      },
+      {
+        "event_type": "resident_mismatch",
+        "model_id": "",
+        "note": "from receipt req_000153",
+        "state_after": "0f295e4a8322efb8",
+        "state_before": "daadde8d4dd9cb37",
+        "timestamp_ms": 30869,
+        "world_tick": 117
+      },
+      {
+        "event_type": "resident_mismatch",
+        "model_id": "",
+        "note": "from receipt req_000154",
+        "state_after": "0f295e4a8322efb8",
+        "state_before": "daadde8d4dd9cb37",
+        "timestamp_ms": 31121,
+        "world_tick": 118
+      },
+      {
+        "event_type": "resident_mismatch",
+        "model_id": "",
+        "note": "from receipt req_000156",
+        "state_after": "0f295e4a8322efb8",
+        "state_before": "daadde8d4dd9cb37",
+        "timestamp_ms": 31415,
+        "world_tick": 120
+      },
+      {
+        "event_type": "resident_mismatch",
+        "model_id": "",
+        "note": "from receipt req_000155",
+        "state_after": "0f295e4a8322efb8",
+        "state_before": "daadde8d4dd9cb37",
+        "timestamp_ms": 31430,
+        "world_tick": 120
+      }
+    ],
+    "start_model_states": {
+      "falcon-h1-1.5b-instruct": "HOT",
+      "liquidai/lfm2.5-1.2b-instruct": "HOT",
+      "qwen3.5-2b": "HOT"
+    },
+    "start_resident_hash": "daadde8d4dd9cb37",
+    "start_resident_set": [
+      "liquidai/lfm2.5-1.2b-instruct",
+      "qwen3.5-2b",
+      "falcon-h1-1.5b-instruct"
+    ],
+    "suspects": [
+      {
+        "model_id": "liquidai/lfm2.5-1.2b-instruct",
+        "request_id": "req_000001",
+        "residual": 3.12224159373341,
+        "world_tick": 1
+      },
+      {
+        "model_id": "qwen3.5-2b",
+        "request_id": "req_000002",
+        "residual": 2.41345696042714,
+        "world_tick": 3
+      },
+      {
+        "model_id": "liquidai/lfm2.5-1.2b-instruct",
+        "request_id": "req_000088",
+        "residual": 1.81066021436311,
+        "world_tick": 74
+      },
+      {
+        "model_id": "liquidai/lfm2.5-1.2b-instruct",
+        "request_id": "req_000150",
+        "residual": 1.91125244849439,
+        "world_tick": 115
+      },
+      {
+        "model_id": "liquidai/lfm2.5-1.2b-instruct",
+        "request_id": "req_000156",
+        "residual": 1.90007553359092,
+        "world_tick": 120
+      }
+    ],
+    "void_reason": "model qwen3.5-2b entered EVICTED during a measured replicate"
+  },
+  "settle_ticks": 0,
+  "shape_failed": 12,
+  "shape_failed_by_agent": {
+    "agent_0": 6,
+    "agent_1": 1,
+    "agent_2": 5
+  },
+  "shape_failed_rates": {
+    "agent_0": 0.0540540540540541,
+    "agent_1": 0.0909090909090909,
+    "agent_2": 0.0819672131147541
+  },
+  "synthetic": false,
+  "throughput": {
+    "actions_per_agent": 60.6666666666667,
+    "actions_per_tick": 1.3,
+    "no_opportunity_rate": 0.0,
+    "observation_opportunities": 183,
+    "opportunities_per_tick": 1.30714285714286
+  },
+  "tick_ms": 250,
+  "void": true,
+  "void_reasons": [
+    "1 agent lifecycle(s) left open",
+    "1 cognition(s) never completed",
+    "runtime: model qwen3.5-2b entered EVICTED during a measured replicate"
+  ]
+}
