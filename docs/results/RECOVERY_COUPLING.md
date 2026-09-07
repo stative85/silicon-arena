@@ -61,15 +61,22 @@ experiment below is the blocker for further ASYNC work, not an optional follow-u
 
 ## What is NOT established
 
-**Causation.** One occurrence, one replicate, no control. Two readings fit the
-same evidence and this run cannot separate them:
+**Causation.** Twelve occurrences now, and still **no control**. Recovery has
+never once been the independent variable: in every instance it was triggered BY
+a health verdict, so "recovery causes the neighbour spike" and "whatever caused
+qwen to degrade also hit falcon a few seconds later" remain observationally
+entangled. Two readings still fit:
 
-1. Recovering qwen transiently destabilised a healthy neighbour — reload
+1. Recovering qwen transiently destabilises a healthy neighbour — reload
    allocation, VRAM churn, or server-side contention during load.
-2. Both models degraded from a shared external cause, and qwen simply crossed
-   its threshold first because `ks` is a ratio against a smaller expectation.
+2. Both models degrade from a shared external cause, and qwen crosses its
+   threshold first because `ks` is a ratio against a smaller expectation.
 
-Temporal adjacency is not a mechanism. 136 ms is suggestive and nothing more.
+Reading 2 is now harder to hold — it has to explain a fixed ordering in 10 of
+10, a 30-37x band for falcon, and a 7.3-8.9 s delay matching reload duration —
+but "harder to hold" is not "excluded". Repetition raises the prior; it does not
+substitute for manipulating the variable. The controlled instrument below is
+still what settles it.
 
 ## The question worth answering
 
