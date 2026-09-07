@@ -59,11 +59,19 @@ var _run_start_ms := 0
 var _model_calls := 0
 var _actions_returned := 0
 var _shape_failed := 0
+var _shape_by_agent: Dictionary = {}
+var _calls_by_agent: Dictionary = {}
 var _equalizer_breaches := 0
 var _settle_ticks := 0
 var _observation_calls := 0
 var _replay: Dictionary = {}
 var _all_envelopes: Array = []
+
+## The bridge issues its OWN request ids, so the transport's id and the
+## experiment's sterile request_id are different namespaces and must be mapped.
+## Keying in-flight cognition by the sterile id alone silently dropped every
+## completion.
+var _bridge_rid: Dictionary = {}   ## bridge request_id -> AsyncEnvelope
 
 
 func _init() -> void:
@@ -103,8 +111,12 @@ func _pre_run() -> bool:
 	print("  synthetic      %s" % str(_synthetic))
 
 	_world = W.make(RESOURCES, HOLD)
-	_run_start_ms = Time.get_ticks_msec()
-	_eng = S.make(_world, _arm, _run_start_ms)
+	# _run_start_ms is set when the tick loop actually begins, NOT here: the
+	# bridge handshake below makes an HTTP residency call, and anchoring the
+	# world clock before it would put every early tick deadline in the past --
+	# the wall-clock wait would never wait, and the run would spin through its
+	# ticks without ever draining a completion.
+	_eng = S.make(_world, _arm, 0)
 	_rng.seed = 990000 + _replicate
 
 	for i in AGENTS:
@@ -192,13 +204,31 @@ func _run_ticks() -> void:
 				_synthetic_complete(env, ag, vt)
 			else:
 				_model_calls += 1
-				_bridge.submit(ag.agent_id, ag.model_id,
+				_calls_by_agent[ag.agent_id] = int(
+					_calls_by_agent.get(ag.agent_id, 0)) + 1
+				var brid := _bridge.submit(ag.agent_id, ag.model_id,
 					_request_payload(vt))
+				_bridge_rid[brid] = env
 
-		# process completions into ENVELOPES ONLY, never the world
+		# Process completions into ENVELOPES ONLY, never the world.
+		#
+		# THE TICK-ADVANCE RULE IS PART OF THE TIMING POLICY. SERIAL means the
+		# world waits for cognition, so its tick ends when the outstanding
+		# cognition has completed. NATURAL and EQUALIZED mean the world
+		# continues, so their ticks are wall-clock 250 ms -- blocking until all
+		# in-flight requests finished would be a barrier and would make both
+		# arms behave synchronously, destroying the asynchrony they measure.
 		if not _synthetic:
-			while _inflight.size() > 0 and _completed.size() < _inflight.size():
-				await process_frame
+			var rule := T.tick_advance_rule(_arm)
+			if rule == T.TICK_WAIT_FOR_COGNITION:
+				while not _inflight.is_empty():
+					await process_frame
+					_drain_completions()
+			else:
+				var deadline := T.tick_start_ms(tick + 1, _run_start_ms)
+				while Time.get_ticks_msec() < deadline:
+					await process_frame
+					_drain_completions()
 			_drain_completions()
 
 		# Drain anything now due IN THIS TICK. For SERIAL this is what "the
@@ -236,6 +266,16 @@ func _run_ticks() -> void:
 	# submission happens below, so every counted action originated inside the
 	# acquisition horizon. Otherwise NATURAL and EQUALIZED would gain extra
 	# cognition opportunities merely for taking longer to empty the pipe.
+	# Live cognition may still be in flight at the horizon. Settle is drainage,
+	# so those requests are awaited and applied -- but NO new observation and
+	# NO new submission happens, so every counted action still originates
+	# inside the acquisition horizon.
+	if not _synthetic:
+		var wait_until := Time.get_ticks_msec() + 120000
+		while not _inflight.is_empty() and Time.get_ticks_msec() < wait_until:
+			await process_frame
+			_drain_completions()
+
 	var settle := 0
 	while not _eng.pending.is_empty() and settle < 64:
 		settle += 1
@@ -286,13 +326,16 @@ func _drain_completions() -> void:
 	for c in _completed:
 		var d: Dictionary = c
 		_guard.on_receipt(d["rec"])
-		var env: AsyncEnvelope = _inflight.get(str(d["rid"]), null)
+		var env: AsyncEnvelope = _bridge_rid.get(str(d["rid"]), null)
 		if env == null:
 			continue
+		_bridge_rid.erase(str(d["rid"]))
 		var ag := _agent_for(env)
 		var parsed := C.parse(str(d["text"]))
 		if not bool(d["ok"]) or not bool(parsed["ok"]):
 			_shape_failed += 1
+			_shape_by_agent[env.agent_id] = int(
+				_shape_by_agent.get(env.agent_id, 0)) + 1
 			env.set_action(W.PASS_TARGET, str(d["text"]))
 		else:
 			_actions_returned += 1
@@ -390,6 +433,18 @@ func _post_run() -> Dictionary:
 			_replay["ordering_exercised"] = "NOT_EXERCISED"
 		else:
 			_replay["ordering_exercised"] = "EXERCISED"
+	# Preregistered void condition: SHAPE_FAILED above 10% for ANY agent means
+	# the contract is not expressible and the descriptors would be measuring
+	# contract-satisfaction, as PIT A Run 1 did.
+	var shape_rates := {}
+	for aid in _calls_by_agent:
+		var calls := int(_calls_by_agent[aid])
+		var sf := int(_shape_by_agent.get(aid, 0))
+		var rate := (float(sf) / float(calls)) if calls > 0 else 0.0
+		shape_rates[aid] = rate
+		if rate > 0.10:
+			problems.append("SHAPE_FAILED %.1f%% for %s (>10%%)"
+				% [rate * 100.0, aid])
 	if _guard.is_void():
 		problems.append("runtime: " + _guard.void_reason)
 
@@ -442,6 +497,9 @@ func _post_run() -> Dictionary:
 		"counts": counts, "throughput": thr, "model_calls": _model_calls,
 		"actions_returned": _actions_returned,
 		"shape_failed": _shape_failed,
+		"shape_failed_by_agent": _shape_by_agent,
+		"model_calls_by_agent": _calls_by_agent,
+		"shape_failed_rates": shape_rates,
 		"equalizer_breaches": _equalizer_breaches,
 		"runtime": _guard.envelope(),
 		"observation_calls": _observation_calls,

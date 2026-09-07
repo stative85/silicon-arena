@@ -1,0 +1,93 @@
+{
+  "actions_returned": 18,
+  "agents": 3,
+  "arm": "EQUALIZED",
+  "arm_type": "LIVE",
+  "contract_schema_hash": "f5a2aaf89dfa6ffa",
+  "counts": {
+    "actions": 20,
+    "by_outcome": {
+      "ACCEPTED": 15,
+      "PASSED": 2,
+      "STALE_CONFLICT": 3
+    },
+    "contention_opportunity": 0,
+    "no_opportunity": 0,
+    "stale_eligible": 3,
+    "stale_revalidated": 0
+  },
+  "equalized_delay_ticks": 4,
+  "equalizer_breaches": 1,
+  "final_world_hash": "aac8e5b1bb603c68",
+  "final_world_tick": 29,
+  "hold_ticks": 4,
+  "journal_hash": "fb5d3b518cecbb476e893b6c8d220d5981a4a506101f8651ca53dae70332cc85",
+  "model_calls": 20,
+  "model_calls_by_agent": {
+    "agent_0": 7,
+    "agent_1": 7,
+    "agent_2": 6
+  },
+  "observation_calls": 20,
+  "observation_horizon_ticks": 25,
+  "replay": {
+
+  },
+  "replicate_id": "EQUALIZED_r0",
+  "resources": 16,
+  "runtime": {
+    "end_model_states": {
+
+    },
+    "end_resident_hash": "e3b0c44298fc1c14",
+    "end_resident_set": [],
+    "expected_resident": [
+      "liquidai/lfm2.5-1.2b-instruct",
+      "h2o-danube2-1.8b-chat",
+      "falcon-h1-1.5b-instruct"
+    ],
+    "expected_resident_hash": "1e77987921c0ff5b",
+    "observed_resident_hashes": [
+      "1e77987921c0ff5b"
+    ],
+    "replicate_id": "EQUALIZED_r0",
+    "runtime_events": [],
+    "start_model_states": {
+      "falcon-h1-1.5b-instruct": "HOT",
+      "h2o-danube2-1.8b-chat": "HOT",
+      "liquidai/lfm2.5-1.2b-instruct": "HOT"
+    },
+    "start_resident_hash": "1e77987921c0ff5b",
+    "start_resident_set": [
+      "liquidai/lfm2.5-1.2b-instruct",
+      "h2o-danube2-1.8b-chat",
+      "falcon-h1-1.5b-instruct"
+    ],
+    "suspects": [],
+    "void_reason": ""
+  },
+  "settle_ticks": 4,
+  "shape_failed": 2,
+  "shape_failed_by_agent": {
+    "agent_1": 2
+  },
+  "shape_failed_rates": {
+    "agent_0": 0.0,
+    "agent_1": 0.285714285714286,
+    "agent_2": 0.0
+  },
+  "synthetic": false,
+  "throughput": {
+    "actions_per_agent": 6.66666666666667,
+    "actions_per_tick": 0.8,
+    "no_opportunity_rate": 0.0,
+    "observation_opportunities": 20,
+    "opportunities_per_tick": 0.8
+  },
+  "tick_ms": 250,
+  "void": true,
+  "void_reasons": [
+    "1 equalizer breaches",
+    "SHAPE_FAILED 28.6% for agent_1 (>10%)"
+  ]
+}

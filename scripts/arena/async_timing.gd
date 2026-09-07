@@ -166,3 +166,23 @@ static func order_due(arm: String, due: Array) -> Array:
 static func _order_key(e) -> String:
 	var env: AsyncEnvelope = e
 	return env.request_id.sha256_text()
+
+
+## WHEN DOES A TICK END? This is part of the timing policy, not an
+## implementation detail of the runner.
+##
+## SERIAL means "the world waits for cognition", so its tick ends when the
+## outstanding cognition for that tick has completed -- however long that takes
+## in wall time.
+##
+## NATURAL and EQUALIZED mean "the world continues", so their ticks are
+## WALL-CLOCK: 250 ms each, regardless of whether anything finished. Blocking
+## until all in-flight requests complete would be a barrier, and would make
+## both arms behave synchronously -- destroying the asynchrony they exist to
+## measure.
+const TICK_WAIT_FOR_COGNITION := "WAIT_FOR_COGNITION"
+const TICK_WALL_CLOCK := "WALL_CLOCK"
+
+
+static func tick_advance_rule(arm: String) -> String:
+	return TICK_WAIT_FOR_COGNITION if arm == SERIAL else TICK_WALL_CLOCK

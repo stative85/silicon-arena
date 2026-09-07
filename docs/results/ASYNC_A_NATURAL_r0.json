@@ -1,0 +1,77 @@
+{
+  "actions_returned": 31,
+  "agents": 3,
+  "arm": "NATURAL",
+  "arm_type": "LIVE",
+  "contract_schema_hash": "f5a2aaf89dfa6ffa",
+  "counts": {
+    "actions": 34,
+    "by_outcome": {
+      "ACCEPTED": 28,
+      "PASSED": 3,
+      "STALE_CONFLICT": 3
+    },
+    "contention_opportunity": 0,
+    "no_opportunity": 0,
+    "stale_eligible": 3,
+    "stale_revalidated": 0
+  },
+  "equalized_delay_ticks": 4,
+  "equalizer_breaches": 0,
+  "final_world_hash": "45922ad222f9b9e9",
+  "final_world_tick": 27,
+  "hold_ticks": 4,
+  "journal_hash": "37d12d4df177c02d9f56197a289358b34306f71b0271717f79289341707dc256",
+  "model_calls": 34,
+  "observation_calls": 34,
+  "observation_horizon_ticks": 25,
+  "replay": {
+
+  },
+  "replicate_id": "NATURAL_r0",
+  "resources": 16,
+  "runtime": {
+    "end_model_states": {
+
+    },
+    "end_resident_hash": "e3b0c44298fc1c14",
+    "end_resident_set": [],
+    "expected_resident": [
+      "liquidai/lfm2.5-1.2b-instruct",
+      "h2o-danube2-1.8b-chat",
+      "falcon-h1-1.5b-instruct"
+    ],
+    "expected_resident_hash": "1e77987921c0ff5b",
+    "observed_resident_hashes": [
+      "1e77987921c0ff5b"
+    ],
+    "replicate_id": "NATURAL_r0",
+    "runtime_events": [],
+    "start_model_states": {
+      "falcon-h1-1.5b-instruct": "HOT",
+      "h2o-danube2-1.8b-chat": "HOT",
+      "liquidai/lfm2.5-1.2b-instruct": "HOT"
+    },
+    "start_resident_hash": "1e77987921c0ff5b",
+    "start_resident_set": [
+      "liquidai/lfm2.5-1.2b-instruct",
+      "h2o-danube2-1.8b-chat",
+      "falcon-h1-1.5b-instruct"
+    ],
+    "suspects": [],
+    "void_reason": ""
+  },
+  "settle_ticks": 2,
+  "shape_failed": 3,
+  "synthetic": false,
+  "throughput": {
+    "actions_per_agent": 11.3333333333333,
+    "actions_per_tick": 1.36,
+    "no_opportunity_rate": 0.0,
+    "observation_opportunities": 34,
+    "opportunities_per_tick": 1.36
+  },
+  "tick_ms": 250,
+  "void": false,
+  "void_reasons": []
+}
