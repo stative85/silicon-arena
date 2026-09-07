@@ -356,9 +356,10 @@ func _write(final: bool) -> void:
 	for w in _windows_out:
 		if bool((w as Dictionary)["gate"]["void"]):
 			voided += 1
-	print("\n[SUMMARY] %s" % _run_kind)
-	print("  windows %d, void %d, probe records %d"
-		% [_windows_out.size(), voided, _records.size()])
+	if final:
+		print("\n[SUMMARY] %s" % _run_kind)
+		print("  windows %d, void %d, probe records %d"
+			% [_windows_out.size(), voided, _records.size()])
 	var path := "res://docs/results/RC_%s_%s.json" % [_run_kind, _tag]
 	var f := FileAccess.open(path, FileAccess.WRITE)
 	if f != null:
