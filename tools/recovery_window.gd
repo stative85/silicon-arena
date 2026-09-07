@@ -128,8 +128,11 @@ func _run() -> void:
 	for wid in _want:
 		var w: Dictionary = _sched["windows"][wid]
 		await _one_window(w)
+		# INCREMENTAL WRITE. A 60-window run that only persists at the
+		# end loses every completed window to a crash in a later one.
+		_write(false)
 
-	_write()
+	_write(true)
 
 
 func _one_window(w: Dictionary) -> void:
@@ -348,7 +351,7 @@ func _payload(visible: Array) -> Dictionary:
 	}
 
 
-func _write() -> void:
+func _write(final: bool) -> void:
 	var voided := 0
 	for w in _windows_out:
 		if bool((w as Dictionary)["gate"]["void"]):
@@ -368,5 +371,7 @@ func _write() -> void:
 			"windows": _windows_out, "records": _records,
 		}, "  "))
 		f.close()
-		print("  wrote %s" % path)
-	quit(0)
+		if final:
+			print("  wrote %s" % path)
+	if final:
+		quit(0)

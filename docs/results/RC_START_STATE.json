@@ -1,0 +1,43 @@
+{
+  "experiment_id": "RECOVERY-COUPLING",
+  "schedule_hash": "9c9dbd9ca0c45252",
+  "schedule_hash_expected": "9c9dbd9ca0c45252",
+  "runtime_version": "lms CLI commit df81c60",
+  "backend_fresh_start_at": "2026-09-07T16:28:33",
+  "backend_pids_after_start": [
+    25092,
+    22628,
+    19276,
+    25592,
+    23148,
+    19224,
+    24884,
+    18324,
+    22412,
+    18920,
+    24980,
+    25968
+  ],
+  "residency_counts": {
+    "liquidai/lfm2.5-1.2b-instruct": 1,
+    "qwen3.5-2b": 1,
+    "falcon-h1-1.5b-instruct": 1
+  },
+  "total_instances": 3,
+  "models": [
+    "liquidai/lfm2.5-1.2b-instruct",
+    "qwen3.5-2b",
+    "falcon-h1-1.5b-instruct"
+  ],
+  "vram_used_mib": 5583,
+  "vram_total_mib": 8151,
+  "host_free_ram_mb": 17308,
+  "active_requests": 0,
+  "arm_baseline": "PASS",
+  "health_surface_sha256": "14536bd0e92f16ba",
+  "ks": 1.8,
+  "kh": 20.0,
+  "n": 3,
+  "at": "2026-09-07T16:28:52",
+  "runtime_version_raw": "\u001b[38;5;166m   __   __  ___  ______          ___        _______   ____\u001b[0m\n\u001b[38;5;214m  / /  /  |/  / / __/ /___ _____/ (_)__    / ___/ /  /  _/\u001b[0m\n\u001b[38;5;226m / /__/ /|_/ / _\\ \\/ __/ // / _  / / _ \\  / /__/ /___/ /  \u001b[0m\n\u001b[38;5;46m/____/_/  /_/ /___/\\__/\\_,_/\\_,_/_/\\___/  \\___/____/___/  \u001b[0m\n\nlms is LM Studio's CLI utility for your models, server, and inference runtime.\nCLI commit: df81c60\n\nDocs: https://lmstudio.ai/docs/developer\nJoin our Discord: https://discord.gg/lmstudio\nContribute: https://github.com/lmstudio-ai/lms"
+}
