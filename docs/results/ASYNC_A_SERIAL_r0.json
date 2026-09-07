@@ -1,30 +1,35 @@
 {
-  "actions_returned": 68,
+  "actions_returned": 2200,
   "agents": 3,
   "arm": "SERIAL",
   "arm_type": "LIVE",
   "contract_schema_hash": "f5a2aaf89dfa6ffa",
   "counts": {
-    "actions": 75,
+    "actions": 2400,
     "by_outcome": {
-      "ACCEPTED": 57,
-      "CONTENTION_LOST": 11,
-      "PASSED": 7
+      "ACCEPTED": 1801,
+      "CONTENTION_LOST": 399,
+      "PASSED": 200
     },
     "contention_opportunity": 0,
     "no_opportunity": 0,
-    "stale_eligible": 11,
+    "stale_eligible": 399,
     "stale_revalidated": 0
   },
   "equalized_delay_ticks": 4,
   "equalizer_breaches": 0,
-  "final_world_hash": "19f89afc7684e01f",
-  "final_world_tick": 25,
+  "final_world_hash": "89810f96bf2601ba",
+  "final_world_tick": 800,
   "hold_ticks": 4,
-  "journal_hash": "026539ed9f2c27d8ad425dac5113eec8b1a35b87614bc4e0650907edb3b65f16",
-  "model_calls": 75,
-  "observation_calls": 75,
-  "observation_horizon_ticks": 25,
+  "journal_hash": "4bb5513b766d87ee763854a64261a77b6bd4532b83e555748ef4cc854f95213e",
+  "model_calls": 2400,
+  "model_calls_by_agent": {
+    "agent_0": 800,
+    "agent_1": 800,
+    "agent_2": 800
+  },
+  "observation_calls": 2400,
+  "observation_horizon_ticks": 800,
   "replay": {
 
   },
@@ -58,20 +63,37 @@
       "h2o-danube2-1.8b-chat",
       "falcon-h1-1.5b-instruct"
     ],
-    "suspects": [],
+    "suspects": [
+      {
+        "model_id": "liquidai/lfm2.5-1.2b-instruct",
+        "request_id": "req_000244",
+        "residual": 1.80839047910584,
+        "world_tick": 81
+      }
+    ],
     "void_reason": ""
   },
   "settle_ticks": 0,
-  "shape_failed": 7,
+  "shape_failed": 200,
+  "shape_failed_by_agent": {
+    "agent_1": 200
+  },
+  "shape_failed_rates": {
+    "agent_0": 0.0,
+    "agent_1": 0.25,
+    "agent_2": 0.0
+  },
   "synthetic": false,
   "throughput": {
-    "actions_per_agent": 25.0,
+    "actions_per_agent": 800.0,
     "actions_per_tick": 3.0,
     "no_opportunity_rate": 0.0,
-    "observation_opportunities": 75,
+    "observation_opportunities": 2400,
     "opportunities_per_tick": 3.0
   },
   "tick_ms": 250,
-  "void": false,
-  "void_reasons": []
+  "void": true,
+  "void_reasons": [
+    "SHAPE_FAILED 25.0% for agent_1 (>10%)"
+  ]
 }
