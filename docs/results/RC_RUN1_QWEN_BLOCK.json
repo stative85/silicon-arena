@@ -1,0 +1,42 @@
+{
+  "block_id": "RC_RUN1_QWEN_BLOCK",
+  "status": "QUARANTINED",
+  "integrity": "locally clean",
+  "causal_evidence_eligible": false,
+  "reason": [
+    "parent run terminated",
+    "apparatus nonstationary",
+    "block start state not independently qualified"
+  ],
+  "no_treatment_effect_analysis_performed": true,
+  "parent_run": "RC_EXPERIMENT_r1",
+  "parent_verdict": "VOID / TERMINATED",
+  "window_ids": [
+    20,
+    21,
+    22,
+    23,
+    24,
+    25,
+    26,
+    27,
+    28,
+    29,
+    30,
+    31,
+    32,
+    33,
+    34,
+    35,
+    36,
+    37,
+    38,
+    39
+  ],
+  "windows": 20,
+  "treatment": 10,
+  "control": 10,
+  "voids": 0,
+  "preceded_by": "18 of 20 lfm2.5-rotation windows void on RAM_FLOOR_EVENT",
+  "future_use": "may become a diagnostic fossil ONLY if RUNTIME-MEMORY independently demonstrates the runtime had returned to a qualified stable regime before this block, and ONLY under a rule preregistered BEFORE that demonstration is read"
+}

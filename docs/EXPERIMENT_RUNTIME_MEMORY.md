@@ -107,3 +107,53 @@ release on client disconnect confirmed
 
 No threshold changes. No RECOVERY-COUPLING rerun. No health-surface work. No
 lowering of any floor anywhere. This experiment characterises and stops.
+
+
+---
+
+# Amendment 1 — reading order, and a law held in reserve
+
+Frozen before implementation.
+
+## The order the result is read in
+
+Fixed now so the answer is not assembled from whichever arm looks most
+interesting:
+
+```text
+1. Does IDLE move materially?
+2. Does CONTROL WORKLOAD reproduce the RAM depression without any recovery?
+3. Does RECOVERY-ONLY reproduce it with minimal probing?
+4. Does FULL WINDOW reproduce the LFM-like collapse?
+5. At client disconnect, does LM Studio RSS step downward reproducibly
+   while the backend stays alive?
+6. Does memory plateau, oscillate, or recover BEFORE disconnect?
+7. Are the trajectories model-dependent -- especially around lfm2.5 -- or
+   merely coincident with rotation position and elapsed time?
+```
+
+Item 7 is the one Run 1 cannot answer and this experiment can: the collapse
+coincided with the lfm2.5 rotation block, but rotation position and elapsed time
+were perfectly confounded there.
+
+## Resource primitives, kept beside any rate
+
+`MB / 100 requests`, `MB / recovery` and `MB / minute` are descriptive mechanism
+summaries, **not** new scores. The primitives underneath them -- request count,
+prompt tokens, completions, recoveries, elapsed time -- are retained per sample
+for the same reason `observed_ttft` and `expected_ttft` are kept beside
+`residual`: a rate cannot be interrogated once its numerator and denominator
+have been thrown away.
+
+## A law held in reserve, NOT yet named
+
+Run 1 suggests a sixth ROBRUSTION law:
+
+> **VALID START STATE != VALID EXECUTION TRAJECTORY.**
+> A start-state witness proves initial conditions. It does not establish that
+> the workload remains inside its qualified resource envelope.
+
+It is **deliberately not added to `ROBRUSTION_LAWS.md` yet.** Every existing law
+there is anchored to a measured mechanism. This one currently rests on an effect
+whose mechanism is unknown -- which is exactly what this experiment exists to
+supply. It gets named after RUNTIME-MEMORY reports, or not at all.
