@@ -84,25 +84,42 @@ static func resident_set(http: HTTPRequest) -> Array:
 	return got
 
 
-## Strip a duplicate-instance suffix: "qwen3.5-2b:2" -> "qwen3.5-2b". Only a
-## trailing colon followed by digits is removed, so a model id that legitimately
-## contains a colon is left alone.
-static func base_id(instance_id: String) -> String:
+## PRODUCER CONTRACT, qualified empirically against this runtime rather than
+## inferred from a pattern. Observed directly on 2026-09-07:
+##
+##     lms load qwen3.5-2b   (already resident)
+##     -> 'To use the model in the API/SDK, use the identifier "qwen3.5-2b:2".'
+##     -> /api/v0/models then lists BOTH "qwen3.5-2b" and "qwen3.5-2b:2"
+##
+## So a trailing ":<digits>" denotes instance multiplicity FOR THIS PRODUCER.
+##
+## THE SUFFIX IS ONLY STRIPPED WHEN THE RESULT IS A KNOWN POOL MEMBER. A blind
+## parser would one day meet a legitimate model whose canonical id ends in ":2"
+## and silently merge it into a base that does not exist -- Law 5 murdered by a
+## naming convention. An unrecognised numeric-colon id is left intact so the
+## gate reports it as foreign rather than quietly absorbing it.
+static func base_id(instance_id: String, known: Array = []) -> String:
+	if known.has(instance_id):
+		return instance_id
 	var c := instance_id.rfind(":")
 	if c < 0:
 		return instance_id
 	var suffix := instance_id.substr(c + 1)
 	if suffix.is_empty() or not suffix.is_valid_int():
 		return instance_id
-	return instance_id.substr(0, c)
+	var candidate := instance_id.substr(0, c)
+	if known.is_empty() or known.has(candidate):
+		return candidate
+	return instance_id      # numeric colon, unknown base: NOT collapsed
 
 
 ## Residency as a COUNT MAP: base model id -> number of live instances.
-static func residency_counts(http: HTTPRequest) -> Dictionary:
+static func residency_counts(http: HTTPRequest,
+		known: Array = []) -> Dictionary:
 	var ids := await resident_set(http)
 	var counts := {}
 	for i in ids:
-		var b := base_id(str(i))
+		var b := base_id(str(i), known)
 		counts[b] = int(counts.get(b, 0)) + 1
 	return counts
 
