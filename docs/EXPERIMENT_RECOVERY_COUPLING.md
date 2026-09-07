@@ -149,3 +149,73 @@ reload fails to complete within the window              -> recorded, window
 No threshold change. No scheduler change during the experiment. No roster
 change. No ASYNC-B re-run. No reinterpretation of ASYNC-A2 or ASYNC-B envelopes
 as evidence for either hypothesis — those are observational and stay that way.
+
+
+---
+
+# Amendment 1 - endpoint discipline after HEALTH-REUSE
+
+Frozen before the first recovery call.
+
+> HEALTH-REUSE established that Qwen residual mass is concentrated near the
+> SUSPECT boundary `ks=1.8`, making SUSPECT/DEGRADED rates highly sensitive to
+> small level shifts. Therefore SUSPECT rate, DEGRADED count, and
+> consecutive-SUSPECT streaks SHALL NOT be used as evidence for treatment effect
+> in RECOVERY-COUPLING.
+>
+> The frozen causal treatment, sample size, recovery schedule, probe timing,
+> controls, `ks`, `kh`, and `n` remain unchanged.
+>
+> The original primary endpoint remains the count/proportion of recovery windows
+> containing a neighbor residual `>= kh=20`, compared with matched no-recovery
+> windows.
+>
+> Every neighbor probe SHALL additionally retain the continuous residual and its
+> mechanical components: observed TTFT, expected TTFT, prompt tokens, load
+> condition, recovered model, neighbor model, probe index, and elapsed time from
+> recovery.
+>
+> Continuous residual distributions SHALL be reported by directed recovery pair
+> and control using median, p95, p99, maximum, and the complete observed range.
+> SUSPECT/DEGRADED classifications may appear only as audit telemetry.
+>
+> Verdict-triggered recovery during a measurement window remains VOID exactly as
+> frozen.
+
+## Why the primary endpoint is NOT laundered
+
+`kh = 20` sits an order of magnitude above the marginal decision boundary that
+HEALTH-REUSE exposed, and the observed neighbour excursions were 30x-60x. The
+amplification problem applies to thresholds sitting inside a dense region of the
+distribution; it does not apply here. The frozen primary therefore stands
+unchanged rather than being rewritten after seeing another experiment's result.
+
+## The causal matrix
+
+```text
+RECOVER QWEN   -> LFM residuals, FALCON residuals
+RECOVER FALCON -> LFM residuals, QWEN residuals
+RECOVER LFM    -> QWEN residuals, FALCON residuals
+```
+
+against identical no-recovery windows.
+
+## Frozen interpretation
+
+```text
+scheduled qwen recovery repeatedly produces falcon residuals ~30-60
+while matched controls stay near baseline
+  -> Blocker 2 is causal
+
+recovery shifts falcon 1.2 -> 1.5 but never approaches 20
+  -> the spectacular A2/B observation does NOT reproduce causally
+
+every recovery direction raises both neighbours
+  -> general reload/residency disturbance, not qwen-specific coupling
+
+only qwen recovery -> falcon catastrophe survives
+  -> a directional runtime interaction, and the more interesting result
+
+controls also produce giant excursions
+  -> STOP. Recovery is not identified.
+```

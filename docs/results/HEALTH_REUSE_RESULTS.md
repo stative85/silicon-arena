@@ -77,10 +77,10 @@ That single fact explains the entire confusing history:
   a small favourable shift.
 - Why every diagnostic so far has looked unstable and contradictory.
 
-**SUSPECT rate is an amplifier, not a measurement, in this regime.** When the
-median sits on the tripwire, the rate is a hypersensitive function of tiny
-latency changes, and any experiment using it as an outcome is measuring
-amplification as much as signal. Residual medians are far better behaved:
+**SUSPECT rate is an amplifier, not an effect-size measure, in this regime.**
+It does measure threshold crossings, and it measures them correctly. It simply
+becomes a wildly nonlinear proxy for the underlying residual when ~60% of the
+mass sits within 0.10 of the boundary, so it cannot be read as a magnitude. Residual medians are far better behaved:
 qwen moved only 1.73-1.86 across every condition in this experiment while its
 SUSPECT rate swung from 19% to 75%.
 
