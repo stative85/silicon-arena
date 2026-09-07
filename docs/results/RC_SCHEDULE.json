@@ -1,0 +1,855 @@
+{
+  "models": [
+    "liquidai/lfm2.5-1.2b-instruct",
+    "qwen3.5-2b",
+    "falcon-h1-1.5b-instruct"
+  ],
+  "windows_per_condition": 10,
+  "pre_ms": 10000,
+  "post_ms": 30000,
+  "window_ms": 40000,
+  "probe_list_len": 10,
+  "schedule_hash": "9c9dbd9ca0c45252",
+  "windows": [
+    {
+      "window_id": 0,
+      "recovered_model": "liquidai/lfm2.5-1.2b-instruct",
+      "neighbours": [
+        "qwen3.5-2b",
+        "falcon-h1-1.5b-instruct"
+      ],
+      "condition": "TREATMENT",
+      "pair_index": 0,
+      "pre_ms": 10000,
+      "post_ms": 30000,
+      "recovery_at_ms": 10000,
+      "probe_list_len": 10
+    },
+    {
+      "window_id": 1,
+      "recovered_model": "liquidai/lfm2.5-1.2b-instruct",
+      "neighbours": [
+        "qwen3.5-2b",
+        "falcon-h1-1.5b-instruct"
+      ],
+      "condition": "CONTROL",
+      "pair_index": 0,
+      "pre_ms": 10000,
+      "post_ms": 30000,
+      "recovery_at_ms": -1,
+      "probe_list_len": 10
+    },
+    {
+      "window_id": 2,
+      "recovered_model": "liquidai/lfm2.5-1.2b-instruct",
+      "neighbours": [
+        "qwen3.5-2b",
+        "falcon-h1-1.5b-instruct"
+      ],
+      "condition": "CONTROL",
+      "pair_index": 1,
+      "pre_ms": 10000,
+      "post_ms": 30000,
+      "recovery_at_ms": -1,
+      "probe_list_len": 10
+    },
+    {
+      "window_id": 3,
+      "recovered_model": "liquidai/lfm2.5-1.2b-instruct",
+      "neighbours": [
+        "qwen3.5-2b",
+        "falcon-h1-1.5b-instruct"
+      ],
+      "condition": "TREATMENT",
+      "pair_index": 1,
+      "pre_ms": 10000,
+      "post_ms": 30000,
+      "recovery_at_ms": 10000,
+      "probe_list_len": 10
+    },
+    {
+      "window_id": 4,
+      "recovered_model": "liquidai/lfm2.5-1.2b-instruct",
+      "neighbours": [
+        "qwen3.5-2b",
+        "falcon-h1-1.5b-instruct"
+      ],
+      "condition": "TREATMENT",
+      "pair_index": 2,
+      "pre_ms": 10000,
+      "post_ms": 30000,
+      "recovery_at_ms": 10000,
+      "probe_list_len": 10
+    },
+    {
+      "window_id": 5,
+      "recovered_model": "liquidai/lfm2.5-1.2b-instruct",
+      "neighbours": [
+        "qwen3.5-2b",
+        "falcon-h1-1.5b-instruct"
+      ],
+      "condition": "CONTROL",
+      "pair_index": 2,
+      "pre_ms": 10000,
+      "post_ms": 30000,
+      "recovery_at_ms": -1,
+      "probe_list_len": 10
+    },
+    {
+      "window_id": 6,
+      "recovered_model": "liquidai/lfm2.5-1.2b-instruct",
+      "neighbours": [
+        "qwen3.5-2b",
+        "falcon-h1-1.5b-instruct"
+      ],
+      "condition": "CONTROL",
+      "pair_index": 3,
+      "pre_ms": 10000,
+      "post_ms": 30000,
+      "recovery_at_ms": -1,
+      "probe_list_len": 10
+    },
+    {
+      "window_id": 7,
+      "recovered_model": "liquidai/lfm2.5-1.2b-instruct",
+      "neighbours": [
+        "qwen3.5-2b",
+        "falcon-h1-1.5b-instruct"
+      ],
+      "condition": "TREATMENT",
+      "pair_index": 3,
+      "pre_ms": 10000,
+      "post_ms": 30000,
+      "recovery_at_ms": 10000,
+      "probe_list_len": 10
+    },
+    {
+      "window_id": 8,
+      "recovered_model": "liquidai/lfm2.5-1.2b-instruct",
+      "neighbours": [
+        "qwen3.5-2b",
+        "falcon-h1-1.5b-instruct"
+      ],
+      "condition": "TREATMENT",
+      "pair_index": 4,
+      "pre_ms": 10000,
+      "post_ms": 30000,
+      "recovery_at_ms": 10000,
+      "probe_list_len": 10
+    },
+    {
+      "window_id": 9,
+      "recovered_model": "liquidai/lfm2.5-1.2b-instruct",
+      "neighbours": [
+        "qwen3.5-2b",
+        "falcon-h1-1.5b-instruct"
+      ],
+      "condition": "CONTROL",
+      "pair_index": 4,
+      "pre_ms": 10000,
+      "post_ms": 30000,
+      "recovery_at_ms": -1,
+      "probe_list_len": 10
+    },
+    {
+      "window_id": 10,
+      "recovered_model": "liquidai/lfm2.5-1.2b-instruct",
+      "neighbours": [
+        "qwen3.5-2b",
+        "falcon-h1-1.5b-instruct"
+      ],
+      "condition": "CONTROL",
+      "pair_index": 5,
+      "pre_ms": 10000,
+      "post_ms": 30000,
+      "recovery_at_ms": -1,
+      "probe_list_len": 10
+    },
+    {
+      "window_id": 11,
+      "recovered_model": "liquidai/lfm2.5-1.2b-instruct",
+      "neighbours": [
+        "qwen3.5-2b",
+        "falcon-h1-1.5b-instruct"
+      ],
+      "condition": "TREATMENT",
+      "pair_index": 5,
+      "pre_ms": 10000,
+      "post_ms": 30000,
+      "recovery_at_ms": 10000,
+      "probe_list_len": 10
+    },
+    {
+      "window_id": 12,
+      "recovered_model": "liquidai/lfm2.5-1.2b-instruct",
+      "neighbours": [
+        "qwen3.5-2b",
+        "falcon-h1-1.5b-instruct"
+      ],
+      "condition": "TREATMENT",
+      "pair_index": 6,
+      "pre_ms": 10000,
+      "post_ms": 30000,
+      "recovery_at_ms": 10000,
+      "probe_list_len": 10
+    },
+    {
+      "window_id": 13,
+      "recovered_model": "liquidai/lfm2.5-1.2b-instruct",
+      "neighbours": [
+        "qwen3.5-2b",
+        "falcon-h1-1.5b-instruct"
+      ],
+      "condition": "CONTROL",
+      "pair_index": 6,
+      "pre_ms": 10000,
+      "post_ms": 30000,
+      "recovery_at_ms": -1,
+      "probe_list_len": 10
+    },
+    {
+      "window_id": 14,
+      "recovered_model": "liquidai/lfm2.5-1.2b-instruct",
+      "neighbours": [
+        "qwen3.5-2b",
+        "falcon-h1-1.5b-instruct"
+      ],
+      "condition": "CONTROL",
+      "pair_index": 7,
+      "pre_ms": 10000,
+      "post_ms": 30000,
+      "recovery_at_ms": -1,
+      "probe_list_len": 10
+    },
+    {
+      "window_id": 15,
+      "recovered_model": "liquidai/lfm2.5-1.2b-instruct",
+      "neighbours": [
+        "qwen3.5-2b",
+        "falcon-h1-1.5b-instruct"
+      ],
+      "condition": "TREATMENT",
+      "pair_index": 7,
+      "pre_ms": 10000,
+      "post_ms": 30000,
+      "recovery_at_ms": 10000,
+      "probe_list_len": 10
+    },
+    {
+      "window_id": 16,
+      "recovered_model": "liquidai/lfm2.5-1.2b-instruct",
+      "neighbours": [
+        "qwen3.5-2b",
+        "falcon-h1-1.5b-instruct"
+      ],
+      "condition": "TREATMENT",
+      "pair_index": 8,
+      "pre_ms": 10000,
+      "post_ms": 30000,
+      "recovery_at_ms": 10000,
+      "probe_list_len": 10
+    },
+    {
+      "window_id": 17,
+      "recovered_model": "liquidai/lfm2.5-1.2b-instruct",
+      "neighbours": [
+        "qwen3.5-2b",
+        "falcon-h1-1.5b-instruct"
+      ],
+      "condition": "CONTROL",
+      "pair_index": 8,
+      "pre_ms": 10000,
+      "post_ms": 30000,
+      "recovery_at_ms": -1,
+      "probe_list_len": 10
+    },
+    {
+      "window_id": 18,
+      "recovered_model": "liquidai/lfm2.5-1.2b-instruct",
+      "neighbours": [
+        "qwen3.5-2b",
+        "falcon-h1-1.5b-instruct"
+      ],
+      "condition": "CONTROL",
+      "pair_index": 9,
+      "pre_ms": 10000,
+      "post_ms": 30000,
+      "recovery_at_ms": -1,
+      "probe_list_len": 10
+    },
+    {
+      "window_id": 19,
+      "recovered_model": "liquidai/lfm2.5-1.2b-instruct",
+      "neighbours": [
+        "qwen3.5-2b",
+        "falcon-h1-1.5b-instruct"
+      ],
+      "condition": "TREATMENT",
+      "pair_index": 9,
+      "pre_ms": 10000,
+      "post_ms": 30000,
+      "recovery_at_ms": 10000,
+      "probe_list_len": 10
+    },
+    {
+      "window_id": 20,
+      "recovered_model": "qwen3.5-2b",
+      "neighbours": [
+        "liquidai/lfm2.5-1.2b-instruct",
+        "falcon-h1-1.5b-instruct"
+      ],
+      "condition": "TREATMENT",
+      "pair_index": 0,
+      "pre_ms": 10000,
+      "post_ms": 30000,
+      "recovery_at_ms": 10000,
+      "probe_list_len": 10
+    },
+    {
+      "window_id": 21,
+      "recovered_model": "qwen3.5-2b",
+      "neighbours": [
+        "liquidai/lfm2.5-1.2b-instruct",
+        "falcon-h1-1.5b-instruct"
+      ],
+      "condition": "CONTROL",
+      "pair_index": 0,
+      "pre_ms": 10000,
+      "post_ms": 30000,
+      "recovery_at_ms": -1,
+      "probe_list_len": 10
+    },
+    {
+      "window_id": 22,
+      "recovered_model": "qwen3.5-2b",
+      "neighbours": [
+        "liquidai/lfm2.5-1.2b-instruct",
+        "falcon-h1-1.5b-instruct"
+      ],
+      "condition": "CONTROL",
+      "pair_index": 1,
+      "pre_ms": 10000,
+      "post_ms": 30000,
+      "recovery_at_ms": -1,
+      "probe_list_len": 10
+    },
+    {
+      "window_id": 23,
+      "recovered_model": "qwen3.5-2b",
+      "neighbours": [
+        "liquidai/lfm2.5-1.2b-instruct",
+        "falcon-h1-1.5b-instruct"
+      ],
+      "condition": "TREATMENT",
+      "pair_index": 1,
+      "pre_ms": 10000,
+      "post_ms": 30000,
+      "recovery_at_ms": 10000,
+      "probe_list_len": 10
+    },
+    {
+      "window_id": 24,
+      "recovered_model": "qwen3.5-2b",
+      "neighbours": [
+        "liquidai/lfm2.5-1.2b-instruct",
+        "falcon-h1-1.5b-instruct"
+      ],
+      "condition": "TREATMENT",
+      "pair_index": 2,
+      "pre_ms": 10000,
+      "post_ms": 30000,
+      "recovery_at_ms": 10000,
+      "probe_list_len": 10
+    },
+    {
+      "window_id": 25,
+      "recovered_model": "qwen3.5-2b",
+      "neighbours": [
+        "liquidai/lfm2.5-1.2b-instruct",
+        "falcon-h1-1.5b-instruct"
+      ],
+      "condition": "CONTROL",
+      "pair_index": 2,
+      "pre_ms": 10000,
+      "post_ms": 30000,
+      "recovery_at_ms": -1,
+      "probe_list_len": 10
+    },
+    {
+      "window_id": 26,
+      "recovered_model": "qwen3.5-2b",
+      "neighbours": [
+        "liquidai/lfm2.5-1.2b-instruct",
+        "falcon-h1-1.5b-instruct"
+      ],
+      "condition": "CONTROL",
+      "pair_index": 3,
+      "pre_ms": 10000,
+      "post_ms": 30000,
+      "recovery_at_ms": -1,
+      "probe_list_len": 10
+    },
+    {
+      "window_id": 27,
+      "recovered_model": "qwen3.5-2b",
+      "neighbours": [
+        "liquidai/lfm2.5-1.2b-instruct",
+        "falcon-h1-1.5b-instruct"
+      ],
+      "condition": "TREATMENT",
+      "pair_index": 3,
+      "pre_ms": 10000,
+      "post_ms": 30000,
+      "recovery_at_ms": 10000,
+      "probe_list_len": 10
+    },
+    {
+      "window_id": 28,
+      "recovered_model": "qwen3.5-2b",
+      "neighbours": [
+        "liquidai/lfm2.5-1.2b-instruct",
+        "falcon-h1-1.5b-instruct"
+      ],
+      "condition": "TREATMENT",
+      "pair_index": 4,
+      "pre_ms": 10000,
+      "post_ms": 30000,
+      "recovery_at_ms": 10000,
+      "probe_list_len": 10
+    },
+    {
+      "window_id": 29,
+      "recovered_model": "qwen3.5-2b",
+      "neighbours": [
+        "liquidai/lfm2.5-1.2b-instruct",
+        "falcon-h1-1.5b-instruct"
+      ],
+      "condition": "CONTROL",
+      "pair_index": 4,
+      "pre_ms": 10000,
+      "post_ms": 30000,
+      "recovery_at_ms": -1,
+      "probe_list_len": 10
+    },
+    {
+      "window_id": 30,
+      "recovered_model": "qwen3.5-2b",
+      "neighbours": [
+        "liquidai/lfm2.5-1.2b-instruct",
+        "falcon-h1-1.5b-instruct"
+      ],
+      "condition": "CONTROL",
+      "pair_index": 5,
+      "pre_ms": 10000,
+      "post_ms": 30000,
+      "recovery_at_ms": -1,
+      "probe_list_len": 10
+    },
+    {
+      "window_id": 31,
+      "recovered_model": "qwen3.5-2b",
+      "neighbours": [
+        "liquidai/lfm2.5-1.2b-instruct",
+        "falcon-h1-1.5b-instruct"
+      ],
+      "condition": "TREATMENT",
+      "pair_index": 5,
+      "pre_ms": 10000,
+      "post_ms": 30000,
+      "recovery_at_ms": 10000,
+      "probe_list_len": 10
+    },
+    {
+      "window_id": 32,
+      "recovered_model": "qwen3.5-2b",
+      "neighbours": [
+        "liquidai/lfm2.5-1.2b-instruct",
+        "falcon-h1-1.5b-instruct"
+      ],
+      "condition": "TREATMENT",
+      "pair_index": 6,
+      "pre_ms": 10000,
+      "post_ms": 30000,
+      "recovery_at_ms": 10000,
+      "probe_list_len": 10
+    },
+    {
+      "window_id": 33,
+      "recovered_model": "qwen3.5-2b",
+      "neighbours": [
+        "liquidai/lfm2.5-1.2b-instruct",
+        "falcon-h1-1.5b-instruct"
+      ],
+      "condition": "CONTROL",
+      "pair_index": 6,
+      "pre_ms": 10000,
+      "post_ms": 30000,
+      "recovery_at_ms": -1,
+      "probe_list_len": 10
+    },
+    {
+      "window_id": 34,
+      "recovered_model": "qwen3.5-2b",
+      "neighbours": [
+        "liquidai/lfm2.5-1.2b-instruct",
+        "falcon-h1-1.5b-instruct"
+      ],
+      "condition": "CONTROL",
+      "pair_index": 7,
+      "pre_ms": 10000,
+      "post_ms": 30000,
+      "recovery_at_ms": -1,
+      "probe_list_len": 10
+    },
+    {
+      "window_id": 35,
+      "recovered_model": "qwen3.5-2b",
+      "neighbours": [
+        "liquidai/lfm2.5-1.2b-instruct",
+        "falcon-h1-1.5b-instruct"
+      ],
+      "condition": "TREATMENT",
+      "pair_index": 7,
+      "pre_ms": 10000,
+      "post_ms": 30000,
+      "recovery_at_ms": 10000,
+      "probe_list_len": 10
+    },
+    {
+      "window_id": 36,
+      "recovered_model": "qwen3.5-2b",
+      "neighbours": [
+        "liquidai/lfm2.5-1.2b-instruct",
+        "falcon-h1-1.5b-instruct"
+      ],
+      "condition": "TREATMENT",
+      "pair_index": 8,
+      "pre_ms": 10000,
+      "post_ms": 30000,
+      "recovery_at_ms": 10000,
+      "probe_list_len": 10
+    },
+    {
+      "window_id": 37,
+      "recovered_model": "qwen3.5-2b",
+      "neighbours": [
+        "liquidai/lfm2.5-1.2b-instruct",
+        "falcon-h1-1.5b-instruct"
+      ],
+      "condition": "CONTROL",
+      "pair_index": 8,
+      "pre_ms": 10000,
+      "post_ms": 30000,
+      "recovery_at_ms": -1,
+      "probe_list_len": 10
+    },
+    {
+      "window_id": 38,
+      "recovered_model": "qwen3.5-2b",
+      "neighbours": [
+        "liquidai/lfm2.5-1.2b-instruct",
+        "falcon-h1-1.5b-instruct"
+      ],
+      "condition": "CONTROL",
+      "pair_index": 9,
+      "pre_ms": 10000,
+      "post_ms": 30000,
+      "recovery_at_ms": -1,
+      "probe_list_len": 10
+    },
+    {
+      "window_id": 39,
+      "recovered_model": "qwen3.5-2b",
+      "neighbours": [
+        "liquidai/lfm2.5-1.2b-instruct",
+        "falcon-h1-1.5b-instruct"
+      ],
+      "condition": "TREATMENT",
+      "pair_index": 9,
+      "pre_ms": 10000,
+      "post_ms": 30000,
+      "recovery_at_ms": 10000,
+      "probe_list_len": 10
+    },
+    {
+      "window_id": 40,
+      "recovered_model": "falcon-h1-1.5b-instruct",
+      "neighbours": [
+        "liquidai/lfm2.5-1.2b-instruct",
+        "qwen3.5-2b"
+      ],
+      "condition": "TREATMENT",
+      "pair_index": 0,
+      "pre_ms": 10000,
+      "post_ms": 30000,
+      "recovery_at_ms": 10000,
+      "probe_list_len": 10
+    },
+    {
+      "window_id": 41,
+      "recovered_model": "falcon-h1-1.5b-instruct",
+      "neighbours": [
+        "liquidai/lfm2.5-1.2b-instruct",
+        "qwen3.5-2b"
+      ],
+      "condition": "CONTROL",
+      "pair_index": 0,
+      "pre_ms": 10000,
+      "post_ms": 30000,
+      "recovery_at_ms": -1,
+      "probe_list_len": 10
+    },
+    {
+      "window_id": 42,
+      "recovered_model": "falcon-h1-1.5b-instruct",
+      "neighbours": [
+        "liquidai/lfm2.5-1.2b-instruct",
+        "qwen3.5-2b"
+      ],
+      "condition": "CONTROL",
+      "pair_index": 1,
+      "pre_ms": 10000,
+      "post_ms": 30000,
+      "recovery_at_ms": -1,
+      "probe_list_len": 10
+    },
+    {
+      "window_id": 43,
+      "recovered_model": "falcon-h1-1.5b-instruct",
+      "neighbours": [
+        "liquidai/lfm2.5-1.2b-instruct",
+        "qwen3.5-2b"
+      ],
+      "condition": "TREATMENT",
+      "pair_index": 1,
+      "pre_ms": 10000,
+      "post_ms": 30000,
+      "recovery_at_ms": 10000,
+      "probe_list_len": 10
+    },
+    {
+      "window_id": 44,
+      "recovered_model": "falcon-h1-1.5b-instruct",
+      "neighbours": [
+        "liquidai/lfm2.5-1.2b-instruct",
+        "qwen3.5-2b"
+      ],
+      "condition": "TREATMENT",
+      "pair_index": 2,
+      "pre_ms": 10000,
+      "post_ms": 30000,
+      "recovery_at_ms": 10000,
+      "probe_list_len": 10
+    },
+    {
+      "window_id": 45,
+      "recovered_model": "falcon-h1-1.5b-instruct",
+      "neighbours": [
+        "liquidai/lfm2.5-1.2b-instruct",
+        "qwen3.5-2b"
+      ],
+      "condition": "CONTROL",
+      "pair_index": 2,
+      "pre_ms": 10000,
+      "post_ms": 30000,
+      "recovery_at_ms": -1,
+      "probe_list_len": 10
+    },
+    {
+      "window_id": 46,
+      "recovered_model": "falcon-h1-1.5b-instruct",
+      "neighbours": [
+        "liquidai/lfm2.5-1.2b-instruct",
+        "qwen3.5-2b"
+      ],
+      "condition": "CONTROL",
+      "pair_index": 3,
+      "pre_ms": 10000,
+      "post_ms": 30000,
+      "recovery_at_ms": -1,
+      "probe_list_len": 10
+    },
+    {
+      "window_id": 47,
+      "recovered_model": "falcon-h1-1.5b-instruct",
+      "neighbours": [
+        "liquidai/lfm2.5-1.2b-instruct",
+        "qwen3.5-2b"
+      ],
+      "condition": "TREATMENT",
+      "pair_index": 3,
+      "pre_ms": 10000,
+      "post_ms": 30000,
+      "recovery_at_ms": 10000,
+      "probe_list_len": 10
+    },
+    {
+      "window_id": 48,
+      "recovered_model": "falcon-h1-1.5b-instruct",
+      "neighbours": [
+        "liquidai/lfm2.5-1.2b-instruct",
+        "qwen3.5-2b"
+      ],
+      "condition": "TREATMENT",
+      "pair_index": 4,
+      "pre_ms": 10000,
+      "post_ms": 30000,
+      "recovery_at_ms": 10000,
+      "probe_list_len": 10
+    },
+    {
+      "window_id": 49,
+      "recovered_model": "falcon-h1-1.5b-instruct",
+      "neighbours": [
+        "liquidai/lfm2.5-1.2b-instruct",
+        "qwen3.5-2b"
+      ],
+      "condition": "CONTROL",
+      "pair_index": 4,
+      "pre_ms": 10000,
+      "post_ms": 30000,
+      "recovery_at_ms": -1,
+      "probe_list_len": 10
+    },
+    {
+      "window_id": 50,
+      "recovered_model": "falcon-h1-1.5b-instruct",
+      "neighbours": [
+        "liquidai/lfm2.5-1.2b-instruct",
+        "qwen3.5-2b"
+      ],
+      "condition": "CONTROL",
+      "pair_index": 5,
+      "pre_ms": 10000,
+      "post_ms": 30000,
+      "recovery_at_ms": -1,
+      "probe_list_len": 10
+    },
+    {
+      "window_id": 51,
+      "recovered_model": "falcon-h1-1.5b-instruct",
+      "neighbours": [
+        "liquidai/lfm2.5-1.2b-instruct",
+        "qwen3.5-2b"
+      ],
+      "condition": "TREATMENT",
+      "pair_index": 5,
+      "pre_ms": 10000,
+      "post_ms": 30000,
+      "recovery_at_ms": 10000,
+      "probe_list_len": 10
+    },
+    {
+      "window_id": 52,
+      "recovered_model": "falcon-h1-1.5b-instruct",
+      "neighbours": [
+        "liquidai/lfm2.5-1.2b-instruct",
+        "qwen3.5-2b"
+      ],
+      "condition": "TREATMENT",
+      "pair_index": 6,
+      "pre_ms": 10000,
+      "post_ms": 30000,
+      "recovery_at_ms": 10000,
+      "probe_list_len": 10
+    },
+    {
+      "window_id": 53,
+      "recovered_model": "falcon-h1-1.5b-instruct",
+      "neighbours": [
+        "liquidai/lfm2.5-1.2b-instruct",
+        "qwen3.5-2b"
+      ],
+      "condition": "CONTROL",
+      "pair_index": 6,
+      "pre_ms": 10000,
+      "post_ms": 30000,
+      "recovery_at_ms": -1,
+      "probe_list_len": 10
+    },
+    {
+      "window_id": 54,
+      "recovered_model": "falcon-h1-1.5b-instruct",
+      "neighbours": [
+        "liquidai/lfm2.5-1.2b-instruct",
+        "qwen3.5-2b"
+      ],
+      "condition": "CONTROL",
+      "pair_index": 7,
+      "pre_ms": 10000,
+      "post_ms": 30000,
+      "recovery_at_ms": -1,
+      "probe_list_len": 10
+    },
+    {
+      "window_id": 55,
+      "recovered_model": "falcon-h1-1.5b-instruct",
+      "neighbours": [
+        "liquidai/lfm2.5-1.2b-instruct",
+        "qwen3.5-2b"
+      ],
+      "condition": "TREATMENT",
+      "pair_index": 7,
+      "pre_ms": 10000,
+      "post_ms": 30000,
+      "recovery_at_ms": 10000,
+      "probe_list_len": 10
+    },
+    {
+      "window_id": 56,
+      "recovered_model": "falcon-h1-1.5b-instruct",
+      "neighbours": [
+        "liquidai/lfm2.5-1.2b-instruct",
+        "qwen3.5-2b"
+      ],
+      "condition": "TREATMENT",
+      "pair_index": 8,
+      "pre_ms": 10000,
+      "post_ms": 30000,
+      "recovery_at_ms": 10000,
+      "probe_list_len": 10
+    },
+    {
+      "window_id": 57,
+      "recovered_model": "falcon-h1-1.5b-instruct",
+      "neighbours": [
+        "liquidai/lfm2.5-1.2b-instruct",
+        "qwen3.5-2b"
+      ],
+      "condition": "CONTROL",
+      "pair_index": 8,
+      "pre_ms": 10000,
+      "post_ms": 30000,
+      "recovery_at_ms": -1,
+      "probe_list_len": 10
+    },
+    {
+      "window_id": 58,
+      "recovered_model": "falcon-h1-1.5b-instruct",
+      "neighbours": [
+        "liquidai/lfm2.5-1.2b-instruct",
+        "qwen3.5-2b"
+      ],
+      "condition": "CONTROL",
+      "pair_index": 9,
+      "pre_ms": 10000,
+      "post_ms": 30000,
+      "recovery_at_ms": -1,
+      "probe_list_len": 10
+    },
+    {
+      "window_id": 59,
+      "recovered_model": "falcon-h1-1.5b-instruct",
+      "neighbours": [
+        "liquidai/lfm2.5-1.2b-instruct",
+        "qwen3.5-2b"
+      ],
+      "condition": "TREATMENT",
+      "pair_index": 9,
+      "pre_ms": 10000,
+      "post_ms": 30000,
+      "recovery_at_ms": 10000,
+      "probe_list_len": 10
+    }
+  ]
+}

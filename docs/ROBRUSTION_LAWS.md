@@ -121,5 +121,19 @@ the specimen can move the microscope's calibration knob
 
 The counter-discipline is not more careful reading of results. It is designing
 each experiment so the knob-turning is detectable — controls that should not
-move, manipulation checks that must fire, and endpoints chosen away from the
-regions where the instrument is most sensitive to itself.
+move, and manipulation checks that must fire.
+
+**On endpoint choice, one correction worth stating explicitly.** The rule is NOT
+"choose endpoints away from where the instrument is most sensitive." That
+degenerates into designing the experiment around the detector, which is the same
+disease wearing a lab coat. The rule is:
+
+```text
+Prefer the continuous decision statistic for effect magnitude.
+
+Use thresholded verdicts only when the threshold itself is the object of
+interest, and qualify the distribution around that threshold.
+```
+
+Humans are astonishingly talented at fixing one metric by inventing another one
+to worship.
