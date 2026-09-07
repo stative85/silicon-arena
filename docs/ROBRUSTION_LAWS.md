@@ -104,13 +104,53 @@ See RECOVERY-COUPLING Amendment 1, which bars it as treatment evidence while
 leaving the `kh = 20` primary untouched — a threshold an order of magnitude
 above the dense region is not subject to this law.
 
+## 5. CARDINALITY IS STATE LAW
+
+```text
+When a runtime can instantiate the same logical resource more than once,
+presence is insufficient evidence of state. Validation must preserve
+multiplicity.
+```
+
+**Earned by the RECOVERY-COUPLING step-2 restore bug.** A restore loop called
+`lms load` on already-resident models. `lms load` is **not idempotent** — it
+spawns a second instance:
+
+```text
+intended                     actual
+qwen3.5-2b       = 1         qwen3.5-2b       = 1
+                             qwen3.5-2b:2     = 1
+falcon           = 1         falcon           = 1
+                             falcon:2         = 1
+lfm2.5           = 1         lfm2.5           = 1
+                             ----------------------
+                             5 instances, 7,656 of 8,151 MiB VRAM
+```
+
+A presence-based check certified that as "pool restored", because every expected
+model *was* present. `{qwen, falcon}` and `{qwen, qwen, falcon}` are the same
+mathematical set and radically different runtime states.
+
+The invariant is therefore an exact **count map**, not a set, and an extra
+instance of any model fails the witness. `RecoveryGate.classify()` distinguishes
+`UNEXPECTED_DUPLICATE`, `UNEXPECTED_DISAPPEARANCE`, `UNEXPECTED_REPLACEMENT` and
+`UNEXPECTED_RESIDENT_MODEL`, because "something changed" is not actionable and
+those four have different causes.
+
+**This one travels furthest.** Containers, GPU workers, DB replicas, model
+servers, subprocesses, agent pools — anywhere a `create`/`load`/`start` call is
+assumed idempotent and is not, presence-based health checks will certify a
+corrupted runtime as healthy.
+
 ---
 
-## What these four have in common
+## What these five have in common
 
-Every one describes the instrument being changed by the thing it was measuring,
-or the instrument's stated variables failing to capture what it actually
-responds to. That is the specific hazard of running experiments on a substrate
+The first four describe the instrument being changed by the thing it was
+measuring, or the instrument's stated variables failing to capture what it
+actually responds to. The fifth is the same disease one level down: the
+instrument's model of the runtime was too coarse to represent the state the
+runtime could actually be in. That is the specific hazard of running experiments on a substrate
 you also built.
 
 The general form:

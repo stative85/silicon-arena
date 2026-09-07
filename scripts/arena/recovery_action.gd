@@ -26,7 +26,13 @@ class_name RecoveryAction
 ## against its own runtime. This project has already paid tuition for that class
 ## of engineering comedy.
 ##
-## RESIDENCY IS CHECKED AS AN EXACT SET, NOT AS PRESENCE. `lms load` on an
+## RESIDENCY IS A MULTISET, NOT A SET. LM Studio proved it: {qwen, falcon} and
+## {qwen, qwen, falcon} are the same mathematical set and radically different
+## runtime states. The invariant is therefore an exact COUNT MAP --
+## qwen=1, lfm2.5=1, falcon=1, total=3 -- and an extra instance of any model
+## fails the witness even though every expected model is present.
+##
+## RESIDENCY IS CHECKED AS AN EXACT COUNT MAP, NOT AS PRESENCE. `lms load` on an
 ## already-resident model creates a SECOND INSTANCE ("qwen3.5-2b:2") rather than
 ## being idempotent. A presence-only check calls that restored while the pool
 ## silently carries a duplicate eating ~1.3 GB of VRAM and changing contention
@@ -78,6 +84,48 @@ static func resident_set(http: HTTPRequest) -> Array:
 	return got
 
 
+## Strip a duplicate-instance suffix: "qwen3.5-2b:2" -> "qwen3.5-2b". Only a
+## trailing colon followed by digits is removed, so a model id that legitimately
+## contains a colon is left alone.
+static func base_id(instance_id: String) -> String:
+	var c := instance_id.rfind(":")
+	if c < 0:
+		return instance_id
+	var suffix := instance_id.substr(c + 1)
+	if suffix.is_empty() or not suffix.is_valid_int():
+		return instance_id
+	return instance_id.substr(0, c)
+
+
+## Residency as a COUNT MAP: base model id -> number of live instances.
+static func residency_counts(http: HTTPRequest) -> Dictionary:
+	var ids := await resident_set(http)
+	var counts := {}
+	for i in ids:
+		var b := base_id(str(i))
+		counts[b] = int(counts.get(b, 0)) + 1
+	return counts
+
+
+## Exact count-map equality. An EXTRA instance fails this; so does a missing one,
+## a replacement, and an unexpected model.
+static func counts_match(got: Dictionary, want: Dictionary) -> bool:
+	if got.size() != want.size():
+		return false
+	for k in want:
+		if int(got.get(k, 0)) != int(want[k]):
+			return false
+	return true
+
+
+## Expected count map for a pool: exactly one instance of each.
+static func expect_one_each(models: Array) -> Dictionary:
+	var want := {}
+	for m in models:
+		want[str(m)] = 1
+	return want
+
+
 ## One mechanical liveness probe: does the target answer at all after reload?
 ## Deliberately trivial -- 1 token, no schema, no judgement of the content.
 static func liveness(http: HTTPRequest, model_id: String) -> bool:
@@ -116,11 +164,14 @@ func perform(http: HTTPRequest, target: String, neighbours: Array,
 	}
 
 	# PRE
-	var pre := await resident_set(http)
-	w["pre_target_present"] = pre.has(target)
+	var pre := await residency_counts(http)
 	var expected: Array = neighbours.duplicate()
 	expected.append(target)
-	w["pre_neighbours_present"] = _exact(pre, expected)
+	var want_full := expect_one_each(expected)
+	var want_absent := expect_one_each(neighbours)
+	w["pre_counts"] = pre
+	w["pre_target_present"] = int(pre.get(target, 0)) == 1
+	w["pre_neighbours_present"] = counts_match(pre, want_full)
 	if not bool(w["pre_target_present"]) or not bool(w["pre_neighbours_present"]):
 		w["reason"] = "pre-state wrong: resident=%s" % str(pre)
 		return w
@@ -130,9 +181,10 @@ func perform(http: HTTPRequest, target: String, neighbours: Array,
 	w["t_unload_start_ms"] = Time.get_ticks_msec()
 	run.call(["unload", target])
 	w["t_unload_done_ms"] = Time.get_ticks_msec()
-	var mid := await resident_set(http)
-	w["unload_verified"] = not mid.has(target)
-	w["unload_neighbours_present"] = _exact(mid, neighbours)
+	var mid := await residency_counts(http)
+	w["mid_counts"] = mid
+	w["unload_verified"] = int(mid.get(target, 0)) == 0
+	w["unload_neighbours_present"] = counts_match(mid, want_absent)
 	var mid_n: bool = bool(w["unload_neighbours_present"])
 	if not w["unload_verified"]:
 		w["reason"] = "target never became absent; resident=%s" % str(mid)
@@ -144,11 +196,11 @@ func perform(http: HTTPRequest, target: String, neighbours: Array,
 	w["t_reload_start_ms"] = Time.get_ticks_msec()
 	run.call(["load", target, "--gpu=max", "--context-length=" + CONTEXT, "-y"])
 	w["t_reload_done_ms"] = Time.get_ticks_msec()
-	var post := await resident_set(http)
-	w["reload_verified"] = post.has(target)
-	var post_n := _exact(post, expected)
+	var post := await residency_counts(http)
+	w["post_counts"] = post
+	w["reload_verified"] = int(post.get(target, 0)) == 1
+	var post_n := counts_match(post, want_full)
 	w["neighbor_set_preserved"] = mid_n and post_n
-	w["post_resident_set"] = post
 	if not w["reload_verified"]:
 		w["reason"] = "target absent after reload; resident=%s" % str(post)
 		return w
@@ -169,27 +221,16 @@ func perform(http: HTTPRequest, target: String, neighbours: Array,
 	return w
 
 
-## Exact set equality, order-insensitive. An EXTRA resident model fails this,
-## which is the whole reason it exists.
-static func _exact(got: Array, want: Array) -> bool:
-	if got.size() != want.size():
-		return false
-	for x in want:
-		if not got.has(str(x)):
-			return false
-	return true
-
-
 ## Load only if not already resident. `lms load` is NOT idempotent -- it spawns
 ## a second instance -- so every restore path must check first.
 static func ensure_loaded(http: HTTPRequest, model_id: String) -> bool:
-	var now := await resident_set(http)
-	if now.has(model_id):
+	var now := await residency_counts(http)
+	if int(now.get(model_id, 0)) >= 1:
 		return true
 	real_runner(["load", model_id, "--gpu=max",
 		"--context-length=" + CONTEXT, "-y"])
-	var after := await resident_set(http)
-	return after.has(model_id)
+	var after := await residency_counts(http)
+	return int(after.get(model_id, 0)) == 1
 
 
 ## The contract, evaluated from a witness. Kept separate so a witness can be
