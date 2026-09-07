@@ -13,7 +13,7 @@ A3 repairs ONLY:
 1. live Gate-4 integration
 2. cold-start-inclusive equalizer qualification
 3. identical runtime re-baseline before every live arm
-4. the world clock anchor            <- SEE "SCOPE QUESTION" BELOW
+4. the world clock origin            <- ACCEPTED, see Amendment 1
 
 Everything else remains frozen.
 No new world. No scarcity change. No new metric. No prompt tweak.
@@ -179,11 +179,14 @@ the next arm.** A void does not cascade into the next arm's starting condition.
 
 ---
 
-## Repair 4 — the world clock anchor (SCOPE QUESTION)
+## Repair 4 — the world clock origin (ACCEPTED)
 
-**This exceeds the three repairs named above and is flagged rather than
-smuggled in.** It is implemented in the working tree and is the user's to accept
-or revert before A3 runs.
+**ACCEPTED as an implementation repair.** It was flagged rather than smuggled
+in, reviewed, and admitted alongside the other three. See Amendment 1, which is
+the frozen text.
+
+It is more fundamental than the other three: without it, **world time itself was
+wrong.**
 
 **The defect.** `_run_start_ms` was declared, documented at its own declaration
 as "set when the tick loop actually begins", and **never assigned**. It stayed
@@ -247,3 +250,104 @@ A3 repairs the instrument. It does not make A2 confirmatory, and it does not
 answer the recovery-neighbour coupling question — that is bridge mechanics with
 its own pre-registration, tracked in `docs/results/RECOVERY_COUPLING.md`, and it
 does not belong inside an ASYNC experiment.
+
+
+---
+
+# Amendment 1 — world clock origin
+
+Frozen before the measured run. Commit: see git history for this file.
+
+```text
+REPAIR 4 - WORLD CLOCK ORIGIN
+
+Accepted as an implementation repair.
+
+_run_start_ms MUST be assigned immediately before the measured
+tick loop begins.
+
+All world-tick deadlines and observation-to-release timing are
+derived from this origin.
+
+Reason:
+ASYNC-A2 left _run_start_ms at zero, causing tick-0 deadlines to
+include ~410 ms of engine startup and residency preparation that
+occurred before any observation existed.
+
+This repair changes no delay, horizon, world rule, model, contract,
+metric, hypothesis, or outcome criterion.
+```
+
+## The defect stated as semantics
+
+The frozen semantic has always been:
+
+```text
+observation at run time T
+        |
+1000 ms cognition allowance
+        |
+deadline = T + 1000 ms
+```
+
+ASYNC-A2 accidentally implemented:
+
+```text
+engine/process starts
+        |
+~410 ms boot + residency work
+        |
+first observation
+        |
+deadline still measured from the earlier clock
+```
+
+The repair **restores the already-declared meaning of the experiment. It does
+not change that meaning.**
+
+## Evidence that the repair does what it claims
+
+```text
+predicted defect:   ~400 ms phantom pre-observation time
+repair:             anchor at tick-loop start
+post-repair:        phantom offset disappears
+```
+
+| | submit offset from run start |
+|---|---|
+| A2, clock unanchored | 407-418 ms |
+| A3 gate, 120 cold completions | 0-22 ms |
+
+And the equalizer survives measurement against the corrected clock without
+being rescued or inflated: 750 ms takes one breach, 1000 ms takes none, and the
+first-passing rule stops there.
+
+## What this does NOT do
+
+**A2 EQUALIZED remains VOID.** It is not retroactively converted into valid data
+because the breach is now known to have been manufactured by the clock defect.
+The run occurred under a defective instrument; its usefulness is **diagnostic,
+not confirmatory**.
+
+**A2 NATURAL and ORDER_REPLAY remain non-confirmatory** for the separate reason
+that live Gate 4 integration was missing, so their runtime-integrity claim was
+never exercised. The sabotage test now demonstrates the live runner detects a
+transient eviction *even when the model returns before the horizon* — which is
+precisely the case A2 could not have seen.
+
+## A3 status at freeze
+
+```text
+UNCHANGED
+scientific question, 3-model roster, 16 resources, hold 4,
+800 ticks, 250 ms/tick, 1000 ms equalizer, contract,
+health thresholds, four arms, analysis, metrics
+
+REPAIRED
+1. Gate 4 actually wired into the live runner
+2. equalizer qualification includes cold start
+3. runtime re-baselined between live arms
+4. tick clock actually starts where the design said it starts
+```
+
+**FROZEN. No more changes unless a pre-registered gate fires.**
