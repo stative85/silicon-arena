@@ -68,7 +68,7 @@ made from it.
 The interleaved schedule that would have avoided it is obvious in hindsight and
 is the first thing a follow-up must fix.
 
-## A drift signal that survives the confound
+## A drift signal, IMPLICATED not established
 
 At **fixed length 16**, across increasing wall-clock position:
 
@@ -88,10 +88,21 @@ Length is held constant here, so this is not the slope effect. Over roughly six
 minutes of continuous operation qwen's SUSPECT rate at an unchanged prompt size
 went from 2% to 45%, while falcon barely moved and never once fired.
 
-This points at **MODEL / RUNTIME HISTORY** — LM Studio process lifetime, cache
-state, resident duration, GPU scheduling — which is precisely the half
-Amendment 1 declared out of scope and did not manipulate. `CELL_LIKE` resets the
-client and cannot touch any of it.
+**This is implicated, NOT established.** The three len-16 observations sit in
+three different arms — `long_desc`, `long_asc`, `cell_16` — so arm and wall
+clock advance together even with length pinned. Holding one variable constant
+did not clean the comparison; it only removed the variable that was already
+understood. The correct claim is:
+
+> model/runtime history is **implicated**
+
+and not:
+
+> model/runtime history **caused** it
+
+`CELL_LIKE` resets the client and cannot touch LM Studio process lifetime, cache
+state, resident duration or GPU scheduling, so the null client-session result is
+consistent with the cause living in that half. Consistent is not demonstrated.
 
 So the null client-session result and this drift are consistent: the experiment
 manipulated the wrong half of the bundle. That is a useful negative, and it was
@@ -117,9 +128,49 @@ harness      fresh random subset  -> no shared prefix     -> full prefill -> hig
 That would make the anti-cache decision the thing that made the harness
 systematically **slower than production**, and would explain cell A directly.
 
-**This is a hypothesis with no evidence behind it yet.** ASYNC-B's manifests do
-not record TTFT, so it cannot be checked against existing artifacts. It is named
-here so a future experiment can test it, and it is **not** acted on.
+### TESTED AND FALSE — killed before HEALTH-PREFIX was built
+
+The hypothesis was checkable after all, from the Cell-A fossils, without a
+single model call. It is **wrong**:
+
+```text
+Cell-A consecutive prompts, 8 non-void seeds, 200 rounds each
+  longest common prefix, median          25 characters
+  the string "Available resources:
+  r_" is exactly  25 characters
+  consecutive rounds sharing the same first item      0.0%
+```
+
+An LCP of 25 is the fixed header plus the start of the first id, so **production
+shared no content prefix at all.** The first item changed on literally every
+round. Both harnesses and production had the same near-zero prefix continuity,
+so the anti-cache decision removed nothing production was receiving.
+
+A second cache route also fails. Cell A's 200 rounds contain only **~10 distinct
+prompts** (94.9% duplicates), which looks like a large exact-match cache
+opportunity — but the duplicates are never consecutive:
+
+```text
+consecutive-identical rounds                    0.0%
+gap to the previous identical prompt   median 4, minimum 4
+```
+
+Every repeat is at least four rounds away, and three other prompts are issued to
+that model in between. A single KV context per model is evicted long before the
+repeat arrives.
+
+**HEALTH-PREFIX is therefore not built.** Its manipulation check would have
+failed as NOT EXERCISED: P and X have the same prefix continuity because P has
+none. That is 9,600 calls not spent.
+
+### An unexpected fact about the world, not the detector
+
+`gap = 4` with a minimum of 4 is not coincidence: `hold_ticks = 4`. ASYNC-B cell
+A was running a **near-periodic world** — roughly ten distinct availability
+configurations cycling on the hold period, across all 200 ticks. That is a
+property of the world's parameters, recorded here because it was discovered
+while chasing something else and belongs with the ASYNC results rather than in
+anyone's memory.
 
 ## Status
 
@@ -128,7 +179,8 @@ SLOPE ERROR        CONFIRMED x3, robust across arms and positions
 LEVEL OFFSET       STILL UNRESOLVED; this run's arms are confounded with
                    wall clock by my own scheduling error
 CLIENT SESSION     not supported as the explanation
-RUNTIME HISTORY    implicated by the fixed-length drift, NOT manipulated
+RUNTIME HISTORY    implicated, not established; never manipulated, and the
+                   fixed-length comparison is still entangled with arm order
 ANCHOR FACT        still unexplained
 REPAIR             forbidden by the frozen fourth reading
 ```
