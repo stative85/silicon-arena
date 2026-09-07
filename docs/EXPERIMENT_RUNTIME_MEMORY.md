@@ -275,3 +275,83 @@ anything about designing a sustainable execution regime.
 If all four arms behave differently AND their start witnesses also differ, the
 honest answer is that the sequential design cannot separate workload from arm
 position. That is a reportable outcome, not a failure to analyse harder.
+
+---
+
+# Amendment 4 — "materially shifted" may only mean pre-existing boundaries
+
+Frozen before any arm has reported. Closes the loophole left open by
+Amendment 3.
+
+## The loophole
+
+Amendment 3 said a "materially shifted" start witness downgrades that arm's
+contrast, without saying what material means. Left there, the term gets defined
+from the four witnesses once they exist — which is a post-hoc pass/fail
+criterion built out of the data it is supposed to judge.
+
+## The only admissible boundaries
+
+Boundaries that existed BEFORE RUNTIME-MEMORY, and no others:
+
+```text
+the frozen 2048 MB host-RAM floor
+exact residency multiset 1/1/1
+runtime / version identity
+health surface hash identity
+arm_baseline PASS
+schedule / pool / load-order identity
+```
+
+Everything else is reported **descriptively and only descriptively**:
+
+```text
+host RAM at start:  A / B / C / D
+LM Studio RSS:      A / B / C / D
+VRAM used:          A / B / C / D
+external load:      A / B / C / D
+```
+
+Those numbers are stated. They do **not** become a threshold, a score, or a
+pass/fail criterion invented after the fact.
+
+## The rule
+
+```text
+PRE-EXISTING QUALIFIED ENVELOPE VIOLATED
+  -> integrity consequence according to the already-frozen rules
+
+START WITNESSES DIFFER BUT REMAIN QUALIFIED
+  -> state the difference
+  -> retain the sequential-arm limitation
+  -> cap generality
+  -> NO correction, normalisation, or subtraction
+
+NO POSITION REPLICATION
+  -> arm effect and wall-clock position cannot be separated statistically
+```
+
+## The sentence that governs it
+
+> **With four arms and no replication of position, arm order is NOT ESTIMABLE.**
+
+Not "hard to estimate". Not "adjusted for". Not estimable. If one arm later
+produces the most persuasive RAM curve imaginable, nobody gets to invent a
+detrending function and recover causality from four perfectly confounded
+trajectories.
+
+## Evidence hierarchy
+
+```text
+RAW TRAJECTORIES
+      |
+START-STATE WITNESSES
+      |
+PRE-FROZEN INTEGRITY RULES
+      |
+DESCRIPTIVE CROSS-ARM COMPARISON
+      |
+MECHANISM ONLY AS FAR AS THE DESIGN IDENTIFIES
+```
+
+No statistical seance at the bottom.
