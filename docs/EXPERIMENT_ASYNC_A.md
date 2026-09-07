@@ -938,3 +938,176 @@ in observed set, gone, age == 0                    -> CONTENTION_LOST
 same id regenerated (generation changed)           -> ACCEPTED + STALE_REVALIDATED
 still current and available                        -> ACCEPTED
 ```
+
+---
+
+# Amendment 6: four pre-run gates
+
+**Written before the run loop exists.**
+
+## Note on agent count
+
+This experiment is preregistered at **3 agents** (Amendment 1: 200 cycles x 3
+agents = 600 actions per replicate), matching the three-model hot set, and the
+world calibration ran at 3. A five-agent design would change queue pressure
+materially and requires its own amendment and its own feasibility check. The
+gates below are specified and run at **3**.
+
+## Gate 1 — equalizer feasibility under real queue pressure
+
+The 750 ms equalizer was justified against measured *solo* small-prompt
+latencies of roughly 190-580 ms. **That is the wrong load regime.** The bridge
+runs `max_active = 2`, and ASYNC-A agents observe together and can submit
+together:
+
+```
+3 submitted
+  -> 2 active
+  -> 1 queued
+```
+
+A queued request may be perfectly healthy and still complete more than 750 ms
+after its observation, purely because it waited for a slot. That would raise
+`EQUALIZER_BREACH` and void arm 3 **while every subsystem behaves correctly** —
+not because equalization failed, and not because a model was slow, but because
+a scheduler queue exists.
+
+### Protocol, bridge only
+
+No world. No resource outcomes. No arm comparisons. Just the bridge under the
+submission pattern ASYNC-A will actually create.
+
+```
+candidate delays      750, 1000, 1250, 1500, 2000 ms
+bursts                60
+pattern               all agents submit at the same observation instant
+prompts               unique and tiny, ASYNC-A shaped
+agents                3, one per hot-set model
+max_active            2 (unchanged)
+
+accept the FIRST delay with:
+    0 healthy completion breaches
+    0 bridge-health interventions
+    0 transport failures
+stop immediately, freeze it
+```
+
+Same first-pass discipline as the world calibration: **do not search for the
+prettiest delay.** If 750 ms survives real queue pressure it is kept unchanged.
+
+## Gate 2 — same world code is necessary but NOT sufficient
+
+The calibration proved how dangerous phase order is: a single `world.advance()`
+in the wrong place manufactured staleness that time could not have caused.
+
+Sharing `AsyncWorld` therefore does not make calibration and ASYNC-A the same
+dynamical system. The invariant must be:
+
+> **same `AsyncWorld` + same world-step protocol**
+
+Otherwise calibration measured one system and ASYNC-A runs another out of the
+same class file.
+
+The tick protocol is frozen as **shared code**, not duplicated call ordering,
+and the calibration driver and the ASYNC-A runner both call it.
+
+### The reproduction tooth
+
+```
+standalone calibration driver
+        vs
+ASYNC-A runner step engine + synthetic transport
+
+same seed, same timing schedule, same synthetic choices
+    => identical outcome journal hash
+```
+
+**If those differ, the main experiment does not start.**
+
+## Gate 3 — scarcity must not manufacture hallucination
+
+If an agent has **zero visible legal targets**, it is not asked to choose one.
+No model call is made. A substrate event is recorded:
+
+```
+NO_OPPORTUNITY
+```
+
+Forcing a model to emit `{"target_id": ...}` when nothing is available and then
+scoring the inevitable failure as `SEMANTIC_INVALID` would let world scarcity
+mechanically generate a hallucination rate — and `SEMANTIC_INVALID` is a
+control variable for exactly the opposite purpose. `NO_OPPORTUNITY` is neither a
+decision nor a failure, and never enters any outcome denominator.
+
+## Gate 4 — runtime faults void the replicate
+
+ASYNC-A does not study runtime faults. During a measured replicate:
+
+```
+bridge health DEGRADED or CATASTROPHE
+model recovery / reload
+unexpected residency change
+    => the replicate is VOID and re-run
+```
+
+A five-second model reload producing "asynchronous specialization" would be
+comedy, not emergence. Bridge health remains closed infrastructure and is not
+retuned to make a replicate survive; the replicate is discarded instead.
+
+---
+
+# Amendment 7: EQUALIZED_DELAY_TICKS 3 -> 4, per Gate 1
+
+**Supersedes the 750 ms constant in Amendment 4.** Recorded before any ASYNC-A
+run, from the Gate 1 feasibility check.
+
+## Result
+
+Gate 1 ran the bridge alone under the exact submission pattern ASYNC-A creates:
+3 agents submitting simultaneously, `max_active = 2`, 60 bursts, unique tiny
+ASYNC-A-shaped prompts. Observation-to-completion:
+
+```
+                          n   median    p95    max
+lfm2.5                   60      255    292    312
+danube2                  60      353    419    430
+falcon                   60      656    837    852
+ALL                     180      353    801    852
+```
+
+```
+delay_ms   healthy completions exceeding it
+   750     24    <- would have voided arm 3
+  1000      0    <- PASS, taken, search stopped
+```
+
+Zero transport failures, zero bridge-health interventions.
+
+## What this means
+
+**750 ms was justified against the wrong load regime.** Solo small-prompt
+latencies measured 190-580 ms, but with `max_active = 2` and three agents
+submitting together, one request always waits for a slot. falcon's p95 rises
+from roughly 580 ms solo to 837 ms under queue pressure — perfectly healthy, and
+past the old deadline.
+
+Arm 3 would have raised `EQUALIZER_BREACH` on **24 of 180 actions (13%)** and
+voided repeatedly, not because equalization failed and not because a model was
+slow, but because a scheduler queue exists. That failure would have appeared
+only after collecting outcomes.
+
+## The new constant
+
+```
+EQUALIZED_DELAY_TICKS = 4        (4 x 250 ms = 1000 ms)
+```
+
+Taken by the first-pass rule: 1000 ms is the first candidate with zero
+breaches, the search stopped there, and no prettier value was sought.
+
+The consequence noted in Amendment 4 is now larger and stays stated: equalizing
+can only level upward, so arm 3's uniform 1000 ms delay exceeds arm 2's mean
+natural delay by more than before. Q2 compares **between-agent differences
+within each arm**, so this is not a confound for the question asked — but the
+absolute staleness rate in arm 3 is expected to exceed arm 2's, and that
+difference is not evidence of anything by itself.

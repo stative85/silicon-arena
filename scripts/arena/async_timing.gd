@@ -18,7 +18,11 @@ const ARMS := [SERIAL, NATURAL, EQUALIZED, ORDER_REPLAY]
 
 ## Frozen in Amendment 4.
 const TICK_MS := 250
-const EQUALIZED_DELAY_TICKS := 3
+## Amendment 7: raised from 3 after Gate 1 measured 24 of 180 HEALTHY
+## completions exceeding 750 ms under real three-agent queue pressure
+## (max_active = 2, so one request always waits for a slot). 1000 ms was
+## the first candidate with zero breaches; the search stopped there.
+const EQUALIZED_DELAY_TICKS := 4
 
 
 ## WORLD TIME IS NEVER DERIVED FROM FRAME RATE. A headless machine running at

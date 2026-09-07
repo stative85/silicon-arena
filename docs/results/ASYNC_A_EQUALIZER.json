@@ -1,0 +1,18 @@
+{
+  "agents": 3,
+  "bursts": 60,
+  "candidates": [
+    750,
+    1000,
+    1250,
+    1500,
+    2000
+  ],
+  "chosen_delay_ms": 1000,
+  "health_interventions": 0,
+  "max_active": 2,
+  "max_ms": 852,
+  "median_ms": 353,
+  "samples": 180,
+  "transport_failures": 0
+}
