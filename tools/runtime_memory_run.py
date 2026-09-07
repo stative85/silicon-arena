@@ -60,7 +60,7 @@ POOL = ["liquidai/lfm2.5-1.2b-instruct", "qwen3.5-2b",
         "falcon-h1-1.5b-instruct"]
 CONTEXT = "8192"
 ARMS = ["IDLE", "CONTROL_WORKLOAD", "RECOVERY_ONLY", "FULL_WINDOW"]
-WINDOWS = 20                      # same duration / horizon for every arm
+WINDOWS = 40                      # same duration / horizon for every arm
 DISCONNECT_SAMPLES = [5, 15, 30, 60]   # seconds after client exit
 
 

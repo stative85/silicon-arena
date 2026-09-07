@@ -157,3 +157,61 @@ It is **deliberately not added to `ROBRUSTION_LAWS.md` yet.** Every existing law
 there is anchored to a measured mechanism. This one currently rests on an effect
 whose mechanism is unknown -- which is exactly what this experiment exists to
 supply. It gets named after RUNTIME-MEMORY reports, or not at all.
+
+---
+
+# Amendment 2 — horizon 40 windows, and a phase-aware reading
+
+Frozen before the first RUNTIME-MEMORY call, before the four restarts, and
+before any arm exists.
+
+## The 20-window horizon censors the phenomenon
+
+RECOVERY-COUPLING Run 1, recorded in `docs/results/RC_RUN1_VOID.md` at commit
+`9707314` — **before this amendment and before any RUNTIME-MEMORY outcome
+exists** — showed:
+
+```text
+RAM depression begins   ~window 2
+stays depressed through ~window 19
+recovers                ~window 21
+then ~20 clean windows
+```
+
+A 20-window arm would have stopped one window before the recovery. Four
+beautifully controlled arms could have concluded "memory stays depressed"
+because the stopwatch quit just before the runtime got back up.
+
+```text
+HORIZON = 40 windows per arm
+```
+
+~26.7 minutes per arm, ~1h50m for four arms plus restarts. This experiment is
+specifically about **trajectory shape**, so a horizon shorter than the known
+recovery timescale is not a saving, it is a censoring.
+
+This is an amendment made on an observation that PREDATES it, not on any
+RUNTIME-MEMORY result. The git chronology is the evidence: `9707314` precedes
+this commit, and no RUNTIME-MEMORY arm has run.
+
+## Phase-aware reading, descriptive only
+
+Reported per arm. **No thresholds, and no "recovered" cutoff invented
+afterwards** — the shape is described, not scored:
+
+```text
+minimum host-free RAM, and the window it occurred in
+maximum LM Studio RSS, and the window it occurred in
+time / window index to the minimum
+whether a recovery occurs before the arm ends
+post-minimum slope
+final 5-window median
+disconnect drop at +5s / +15s / +30s / +60s
+```
+
+## No early-stop rule for RAM
+
+Crossing the 2 GB floor remains **the observable**, not a void condition, as
+already frozen. The only permitted stops are the genuine machine-safety and
+runtime failures already listed in the void conditions. "This graph looks
+conclusive" is not a stopping rule.

@@ -42,7 +42,7 @@ const RECOVERY_ONLY := "RECOVERY_ONLY"
 const FULL_WINDOW := "FULL_WINDOW"
 
 var _arm := IDLE
-var _windows := 20
+var _windows := 40
 var _bridge: InferenceBridge
 var _http: HTTPRequest
 var _http_rec: HTTPRequest
