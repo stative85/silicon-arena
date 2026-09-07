@@ -1,36 +1,34 @@
 {
-  "actions_returned": 1013,
+  "actions_returned": 4,
   "agents": 3,
   "arm": "NATURAL",
   "arm_type": "LIVE",
   "contract_schema_hash": "f5a2aaf89dfa6ffa",
   "counts": {
-    "actions": 1101,
+    "actions": 4,
     "by_outcome": {
-      "ACCEPTED": 894,
-      "PASSED": 88,
-      "SEMANTIC_INVALID": 2,
-      "STALE_CONFLICT": 117
+      "ACCEPTED": 3,
+      "STALE_CONFLICT": 1
     },
     "contention_opportunity": 0,
     "no_opportunity": 0,
-    "stale_eligible": 117,
+    "stale_eligible": 1,
     "stale_revalidated": 0
   },
   "equalized_delay_ticks": 4,
   "equalizer_breaches": 0,
-  "final_world_hash": "d42827f1a557b2c4",
-  "final_world_tick": 802,
+  "final_world_hash": "802abf7174424169",
+  "final_world_tick": 6,
   "hold_ticks": 4,
-  "journal_hash": "b001c4715fcecb7dee01f04ef7fb48a8196e09265251dea8abf45ce60f4715e9",
-  "model_calls": 1101,
+  "journal_hash": "eee785ba90400bf9986b81a5c02429e7d0de6d5236f275ee0422ba0db734d2d9",
+  "model_calls": 4,
   "model_calls_by_agent": {
-    "agent_0": 554,
-    "agent_1": 278,
-    "agent_2": 269
+    "agent_0": 2,
+    "agent_1": 1,
+    "agent_2": 1
   },
-  "observation_calls": 1101,
-  "observation_horizon_ticks": 800,
+  "observation_calls": 4,
+  "observation_horizon_ticks": 5,
   "replay": {
 
   },
@@ -44,50 +42,48 @@
     "end_resident_set": [],
     "expected_resident": [
       "liquidai/lfm2.5-1.2b-instruct",
-      "h2o-danube2-1.8b-chat",
+      "qwen3.5-2b",
       "falcon-h1-1.5b-instruct"
     ],
-    "expected_resident_hash": "1e77987921c0ff5b",
+    "expected_resident_hash": "daadde8d4dd9cb37",
     "observed_resident_hashes": [
-      "1e77987921c0ff5b"
+      "daadde8d4dd9cb37"
     ],
     "replicate_id": "NATURAL_r0",
     "runtime_events": [],
     "start_model_states": {
       "falcon-h1-1.5b-instruct": "HOT",
-      "h2o-danube2-1.8b-chat": "HOT",
-      "liquidai/lfm2.5-1.2b-instruct": "HOT"
+      "liquidai/lfm2.5-1.2b-instruct": "HOT",
+      "qwen3.5-2b": "HOT"
     },
-    "start_resident_hash": "1e77987921c0ff5b",
+    "start_resident_hash": "daadde8d4dd9cb37",
     "start_resident_set": [
       "liquidai/lfm2.5-1.2b-instruct",
-      "h2o-danube2-1.8b-chat",
+      "qwen3.5-2b",
       "falcon-h1-1.5b-instruct"
     ],
     "suspects": [],
     "void_reason": ""
   },
-  "settle_ticks": 2,
-  "shape_failed": 88,
+  "settle_ticks": 1,
+  "shape_failed": 0,
   "shape_failed_by_agent": {
-    "agent_1": 88
+
   },
   "shape_failed_rates": {
     "agent_0": 0.0,
-    "agent_1": 0.316546762589928,
+    "agent_1": 0.0,
     "agent_2": 0.0
   },
   "synthetic": false,
   "throughput": {
-    "actions_per_agent": 367.0,
-    "actions_per_tick": 1.37625,
+    "actions_per_agent": 1.33333333333333,
+    "actions_per_tick": 0.8,
     "no_opportunity_rate": 0.0,
-    "observation_opportunities": 1101,
-    "opportunities_per_tick": 1.37625
+    "observation_opportunities": 4,
+    "opportunities_per_tick": 0.8
   },
   "tick_ms": 250,
-  "void": true,
-  "void_reasons": [
-    "SHAPE_FAILED 31.7% for agent_1 (>10%)"
-  ]
+  "void": false,
+  "void_reasons": []
 }

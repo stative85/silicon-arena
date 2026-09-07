@@ -32,7 +32,16 @@ const HL := preload("res://scripts/arena/bridge_health.gd")
 
 ## Declared before any output.
 const CANDIDATES := [750, 1000, 1250, 1500, 2000]
-const BURSTS := 60
+## RUN-EQUIVALENT EXPOSURE. The gate originally used 60 bursts = 180
+## completions and passed 1000 ms, but ASYNC-A Run 1's EQUALIZED arm generated
+## ~600 completions and hit one breach at that same deadline. The gate was
+## UNDERPOWERED, not necessarily the constant wrong. 200 bursts = 600
+## completions is approximately one EQUALIZED replicate's exposure.
+##
+## ALL candidates are tested against ONE completion corpus: generating a fresh
+## run per candidate would let candidate testing change the runtime conditions
+## it is supposed to be measuring.
+const BURSTS := 200
 const AGENTS := 3          ## preregistered; see Amendment 6
 
 var _bridge: InferenceBridge

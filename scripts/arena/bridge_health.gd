@@ -63,6 +63,14 @@ const SUSPECT := "SUSPECT"
 const DEGRADED := "DEGRADED"
 const CATASTROPHE := "CATASTROPHE"
 
+## A model with no expectation surface cannot be judged. Reporting that as
+## NORMAL is worse than shadow mode: shadow suppresses ACTION while still
+## classifying, whereas an unknown model was silently UNMONITORED and looked
+## healthy by default. UNPROFILED never triggers recovery -- there is nothing to
+## recover from -- but a measured experiment must refuse to start with one on
+## its roster.
+const UNPROFILED := "UNPROFILED"
+
 ## Piecewise expectation knots: [prompt_tokens, median_ttft_ms], uncontended.
 ##
 ## Sizes within 10% of each other are pooled into one knot. Without that, the
@@ -157,7 +165,8 @@ func classify(model_id: String, prompt_tokens: int, load: int,
 		return out
 	var e := expected_ttft(model_id, prompt_tokens, load)
 	if e <= 0.0:
-		out["reason"] = "no expectation for model " + model_id
+		out["verdict"] = UNPROFILED
+		out["reason"] = "no expectation surface for " + model_id
 		return out
 	var residual := float(ttft_ms) / e
 	out["expected_ms"] = e
@@ -203,6 +212,17 @@ func _record(model_id: String, out: Dictionary) -> void:
 func reset() -> void:
 	_streak.clear()
 	events.clear()
+
+
+## Is every model on this roster profiled? A measured experiment calls this in
+## PRE-RUN and refuses to start otherwise; qualification tooling is expected to
+## run WITH unprofiled models, which is why this reports rather than enforces.
+static func unprofiled(models: Array) -> Array:
+	var out: Array = []
+	for m in models:
+		if not KNOTS.has(str(m)):
+			out.append(str(m))
+	return out
 
 
 func streak_for(model_id: String) -> int:

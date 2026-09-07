@@ -1,6 +1,6 @@
 {
   "agents": 3,
-  "bursts": 60,
+  "bursts": 200,
   "candidates": [
     750,
     1000,
@@ -11,8 +11,8 @@
   "chosen_delay_ms": 1000,
   "health_interventions": 0,
   "max_active": 2,
-  "max_ms": 870,
-  "median_ms": 537,
-  "samples": 180,
+  "max_ms": 958,
+  "median_ms": 568,
+  "samples": 600,
   "transport_failures": 0
 }

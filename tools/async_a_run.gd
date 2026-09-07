@@ -144,6 +144,16 @@ func _pre_run() -> bool:
 		(_agents[i] as AsyncAgentState).model_id = _models[i]
 	print("  resident       %s" % str(_models))
 
+	# A measured experiment must not start with a model the bridge cannot
+	# monitor. UNPROFILED is not a failure state -- it means no expectation
+	# surface exists -- but running an arm against one would leave that model
+	# silently unmonitored for the whole replicate.
+	var unprof := HL.unprofiled(_models)
+	if not unprof.is_empty():
+		print("  FAIL UNPROFILED models on the roster: %s" % str(unprof))
+		print("       qualify them before a measured run")
+		return false
+
 	_guard = G.make(replicate_id(), _models)
 	var states := {}
 	for mid in _models:
