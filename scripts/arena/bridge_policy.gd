@@ -26,15 +26,20 @@ class_name BridgePolicy
 ##
 ## Note rwkv7 is the CHEAPEST model at 767 MiB. It is parked on runtime
 ## grounds, not memory grounds. Swapping it back in is a supported policy.
+## ASYNC-A2 roster: danube2 retired from the arena roster after failing the
+## one-field contract at 25-50% (ASYNC-A Run 1 VOID, 241d86c) while lfm2.5 and
+## falcon failed zero times in thousands of calls. qwen3.5 qualified at 0/200.
+## The hot set is configuration by design; this is a roster change, not a
+## change to bridge health.
 var hot_set: Array[String] = [
 	"liquidai/lfm2.5-1.2b-instruct",
-	"h2o-danube2-1.8b-chat",
+	"qwen3.5-2b",
 	"falcon-h1-1.5b-instruct",
 ]
 
 ## Known to the pool but not resident by default.
 var parked_set: Array[String] = [
-	"qwen3.5-2b",
+	"h2o-danube2-1.8b-chat",
 	"rwkv7-1.5b-g1",
 ]
 

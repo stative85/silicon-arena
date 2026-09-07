@@ -11,8 +11,8 @@
   "chosen_delay_ms": 1000,
   "health_interventions": 0,
   "max_active": 2,
-  "max_ms": 852,
-  "median_ms": 353,
+  "max_ms": 870,
+  "median_ms": 537,
   "samples": 180,
   "transport_failures": 0
 }

@@ -1,0 +1,39 @@
+{
+  "calls": 200,
+  "candidates": [
+    {
+      "calls": 200,
+      "model": "liquidai/lfm2.5-1.2b-instruct",
+      "pass": true,
+      "samples": [],
+      "shape_failures": 0,
+      "shape_rate": 0.0,
+      "transport_failures": 0
+    },
+    {
+      "calls": 200,
+      "model": "falcon-h1-1.5b-instruct",
+      "pass": true,
+      "samples": [],
+      "shape_failures": 0,
+      "shape_rate": 0.0,
+      "transport_failures": 0
+    },
+    {
+      "calls": 200,
+      "model": "qwen3.5-2b",
+      "pass": true,
+      "samples": [],
+      "shape_failures": 0,
+      "shape_rate": 0.0,
+      "transport_failures": 0
+    }
+  ],
+  "contract_schema_hash": "f5a2aaf89dfa6ffa",
+  "criterion": 0.1,
+  "qualified": [
+    "liquidai/lfm2.5-1.2b-instruct",
+    "falcon-h1-1.5b-instruct",
+    "qwen3.5-2b"
+  ]
+}
