@@ -1,0 +1,26 @@
+Godot Engine v4.6.stable.official.89cea1439 - https://godotengine.org
+
+=== HEALTH-DUTY  arm=CELL  tag=cell_16 ===
+order [16], 120 rounds each, shadow, no fitting
+
+resident ["liquidai/lfm2.5-1.2b-instruct", "qwen3.5-2b", "falcon-h1-1.5b-instruct"]
+shadow   true   ks/kh/n 1.8/20.0/3
+
+host free 2315 MB
+  regime 16 ...
+
+[RESULTS] arm=CELL tag=cell_16
+
+liquidai/lfm2.5-1.2b-instruct
+  len      n  tokens  ttft_med  exp_med  res_med  res_p95   susp   degr
+  16     120     110       140       94     1.49     2.32     30      1
+
+qwen3.5-2b
+  len      n  tokens  ttft_med  exp_med  res_med  res_p95   susp   degr
+  16     120     131       373      210     1.78     2.08     54      8
+
+falcon-h1-1.5b-instruct
+  len      n  tokens  ttft_med  exp_med  res_med  res_p95   susp   degr
+  16     120     130       345      280     1.23     1.40      0      0
+
+wrote docs/results/HEALTH_DUTY_cell_16.json

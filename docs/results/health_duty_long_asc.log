@@ -1,0 +1,34 @@
+Godot Engine v4.6.stable.official.89cea1439 - https://godotengine.org
+
+=== HEALTH-DUTY  arm=LONG  tag=long_asc ===
+order [4, 10, 16], 120 rounds each, shadow, no fitting
+
+resident ["liquidai/lfm2.5-1.2b-instruct", "qwen3.5-2b", "falcon-h1-1.5b-instruct"]
+shadow   true   ks/kh/n 1.8/20.0/3
+
+host free 2107 MB
+  regime  4 ...
+  regime 10 ...
+  regime 16 ...
+
+[RESULTS] arm=LONG tag=long_asc
+
+liquidai/lfm2.5-1.2b-instruct
+  len      n  tokens  ttft_med  exp_med  res_med  res_p95   susp   degr
+  4      120      50       141       80     1.76     1.96     45      3
+  10     120      80       124       87     1.42     1.79      5      0
+  16     120     110       142       94     1.51     1.83     27      2
+
+qwen3.5-2b
+  len      n  tokens  ttft_med  exp_med  res_med  res_p95   susp   degr
+  4      120      59       324      166     1.95     2.09    100     28
+  10     120      95       314      188     1.67     1.83     16      1
+  16     120     131       356      210     1.69     1.85      6      0
+
+falcon-h1-1.5b-instruct
+  len      n  tokens  ttft_med  exp_med  res_med  res_p95   susp   degr
+  4      120      58       268      227     1.18     1.32      0      0
+  10     120      94       326      253     1.29     1.47      0      0
+  16     120     130       343      280     1.22     1.35      0      0
+
+wrote docs/results/HEALTH_DUTY_long_asc.json
