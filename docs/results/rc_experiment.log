@@ -1,0 +1,299 @@
+Godot Engine v4.6.stable.official.89cea1439 - https://godotengine.org
+
+=== RECOVERY-COUPLING window executor ===
+run_kind EXPERIMENT   windows [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59]
+schedule hash 9c9dbd9ca0c45252, pool ["liquidai/lfm2.5-1.2b-instruct", "qwen3.5-2b", "falcon-h1-1.5b-instruct"]
+
+health shadow true (verdict-triggered recovery is impossible)
+
+
+--- window 0  TREATMENT  recover=liquidai/lfm2.5-1.2b-instruct ---
+  pre        counts={ "liquidai/lfm2.5-1.2b-instruct": 1, "qwen3.5-2b": 1, "falcon-h1-1.5b-instruct": 1 } gate=CLEAN
+  recovery   verdict=RECOVERY_VALID epoch 0->1 done at +16564 ms
+  post       counts={ "qwen3.5-2b": 1, "falcon-h1-1.5b-instruct": 1, "liquidai/lfm2.5-1.2b-instruct": 1 } gate=CLEAN
+  probes     124 records this window, 0 invalid
+  gate       void=false reason= offences=0
+
+--- window 1  CONTROL  recover=liquidai/lfm2.5-1.2b-instruct ---
+  pre        counts={ "qwen3.5-2b": 1, "falcon-h1-1.5b-instruct": 1, "liquidai/lfm2.5-1.2b-instruct": 1 } gate=CLEAN
+  control    matched reads + liveness=true at +10222 ms
+  post       counts={ "qwen3.5-2b": 1, "falcon-h1-1.5b-instruct": 1, "liquidai/lfm2.5-1.2b-instruct": 1 } gate=CLEAN
+  probes     144 records this window, 0 invalid
+  gate       void=false reason= offences=0
+
+--- window 2  CONTROL  recover=liquidai/lfm2.5-1.2b-instruct ---
+  pre        counts={ "qwen3.5-2b": 1, "falcon-h1-1.5b-instruct": 1, "liquidai/lfm2.5-1.2b-instruct": 1 } gate=CLEAN
+  control    matched reads + liveness=true at +10358 ms
+  post       counts={ "qwen3.5-2b": 1, "falcon-h1-1.5b-instruct": 1, "liquidai/lfm2.5-1.2b-instruct": 1 } gate=RAM_FLOOR_EVENT
+  probes     138 records this window, 0 invalid
+  gate       void=true reason=RAM_FLOOR_EVENT offences=14
+
+--- window 3  TREATMENT  recover=liquidai/lfm2.5-1.2b-instruct ---
+  pre        counts={ "qwen3.5-2b": 1, "falcon-h1-1.5b-instruct": 1, "liquidai/lfm2.5-1.2b-instruct": 1 } gate=RAM_FLOOR_EVENT
+  recovery   verdict=RECOVERY_VALID epoch 1->2 done at +16984 ms
+  post       counts={ "qwen3.5-2b": 1, "falcon-h1-1.5b-instruct": 1, "liquidai/lfm2.5-1.2b-instruct": 1 } gate=RAM_FLOOR_EVENT
+  probes     120 records this window, 0 invalid
+  gate       void=true reason=RAM_FLOOR_EVENT offences=62
+
+--- window 4  TREATMENT  recover=liquidai/lfm2.5-1.2b-instruct ---
+  pre        counts={ "qwen3.5-2b": 1, "falcon-h1-1.5b-instruct": 1, "liquidai/lfm2.5-1.2b-instruct": 1 } gate=RAM_FLOOR_EVENT
+  recovery   verdict=RECOVERY_VALID epoch 2->3 done at +16801 ms
+  post       counts={ "qwen3.5-2b": 1, "falcon-h1-1.5b-instruct": 1, "liquidai/lfm2.5-1.2b-instruct": 1 } gate=RAM_FLOOR_EVENT
+  probes     122 records this window, 0 invalid
+  gate       void=true reason=RAM_FLOOR_EVENT offences=63
+
+--- window 5  CONTROL  recover=liquidai/lfm2.5-1.2b-instruct ---
+  pre        counts={ "qwen3.5-2b": 1, "falcon-h1-1.5b-instruct": 1, "liquidai/lfm2.5-1.2b-instruct": 1 } gate=RAM_FLOOR_EVENT
+  control    matched reads + liveness=true at +10558 ms
+  post       counts={ "qwen3.5-2b": 1, "falcon-h1-1.5b-instruct": 1, "liquidai/lfm2.5-1.2b-instruct": 1 } gate=RAM_FLOOR_EVENT
+  probes     146 records this window, 0 invalid
+  gate       void=true reason=RAM_FLOOR_EVENT offences=78
+
+--- window 6  CONTROL  recover=liquidai/lfm2.5-1.2b-instruct ---
+  pre        counts={ "qwen3.5-2b": 1, "falcon-h1-1.5b-instruct": 1, "liquidai/lfm2.5-1.2b-instruct": 1 } gate=RAM_FLOOR_EVENT
+  control    matched reads + liveness=true at +10627 ms
+  post       counts={ "qwen3.5-2b": 1, "falcon-h1-1.5b-instruct": 1, "liquidai/lfm2.5-1.2b-instruct": 1 } gate=RAM_FLOOR_EVENT
+  probes     148 records this window, 0 invalid
+  gate       void=true reason=RAM_FLOOR_EVENT offences=79
+
+--- window 7  TREATMENT  recover=liquidai/lfm2.5-1.2b-instruct ---
+  pre        counts={ "qwen3.5-2b": 1, "falcon-h1-1.5b-instruct": 1, "liquidai/lfm2.5-1.2b-instruct": 1 } gate=RAM_FLOOR_EVENT
+  recovery   verdict=RECOVERY_VALID epoch 3->4 done at +17166 ms
+  post       counts={ "qwen3.5-2b": 1, "falcon-h1-1.5b-instruct": 1, "liquidai/lfm2.5-1.2b-instruct": 1 } gate=RAM_FLOOR_EVENT
+  probes     124 records this window, 0 invalid
+  gate       void=true reason=RAM_FLOOR_EVENT offences=64
+
+--- window 8  TREATMENT  recover=liquidai/lfm2.5-1.2b-instruct ---
+  pre        counts={ "qwen3.5-2b": 1, "falcon-h1-1.5b-instruct": 1, "liquidai/lfm2.5-1.2b-instruct": 1 } gate=RAM_FLOOR_EVENT
+  recovery   verdict=RECOVERY_VALID epoch 4->5 done at +16885 ms
+  post       counts={ "qwen3.5-2b": 1, "falcon-h1-1.5b-instruct": 1, "liquidai/lfm2.5-1.2b-instruct": 1 } gate=RAM_FLOOR_EVENT
+  probes     122 records this window, 0 invalid
+  gate       void=true reason=RAM_FLOOR_EVENT offences=63
+
+--- window 9  CONTROL  recover=liquidai/lfm2.5-1.2b-instruct ---
+  pre        counts={ "qwen3.5-2b": 1, "falcon-h1-1.5b-instruct": 1, "liquidai/lfm2.5-1.2b-instruct": 1 } gate=RAM_FLOOR_EVENT
+  control    matched reads + liveness=true at +10494 ms
+  post       counts={ "qwen3.5-2b": 1, "falcon-h1-1.5b-instruct": 1, "liquidai/lfm2.5-1.2b-instruct": 1 } gate=RAM_FLOOR_EVENT
+  probes     144 records this window, 0 invalid
+  gate       void=true reason=RAM_FLOOR_EVENT offences=77
+
+--- window 10  CONTROL  recover=liquidai/lfm2.5-1.2b-instruct ---
+  pre        counts={ "qwen3.5-2b": 1, "falcon-h1-1.5b-instruct": 1, "liquidai/lfm2.5-1.2b-instruct": 1 } gate=RAM_FLOOR_EVENT
+  control    matched reads + liveness=true at +10633 ms
+  post       counts={ "qwen3.5-2b": 1, "falcon-h1-1.5b-instruct": 1, "liquidai/lfm2.5-1.2b-instruct": 1 } gate=RAM_FLOOR_EVENT
+  probes     142 records this window, 0 invalid
+  gate       void=true reason=RAM_FLOOR_EVENT offences=76
+
+--- window 11  TREATMENT  recover=liquidai/lfm2.5-1.2b-instruct ---
+  pre        counts={ "qwen3.5-2b": 1, "falcon-h1-1.5b-instruct": 1, "liquidai/lfm2.5-1.2b-instruct": 1 } gate=RAM_FLOOR_EVENT
+  recovery   verdict=RECOVERY_VALID epoch 5->6 done at +17145 ms
+  post       counts={ "qwen3.5-2b": 1, "falcon-h1-1.5b-instruct": 1, "liquidai/lfm2.5-1.2b-instruct": 1 } gate=RAM_FLOOR_EVENT
+  probes     122 records this window, 0 invalid
+  gate       void=true reason=RAM_FLOOR_EVENT offences=63
+
+--- window 12  TREATMENT  recover=liquidai/lfm2.5-1.2b-instruct ---
+  pre        counts={ "qwen3.5-2b": 1, "falcon-h1-1.5b-instruct": 1, "liquidai/lfm2.5-1.2b-instruct": 1 } gate=RAM_FLOOR_EVENT
+  recovery   verdict=RECOVERY_VALID epoch 6->7 done at +16732 ms
+  post       counts={ "qwen3.5-2b": 1, "falcon-h1-1.5b-instruct": 1, "liquidai/lfm2.5-1.2b-instruct": 1 } gate=RAM_FLOOR_EVENT
+  probes     122 records this window, 0 invalid
+  gate       void=true reason=RAM_FLOOR_EVENT offences=63
+
+--- window 13  CONTROL  recover=liquidai/lfm2.5-1.2b-instruct ---
+  pre        counts={ "qwen3.5-2b": 1, "falcon-h1-1.5b-instruct": 1, "liquidai/lfm2.5-1.2b-instruct": 1 } gate=RAM_FLOOR_EVENT
+  control    matched reads + liveness=true at +10295 ms
+  post       counts={ "qwen3.5-2b": 1, "falcon-h1-1.5b-instruct": 1, "liquidai/lfm2.5-1.2b-instruct": 1 } gate=RAM_FLOOR_EVENT
+  probes     146 records this window, 0 invalid
+  gate       void=true reason=RAM_FLOOR_EVENT offences=78
+
+--- window 14  CONTROL  recover=liquidai/lfm2.5-1.2b-instruct ---
+  pre        counts={ "qwen3.5-2b": 1, "falcon-h1-1.5b-instruct": 1, "liquidai/lfm2.5-1.2b-instruct": 1 } gate=RAM_FLOOR_EVENT
+  control    matched reads + liveness=true at +10553 ms
+  post       counts={ "qwen3.5-2b": 1, "falcon-h1-1.5b-instruct": 1, "liquidai/lfm2.5-1.2b-instruct": 1 } gate=RAM_FLOOR_EVENT
+  probes     146 records this window, 0 invalid
+  gate       void=true reason=RAM_FLOOR_EVENT offences=78
+
+--- window 15  TREATMENT  recover=liquidai/lfm2.5-1.2b-instruct ---
+  pre        counts={ "qwen3.5-2b": 1, "falcon-h1-1.5b-instruct": 1, "liquidai/lfm2.5-1.2b-instruct": 1 } gate=RAM_FLOOR_EVENT
+  recovery   verdict=RECOVERY_VALID epoch 7->8 done at +16187 ms
+  post       counts={ "qwen3.5-2b": 1, "falcon-h1-1.5b-instruct": 1, "liquidai/lfm2.5-1.2b-instruct": 1 } gate=RAM_FLOOR_EVENT
+  probes     126 records this window, 0 invalid
+  gate       void=true reason=RAM_FLOOR_EVENT offences=65
+
+--- window 16  TREATMENT  recover=liquidai/lfm2.5-1.2b-instruct ---
+  pre        counts={ "qwen3.5-2b": 1, "falcon-h1-1.5b-instruct": 1, "liquidai/lfm2.5-1.2b-instruct": 1 } gate=RAM_FLOOR_EVENT
+  recovery   verdict=RECOVERY_VALID epoch 8->9 done at +15983 ms
+  post       counts={ "qwen3.5-2b": 1, "falcon-h1-1.5b-instruct": 1, "liquidai/lfm2.5-1.2b-instruct": 1 } gate=RAM_FLOOR_EVENT
+  probes     128 records this window, 0 invalid
+  gate       void=true reason=RAM_FLOOR_EVENT offences=66
+
+--- window 17  CONTROL  recover=liquidai/lfm2.5-1.2b-instruct ---
+  pre        counts={ "qwen3.5-2b": 1, "falcon-h1-1.5b-instruct": 1, "liquidai/lfm2.5-1.2b-instruct": 1 } gate=RAM_FLOOR_EVENT
+  control    matched reads + liveness=true at +10657 ms
+  post       counts={ "qwen3.5-2b": 1, "falcon-h1-1.5b-instruct": 1, "liquidai/lfm2.5-1.2b-instruct": 1 } gate=RAM_FLOOR_EVENT
+  probes     144 records this window, 0 invalid
+  gate       void=true reason=RAM_FLOOR_EVENT offences=77
+
+--- window 18  CONTROL  recover=liquidai/lfm2.5-1.2b-instruct ---
+  pre        counts={ "qwen3.5-2b": 1, "falcon-h1-1.5b-instruct": 1, "liquidai/lfm2.5-1.2b-instruct": 1 } gate=RAM_FLOOR_EVENT
+  control    matched reads + liveness=true at +10235 ms
+  post       counts={ "qwen3.5-2b": 1, "falcon-h1-1.5b-instruct": 1, "liquidai/lfm2.5-1.2b-instruct": 1 } gate=RAM_FLOOR_EVENT
+  probes     146 records this window, 0 invalid
+  gate       void=true reason=RAM_FLOOR_EVENT offences=78
+
+--- window 19  TREATMENT  recover=liquidai/lfm2.5-1.2b-instruct ---
+  pre        counts={ "qwen3.5-2b": 1, "falcon-h1-1.5b-instruct": 1, "liquidai/lfm2.5-1.2b-instruct": 1 } gate=RAM_FLOOR_EVENT
+  recovery   verdict=RECOVERY_VALID epoch 9->10 done at +15769 ms
+  post       counts={ "qwen3.5-2b": 1, "falcon-h1-1.5b-instruct": 1, "liquidai/lfm2.5-1.2b-instruct": 1 } gate=CLEAN
+  probes     126 records this window, 0 invalid
+  gate       void=true reason=RAM_FLOOR_EVENT offences=56
+
+--- window 20  TREATMENT  recover=qwen3.5-2b ---
+  pre        counts={ "qwen3.5-2b": 1, "falcon-h1-1.5b-instruct": 1, "liquidai/lfm2.5-1.2b-instruct": 1 } gate=CLEAN
+  recovery   verdict=RECOVERY_VALID epoch 10->11 done at +16374 ms
+  post       counts={ "falcon-h1-1.5b-instruct": 1, "liquidai/lfm2.5-1.2b-instruct": 1, "qwen3.5-2b": 1 } gate=CLEAN
+  probes     136 records this window, 0 invalid
+  gate       void=false reason= offences=0
+
+--- window 21  CONTROL  recover=qwen3.5-2b ---
+  pre        counts={ "falcon-h1-1.5b-instruct": 1, "liquidai/lfm2.5-1.2b-instruct": 1, "qwen3.5-2b": 1 } gate=CLEAN
+  control    matched reads + liveness=true at +10496 ms
+  post       counts={ "falcon-h1-1.5b-instruct": 1, "liquidai/lfm2.5-1.2b-instruct": 1, "qwen3.5-2b": 1 } gate=CLEAN
+  probes     160 records this window, 0 invalid
+  gate       void=false reason= offences=0
+
+--- window 22  CONTROL  recover=qwen3.5-2b ---
+  pre        counts={ "falcon-h1-1.5b-instruct": 1, "liquidai/lfm2.5-1.2b-instruct": 1, "qwen3.5-2b": 1 } gate=CLEAN
+  control    matched reads + liveness=true at +10360 ms
+  post       counts={ "falcon-h1-1.5b-instruct": 1, "liquidai/lfm2.5-1.2b-instruct": 1, "qwen3.5-2b": 1 } gate=CLEAN
+  probes     162 records this window, 0 invalid
+  gate       void=false reason= offences=0
+
+--- window 23  TREATMENT  recover=qwen3.5-2b ---
+  pre        counts={ "falcon-h1-1.5b-instruct": 1, "liquidai/lfm2.5-1.2b-instruct": 1, "qwen3.5-2b": 1 } gate=CLEAN
+  recovery   verdict=RECOVERY_VALID epoch 11->12 done at +16569 ms
+  post       counts={ "falcon-h1-1.5b-instruct": 1, "liquidai/lfm2.5-1.2b-instruct": 1, "qwen3.5-2b": 1 } gate=CLEAN
+  probes     136 records this window, 0 invalid
+  gate       void=false reason= offences=0
+
+--- window 24  TREATMENT  recover=qwen3.5-2b ---
+  pre        counts={ "falcon-h1-1.5b-instruct": 1, "liquidai/lfm2.5-1.2b-instruct": 1, "qwen3.5-2b": 1 } gate=CLEAN
+  recovery   verdict=RECOVERY_VALID epoch 12->13 done at +17147 ms
+  post       counts={ "falcon-h1-1.5b-instruct": 1, "liquidai/lfm2.5-1.2b-instruct": 1, "qwen3.5-2b": 1 } gate=CLEAN
+  probes     136 records this window, 0 invalid
+  gate       void=false reason= offences=0
+
+--- window 25  CONTROL  recover=qwen3.5-2b ---
+  pre        counts={ "falcon-h1-1.5b-instruct": 1, "liquidai/lfm2.5-1.2b-instruct": 1, "qwen3.5-2b": 1 } gate=CLEAN
+  control    matched reads + liveness=true at +10249 ms
+  post       counts={ "falcon-h1-1.5b-instruct": 1, "liquidai/lfm2.5-1.2b-instruct": 1, "qwen3.5-2b": 1 } gate=CLEAN
+  probes     162 records this window, 0 invalid
+  gate       void=false reason= offences=0
+
+--- window 26  CONTROL  recover=qwen3.5-2b ---
+  pre        counts={ "falcon-h1-1.5b-instruct": 1, "liquidai/lfm2.5-1.2b-instruct": 1, "qwen3.5-2b": 1 } gate=CLEAN
+  control    matched reads + liveness=true at +10547 ms
+  post       counts={ "falcon-h1-1.5b-instruct": 1, "liquidai/lfm2.5-1.2b-instruct": 1, "qwen3.5-2b": 1 } gate=CLEAN
+  probes     164 records this window, 0 invalid
+  gate       void=false reason= offences=0
+
+--- window 27  TREATMENT  recover=qwen3.5-2b ---
+  pre        counts={ "falcon-h1-1.5b-instruct": 1, "liquidai/lfm2.5-1.2b-instruct": 1, "qwen3.5-2b": 1 } gate=CLEAN
+  recovery   verdict=RECOVERY_VALID epoch 13->14 done at +16564 ms
+  post       counts={ "falcon-h1-1.5b-instruct": 1, "liquidai/lfm2.5-1.2b-instruct": 1, "qwen3.5-2b": 1 } gate=CLEAN
+  probes     142 records this window, 0 invalid
+  gate       void=false reason= offences=0
+
+--- window 28  TREATMENT  recover=qwen3.5-2b ---
+  pre        counts={ "falcon-h1-1.5b-instruct": 1, "liquidai/lfm2.5-1.2b-instruct": 1, "qwen3.5-2b": 1 } gate=CLEAN
+  recovery   verdict=RECOVERY_VALID epoch 14->15 done at +16666 ms
+  post       counts={ "falcon-h1-1.5b-instruct": 1, "liquidai/lfm2.5-1.2b-instruct": 1, "qwen3.5-2b": 1 } gate=CLEAN
+  probes     138 records this window, 0 invalid
+  gate       void=false reason= offences=0
+
+--- window 29  CONTROL  recover=qwen3.5-2b ---
+  pre        counts={ "falcon-h1-1.5b-instruct": 1, "liquidai/lfm2.5-1.2b-instruct": 1, "qwen3.5-2b": 1 } gate=CLEAN
+  control    matched reads + liveness=true at +10685 ms
+  post       counts={ "falcon-h1-1.5b-instruct": 1, "liquidai/lfm2.5-1.2b-instruct": 1, "qwen3.5-2b": 1 } gate=CLEAN
+  probes     162 records this window, 0 invalid
+  gate       void=false reason= offences=0
+
+--- window 30  CONTROL  recover=qwen3.5-2b ---
+  pre        counts={ "falcon-h1-1.5b-instruct": 1, "liquidai/lfm2.5-1.2b-instruct": 1, "qwen3.5-2b": 1 } gate=CLEAN
+  control    matched reads + liveness=true at +10670 ms
+  post       counts={ "falcon-h1-1.5b-instruct": 1, "liquidai/lfm2.5-1.2b-instruct": 1, "qwen3.5-2b": 1 } gate=CLEAN
+  probes     162 records this window, 0 invalid
+  gate       void=false reason= offences=0
+
+--- window 31  TREATMENT  recover=qwen3.5-2b ---
+  pre        counts={ "falcon-h1-1.5b-instruct": 1, "liquidai/lfm2.5-1.2b-instruct": 1, "qwen3.5-2b": 1 } gate=CLEAN
+  recovery   verdict=RECOVERY_VALID epoch 15->16 done at +16853 ms
+  post       counts={ "falcon-h1-1.5b-instruct": 1, "liquidai/lfm2.5-1.2b-instruct": 1, "qwen3.5-2b": 1 } gate=CLEAN
+  probes     138 records this window, 0 invalid
+  gate       void=false reason= offences=0
+
+--- window 32  TREATMENT  recover=qwen3.5-2b ---
+  pre        counts={ "falcon-h1-1.5b-instruct": 1, "liquidai/lfm2.5-1.2b-instruct": 1, "qwen3.5-2b": 1 } gate=CLEAN
+  recovery   verdict=RECOVERY_VALID epoch 16->17 done at +16809 ms
+  post       counts={ "falcon-h1-1.5b-instruct": 1, "liquidai/lfm2.5-1.2b-instruct": 1, "qwen3.5-2b": 1 } gate=CLEAN
+  probes     138 records this window, 0 invalid
+  gate       void=false reason= offences=0
+
+--- window 33  CONTROL  recover=qwen3.5-2b ---
+  pre        counts={ "falcon-h1-1.5b-instruct": 1, "liquidai/lfm2.5-1.2b-instruct": 1, "qwen3.5-2b": 1 } gate=CLEAN
+  control    matched reads + liveness=true at +10250 ms
+  post       counts={ "falcon-h1-1.5b-instruct": 1, "liquidai/lfm2.5-1.2b-instruct": 1, "qwen3.5-2b": 1 } gate=CLEAN
+  probes     160 records this window, 0 invalid
+  gate       void=false reason= offences=0
+
+--- window 34  CONTROL  recover=qwen3.5-2b ---
+  pre        counts={ "falcon-h1-1.5b-instruct": 1, "liquidai/lfm2.5-1.2b-instruct": 1, "qwen3.5-2b": 1 } gate=CLEAN
+  control    matched reads + liveness=true at +10261 ms
+  post       counts={ "falcon-h1-1.5b-instruct": 1, "liquidai/lfm2.5-1.2b-instruct": 1, "qwen3.5-2b": 1 } gate=CLEAN
+  probes     160 records this window, 0 invalid
+  gate       void=false reason= offences=0
+
+--- window 35  TREATMENT  recover=qwen3.5-2b ---
+  pre        counts={ "falcon-h1-1.5b-instruct": 1, "liquidai/lfm2.5-1.2b-instruct": 1, "qwen3.5-2b": 1 } gate=CLEAN
+  recovery   verdict=RECOVERY_VALID epoch 17->18 done at +16625 ms
+  post       counts={ "falcon-h1-1.5b-instruct": 1, "liquidai/lfm2.5-1.2b-instruct": 1, "qwen3.5-2b": 1 } gate=CLEAN
+  probes     136 records this window, 0 invalid
+  gate       void=false reason= offences=0
+
+--- window 36  TREATMENT  recover=qwen3.5-2b ---
+  pre        counts={ "falcon-h1-1.5b-instruct": 1, "liquidai/lfm2.5-1.2b-instruct": 1, "qwen3.5-2b": 1 } gate=CLEAN
+  recovery   verdict=RECOVERY_VALID epoch 18->19 done at +16801 ms
+  post       counts={ "falcon-h1-1.5b-instruct": 1, "liquidai/lfm2.5-1.2b-instruct": 1, "qwen3.5-2b": 1 } gate=CLEAN
+  probes     138 records this window, 0 invalid
+  gate       void=false reason= offences=0
+
+--- window 37  CONTROL  recover=qwen3.5-2b ---
+  pre        counts={ "falcon-h1-1.5b-instruct": 1, "liquidai/lfm2.5-1.2b-instruct": 1, "qwen3.5-2b": 1 } gate=CLEAN
+  control    matched reads + liveness=true at +10663 ms
+  post       counts={ "falcon-h1-1.5b-instruct": 1, "liquidai/lfm2.5-1.2b-instruct": 1, "qwen3.5-2b": 1 } gate=CLEAN
+  probes     158 records this window, 0 invalid
+  gate       void=false reason= offences=0
+
+--- window 38  CONTROL  recover=qwen3.5-2b ---
+  pre        counts={ "falcon-h1-1.5b-instruct": 1, "liquidai/lfm2.5-1.2b-instruct": 1, "qwen3.5-2b": 1 } gate=CLEAN
+  control    matched reads + liveness=true at +10384 ms
+  post       counts={ "falcon-h1-1.5b-instruct": 1, "liquidai/lfm2.5-1.2b-instruct": 1, "qwen3.5-2b": 1 } gate=CLEAN
+  probes     162 records this window, 0 invalid
+  gate       void=false reason= offences=0
+
+--- window 39  TREATMENT  recover=qwen3.5-2b ---
+  pre        counts={ "falcon-h1-1.5b-instruct": 1, "liquidai/lfm2.5-1.2b-instruct": 1, "qwen3.5-2b": 1 } gate=CLEAN
+  recovery   verdict=RECOVERY_VALID epoch 19->20 done at +17342 ms
+  post       counts={ "falcon-h1-1.5b-instruct": 1, "liquidai/lfm2.5-1.2b-instruct": 1, "qwen3.5-2b": 1 } gate=CLEAN
+  probes     132 records this window, 0 invalid
+  gate       void=false reason= offences=0
+
+--- window 40  TREATMENT  recover=falcon-h1-1.5b-instruct ---
+  pre        counts={ "falcon-h1-1.5b-instruct": 1, "liquidai/lfm2.5-1.2b-instruct": 1, "qwen3.5-2b": 1 } gate=CLEAN
+  recovery   verdict=RECOVERY_VALID epoch 20->21 done at +16563 ms
+  post       counts={ "liquidai/lfm2.5-1.2b-instruct": 1, "qwen3.5-2b": 1, "falcon-h1-1.5b-instruct": 1 } gate=CLEAN
+  probes     130 records this window, 0 invalid
+  gate       void=false reason= offences=0
+
+--- window 41  CONTROL  recover=falcon-h1-1.5b-instruct ---
+  pre        counts={ "liquidai/lfm2.5-1.2b-instruct": 1, "qwen3.5-2b": 1, "falcon-h1-1.5b-instruct": 1 } gate=CLEAN
+  control    matched reads + liveness=true at +10493 ms
