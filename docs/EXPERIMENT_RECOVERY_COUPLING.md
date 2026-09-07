@@ -219,3 +219,96 @@ only qwen recovery -> falcon catastrophe survives
 controls also produce giant excursions
   -> STOP. Recovery is not identified.
 ```
+
+
+---
+
+# Amendment 2 — experiment-start state and witness
+
+Frozen before the first causal window. **Proposed, and not executed until
+approved**, because it requires restarting the user's LM Studio process.
+
+## Why this amendment exists
+
+The frozen prereg specifies pool exactness, the host-memory floor, and the ban
+on verdict-triggered recovery. It says nothing about how the experiment-start
+state is established. Qualification showed that gap matters:
+
+```text
+win  cond        min host free MB   offences
+0    TREATMENT              1159         11
+1    CONTROL                 734         76
+20   TREATMENT               681         22
+21   CONTROL                8870          0
+40   TREATMENT              8152          0
+41   CONTROL               10813          0
+```
+
+The depression is concentrated at the start of a pass that began immediately
+after the previous pass, and window 40 performed a genuine verified recovery
+while never dropping below 8 GB. This is accumulated runtime history, not the
+treatment.
+
+Starting 60 causal windows from such a state would void a large, non-random
+share of them, correlated with position rather than condition.
+
+## The procedure, frozen
+
+Qualification is **not** a warm-up for the experiment. Between the last
+qualification window and the first causal window:
+
+```text
+1. finish and freeze the qualification artifact
+   run_kind = QUALIFICATION, evidence_eligible = false
+
+2. stop the LM Studio backend process entirely
+
+3. start it fresh
+
+4. load exactly ONE instance of each frozen pool member
+   verified by count map, not by presence
+
+5. run tools/arm_baseline.py
+
+6. write the START-STATE WITNESS below
+
+7. window 0 begins
+```
+
+No probes, no liveness calls, and no recoveries occur between step 3 and step 7
+beyond what `arm_baseline.py` already performs, so the causal run does not begin
+on a warmed pool.
+
+## The start-state witness
+
+Recorded to `docs/results/RC_START_STATE.json` before window 0:
+
+```text
+lms_process_started_at        fresh-session evidence
+exact residency count map     one instance of each, nothing else
+vram_used_mib, vram_total_mib
+host_free_ram_mb
+model ids, all three
+runtime version                lms / LM Studio build
+health surface hash            bridge_health.gd knots + contention + ks/kh/n
+schedule_hash                  must equal 9c9dbd9ca0c45252
+active_requests                must be zero
+```
+
+`counts == expected` alone is **not** sufficient and is explicitly rejected as a
+start-state test: it proves current residency and says nothing about cache,
+allocator, or resident-age history, which is the variable this amendment exists
+to reset.
+
+## What does NOT change
+
+Treatment, rotation, schedule, window timing, probe cadence, controls, `ks`,
+`kh`, `n`, the primary endpoint, and every void condition remain exactly as
+frozen. Amendment 2 adds a start procedure and a witness. It changes no
+measurement and no threshold.
+
+## After window 0 begins
+
+No tuning, no quick fix, no threshold adjustment, no scheduler edit. A
+discovered integrity defect either voids the affected scope per the frozen void
+conditions or stops the run.

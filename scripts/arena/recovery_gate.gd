@@ -31,6 +31,13 @@ const TRANSPORT := "TRANSPORT_OR_RUNTIME_FAILURE"
 const HOST_FLOOR_MB := 2048.0
 
 var expected: Dictionary = {}      ## base model id -> expected instance count
+## A SCHEDULED absence is not a contamination. During a treatment recovery the
+## target is legitimately gone, so exactly one model may be declared flexible
+## (0 or 1) for the duration. This is set by the executor around its own
+## scheduled recovery and cleared immediately afterwards; every sample records
+## the expectation that was in force when it was taken, so the relaxation cannot
+## be applied retroactively to excuse anything.
+var flex_model: String = ""
 var window_id: int = -1
 var offences: Array = []           ## every offence, in order
 var first_offence: Dictionary = {} ## the one that killed the window
@@ -49,13 +56,19 @@ func begin(window: int, expect_counts: Dictionary) -> void:
 ## actionable, and the three ways a count vector can differ have different
 ## causes. A duplicate is a non-idempotent load. A disappearance is an eviction
 ## or a crash. A replacement is both at once and is the most alarming.
-static func classify(got: Dictionary, want: Dictionary) -> String:
+static func classify(got: Dictionary, want: Dictionary,
+		flex: String = "") -> String:
 	var missing: Array = []
 	var extra: Array = []
 	var foreign: Array = []
 	for k in want:
 		var g := int(got.get(k, 0))
 		var wv := int(want[k])
+		if k == flex:
+			# declared scheduled absence: 0 or 1 is acceptable, 2+ never is
+			if g > wv:
+				extra.append(k)
+			continue
 		if g < wv:
 			missing.append(k)
 		elif g > wv:
@@ -82,14 +95,14 @@ func sample(http: HTTPRequest, phase: String, elapsed_ms: int) -> Dictionary:
 	if counts.is_empty():
 		reason = TRANSPORT          # a failed read is not an empty pool
 	else:
-		reason = classify(counts, expected)
+		reason = classify(counts, expected, flex_model)
 	var mem := OS.get_memory_info()
 	var free_mb := float(mem.get("free", 0)) / (1024.0 * 1024.0)
 	if reason == OK and free_mb > 0.0 and free_mb < HOST_FLOOR_MB:
 		reason = RAM_FLOOR
 	var s := {
 		"window_id": window_id, "phase": phase, "elapsed_ms": elapsed_ms,
-		"counts": counts, "expected": expected,
+		"counts": counts, "expected": expected, "flex_model": flex_model,
 		"host_free_mb": int(free_mb), "reason": reason,
 		"at_ms": Time.get_ticks_msec(),
 	}

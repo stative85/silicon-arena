@@ -1,0 +1,56 @@
+Godot Engine v4.6.stable.official.89cea1439 - https://godotengine.org
+
+=== RECOVERY-COUPLING window executor ===
+run_kind QUALIFICATION   windows [0, 1, 20, 21, 40, 41]
+inject  synthetic contamination into window 1
+schedule hash 9c9dbd9ca0c45252, pool ["liquidai/lfm2.5-1.2b-instruct", "qwen3.5-2b", "falcon-h1-1.5b-instruct"]
+
+health shadow true (verdict-triggered recovery is impossible)
+
+
+--- window 0  TREATMENT  recover=liquidai/lfm2.5-1.2b-instruct ---
+  pre        counts={ "liquidai/lfm2.5-1.2b-instruct": 1, "qwen3.5-2b": 1, "falcon-h1-1.5b-instruct": 1 } gate=CLEAN
+  recovery   verdict=RECOVERY_VALID epoch 0->1 done at +16892 ms
+  post       counts={ "qwen3.5-2b": 1, "falcon-h1-1.5b-instruct": 1, "liquidai/lfm2.5-1.2b-instruct": 1 } gate=RAM_FLOOR_EVENT
+  probes     122 records this window, 0 invalid
+  gate       void=true reason=RAM_FLOOR_EVENT offences=11
+
+--- window 1  CONTROL  recover=liquidai/lfm2.5-1.2b-instruct ---
+  pre        counts={ "qwen3.5-2b": 1, "falcon-h1-1.5b-instruct": 1, "liquidai/lfm2.5-1.2b-instruct": 1 } gate=RAM_FLOOR_EVENT
+  control    matched reads + liveness=true at +10344 ms
+  INJECT     synthetic unscheduled recovery (qualification only)
+  post       counts={ "qwen3.5-2b": 1, "falcon-h1-1.5b-instruct": 1, "liquidai/lfm2.5-1.2b-instruct": 1 } gate=RAM_FLOOR_EVENT
+  probes     140 records this window, 0 invalid
+  gate       void=true reason=RAM_FLOOR_EVENT offences=76
+
+--- window 20  TREATMENT  recover=qwen3.5-2b ---
+  pre        counts={ "qwen3.5-2b": 1, "falcon-h1-1.5b-instruct": 1, "liquidai/lfm2.5-1.2b-instruct": 1 } gate=RAM_FLOOR_EVENT
+  recovery   verdict=RECOVERY_VALID epoch 1->2 done at +17940 ms
+  post       counts={ "falcon-h1-1.5b-instruct": 1, "liquidai/lfm2.5-1.2b-instruct": 1, "qwen3.5-2b": 1 } gate=CLEAN
+  probes     136 records this window, 0 invalid
+  gate       void=true reason=RAM_FLOOR_EVENT offences=22
+
+--- window 21  CONTROL  recover=qwen3.5-2b ---
+  pre        counts={ "falcon-h1-1.5b-instruct": 1, "liquidai/lfm2.5-1.2b-instruct": 1, "qwen3.5-2b": 1 } gate=CLEAN
+  control    matched reads + liveness=true at +10341 ms
+  post       counts={ "falcon-h1-1.5b-instruct": 1, "liquidai/lfm2.5-1.2b-instruct": 1, "qwen3.5-2b": 1 } gate=CLEAN
+  probes     166 records this window, 0 invalid
+  gate       void=false reason= offences=0
+
+--- window 40  TREATMENT  recover=falcon-h1-1.5b-instruct ---
+  pre        counts={ "falcon-h1-1.5b-instruct": 1, "liquidai/lfm2.5-1.2b-instruct": 1, "qwen3.5-2b": 1 } gate=CLEAN
+  recovery   verdict=RECOVERY_VALID epoch 2->3 done at +18374 ms
+  post       counts={ "liquidai/lfm2.5-1.2b-instruct": 1, "qwen3.5-2b": 1, "falcon-h1-1.5b-instruct": 1 } gate=CLEAN
+  probes     150 records this window, 0 invalid
+  gate       void=false reason= offences=0
+
+--- window 41  CONTROL  recover=falcon-h1-1.5b-instruct ---
+  pre        counts={ "liquidai/lfm2.5-1.2b-instruct": 1, "qwen3.5-2b": 1, "falcon-h1-1.5b-instruct": 1 } gate=CLEAN
+  control    matched reads + liveness=true at +10321 ms
+  post       counts={ "liquidai/lfm2.5-1.2b-instruct": 1, "qwen3.5-2b": 1, "falcon-h1-1.5b-instruct": 1 } gate=CLEAN
+  probes     158 records this window, 0 invalid
+  gate       void=false reason= offences=0
+
+[SUMMARY] QUALIFICATION
+  windows 6, void 3, probe records 872
+  wrote res://docs/results/RC_QUALIFICATION_q2.json
