@@ -148,6 +148,21 @@ func _pre_run() -> bool:
 	# monitor. UNPROFILED is not a failure state -- it means no expectation
 	# surface exists -- but running an arm against one would leave that model
 	# silently unmonitored for the whole replicate.
+	# Host memory headroom. Three co-resident models cost far more SYSTEM RAM
+	# than VRAM -- Gate 2 saw 0.7 GB free of 31.7 GB with LM Studio holding
+	# ~23.6 GB -- and a mid-replicate OOM kill is not a result. Checked here so
+	# the run refuses rather than dying halfway.
+	# "free" is physical RAM; "available" is virtual address space and reported
+	# 56 GB on a host the OS said had 3.5 GB left. A guard that gives false
+	# assurance is worse than no guard.
+	var mem := OS.get_memory_info()
+	var avail_mb := float(mem.get("free", 0)) / (1024.0 * 1024.0)
+	print("  host free      %.0f MB" % avail_mb)
+	if avail_mb > 0.0 and avail_mb < 2048.0:
+		print("  FAIL host memory headroom below 2 GB; a mid-replicate OOM")
+		print("       kill would void the replicate")
+		return false
+
 	var unprof := HL.unprofiled(_models)
 	if not unprof.is_empty():
 		print("  FAIL UNPROFILED models on the roster: %s" % str(unprof))
