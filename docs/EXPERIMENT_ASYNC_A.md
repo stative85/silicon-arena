@@ -1368,3 +1368,125 @@ This is not another calibration. It proves that adding bridge-facing
 orchestration did not reintroduce a second choreography wrapped around the
 shared step engine. Gate 2 removed the possibility of two sequences drifting;
 this checks that the runner did not quietly create a third.
+
+---
+
+# Amendment 10: request identity must be causally sterile, and observation is per-tick
+
+**Written before the runner exists.**
+
+## Request identity
+
+EQUALIZED breaks within-tick ties on `sha256(request_id)` (Amendment 8). That
+tie-break is only speed-blind if **request identity itself is speed-blind**.
+
+If `request_id` contained a timestamp, a global submission counter, a UUID, a
+bridge slot index, or anything derived from wall time, then model latency would
+influence the ordering of the arm built to remove model latency. The leak would
+be one hash function away from invisible.
+
+```
+request_id = H(replicate_id, agent_id, cognition_index)
+```
+
+Nothing else. No timestamp. No global queue position. No bridge slot. No wall
+clock. `cognition_index` is the agent's own count of cognitions in this
+replicate, which is a fact about the experiment rather than about the machine.
+
+### Required teeth
+
+```
+same replicate + agent + cognition_index, DIFFERENT completion and submission
+wall times
+    -> identical request_id
+    -> identical EQUALIZED ordering
+
+SABOTAGE: a timestamp-derived id
+    -> ordering changes
+    -> the test MUST fail
+```
+
+This also gives arm 4 a stable envelope corpus with reproducible identities
+rather than runtime-flavoured randomness.
+
+## One observation opportunity per agent per tick
+
+An agent that observes at tick 17 and sees zero legal targets correctly makes
+no model call. But if the runner then frees it immediately, it can observe
+again in the same tick:
+
+```
+observe -> no targets -> close -> observe -> no targets -> close -> ...
+```
+
+Best case that inflates opportunity counts. Worst case it is an infinite loop,
+which is the traditional reward for forgetting that doing no work still
+consumes time.
+
+```
+NO_OPPORTUNITY consumes the agent's observation opportunity for that world
+tick. The agent may observe again only after the world advances.
+
+can_observe(current_tick) :=
+    lifecycle == IDLE  AND  current_tick > last_observed_tick
+```
+
+The rule applies **whether or not cognition occurred**.
+
+### Required tooth
+
+```
+zero visible targets, agent remains IDLE
+    without the per-tick gate -> multiple observations in one tick   FAIL
+    with the gate             -> exactly one opportunity per agent per tick
+```
+
+## The denominators this yields
+
+```
+observation_opportunities     the agent got a turn
+no_opportunity                the world offered nothing
+model_calls                   a request was actually made
+actions_returned              a reply came back
+```
+
+Which separates four situations a single "actions" count would blend:
+
+```
+the agent had no world opportunity
+the agent had an opportunity and failed shape
+the agent emitted an illegal target
+latency invalidated a legal target
+```
+
+## Arm 4 is labelled, not merely different
+
+Every manifest carries:
+
+```
+arm_type = LIVE                      arms 1-3
+
+arm_type = COUNTERFACTUAL_REPLAY     arm 4
+source_arm = NATURAL
+source_replicate = <id>
+source_envelope_corpus_hash = <hash>
+```
+
+Arm 4 is not an independent sample. It is the same actions replayed in a
+different order, and a later analysis script that pooled it with live
+replicates would be counting the same cognition twice.
+
+## Final runner dry test — three witnesses
+
+Before any live inference the runner executes one synthetic replicate through
+**the exact final runner path**, and must match the Gate 2 fixture on:
+
+```
+journal_hash        authoritative
+outcome counts      diagnostic
+world_final_hash    diagnostic
+```
+
+The journal hash decides. The other two exist so that a failure can be
+diagnosed by looking at what differs, rather than by staring at two SHA strings
+in the hope of insight.

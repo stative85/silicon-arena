@@ -50,6 +50,23 @@ var _sealed: bool = false
 var _fingerprint: String = ""
 
 
+## CAUSALLY STERILE REQUEST IDENTITY.
+##
+## EQUALIZED breaks within-tick ties on sha256(request_id), which is only
+## speed-blind if request identity is. A timestamp, a global submission
+## counter, a UUID or a bridge slot index would let model latency influence
+## the ordering of the arm built to remove model latency -- a leak one hash
+## function away from invisible.
+##
+## Derived from experimental identity ONLY: which replicate, which agent, and
+## the agent's own count of cognitions. All three are facts about the
+## experiment rather than about the machine.
+static func request_id_for(replicate_id: String, agent_id: String,
+		cognition_index: int) -> String:
+	return ("%s|%s|%d" % [replicate_id, agent_id, cognition_index]
+		).sha256_text().substr(0, 24)
+
+
 static func make(rid: String, agent: String) -> AsyncEnvelope:
 	var e := AsyncEnvelope.new()
 	e.request_id = rid

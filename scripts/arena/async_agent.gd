@@ -32,6 +32,9 @@ var release_tick: int = -1
 
 ## Counters the sabotage test reads. If the gate leaks, a faster agent will
 ## show more observations than a slower one under EQUALIZED.
+var last_observed_tick: int = -1
+var cognition_index: int = 0
+
 var observations: int = 0
 var submissions: int = 0
 var closes: int = 0
@@ -44,17 +47,28 @@ static func make(aid: String, mid: String) -> AsyncAgentState:
 	return a
 
 
-func may_observe() -> bool:
-	return state == IDLE
+## ONE OBSERVATION OPPORTUNITY PER AGENT PER TICK.
+##
+## An agent seeing zero legal targets correctly makes no model call -- but if
+## it were freed immediately it could observe again in the same tick:
+##
+##   observe -> no targets -> close -> observe -> no targets -> close -> ...
+##
+## Best case that inflates opportunity counts; worst case it is an infinite
+## loop. The gate applies whether or not cognition occurred.
+func may_observe(current_tick: int) -> bool:
+	return state == IDLE and current_tick > last_observed_tick
 
 
-func begin(env: AsyncEnvelope) -> void:
+func begin(env: AsyncEnvelope, current_tick: int) -> void:
 	if state != IDLE:
 		push_error("agent %s began a second cognition while %s"
 			% [agent_id, state])
 		return
 	envelope = env
 	state = PENDING
+	last_observed_tick = current_tick
+	cognition_index += 1
 	observations += 1
 	submissions += 1
 
@@ -66,6 +80,13 @@ func complete(release_at_tick: int) -> void:
 		return
 	release_tick = release_at_tick
 	state = AWAITING_RELEASE
+
+
+## The world offered nothing. No model call is made, but the agent has still
+## used its observation opportunity for this tick.
+func note_no_opportunity(current_tick: int) -> void:
+	last_observed_tick = current_tick
+	observations += 1
 
 
 func ready_to_release(now_tick: int) -> bool:

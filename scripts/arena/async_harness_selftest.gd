@@ -23,7 +23,8 @@ var _failures: Array[String] = []
 ## still report OK. Each section registers itself and must mark completion, so
 ## an aborted section fails the run instead of vanishing from it.
 var _expected_sections := ["envelope", "clocks", "equalizer", "inversion",
-	"serial_tooth", "lifecycle", "contract", "within_tick"]
+	"serial_tooth", "lifecycle", "contract", "within_tick",
+	"identity", "per_tick"]
 var _completed_sections: Array[String] = []
 
 
@@ -54,6 +55,8 @@ func _run() -> void:
 	_lifecycle()
 	_contract()
 	_within_tick()
+	_identity()
+	_per_tick()
 	_report()
 
 
@@ -244,20 +247,20 @@ func _lifecycle() -> void:
 	print("\n one outstanding cognition per agent")
 	var w: AsyncWorld = W.make(8, 4)
 	var a: AsyncAgentState = AG.make("fast", "m_fast")
-	_check("   a fresh agent may observe", a.may_observe())
-	a.begin(_mk("x1", "fast", w, "r_00"))
+	_check("   a fresh agent may observe", a.may_observe(0))
+	a.begin(_mk("x1", "fast", w, "r_00"), 0)
 	_check("   an agent with cognition outstanding may NOT observe",
-		not a.may_observe() and a.state == AG.PENDING)
+		not a.may_observe(1) and a.state == AG.PENDING)
 	a.complete(5)
 	_check("   COMPLETING does not free the agent",
-		not a.may_observe() and a.state == AG.AWAITING_RELEASE,
+		not a.may_observe(1) and a.state == AG.AWAITING_RELEASE,
 		"freeing on completion is exactly the leak")
 	_check("   not releasable before the release tick",
 		not a.ready_to_release(4))
 	_check("   releasable at the release tick", a.ready_to_release(5))
 	a.close()
 	_check("   only closing the envelope frees the agent",
-		a.may_observe() and a.closes == 1)
+		a.may_observe(1) and a.closes == 1)
 
 	# The leak, simulated: two agents of different speed under EQUALIZED.
 	var correct := _cadence(false)
@@ -436,6 +439,125 @@ func _within_tick() -> void:
 		str(ids_after) == str(T.order_due(T.EQUALIZED, due).map(
 			func(e): return (e as AsyncEnvelope).request_id)))
 	_done("within_tick")
+
+
+
+## Request identity must be causally sterile, or the EQUALIZED tie-break is not
+## speed-blind after all.
+func _identity() -> void:
+	print("\n request identity is causally sterile")
+	var a := E.request_id_for("rep_0", "agent_1", 7)
+	var b := E.request_id_for("rep_0", "agent_1", 7)
+	_check("   identity is a pure function of experimental facts", a == b)
+	_check("   different cognition index -> different id",
+		a != E.request_id_for("rep_0", "agent_1", 8))
+	_check("   different agent -> different id",
+		a != E.request_id_for("rep_0", "agent_2", 7))
+	_check("   different replicate -> different id",
+		a != E.request_id_for("rep_1", "agent_1", 7))
+
+	# The tooth: same identity, wildly different wall-clock behaviour, same
+	# EQUALIZED order.
+	var w: AsyncWorld = W.make(8, 4)
+	var slow_run: Array = []
+	var fast_run: Array = []
+	for i in 3:
+		var rid := E.request_id_for("rep_0", "agent_%d" % i, 4)
+		var e1: AsyncEnvelope = E.make(rid, "agent_%d" % i)
+		e1.seal_observation(w.observe())
+		e1.set_action("r_0%d" % i, "")
+		e1.submitted_ms = 0
+		e1.completed_ms = 900 - i * 400        # one ordering of speeds
+		slow_run.append(e1)
+
+		var e2: AsyncEnvelope = E.make(rid, "agent_%d" % i)
+		e2.seal_observation(w.observe())
+		e2.set_action("r_0%d" % i, "")
+		e2.submitted_ms = 5000
+		e2.completed_ms = 5000 + i * 700       # the opposite ordering
+		fast_run.append(e2)
+
+	var o1: Array = []
+	for e in T.order_due(T.EQUALIZED, slow_run):
+		o1.append((e as AsyncEnvelope).request_id)
+	var o2: Array = []
+	for e in T.order_due(T.EQUALIZED, fast_run):
+		o2.append((e as AsyncEnvelope).request_id)
+	_check("   SABOTAGE APPLIED: completion and submission times reversed",
+		(slow_run[0] as AsyncEnvelope).completed_ms
+			!= (fast_run[0] as AsyncEnvelope).completed_ms)
+	_check("   EQUALIZED ordering is identical across both",
+		str(o1) == str(o2),
+		"latency reached arm 3 through request identity: %s vs %s"
+			% [str(o1), str(o2)])
+
+	# SABOTAGE: a timestamp-derived id must be able to change the ordering.
+	var stamped: Array = []
+	for i in 3:
+		var e3: AsyncEnvelope = E.make("ts_%d_%d" % [900 - i * 400, i],
+			"agent_%d" % i)
+		e3.seal_observation(w.observe())
+		e3.set_action("r_0%d" % i, "")
+		e3.completed_ms = 900 - i * 400
+		stamped.append(e3)
+	var o3: Array = []
+	for e in T.order_due(T.EQUALIZED, stamped):
+		o3.append((e as AsyncEnvelope).agent_id)
+	var o1a: Array = []
+	for e in T.order_due(T.EQUALIZED, slow_run):
+		o1a.append((e as AsyncEnvelope).agent_id)
+	_check("   SABOTAGE APPLIED: ids derived from completion time",
+		str((stamped[0] as AsyncEnvelope).request_id).begins_with("ts_"))
+	_check("   a timestamp-derived id changes the ordering",
+		str(o3) != str(o1a),
+		"if this matched, the sterility test would be vacuous")
+	_done("identity")
+
+
+## One observation opportunity per agent per tick, cognition or not.
+func _per_tick() -> void:
+	print("\n one observation opportunity per agent per tick")
+	var a: AsyncAgentState = AG.make("solo", "m")
+	_check("   may observe at tick 0", a.may_observe(0))
+	a.note_no_opportunity(0)
+	_check("   NO_OPPORTUNITY consumes the tick's opportunity",
+		not a.may_observe(0),
+		"otherwise: observe, no targets, close, observe... forever")
+	_check("   the agent is still IDLE, not blocked", a.state == AG.IDLE)
+	_check("   and may observe once the world advances", a.may_observe(1))
+
+	# It is counted as an opportunity, but it is not a cognition.
+	_check("   it counts as an observation opportunity", a.observations == 1)
+	_check("   but no cognition was begun", a.cognition_index == 0)
+
+	# The same gate applies after a completed cognition.
+	var b: AsyncAgentState = AG.make("busy", "m")
+	b.begin(_mk("y1", "busy", W.make(4, 2), "r_00"), 5)
+	b.complete(6)
+	b.close()
+	_check("   a closed agent cannot re-observe in the same tick",
+		not b.may_observe(5),
+		"closing must not hand back the tick it already used")
+	_check("   and may observe on the next tick", b.may_observe(6))
+	_check("   cognition_index advanced exactly once", b.cognition_index == 1)
+
+	# The loop that would have happened without the gate.
+	var c: AsyncAgentState = AG.make("loop", "m")
+	var ungated := 0
+	for _i in 10:
+		if c.state == AG.IDLE:          # the OLD condition, no tick check
+			ungated += 1
+			c.note_no_opportunity(3)
+	_check("   SABOTAGE APPLIED: state-only check observes repeatedly",
+		ungated == 10, str(ungated))
+	var d: AsyncAgentState = AG.make("gated", "m")
+	var gated := 0
+	for _i in 10:
+		if d.may_observe(3):
+			gated += 1
+			d.note_no_opportunity(3)
+	_check("   the per-tick gate allows exactly one", gated == 1, str(gated))
+	_done("per_tick")
 
 
 func _report() -> void:
