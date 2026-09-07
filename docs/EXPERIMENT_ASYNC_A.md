@@ -1221,3 +1221,150 @@ Recorded instead, before any outcome exists:
 landed near the world's regeneration horizon — **not** that equalization made
 agents better at anything. Because ABA is now explicitly measurable, this is
 checkable rather than a matter of opinion.
+
+---
+
+# Amendment 9: Gate 4 specified — runtime integrity
+
+**Written before the runtime guard exists.**
+
+## An isolated SUSPECT does NOT void
+
+The frozen health policy establishes that one unusual completed call is not a
+pathological state: `SUSPECT` is recorded and explicitly **not** recovered, and
+only three consecutive suspect calls make `DEGRADED` actionable. That threshold
+was chosen because `n = 1` produced false positives on held-out data.
+
+If ASYNC-A voided a replicate on any `SUSPECT`, it would **resurrect `n = 1`
+through the experimental harness** after the health work proved `n = 1` wrong.
+The instrument would contradict its own calibrated policy.
+
+```
+DO NOT VOID
+    an isolated SUSPECT verdict          recorded as runtime context
+
+VOID
+    DEGRADED
+    HARD_CATASTROPHE
+    WEDGE
+    transport recovery
+    explicit model reload
+    unexpected eviction
+    unexpected residency mutation
+    any bridge recovery event
+```
+
+Isolated suspects are recorded in the replicate manifest — they are real
+runtime context — but a replicate is not a failed regime unless the bridge
+itself considers the condition actionable.
+
+## Endpoint hashes are not sufficient
+
+```
+replicate start   resident = A B C   hash = X
+  ...mid-run      C evicted, C reloaded
+replicate end     resident = A B C   hash = X
+```
+
+Endpoint snapshots say nothing happened. Meanwhile one model spent several
+world ticks absent, and those ticks are in the data.
+
+Gate 4 therefore requires an **event history, not snapshots**. Where the bridge
+emits explicit recovery and state-change events, those are **authoritative** —
+the machinery already knows exactly when they happened, so nothing is inferred
+after the fact from before/after comparisons.
+
+### The replicate runtime envelope
+
+```
+replicate_id
+bridge_policy_hash
+health_policy_hash
+
+start_resident_set        start_resident_hash        start_model_states
+
+runtime_events[]
+    timestamp_ms   world_tick   event_type   model_id
+    resident_set_before   resident_set_after
+    bridge_state_before   bridge_state_after
+
+end_resident_set          end_resident_hash          end_model_states
+
+void_reason
+```
+
+### Independent cross-check
+
+```
+replicate begins -> freeze resident-set hash R0
+every dispatch and completion receipt records a resident-set hash
+replicate ends
+
+all observed resident hashes == R0, or the replicate is VOID
+```
+
+This does not replace event detection; it is a second, differently-sourced
+witness to the same fact.
+
+### Required sabotage
+
+```
+remove one model mid-replicate, restore it before the end
+
+endpoint-only detector   -> incorrectly PASSES
+event/receipt detector   -> MUST VOID
+```
+
+If the event detector does not void that case, it is measuring snapshots with
+extra steps.
+
+## The runtime condition, stated in the causal interpretation
+
+> ASYNC-A measures timing under a **stable three-model explicit-residency
+> regime**. Runtime degradation, recovery, eviction and residency transitions
+> are **not experimental treatments**. They void the affected replicate.
+
+This is written down now so that a future reader confronted with a spectacular
+result cannot decide afterwards that a surprise GPU eviction was "part of the
+ecology". That experiment is a different experiment, with its own
+pre-registration.
+
+Expected regime during a measured replicate:
+
+```
+resident      lfm2.5, danube2, falcon-h1
+state         HOT
+swapping      forbidden
+recovery      forbidden
+```
+
+Any actual residency transition is therefore straightforward evidence of
+contamination rather than a judgement call.
+
+## Runner phase separation
+
+```
+PRE-RUN     verify bridge health
+            verify resident set
+            freeze the runtime header
+
+RUN         StepEngine + AgentState + Bridge + TimingPolicy + AsyncWorld
+
+POST-RUN    assert envelopes immutable
+            assert runtime integrity
+            assert arm teeth
+            seal the journal
+            hash everything
+```
+
+## The synthetic dry replicate
+
+Before the runner ever calls a model, it runs one **synthetic dry replicate
+through the exact final runner path** — same runner, same step engine, same
+lifecycle, a deterministic synthetic transport — and compares its journal hash
+against the Gate 2 fixture.
+
+This is not another calibration. It proves that adding bridge-facing
+orchestration did not reintroduce a second choreography wrapped around the
+shared step engine. Gate 2 removed the possibility of two sequences drifting;
+this checks that the runner did not quietly create a third.
