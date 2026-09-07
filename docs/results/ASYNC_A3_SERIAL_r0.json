@@ -1,0 +1,110 @@
+{
+  "actions_returned": 2400,
+  "agents": 3,
+  "arm": "SERIAL",
+  "arm_type": "LIVE",
+  "contract_schema_hash": "f5a2aaf89dfa6ffa",
+  "counts": {
+    "actions": 2400,
+    "by_outcome": {
+      "ACCEPTED": 2000,
+      "CONTENTION_LOST": 400
+    },
+    "contention_opportunity": 0,
+    "no_opportunity": 0,
+    "stale_eligible": 400,
+    "stale_revalidated": 0
+  },
+  "equalized_delay_ticks": 4,
+  "equalizer_breaches": 0,
+  "experiment": "A3",
+  "final_world_hash": "4ba1ae12ef84ef4c",
+  "final_world_tick": 800,
+  "hold_ticks": 4,
+  "journal_hash": "895648bf4842abbf85cd54151c07d71a1cd70d0ed85b3b4d397c84cf9e6411d0",
+  "model_calls": 2400,
+  "model_calls_by_agent": {
+    "agent_0": 800,
+    "agent_1": 800,
+    "agent_2": 800
+  },
+  "observation_calls": 2400,
+  "observation_horizon_ticks": 800,
+  "replay": {
+
+  },
+  "replicate_id": "A3_SERIAL_r0",
+  "resources": 16,
+  "run_start_ms": 1215,
+  "runtime": {
+    "end_model_states": {
+      "falcon-h1-1.5b-instruct": "HOT",
+      "liquidai/lfm2.5-1.2b-instruct": "HOT",
+      "qwen3.5-2b": "HOT"
+    },
+    "end_resident_hash": "daadde8d4dd9cb37",
+    "end_resident_set": [
+      "liquidai/lfm2.5-1.2b-instruct",
+      "falcon-h1-1.5b-instruct",
+      "qwen3.5-2b"
+    ],
+    "expected_resident": [
+      "liquidai/lfm2.5-1.2b-instruct",
+      "qwen3.5-2b",
+      "falcon-h1-1.5b-instruct"
+    ],
+    "expected_resident_hash": "daadde8d4dd9cb37",
+    "observed_resident_hashes": [
+      "daadde8d4dd9cb37"
+    ],
+    "replicate_id": "A3_SERIAL_r0",
+    "runtime_events": [],
+    "start_model_states": {
+      "falcon-h1-1.5b-instruct": "HOT",
+      "liquidai/lfm2.5-1.2b-instruct": "HOT",
+      "qwen3.5-2b": "HOT"
+    },
+    "start_resident_hash": "daadde8d4dd9cb37",
+    "start_resident_set": [
+      "liquidai/lfm2.5-1.2b-instruct",
+      "qwen3.5-2b",
+      "falcon-h1-1.5b-instruct"
+    ],
+    "suspects": [
+      {
+        "model_id": "qwen3.5-2b",
+        "request_id": "req_000002",
+        "residual": 1.82318346320236,
+        "world_tick": 0
+      },
+      {
+        "model_id": "qwen3.5-2b",
+        "request_id": "req_000812",
+        "residual": 1.81028548051396,
+        "world_tick": 270
+      }
+    ],
+    "void_reason": ""
+  },
+  "settle_ticks": 0,
+  "shape_failed": 0,
+  "shape_failed_by_agent": {
+
+  },
+  "shape_failed_rates": {
+    "agent_0": 0.0,
+    "agent_1": 0.0,
+    "agent_2": 0.0
+  },
+  "synthetic": false,
+  "throughput": {
+    "actions_per_agent": 800.0,
+    "actions_per_tick": 3.0,
+    "no_opportunity_rate": 0.0,
+    "observation_opportunities": 2400,
+    "opportunities_per_tick": 3.0
+  },
+  "tick_ms": 250,
+  "void": false,
+  "void_reasons": []
+}

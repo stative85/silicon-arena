@@ -1,0 +1,256 @@
+{
+  "actions_returned": 1082,
+  "agents": 3,
+  "arm": "NATURAL",
+  "arm_type": "LIVE",
+  "contract_schema_hash": "f5a2aaf89dfa6ffa",
+  "counts": {
+    "actions": 1082,
+    "by_outcome": {
+      "ACCEPTED": 881,
+      "CONTENTION_LOST": 1,
+      "SEMANTIC_INVALID": 2,
+      "STALE_CONFLICT": 198
+    },
+    "contention_opportunity": 0,
+    "no_opportunity": 0,
+    "stale_eligible": 199,
+    "stale_revalidated": 0
+  },
+  "equalized_delay_ticks": 4,
+  "equalizer_breaches": 0,
+  "experiment": "A3",
+  "final_world_hash": "6551ed240a32a7a4",
+  "final_world_tick": 802,
+  "hold_ticks": 4,
+  "journal_hash": "eaff168c1d10b0b7cd722734d3bd9d1f1abd852f3b3b57ba8036558a83218a89",
+  "model_calls": 1082,
+  "model_calls_by_agent": {
+    "agent_0": 544,
+    "agent_1": 268,
+    "agent_2": 270
+  },
+  "observation_calls": 1082,
+  "observation_horizon_ticks": 800,
+  "replay": {
+
+  },
+  "replicate_id": "A3_NATURAL_r0",
+  "resources": 16,
+  "run_start_ms": 1287,
+  "runtime": {
+    "end_model_states": {
+      "falcon-h1-1.5b-instruct": "HOT",
+      "liquidai/lfm2.5-1.2b-instruct": "HOT",
+      "qwen3.5-2b": "HOT"
+    },
+    "end_resident_hash": "daadde8d4dd9cb37",
+    "end_resident_set": [
+      "liquidai/lfm2.5-1.2b-instruct",
+      "falcon-h1-1.5b-instruct",
+      "qwen3.5-2b"
+    ],
+    "expected_resident": [
+      "liquidai/lfm2.5-1.2b-instruct",
+      "qwen3.5-2b",
+      "falcon-h1-1.5b-instruct"
+    ],
+    "expected_resident_hash": "daadde8d4dd9cb37",
+    "observed_resident_hashes": [
+      "daadde8d4dd9cb37"
+    ],
+    "replicate_id": "A3_NATURAL_r0",
+    "runtime_events": [],
+    "start_model_states": {
+      "falcon-h1-1.5b-instruct": "HOT",
+      "liquidai/lfm2.5-1.2b-instruct": "HOT",
+      "qwen3.5-2b": "HOT"
+    },
+    "start_resident_hash": "daadde8d4dd9cb37",
+    "start_resident_set": [
+      "liquidai/lfm2.5-1.2b-instruct",
+      "qwen3.5-2b",
+      "falcon-h1-1.5b-instruct"
+    ],
+    "suspects": [
+      {
+        "model_id": "liquidai/lfm2.5-1.2b-instruct",
+        "request_id": "req_000043",
+        "residual": 1.88889861868744,
+        "world_tick": 32
+      },
+      {
+        "model_id": "liquidai/lfm2.5-1.2b-instruct",
+        "request_id": "req_000071",
+        "residual": 1.91961078793856,
+        "world_tick": 53
+      },
+      {
+        "model_id": "liquidai/lfm2.5-1.2b-instruct",
+        "request_id": "req_000079",
+        "residual": 1.87548180430779,
+        "world_tick": 59
+      },
+      {
+        "model_id": "liquidai/lfm2.5-1.2b-instruct",
+        "request_id": "req_000096",
+        "residual": 1.91125244849439,
+        "world_tick": 71
+      },
+      {
+        "model_id": "liquidai/lfm2.5-1.2b-instruct",
+        "request_id": "req_000110",
+        "residual": 1.90007553359092,
+        "world_tick": 82
+      },
+      {
+        "model_id": "liquidai/lfm2.5-1.2b-instruct",
+        "request_id": "req_000141",
+        "residual": 1.92532284266443,
+        "world_tick": 105
+      },
+      {
+        "model_id": "liquidai/lfm2.5-1.2b-instruct",
+        "request_id": "req_000191",
+        "residual": 1.86654478888049,
+        "world_tick": 143
+      },
+      {
+        "model_id": "liquidai/lfm2.5-1.2b-instruct",
+        "request_id": "req_000207",
+        "residual": 1.80928832886164,
+        "world_tick": 155
+      },
+      {
+        "model_id": "liquidai/lfm2.5-1.2b-instruct",
+        "request_id": "req_000215",
+        "residual": 1.9559601081083,
+        "world_tick": 161
+      },
+      {
+        "model_id": "liquidai/lfm2.5-1.2b-instruct",
+        "request_id": "req_000253",
+        "residual": 1.83301404417006,
+        "world_tick": 190
+      },
+      {
+        "model_id": "liquidai/lfm2.5-1.2b-instruct",
+        "request_id": "req_000269",
+        "residual": 1.8644495584001,
+        "world_tick": 202
+      },
+      {
+        "model_id": "liquidai/lfm2.5-1.2b-instruct",
+        "request_id": "req_000288",
+        "residual": 1.8644495584001,
+        "world_tick": 217
+      },
+      {
+        "model_id": "liquidai/lfm2.5-1.2b-instruct",
+        "request_id": "req_000331",
+        "residual": 1.82183712926659,
+        "world_tick": 247
+      },
+      {
+        "model_id": "liquidai/lfm2.5-1.2b-instruct",
+        "request_id": "req_000438",
+        "residual": 1.80928832886164,
+        "world_tick": 326
+      },
+      {
+        "model_id": "liquidai/lfm2.5-1.2b-instruct",
+        "request_id": "req_000456",
+        "residual": 1.85341731249241,
+        "world_tick": 339
+      },
+      {
+        "model_id": "liquidai/lfm2.5-1.2b-instruct",
+        "request_id": "req_000489",
+        "residual": 1.93360627830135,
+        "world_tick": 363
+      },
+      {
+        "model_id": "liquidai/lfm2.5-1.2b-instruct",
+        "request_id": "req_000607",
+        "residual": 1.80074312931555,
+        "world_tick": 452
+      },
+      {
+        "model_id": "liquidai/lfm2.5-1.2b-instruct",
+        "request_id": "req_000611",
+        "residual": 1.93064303384626,
+        "world_tick": 455
+      },
+      {
+        "model_id": "liquidai/lfm2.5-1.2b-instruct",
+        "request_id": "req_000662",
+        "residual": 1.84419095907354,
+        "world_tick": 493
+      },
+      {
+        "model_id": "liquidai/lfm2.5-1.2b-instruct",
+        "request_id": "req_000675",
+        "residual": 2.07890617204653,
+        "world_tick": 502
+      },
+      {
+        "model_id": "liquidai/lfm2.5-1.2b-instruct",
+        "request_id": "req_000765",
+        "residual": 1.81066021436311,
+        "world_tick": 567
+      },
+      {
+        "model_id": "liquidai/lfm2.5-1.2b-instruct",
+        "request_id": "req_000794",
+        "residual": 2.02302159752915,
+        "world_tick": 588
+      },
+      {
+        "model_id": "liquidai/lfm2.5-1.2b-instruct",
+        "request_id": "req_000820",
+        "residual": 2.04537542733611,
+        "world_tick": 606
+      },
+      {
+        "model_id": "liquidai/lfm2.5-1.2b-instruct",
+        "request_id": "req_000984",
+        "residual": 1.90007553359092,
+        "world_tick": 726
+      },
+      {
+        "model_id": "liquidai/lfm2.5-1.2b-instruct",
+        "request_id": "req_000988",
+        "residual": 2.04537542733611,
+        "world_tick": 729
+      },
+      {
+        "model_id": "qwen3.5-2b",
+        "request_id": "req_001013",
+        "residual": 1.85898816454328,
+        "world_tick": 748
+      }
+    ],
+    "void_reason": ""
+  },
+  "settle_ticks": 2,
+  "shape_failed": 0,
+  "shape_failed_by_agent": {
+
+  },
+  "shape_failed_rates": {
+    "agent_0": 0.0,
+    "agent_1": 0.0,
+    "agent_2": 0.0
+  },
+  "synthetic": false,
+  "throughput": {
+    "actions_per_agent": 360.666666666667,
+    "actions_per_tick": 1.3525,
+    "no_opportunity_rate": 0.0,
+    "observation_opportunities": 1082,
+    "opportunities_per_tick": 1.3525
+  },
+  "tick_ms": 250,
+  "void": false,
+  "void_reasons": []
+}

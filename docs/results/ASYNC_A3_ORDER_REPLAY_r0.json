@@ -1,0 +1,109 @@
+{
+  "actions_returned": 0,
+  "agents": 3,
+  "arm": "ORDER_REPLAY",
+  "arm_type": "COUNTERFACTUAL_REPLAY",
+  "contract_schema_hash": "f5a2aaf89dfa6ffa",
+  "counts": {
+    "actions": 1082,
+    "by_outcome": {
+      "ACCEPTED": 881,
+      "CONTENTION_LOST": 2,
+      "SEMANTIC_INVALID": 4,
+      "STALE_CONFLICT": 195
+    },
+    "contention_opportunity": 0,
+    "no_opportunity": 0,
+    "stale_eligible": 197,
+    "stale_revalidated": 0
+  },
+  "equalized_delay_ticks": 4,
+  "equalizer_breaches": 0,
+  "experiment": "A3",
+  "final_world_hash": "6551ed240a32a7a4",
+  "final_world_tick": 802,
+  "hold_ticks": 4,
+  "journal_hash": "3307262e6e6783e29d2988d3a3474c0d09fd3af1d023c298e6e6f4404828cf16",
+  "model_calls": 0,
+  "model_calls_by_agent": {
+
+  },
+  "observation_calls": 0,
+  "observation_horizon_ticks": 800,
+  "replay": {
+    "envelopes_reordered": 370,
+    "fraction_of_applications_reordered": 0.341959334565619,
+    "journal_differs_from_source": true,
+    "ordering_exercised": "EXERCISED",
+    "ordering_transform": "LATENCY_RANK_INVERSION",
+    "pairwise_order_inversions": 185,
+    "reorderable_groups": 296,
+    "replay_input_corpus_hash": "c0f8c4613f33ee459f3a548bd82cad76c9fdbcb63e5aecba7bfafb1c84e8a1ff",
+    "replay_journal_hash": "3307262e6e6783e29d2988d3a3474c0d09fd3af1d023c298e6e6f4404828cf16",
+    "source_arm": "NATURAL",
+    "source_envelope_corpus_hash": "c0f8c4613f33ee459f3a548bd82cad76c9fdbcb63e5aecba7bfafb1c84e8a1ff",
+    "source_envelopes_mutated": 0,
+    "source_hash_after": "c0f8c4613f33ee459f3a548bd82cad76c9fdbcb63e5aecba7bfafb1c84e8a1ff",
+    "source_journal_hash": "9667f612c89eaad784b0112c1047ae94a23c8537aca8db6ac070281e1ef1bbb8",
+    "source_replicate": "A3_NATURAL_r0"
+  },
+  "replicate_id": "A3_ORDER_REPLAY_r0",
+  "resources": 16,
+  "run_start_ms": 0,
+  "runtime": {
+    "end_model_states": {
+      "falcon-h1-1.5b-instruct": "HOT",
+      "liquidai/lfm2.5-1.2b-instruct": "HOT",
+      "qwen3.5-2b": "HOT"
+    },
+    "end_resident_hash": "daadde8d4dd9cb37",
+    "end_resident_set": [
+      "liquidai/lfm2.5-1.2b-instruct",
+      "falcon-h1-1.5b-instruct",
+      "qwen3.5-2b"
+    ],
+    "expected_resident": [
+      "liquidai/lfm2.5-1.2b-instruct",
+      "qwen3.5-2b",
+      "falcon-h1-1.5b-instruct"
+    ],
+    "expected_resident_hash": "daadde8d4dd9cb37",
+    "observed_resident_hashes": [
+      "daadde8d4dd9cb37"
+    ],
+    "replicate_id": "A3_ORDER_REPLAY_r0",
+    "runtime_events": [],
+    "start_model_states": {
+      "falcon-h1-1.5b-instruct": "HOT",
+      "liquidai/lfm2.5-1.2b-instruct": "HOT",
+      "qwen3.5-2b": "HOT"
+    },
+    "start_resident_hash": "daadde8d4dd9cb37",
+    "start_resident_set": [
+      "liquidai/lfm2.5-1.2b-instruct",
+      "qwen3.5-2b",
+      "falcon-h1-1.5b-instruct"
+    ],
+    "suspects": [],
+    "void_reason": ""
+  },
+  "settle_ticks": 0,
+  "shape_failed": 0,
+  "shape_failed_by_agent": {
+
+  },
+  "shape_failed_rates": {
+
+  },
+  "synthetic": false,
+  "throughput": {
+    "actions_per_agent": 360.666666666667,
+    "actions_per_tick": 1.3525,
+    "no_opportunity_rate": 0.0,
+    "observation_opportunities": 0,
+    "opportunities_per_tick": 0.0
+  },
+  "tick_ms": 250,
+  "void": false,
+  "void_reasons": []
+}

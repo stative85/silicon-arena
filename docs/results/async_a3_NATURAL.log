@@ -1,0 +1,39 @@
+Godot Engine v4.6.stable.official.89cea1439 - https://godotengine.org
+
+=== ASYNC-A runner ===
+
+[PRE-RUN]
+  arm            NATURAL
+  replicate      A3_NATURAL_r0
+  world          16 resources, hold 4
+  agents         3
+  cycles         800
+  tick           250 ms
+  equalizer      4 ticks (1000 ms)
+  contract hash  f5a2aaf89dfa6ffa
+  synthetic      false
+  resident       ["liquidai/lfm2.5-1.2b-instruct", "qwen3.5-2b", "falcon-h1-1.5b-instruct"]
+  host free      12874 MB
+  genesis hash   c16b1d7ae8e2fd50
+
+[RUN]
+  800 ticks completed, 2 settle ticks
+
+[POST-RUN]
+  actions              1082
+  outcomes             { "ACCEPTED": 881, "STALE_CONFLICT": 198, "SEMANTIC_INVALID": 2, "CONTENTION_LOST": 1 }
+  stale_revalidated    0
+  stale_eligible       199
+  no_opportunity       0
+  model_calls          1082
+  actions_returned     1082
+  shape_failed         0
+  actions/tick         1.353
+  actions/agent        360.7
+  opportunities/tick   1.353
+  no_opportunity_rate  0.0000
+  journal_hash         eaff168c1d10b0b7cd722734d3bd9d1f1abd852f3b3b57ba8036558a83218a89
+  final_world_hash     6551ed240a32a7a4
+  arm teeth            OK
+
+wrote res://docs/results/ASYNC_A3_NATURAL_r0.json
