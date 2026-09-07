@@ -1,0 +1,19 @@
+{
+  "frozen_pool": [
+    "falcon-h1-1.5b-instruct",
+    "liquidai/lfm2.5-1.2b-instruct",
+    "qwen3.5-2b"
+  ],
+  "observed": [
+    "falcon-h1-1.5b-instruct",
+    "liquidai/lfm2.5-1.2b-instruct",
+    "qwen3.5-2b"
+  ],
+  "expected_resident_hash": "daadde8d4dd9cb37",
+  "observed_resident_hash": "daadde8d4dd9cb37",
+  "host_free_mb": 13657,
+  "host_floor_mb": 2048,
+  "stray_runners": [],
+  "baseline_ok": true,
+  "at": "2026-09-07T13:11:47"
+}

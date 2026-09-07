@@ -1,6 +1,6 @@
 # Recovery-neighbour coupling — reopened bridge investigation
 
-**Status: OPEN QUESTION, no answer claimed.**
+**Status: OPEN QUESTION, no answer claimed. BLOCKING further ASYNC work.**
 
 ## Why the wall opens here and not elsewhere
 
@@ -30,6 +30,34 @@ falcon had been healthy for the preceding 508 ticks.
 
 Host free memory was 4,676 MB against a 2,048 MB floor, so this is not an OOM.
 GPU was 5,335 MiB of 8,151 MiB with all three models resident.
+
+## ELEVEN MORE INSTANCES — ASYNC-B Run 1
+
+ASYNC-B Run 1 (VOID, see `ASYNC_B_RUN1_VOID.md`) produced the same sequence
+eleven more times across 32 cells. Ten of the eleven are the identical ordering:
+
+```text
+qwen3.5-2b  3 consecutive suspect -> DEGRADED -> reload
+falcon-h1   residual 30.4x .. 37.3x  >= catastrophe 20x
+gap 7,310 .. 8,862 ms
+```
+
+The eleventh (seed 2, cell D) was qwen degrading twice with no falcon event.
+
+Three things changed the evidentiary situation:
+
+1. **Fixed ordering.** qwen first, falcon second, in 10 of 10 two-model cases.
+   Never the reverse.
+2. **Narrow residual band.** 30.4x-37.3x. A shared external cause would not be
+   expected to land falcon in so tight a window every time while leaving qwen's
+   own residuals modest (~1.8x, the SUSPECT threshold).
+3. **Narrow latency band.** 7.3-8.9 s between qwen's DEGRADED verdict and
+   falcon's catastrophe, consistent with the duration of qwen's reload.
+
+A3's single instance justified "adjacency is not a mechanism". Eleven do not
+overturn that on their own — **recovery was still never the independent
+variable** — but the regularity is now strong enough that the controlled
+experiment below is the blocker for further ASYNC work, not an optional follow-up.
 
 ## What is NOT established
 

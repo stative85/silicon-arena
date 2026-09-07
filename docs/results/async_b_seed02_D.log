@@ -1,0 +1,30 @@
+Godot Engine v4.6.stable.official.89cea1439 - https://godotengine.org
+
+=== ASYNC-B cell B_seed02_D ===
+[PRE-RUN]
+  seed           2
+  cell           D
+  shared_order   false
+  shared_labels  false
+  world          16 resources, hold 4
+  cycles         200 (SERIAL)
+  agent_0  order bb68f50e17ba4b55  label 303b8484e812fb1a
+  agent_1  order c798c65f05462bc6  label 30e1e1e5c466745b
+  agent_2  order 55f12a895f11c6e0  label 145e054b5bb0639b
+  host free      11784 MB
+  genesis hash   c16b1d7ae8e2fd50
+
+[RUN]
+  200 ticks completed
+
+[POST-RUN]
+  rows            600
+  outcomes        {"ACCEPTED":540,"CONTENTION_LOST":60}
+  shape_failed    {"agent_0":0,"agent_1":0,"agent_2":0}
+  stale           0 (must be 0)
+  nonzero age     0 (must be 0)
+  exercised       true
+  final world     f6b1c774a8acd047
+  VOID: runtime: model qwen3.5-2b entered DEGRADED during a measured replicate
+
+wrote res://docs/results/ASYNC_B_seed02_D.json

@@ -1,0 +1,30 @@
+Godot Engine v4.6.stable.official.89cea1439 - https://godotengine.org
+
+=== ASYNC-B cell B_seed00_C ===
+[PRE-RUN]
+  seed           0
+  cell           C
+  shared_order   true
+  shared_labels  false
+  world          16 resources, hold 4
+  cycles         200 (SERIAL)
+  agent_0  order 482db9813ab55eac  label f9da395477d9d070
+  agent_1  order 482db9813ab55eac  label 95770d461cf99236
+  agent_2  order 482db9813ab55eac  label 7da91c998920956f
+  host free      15554 MB
+  genesis hash   c16b1d7ae8e2fd50
+
+[RUN]
+  200 ticks completed
+
+[POST-RUN]
+  rows            600
+  outcomes        {"ACCEPTED":367,"CONTENTION_LOST":232,"SEMANTIC_INVALID":1}
+  shape_failed    {"agent_0":0,"agent_1":0,"agent_2":0}
+  stale           0 (must be 0)
+  nonzero age     0 (must be 0)
+  exercised       true
+  final world     9e19addc0b24b35a
+  cell teeth      OK
+
+wrote res://docs/results/ASYNC_B_seed00_C.json
