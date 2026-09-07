@@ -38,5 +38,25 @@
   "control": 10,
   "voids": 0,
   "preceded_by": "18 of 20 lfm2.5-rotation windows void on RAM_FLOOR_EVENT",
-  "future_use": "may become a diagnostic fossil ONLY if RUNTIME-MEMORY independently demonstrates the runtime had returned to a qualified stable regime before this block, and ONLY under a rule preregistered BEFORE that demonstration is read"
+  "causal_evidence_eligible_permanent": true,
+  "causal_evidence_note": "Permanently false. Dead causal evidence is never resurrected. What may be earned later is diagnostic_sensitivity_eligible, which is a different and weaker status.",
+  "diagnostic_sensitivity_eligible": false,
+  "admissibility_criterion": {
+    "target_status": "diagnostic_sensitivity_eligible",
+    "frozen_before_any_runtime_memory_outcome_was_read": true,
+    "conditions": [
+      "1. RUNTIME-MEMORY was preregistered independently",
+      "2. its relevant regime reproduces the RC workload mechanics",
+      "3. host RAM stays above the frozen 2048 MB floor",
+      "4. no transport/runtime failures",
+      "5. exact residency count map preserved",
+      "6. no unscheduled recovery",
+      "7. resource trajectory is stable over a horizon >= 20 windows",
+      "8. the inferred stable interval begins before the historical Qwen block",
+      "9. this criterion was frozen before RUNTIME-MEMORY outcomes were read"
+    ],
+    "all_must_hold": true,
+    "evaluator": "tools/qwen_fossil_admissibility.py",
+    "fails_closed": true
+  }
 }
