@@ -537,8 +537,8 @@ func _health_policy() -> void:
 	loose.reset()
 	h.reset()
 	_check("   ks=1.5 flags a 1.6x call that ks=1.8 calls normal",
-		str(loose.classify(lfm, 47, 1, 149)["verdict"]) == HL.SUSPECT
-			and str(h.classify(lfm, 47, 1, 149)["verdict"]) == HL.NORMAL,
+		str(loose.classify(lfm, 47, 1, 117)["verdict"]) == HL.SUSPECT
+			and str(h.classify(lfm, 47, 1, 117)["verdict"]) == HL.NORMAL,
 		"1.5 produced held-out false positives; 1.8 did not")
 
 	# 2. n -> 1 must fire on a transient spike.

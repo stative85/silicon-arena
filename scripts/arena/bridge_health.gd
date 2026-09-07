@@ -30,8 +30,16 @@ class_name BridgeHealth
 ## beginning.
 ##
 ## PROVENANCE OF THE CONSTANTS
-##   development corpus   docs/results/bridge_timing_run1.json  (1,080 calls)
-##   validation corpus    docs/results/bridge_timing_run2.json  (1,080 calls)
+##   ORIGINAL SELECTION (old pool, lfm2.5+danube2+falcon)
+##     development corpus  docs/results/bridge_timing_run1.json  (1,080 calls)
+##     validation corpus   docs/results/bridge_timing_run2.json  (1,080 calls)
+##
+##   NEW POOL (lfm2.5+qwen3.5+falcon) -- surfaces RE-FITTED, thresholds NOT
+##     collection A        docs/results/bridge_timing_newpool_A.json (1,440)
+##     collection B        held-out validation of the frozen 1.8/20/3 rule
+##   The thresholds were selected on the OLD corpora and given no vote in the
+##   new fit, which makes collection B a genuine external test rather than
+##   another selection corpus.
 ##   exact token source   stream_options.include_usage
 ##   selection            tools/health_harness.py
 ##
@@ -80,17 +88,27 @@ const UNPROFILED := "UNPROFILED"
 ## policy, and it makes the expectation jagged exactly where prompts are
 ## cheapest.
 const KNOTS := {
-	"falcon-h1-1.5b-instruct": [[58, 202.0], [804, 440.0], [6184, 1295.5]],
-	"h2o-danube2-1.8b-chat": [[60, 92.0], [789, 188.0], [5829, 948.0]],
-	"liquidai/lfm2.5-1.2b-instruct": [[47, 93.0], [597, 133.0], [4837, 423.0]],
+	"falcon-h1-1.5b-instruct": [[58, 183.0], [194, 264.5], [804, 403.5], [6184, 1312.5]],
+	"liquidai/lfm2.5-1.2b-instruct": [[47, 73.0], [142, 93.5], [597, 123.0], [4837, 418.0]],
+	"qwen3.5-2b": [[58, 128.5], [187, 190.0], [766, 249.5], [5706, 889.0]],
 }
 
-## Measured multiplier when another request was in flight. Per model, because
-## it varies: 1.16x to 1.48x across the three.
+## Measured multiplier when another request was in flight.
+##
+## RE-MEASURED FOR THE WHOLE POOL, not just for the new model. Expectation is
+## conditioned on model AND load, and the old lfm2.5/falcon numbers were taken
+## beside danube2. Co-resident composition demonstrably matters:
+##
+##     contention     beside danube2   beside qwen3.5
+##     lfm2.5             1.1579           1.0874
+##     falcon             1.4809           1.2390
+##
+## Carrying the old values over would have inflated falcon's expectation by
+## ~20%, making the detector measurably LESS sensitive in the new pool.
 const CONTENTION := {
-	"falcon-h1-1.5b-instruct": 1.4809,
-	"h2o-danube2-1.8b-chat": 1.3339,
-	"liquidai/lfm2.5-1.2b-instruct": 1.1579,
+	"falcon-h1-1.5b-instruct": 1.239,
+	"liquidai/lfm2.5-1.2b-instruct": 1.0874,
+	"qwen3.5-2b": 1.2864,
 }
 
 var ks: float = 1.8

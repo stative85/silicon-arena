@@ -35,7 +35,10 @@ const M := preload("res://scripts/arena/bridge_model.gd")
 const T := preload("res://scripts/arena/bridge_ticket.gd")
 
 ## Default grid. `--low` switches to the tiny grid below.
-const BUCKETS_DEFAULT := ["SMALL", "MEDIUM", "LARGE"]
+## ASYNC is the arena's actual request shape (~50 tokens). Included because
+## ASYNC-A2 runs there, and a surface fitted only on larger prompts would be
+## extrapolating into the regime that matters most.
+const BUCKETS_DEFAULT := ["ASYNC", "SMALL", "MEDIUM", "LARGE"]
 
 ## LOW-END GRID. Live arena traffic measured 20-22 tokens, BELOW the smallest
 ## knot in the frozen expectation (47-60). There the expectation clamps, which
@@ -109,6 +112,19 @@ func _prompt(bucket: String) -> Dictionary:
 		"T40":
 			return _tiny(("Choose one action for this world and say why. "
 				+ "cycle=%s rule_1 memory_1 tool_1") % salt)
+		"ASYNC":
+			# The arena's actual request shape: a 16-id list, one-field reply.
+			var aids: Array = []
+			for i in 16:
+				aids.append("r_%02d_%d" % [i, _uniq])
+			return {
+				"messages": [{"role": "user", "content":
+					"Available resources:\n  "
+					+ "\n  ".join(PackedStringArray(aids))
+					+ "\nChoose exactly one resource to take.\n"
+					+ "Reply with only its id in the field target_id."}],
+				"max_tokens": 24, "temperature": 0.0,
+			}
 		"SMALL":
 			world += "[objects]\n  \"rule_%d\" type=\"rule\"\n" % _uniq
 		"MEDIUM":
@@ -151,6 +167,12 @@ func _run() -> void:
 	print("Bridge characterising itself. No model quality claims.\n")
 
 	_bridge = B.new()
+	# QUALIFICATION MODE. Health classifies and records but never acts: the pool
+	# contains an UNPROFILED model by definition during its own qualification,
+	# and recovery must not fire while the surface it would be judged against is
+	# still being measured.
+	_bridge.health = preload("res://scripts/arena/bridge_health.gd").new()
+	_bridge.health.shadow = true
 	get_root().add_child(_bridge)
 	await process_frame
 
@@ -268,8 +290,10 @@ func _exclusion(rec: Dictionary) -> String:
 		return "failure_kind:" + str(rec.get("failure_kind"))
 	if int(rec.get("ttft_ms", -1)) < 0:
 		return "no_ttft"
-	if int(rec.get("ttft_ms", 0)) > _bridge.policy.hard_degraded_ttft_ms:
-		return "hard_degraded_ttft"
+	# The old 1500 ms exclusion is deliberately NOT used. It is a frozen POLICY
+	# threshold, and policy gets no vote in fitting the surface it will later be
+	# applied to. Stalls are identified relative to each cell's own
+	# distribution after collection instead.
 	var after := str(rec.get("model_state_after", ""))
 	if after != M.HOT and after != "":
 		return "model_state:" + after
@@ -411,12 +435,12 @@ func _analyse() -> void:
 	w.call("No combined score. A single number would average away the "
 		+ "structure the bands need.")
 	w.call("")
-	w.call("> **Read `CENSORED` cells carefully.** The healthy-baseline filter "
-		+ "excludes TTFT > 1500 ms, which is the current global "
-		+ "`HARD_DEGRADED` tooth. In cells where healthy large-prompt prefill "
-		+ "approaches that value, the filter removes the upper tail of the "
-		+ "very distribution the bands are meant to be derived from. Those "
-		+ "cells' `p95`/`p99` are **lower bounds, not estimates**.")
+	w.call("> **Policy thresholds get NO vote in this fit.** The frozen "
+		+ "`ks = 1.8 / kh = 20 / n = 3` rule is not used to filter these "
+		+ "samples: a policy cannot help select the surface it will later be "
+		+ "applied to. Only transport failures and runtime events exclude a "
+		+ "call here. Pathological stalls are identified afterwards, relative "
+		+ "to each cell's own distribution, and reported separately.")
 	w.call("")
 	w.call("```")
 	w.call("healthy reference samples  %d" % healthy.size())

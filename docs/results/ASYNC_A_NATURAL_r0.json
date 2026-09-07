@@ -1,13 +1,13 @@
 {
-  "actions_returned": 4,
+  "actions_returned": 3,
   "agents": 3,
   "arm": "NATURAL",
   "arm_type": "LIVE",
   "contract_schema_hash": "f5a2aaf89dfa6ffa",
   "counts": {
-    "actions": 4,
+    "actions": 3,
     "by_outcome": {
-      "ACCEPTED": 3,
+      "ACCEPTED": 2,
       "STALE_CONFLICT": 1
     },
     "contention_opportunity": 0,
@@ -17,18 +17,18 @@
   },
   "equalized_delay_ticks": 4,
   "equalizer_breaches": 0,
-  "final_world_hash": "802abf7174424169",
+  "final_world_hash": "1870a6d3417343cc",
   "final_world_tick": 6,
   "hold_ticks": 4,
-  "journal_hash": "eee785ba90400bf9986b81a5c02429e7d0de6d5236f275ee0422ba0db734d2d9",
-  "model_calls": 4,
+  "journal_hash": "3233d35aaa5cf3ccbdee0a82a0b7c4b9cc419f5276eee9850e40b4c4e908b2b0",
+  "model_calls": 3,
   "model_calls_by_agent": {
-    "agent_0": 2,
+    "agent_0": 1,
     "agent_1": 1,
     "agent_2": 1
   },
-  "observation_calls": 4,
-  "observation_horizon_ticks": 5,
+  "observation_calls": 3,
+  "observation_horizon_ticks": 2,
   "replay": {
 
   },
@@ -62,10 +62,29 @@
       "qwen3.5-2b",
       "falcon-h1-1.5b-instruct"
     ],
-    "suspects": [],
+    "suspects": [
+      {
+        "model_id": "liquidai/lfm2.5-1.2b-instruct",
+        "request_id": "req_000001",
+        "residual": 2.20893282821956,
+        "world_tick": 1
+      },
+      {
+        "model_id": "qwen3.5-2b",
+        "request_id": "req_000002",
+        "residual": 2.27064885625986,
+        "world_tick": 1
+      },
+      {
+        "model_id": "falcon-h1-1.5b-instruct",
+        "request_id": "req_000003",
+        "residual": 2.06640913704273,
+        "world_tick": 1
+      }
+    ],
     "void_reason": ""
   },
-  "settle_ticks": 1,
+  "settle_ticks": 4,
   "shape_failed": 0,
   "shape_failed_by_agent": {
 
@@ -77,11 +96,11 @@
   },
   "synthetic": false,
   "throughput": {
-    "actions_per_agent": 1.33333333333333,
-    "actions_per_tick": 0.8,
+    "actions_per_agent": 1.0,
+    "actions_per_tick": 1.5,
     "no_opportunity_rate": 0.0,
-    "observation_opportunities": 4,
-    "opportunities_per_tick": 0.8
+    "observation_opportunities": 3,
+    "opportunities_per_tick": 1.5
   },
   "tick_ms": 250,
   "void": false,
