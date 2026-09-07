@@ -225,8 +225,12 @@ controls also produce giant excursions
 
 # Amendment 2 — experiment-start state and witness
 
-Frozen before the first causal window. **Proposed, and not executed until
-approved**, because it requires restarting the user's LM Studio process.
+Frozen before the first causal window. **APPROVED 2026-09-07.** The restart was
+explicitly cleared after qualification demonstrated two defects that would have
+poisoned the causal run.
+
+Qualification artifacts are hashed in `docs/results/RC_QUALIFICATION_HASHES.json`
+and frozen before the backend is touched.
 
 ## Why this amendment exists
 
