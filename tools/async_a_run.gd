@@ -61,6 +61,9 @@ var _actions_returned := 0
 var _shape_failed := 0
 var _equalizer_breaches := 0
 var _settle_ticks := 0
+var _observation_calls := 0
+var _replay: Dictionary = {}
+var _all_envelopes: Array = []
 
 
 func _init() -> void:
@@ -170,6 +173,7 @@ func _run_ticks() -> void:
 			if not ag.may_observe(tick):
 				continue
 			var obs := _world.observe()
+			_observation_calls += 1
 			var vt: Array = obs["valid_targets"]
 			if vt.is_empty():
 				# Scarcity must not manufacture hallucination: no model call.
@@ -183,6 +187,7 @@ func _run_ticks() -> void:
 			env.submitted_ms = Time.get_ticks_msec()
 			ag.begin(env, tick)
 			_inflight[rid] = env
+			_all_envelopes.append(env)
 			if _synthetic:
 				_synthetic_complete(env, ag, vt)
 			else:
@@ -355,6 +360,36 @@ func _post_run() -> Dictionary:
 				break
 	if _arm == T.EQUALIZED and _equalizer_breaches > 0:
 		problems.append("%d equalizer breaches" % _equalizer_breaches)
+	if _arm == T.ORDER_REPLAY:
+		if _model_calls != 0:
+			problems.append("replay made %d model calls" % _model_calls)
+		if _observation_calls != 0:
+			problems.append("replay made %d observation calls"
+				% _observation_calls)
+		if str(_replay.get("source_envelope_corpus_hash", "")) \
+				!= str(_replay.get("replay_input_corpus_hash", "x")):
+			problems.append("source corpus hash != replay input hash")
+		if int(_replay.get("source_envelopes_mutated", -1)) != 0:
+			problems.append("replay mutated the source envelopes")
+		if str(_replay.get("source_hash_after", "")) \
+				!= str(_replay.get("replay_input_corpus_hash", "x")):
+			problems.append("source corpus changed during replay")
+		# Positive control: if nothing was reorderable, arm 4 is not evidence
+		# about ordering for this replicate.
+		# POSITIVE CONTROL. If the transform ran but the replay journal is
+		# byte-identical to the source, either there were no reorderable
+		# collisions or the transform did not actually apply. Record which --
+		# do not quietly report "arm 4 ~ arm 2" as evidence about ordering.
+		var rjh := _eng.journal_hash()
+		_replay["replay_journal_hash"] = rjh
+		_replay["journal_differs_from_source"] = (
+			rjh != str(_replay.get("source_journal_hash", "")))
+		if not bool(_replay["journal_differs_from_source"]):
+			_replay["ordering_exercised"] = "NOT_EXERCISED_NO_EFFECT"
+		if int(_replay.get("reorderable_groups", 0)) == 0:
+			_replay["ordering_exercised"] = "NOT_EXERCISED"
+		else:
+			_replay["ordering_exercised"] = "EXERCISED"
 	if _guard.is_void():
 		problems.append("runtime: " + _guard.void_reason)
 
@@ -409,10 +444,182 @@ func _post_run() -> Dictionary:
 		"shape_failed": _shape_failed,
 		"equalizer_breaches": _equalizer_breaches,
 		"runtime": _guard.envelope(),
+		"observation_calls": _observation_calls,
+		"replay": _replay,
 		"void": not problems.is_empty(),
 		"void_reasons": problems,
 	}
 	return manifest
+
+
+
+# ---------------------------------------------------------------- ARM 4
+
+## The counterfactual replay.
+##
+## THE SEAM GUARDED HARDEST: arm 4 must NEVER regenerate an observation from
+## the replay world. The replay world diverges the moment ordering changes, so
+## asking it what the agent "would have seen" answers a different, incoherent
+## question -- some half-recomputed alternate history. The source envelope is
+## injected as HISTORICAL EVIDENCE instead.
+##
+## Divergence between the replay world and the source world is EXPECTED. That
+## is the experiment, not contamination. Classification still uses the ORIGINAL
+## observation provenance: the agent is not retroactively judged by what a
+## counterfactual world would have shown it.
+func _run_replay(source_path: String) -> bool:
+	print("\n[ARM 4] counterfactual replay")
+	if not FileAccess.file_exists(source_path):
+		print("  FAIL source corpus not found: %s" % source_path)
+		return false
+	var parsed = JSON.parse_string(FileAccess.get_file_as_string(source_path))
+	if typeof(parsed) != TYPE_DICTIONARY:
+		print("  FAIL source corpus unreadable")
+		return false
+	var src: Array = (parsed as Dictionary)["corpus"]
+	var declared_hash := str((parsed as Dictionary).get("corpus_hash", ""))
+	print("  source envelopes     %d" % src.size())
+
+	# Rebuild source envelopes as evidence, then clone for execution.
+	var sources: Array = []
+	for row in src:
+		var d: Dictionary = row
+		var e: AsyncEnvelope = E.make(str(d["request_id"]), str(d["agent_id"]))
+		e.seal_observation({
+			"tick": int(d["observed_tick"]),
+			"version": int(d["observation_version"]),
+			"valid_targets": d["visible_target_ids"],
+			"valid_target_generations": d["visible_target_generations"],
+			"hash": str(d["observation_hash"]),
+		})
+		e.set_action(str(d["chosen_target"]), str(d.get("raw_action", "")))
+		e.submitted_ms = int(d["submitted_ms"])
+		e.completed_ms = int(d["completed_ms"])
+		e.completion_tick = int(d["completion_tick"])
+		e.release_tick = int(d["release_tick"])
+		sources.append(e)
+
+	var src_journal := ""
+	for row in src:
+		var d2: Dictionary = row
+		src_journal += "%s|%s|%s|%d|%d|%s|%s
+" % [
+			str(d2["request_id"]), str(d2["agent_id"]),
+			str(d2["chosen_target"]), int(d2["applied_tick"]),
+			int(d2["observation_age_ticks"]), str(d2["outcome"]),
+			str(d2["stale_revalidated"])]
+	_replay["source_journal_hash"] = src_journal.sha256_text()
+
+	var input_hash := _corpus_hash(sources)
+	_replay["source_envelope_corpus_hash"] = declared_hash
+	_replay["replay_input_corpus_hash"] = input_hash
+	print("  source corpus hash   %s" % declared_hash)
+	print("  replay input hash    %s" % input_hash)
+
+	# Group by release tick; invert latency rank WITHIN each group. Only the
+	# ordering changes -- the tick structure is identical to the source.
+	var groups: Dictionary = {}
+	for e in sources:
+		var env: AsyncEnvelope = e
+		var t := env.release_tick
+		if not groups.has(t):
+			groups[t] = []
+		(groups[t] as Array).append(env)
+
+	var reorderable := 0
+	var reordered := 0
+	var inversions := 0
+	var ticks: Array = groups.keys()
+	ticks.sort()
+	for t in ticks:
+		var g: Array = groups[t]
+		if g.size() < 2:
+			continue
+		reorderable += 1
+		# The baseline is the SOURCE application order -- NATURAL's within-tick
+		# rule -- not the order envelopes happen to sit in memory. Comparing
+		# against memory order measured nothing and reported zero reordering
+		# across 533 groups.
+		var g0 := T.order_due(T.NATURAL, g)
+		var inv := T.invert_by_latency(g)
+		for i in g0.size():
+			if (g0[i] as AsyncEnvelope).request_id != (inv[i] as AsyncEnvelope).request_id:
+				reordered += 1
+		for i in g0.size():
+			for j in range(i + 1, g0.size()):
+				var a_id := (g0[i] as AsyncEnvelope).request_id
+				var b_id := (g0[j] as AsyncEnvelope).request_id
+				var ia := _index_of(inv, a_id)
+				var ib := _index_of(inv, b_id)
+				if ia > ib:
+					inversions += 1
+		groups[t] = inv
+
+	_replay["reorderable_groups"] = reorderable
+	_replay["envelopes_reordered"] = reordered
+	_replay["pairwise_order_inversions"] = inversions
+	_replay["fraction_of_applications_reordered"] = (
+		float(reordered) / float(maxi(sources.size(), 1)))
+	print("  reorderable groups   %d" % reorderable)
+	print("  envelopes reordered  %d" % reordered)
+	print("  pairwise inversions  %d" % inversions)
+
+	# Schedule clones in the inverted order. ORDER_REPLAY's within-tick rule is
+	# "use the order given", so scheduling order IS application order.
+	for t in ticks:
+		for e in (groups[t] as Array):
+			var clone: AsyncEnvelope = (e as AsyncEnvelope).clone_for_replay()
+			_all_envelopes.append(clone)
+			_eng.schedule(clone, t)
+
+	# Run the world forward. NO observations, NO model calls.
+	var max_tick := 0
+	for t in ticks:
+		max_tick = maxi(max_tick, int(t))
+	for _i in max_tick + 1:
+		_eng.step_apply(_world.tick)
+		_eng.step_advance()
+	var settle := 0
+	while not _eng.pending.is_empty() and settle < 64:
+		settle += 1
+		_eng.step_apply(_world.tick)
+		_eng.step_advance()
+	_settle_ticks = settle
+
+	# The fossil must be untouched by the replay.
+	var mutated := 0
+	for e in sources:
+		if not (e as AsyncEnvelope).assert_immutable():
+			mutated += 1
+	_replay["source_envelopes_mutated"] = mutated
+	_replay["source_hash_after"] = _corpus_hash(sources)
+	print("  source hash after    %s" % str(_replay["source_hash_after"]))
+	return true
+
+
+func _index_of(arr: Array, rid: String) -> int:
+	for i in arr.size():
+		if (arr[i] as AsyncEnvelope).request_id == rid:
+			return i
+	return -1
+
+
+## Hash of a corpus as ROWS, so the value written with the corpus and the
+## value recomputed from rebuilt envelopes are the same quantity.
+func _rows_hash(rows: Array) -> String:
+	var fps: Array = []
+	for row in rows:
+		fps.append(str((row as Dictionary)["fingerprint"]))
+	fps.sort()
+	return ("|".join(PackedStringArray(fps))).sha256_text()
+
+
+func _corpus_hash(envs: Array) -> String:
+	var parts: Array = []
+	for e in envs:
+		parts.append((e as AsyncEnvelope).fingerprint())
+	parts.sort()
+	return ("|".join(PackedStringArray(parts))).sha256_text()
 
 
 func _run() -> void:
@@ -420,10 +627,31 @@ func _run() -> void:
 	if not await _pre_run():
 		quit(1)
 		return
-	await _run_ticks()
+	if _arm == T.ORDER_REPLAY:
+		var src := "res://docs/results/ASYNC_A_NATURAL_r%d%s_corpus.json" % [
+			_replicate, "_dry" if _synthetic else ""]
+		_replay["source_arm"] = T.NATURAL
+		_replay["source_replicate"] = "NATURAL_r%d" % _replicate
+		_replay["ordering_transform"] = "LATENCY_RANK_INVERSION"
+		if not _run_replay(src):
+			quit(1)  # reason printed by _run_replay
+			return
+	else:
+		await _run_ticks()
 	var manifest := _post_run()
 	var path := "res://docs/results/ASYNC_A_%s%s.json" % [
 		replicate_id(), "_dry" if _synthetic else ""]
+	# The envelope corpus is arm 4's input, so it is written for every LIVE
+	# arm rather than reconstructed later.
+	if _arm != T.ORDER_REPLAY:
+		# Written in JOURNAL order, which IS the source application order.
+		var corpus: Array = _eng.journal.duplicate()
+		var cf := FileAccess.open("res://docs/results/ASYNC_A_%s%s_corpus.json"
+			% [replicate_id(), "_dry" if _synthetic else ""], FileAccess.WRITE)
+		if cf != null:
+			cf.store_string(JSON.stringify({"corpus": corpus,
+				"corpus_hash": _rows_hash(corpus)}, "  "))
+			cf.close()
 	var f := FileAccess.open(path, FileAccess.WRITE)
 	if f != null:
 		f.store_string(JSON.stringify(manifest, "  "))

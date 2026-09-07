@@ -22,7 +22,11 @@
   "hold_ticks": 4,
   "journal_hash": "92598a9f07e7d1fbba13fbb39f4f1fd24bc4dad85dad56a759e4d0a73b4ec02a",
   "model_calls": 0,
+  "observation_calls": 1467,
   "observation_horizon_ticks": 800,
+  "replay": {
+
+  },
   "replicate_id": "NATURAL_r0",
   "resources": 16,
   "runtime": {

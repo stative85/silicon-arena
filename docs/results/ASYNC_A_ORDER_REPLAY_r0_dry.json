@@ -1,0 +1,80 @@
+{
+  "actions_returned": 0,
+  "agents": 3,
+  "arm": "ORDER_REPLAY",
+  "arm_type": "COUNTERFACTUAL_REPLAY",
+  "contract_schema_hash": "f5a2aaf89dfa6ffa",
+  "counts": {
+    "actions": 1467,
+    "by_outcome": {
+      "ACCEPTED": 1281,
+      "STALE_CONFLICT": 186
+    },
+    "contention_opportunity": 0,
+    "no_opportunity": 0,
+    "stale_eligible": 186,
+    "stale_revalidated": 0
+  },
+  "equalized_delay_ticks": 4,
+  "equalizer_breaches": 0,
+  "final_world_hash": "4f2a9b120ef4f0e2",
+  "final_world_tick": 802,
+  "hold_ticks": 4,
+  "journal_hash": "980baecad0a27944fa959db13c728b1e4224a98b9027f3a65fa98a3eb18e42a0",
+  "model_calls": 0,
+  "observation_calls": 0,
+  "observation_horizon_ticks": 800,
+  "replay": {
+    "envelopes_reordered": 1066,
+    "fraction_of_applications_reordered": 0.7266530334015,
+    "journal_differs_from_source": true,
+    "ordering_exercised": "EXERCISED",
+    "ordering_transform": "LATENCY_RANK_INVERSION",
+    "pairwise_order_inversions": 799,
+    "reorderable_groups": 533,
+    "replay_input_corpus_hash": "02409fba0cd71dde55d1463bad3d9639649fb3de552338ac1416ac444940503d",
+    "replay_journal_hash": "980baecad0a27944fa959db13c728b1e4224a98b9027f3a65fa98a3eb18e42a0",
+    "source_arm": "NATURAL",
+    "source_envelope_corpus_hash": "02409fba0cd71dde55d1463bad3d9639649fb3de552338ac1416ac444940503d",
+    "source_envelopes_mutated": 0,
+    "source_hash_after": "02409fba0cd71dde55d1463bad3d9639649fb3de552338ac1416ac444940503d",
+    "source_journal_hash": "414996161b6f0c910cc87b0323de541cfa2d53cc7108235095ed7a8257644d29",
+    "source_replicate": "NATURAL_r0"
+  },
+  "replicate_id": "ORDER_REPLAY_r0",
+  "resources": 16,
+  "runtime": {
+    "end_model_states": {
+
+    },
+    "end_resident_hash": "e3b0c44298fc1c14",
+    "end_resident_set": [],
+    "expected_resident": [],
+    "expected_resident_hash": "e3b0c44298fc1c14",
+    "observed_resident_hashes": [
+      "e3b0c44298fc1c14"
+    ],
+    "replicate_id": "ORDER_REPLAY_r0",
+    "runtime_events": [],
+    "start_model_states": {
+
+    },
+    "start_resident_hash": "e3b0c44298fc1c14",
+    "start_resident_set": [],
+    "suspects": [],
+    "void_reason": ""
+  },
+  "settle_ticks": 0,
+  "shape_failed": 0,
+  "synthetic": true,
+  "throughput": {
+    "actions_per_agent": 489.0,
+    "actions_per_tick": 1.83375,
+    "no_opportunity_rate": 0.0,
+    "observation_opportunities": 0,
+    "opportunities_per_tick": 0.0
+  },
+  "tick_ms": 250,
+  "void": false,
+  "void_reasons": []
+}

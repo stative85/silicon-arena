@@ -131,6 +131,33 @@ func observation() -> Dictionary:
 	}
 
 
+## A replay copy. The immutable evidence is carried across verbatim -- so the
+## clone's fingerprint EQUALS the source's -- while every execution field is
+## reset.
+##
+## Arm 4 must never carve replay bookkeeping into the source fossil. The source
+## envelope keeps the outcome NATURAL gave it; the clone carries what the
+## counterfactual world did, and the two are compared rather than conflated.
+func clone_for_replay() -> AsyncEnvelope:
+	var c := AsyncEnvelope.new()
+	c.request_id = request_id
+	c.agent_id = agent_id
+	c.observed_tick = observed_tick
+	c.observation_version = observation_version
+	c.observation_hash = observation_hash
+	c.visible_target_ids = visible_target_ids.duplicate()
+	c.visible_target_generations = visible_target_generations.duplicate()
+	c.chosen_target = chosen_target
+	c.chosen_target_generation = chosen_target_generation
+	c.raw_action = raw_action
+	c.submitted_ms = submitted_ms
+	c.completed_ms = completed_ms
+	c.completion_tick = completion_tick
+	c._sealed = true
+	c._fingerprint = c._compute_fingerprint()
+	return c
+
+
 func to_row() -> Dictionary:
 	return {
 		"request_id": request_id, "agent_id": agent_id,
@@ -138,6 +165,12 @@ func to_row() -> Dictionary:
 		"observation_version": observation_version,
 		"observation_hash": observation_hash,
 		"visible_target_ids": visible_target_ids,
+		# The corpus is arm 4's input, so a row must be COMPLETE evidence: an
+		# envelope rebuilt from it has to fingerprint identically. Omitting
+		# generations or the raw action would force the replay to fabricate
+		# them, and fabricated evidence is not evidence.
+		"visible_target_generations": visible_target_generations,
+		"raw_action": raw_action,
 		"chosen_target": chosen_target,
 		"chosen_target_generation": chosen_target_generation,
 		"current_target_generation": current_target_generation,
