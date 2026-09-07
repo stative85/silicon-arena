@@ -1,0 +1,58 @@
+Godot Engine v4.6.stable.official.89cea1439 - https://godotengine.org
+
+=== HEALTH-SHORT (Blocker 1) ===
+No world. No agents. No fitting. Shadow mode.
+
+lengths   [16, 14, 12, 10, 8, 6, 4]
+rounds    120 per length, all three models each round
+
+resident  ["liquidai/lfm2.5-1.2b-instruct", "qwen3.5-2b", "falcon-h1-1.5b-instruct"]
+shadow    true (recovery suppressed, classification unchanged)
+ks/kh/n   1.8 / 20.0 / 3
+
+host free 9386 MB
+3 warmup rounds discarded
+
+  length 16 ...
+  length 14 ...
+  length 12 ...
+  length 10 ...
+  length  8 ...
+  length  6 ...
+  length  4 ...
+
+[RESULTS]  chronology preserved; nothing shuffled
+
+liquidai/lfm2.5-1.2b-instruct
+  len      n  tokens  ttft_med  ttft_p95  exp_med  res_med  res_p95 res_max   susp   lag1
+  16     120     110       140       156       94     1.49     1.66    1.90      1   0.55
+  14     120     100       141       157       92     1.54     1.71    1.87      4   0.09
+  12     120      90       140       156       89     1.56     1.74    1.77      0   0.43
+  10     120      80       140       157       87     1.61     1.80    1.99      6   0.22
+  8      120      70       125       157       85     1.47     1.85    2.03     25   0.65
+  6      120      60       141       157       82     1.71     1.90    2.11     53   0.01
+  4      120      50       142       157       80     1.77     1.96    2.16     56   0.25
+
+qwen3.5-2b
+  len      n  tokens  ttft_med  ttft_p95  exp_med  res_med  res_p95 res_max   susp   lag1
+  16     120     131       342       374      210     1.63     1.78    1.82      1   0.84
+  14     120     119       359       390      203     1.77     1.92    1.94     38   0.36
+  12     120     107       357       390      195     1.83     2.00    2.25     73   0.86
+  10     120      95       344       374      188     1.83     1.99    2.01     85   0.43
+  8      120      83       312       346      181     1.73     1.92    2.01     50   0.88
+  6      120      71       343       371      173     1.98     2.14    2.18    117   0.13
+  4      120      59       325       359      166     1.96     2.16    2.19     95   0.30
+
+falcon-h1-1.5b-instruct
+  len      n  tokens  ttft_med  ttft_p95  exp_med  res_med  res_p95 res_max   susp   lag1
+  16     120     130       341       409      280     1.22     1.46    1.67      0   0.71
+  14     120     118       377       439      271     1.39     1.62    1.80      0   0.24
+  12     120     106       361       424      262     1.38     1.62    1.86      1   0.70
+  10     120      94       345       393      253     1.36     1.55    1.61      0   0.18
+  8      120      82       297       374      245     1.21     1.53    1.67      0   0.81
+  6      120      70       330       389      236     1.40     1.65    1.87      2  -0.05
+  4      120      58       266       299      227     1.17     1.32    1.46      0   0.02
+
+DEGRADED verdicts (shadow, no recovery fired): 141
+
+wrote docs/results/HEALTH_SHORT.json
