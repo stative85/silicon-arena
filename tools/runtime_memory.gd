@@ -57,6 +57,8 @@ var _completions := 0
 var _prompt_tokens := 0
 var _recoveries := 0
 var _pids: Array = []
+var _core_pid := -1
+var _core_created := ""
 var _rec_running := false
 
 
@@ -70,32 +72,80 @@ func _init() -> void:
 	_run.call_deferred()
 
 
-## LM Studio process ids. The treatment boundary is "one backend lifetime per
-## arm", so this set must not change while an arm is running.
-func _backend_pids() -> Array:
+## PRODUCER-DERIVED BACKEND TELEMETRY.
+##
+## The previous implementation recorded a bare PID list and compared the
+## complete set for equality, so it fired on the model-worker churn that a
+## scheduled recovery necessarily causes -- 676 and 582 false offences in
+## RUNTIME-MEMORY arms C and D. The invariant it was meant to protect is
+## backend/core LIFETIME CONTINUITY, not worker PID identity.
+##
+## Roles come from what the producer exposes, never from a count learned in a
+## previous run:
+##
+##   core          no --type= flag AND parent is not another LM Studio process
+##   model_worker  --type=utility --utility-sub-type=node.mojom.NodeService
+##   support       any other --type=
+##
+## FAILS CLOSED. If the producer field cannot be obtained the sample records
+## backend_probe_ok = false and the arm records a problem, rather than
+## defaulting to an empty set that would read as "backend gone".
+func _backend_probe() -> Dictionary:
 	var out: Array = []
-	OS.execute("tasklist", PackedStringArray(["/FI", "IMAGENAME eq LM Studio.exe",
-		"/FO", "CSV", "/NH"]), out, false, false)
-	var pids: Array = []
-	if out.is_empty():
-		return pids
-	for ln in str(out[0]).split("\n"):
-		var parts := str(ln).split("\",\"")
-		if parts.size() > 1:
-			var p := str(parts[1]).replace("\"", "").strip_edges()
-			if p.is_valid_int():
-				pids.append(int(p))
-	pids.sort()
-	return pids
-
-
-func _same_pids(a: Array, b: Array) -> bool:
-	if a.size() != b.size():
-		return false
-	for i in a.size():
-		if int(a[i]) != int(b[i]):
-			return false
-	return true
+	var ps := ("Get-CimInstance Win32_Process -Filter \"Name='LM Studio.exe'\" "
+		+ "| ForEach-Object { \"$($_.ProcessId)|$($_.ParentProcessId)|"
+		+ "$($_.CreationDate)|$($_.CommandLine)\" }")
+	var rc := OS.execute("powershell", PackedStringArray(
+		["-NoProfile", "-Command", ps]), out, false, false)
+	var res := {"ok": false, "procs": [], "core_pid": -1, "core_created": "",
+		"worker_pids": [], "support_pids": [], "pids": []}
+	if rc != 0 or out.is_empty():
+		return res
+	var rows: Array = []
+	var by_pid := {}
+	for ln in str(out[0]).split("
+"):
+		var parts := str(ln).split("|", true, 3)
+		if parts.size() < 4:
+			continue
+		var pid_s := str(parts[0]).strip_edges()
+		if not pid_s.is_valid_int():
+			continue
+		var row := {"pid": int(pid_s),
+			"parent": int(str(parts[1]).strip_edges()) 				if str(parts[1]).strip_edges().is_valid_int() else -1,
+			"created": str(parts[2]).strip_edges(),
+			"cmd": str(parts[3])}
+		rows.append(row)
+		by_pid[row["pid"]] = row
+	if rows.is_empty():
+		return res
+	for r in rows:
+		var row: Dictionary = r
+		var cmd := str(row["cmd"])
+		var pids_all: Array = []
+		if not cmd.contains("--type=") and not by_pid.has(int(row["parent"])):
+			row["role"] = "core"
+		elif cmd.contains("node.mojom.NodeService"):
+			row["role"] = "model_worker"
+		else:
+			row["role"] = "support"
+		res["pids"].append(int(row["pid"]))
+		if str(row["role"]) == "core":
+			res["core_pid"] = int(row["pid"])
+			res["core_created"] = str(row["created"])
+		elif str(row["role"]) == "model_worker":
+			res["worker_pids"].append(int(row["pid"]))
+		else:
+			res["support_pids"].append(int(row["pid"]))
+		res["procs"].append({"pid": int(row["pid"]), "parent": int(row["parent"]),
+			"created": str(row["created"]), "role": str(row["role"])})
+	(res["pids"] as Array).sort()
+	(res["worker_pids"] as Array).sort()
+	(res["support_pids"] as Array).sort()
+	# A probe that found processes but no identifiable core is NOT ok: the
+	# generation witness would be silently absent.
+	res["ok"] = int(res["core_pid"]) > 0 and str(res["core_created"]) != ""
+	return res
 
 
 func _lms_rss_mb() -> float:
@@ -129,10 +179,21 @@ func _vram() -> Array:
 
 
 func _sample(phase: String) -> void:
-	var pids := _backend_pids()
-	if not _pids.is_empty() and not _same_pids(pids, _pids):
-		_problems.append("BACKEND_RESTARTED_MID_ARM: %s -> %s"
-			% [str(_pids), str(pids)])
+	var probe := _backend_probe()
+	if not bool(probe["ok"]):
+		_problems.append("BACKEND_PROBE_FAILED at %s: producer field "
+			% phase + "unavailable; failing closed rather than recording an "
+			+ "empty process set")
+	else:
+		# THE CORRECTED INVARIANT. Worker churn is expected -- a scheduled
+		# recovery replaces model workers by design. What must not change is the
+		# core identity or its generation.
+		if _core_pid > 0 and int(probe["core_pid"]) != _core_pid:
+			_problems.append("BACKEND_CORE_CHANGED at %s: core pid %d -> %d"
+				% [phase, _core_pid, int(probe["core_pid"])])
+		if _core_created != "" and str(probe["core_created"]) != _core_created:
+			_problems.append("BACKEND_GENERATION_CHANGED at %s: %s -> %s"
+				% [phase, _core_created, str(probe["core_created"])])
 	var mem := OS.get_memory_info()
 	var v := _vram()
 	var counts := await RA.residency_counts(_http, POOL)
@@ -145,7 +206,14 @@ func _sample(phase: String) -> void:
 		"requests": _requests, "completions": _completions,
 		"prompt_tokens": _prompt_tokens, "recoveries": _recoveries,
 		"residency_counts": counts,
-		"backend_pids": pids,
+		# producer-derived backend telemetry, persisted per sample
+		"backend_probe_ok": bool(probe["ok"]),
+		"backend_pids": probe["pids"],
+		"backend_core_pid": int(probe["core_pid"]),
+		"backend_core_created": str(probe["core_created"]),
+		"backend_worker_pids": probe["worker_pids"],
+		"backend_support_pids": probe["support_pids"],
+		"backend_procs": probe["procs"],
 	})
 
 
@@ -191,12 +259,19 @@ func _run() -> void:
 	get_root().add_child(_bridge)
 	await process_frame
 
-	_pids = _backend_pids()
-	print("backend pids at arm start: %s" % str(_pids))
-	if _pids.is_empty():
-		print("FAIL no backend process found")
+	var p0 := _backend_probe()
+	if not bool(p0["ok"]):
+		print("FAIL backend probe did not yield a core identity + generation.")
+		print("     Failing closed: an arm cannot be integrity-qualified")
+		print("     without a producer-derived generation witness.")
 		quit(1)
 		return
+	_pids = p0["pids"]
+	_core_pid = int(p0["core_pid"])
+	_core_created = str(p0["core_created"])
+	print("backend core pid %d created %s; %d workers, %d support"
+		% [_core_pid, _core_created, (p0["worker_pids"] as Array).size(),
+		   (p0["support_pids"] as Array).size()])
 
 	await _bridge.refresh_residency()
 	for mid in POOL:
@@ -290,6 +365,8 @@ func _write(final: bool) -> void:
 			"arm": _arm, "windows": _windows, "window_ms": WINDOW_MS,
 			"sample_ms": SAMPLE_MS, "probe_list_len": PROBE_LIST_LEN,
 			"pool": POOL, "backend_pids_at_start": _pids,
+			"backend_core_pid_at_start": _core_pid,
+			"backend_core_created_at_start": _core_created,
 			"samples": _samples, "events": _events, "problems": _problems,
 		}, "  "))
 		f.close()

@@ -101,11 +101,30 @@ def main():
         ck("no %s in the arm script" % what, found is None,
            found.group(0) if found else "")
 
-    print("\n[live backend-PID witness]")
-    ck("captures backend pids at arm start", "_pids = _backend_pids()" in arm)
-    ck("re-checks pids every sample", "_same_pids(pids, _pids)" in arm)
-    ck("voids the arm on a mid-arm restart",
-       "BACKEND_RESTARTED_MID_ARM" in arm)
+    print("\n[producer-derived backend continuity witness]")
+    # The previous version of these checks asserted the DEFECTIVE tooth:
+    # complete-PID-set equality, which fires on the model-worker churn that a
+    # scheduled recovery necessarily causes -- 676 and 582 false offences in
+    # RUNTIME-MEMORY arms C and D. They now assert the corrected invariant.
+    ck("core identity derived from producer structure",
+       "--type=" in arm and "node.mojom.NodeService" in arm)
+    ck("captures core pid AND generation at arm start",
+       "_core_pid = int(p0[" in arm and "_core_created = str(p0[" in arm)
+    ck("fails closed when the producer field is unavailable",
+       "BACKEND_PROBE_FAILED" in arm)
+    ck("arm refuses to start without a generation witness",
+       "an arm cannot be integrity-qualified" in arm)
+    ck("detects a core identity change", "BACKEND_CORE_CHANGED" in arm)
+    ck("detects a core generation change", "BACKEND_GENERATION_CHANGED" in arm)
+    ck("does NOT flag worker churn as contamination",
+       "BACKEND_RESTARTED_MID_ARM" not in arm,
+       "the defective complete-PID-set tooth is still present")
+    ck("persists per-sample backend telemetry, not just a summary",
+       "backend_core_created" in arm and "backend_procs" in arm)
+    ck("persists core identity in the arm artifact",
+       "backend_core_created_at_start" in arm)
+    ck("no count learned from a previous run is hardcoded",
+       "nine" not in arm.lower() and " == 9" not in arm and " >= 9" not in arm)
 
     print("\n[client disconnect is a measured phase]")
     ck("arm takes a final live-client sample",
