@@ -14,20 +14,113 @@ Paths audited:
 
 | path | defects | severity of worst |
 |---|---|---|
-| `tools/runtime_memory.gd` | 9 | **BLOCKER** |
+| `tools/runtime_memory.gd` | 9 (8 standing, **1 REFUTED**) | HIGH — *the BLOCKER was RM-1 and it was false; see the supersession* |
 | `scripts/arena/recovery_action.gd` | 6 | HIGH |
 | `scripts/arena/recovery_gate.gd` | 5 | HIGH |
 | `tools/backend_continuity.py` | 6 | HIGH |
 
 A fifth file, `tools/runtime_memory_selftest.py`, was not on the list but is
-implicated by RM-1 and is reported under it, because the defect is only
+implicated by RM-1 and is reported under it. **RM-1 has since been REFUTED by
+execution**; the sub-finding about that file — that it certifies nothing
+executable — survives independently, because the defect is only
 dangerous *because* that file says GREEN.
 
 ---
 
 ## tools/runtime_memory.gd
 
-### RM-1 — BLOCKER — the arm harness contains three unterminated string literals and cannot parse
+### RM-1 — ~~BLOCKER~~ **REFUTED** — the arm harness parses; this finding was false
+
+> **SUPERSEDED 2026-09-08 — THE FINDING BELOW IS FALSE.** It is preserved
+> unedited, including its confident heading, because a defect log that quietly
+> deletes its own bad findings is not evidence of anything. Read the refutation
+> first, then read the original as the exhibit it now is.
+
+```text
+RM-1
+ORIGINAL STATUS:  BLOCKER
+CURRENT STATUS:   REFUTED
+
+Original basis:   OBSERVED_SHAPE + STATIC_INFERENCE
+Refutation:       EXECUTED_WITNESS
+
+Claim:            tools/runtime_memory.gd cannot parse
+Result:           FALSE
+```
+
+**What was actually observed, and was true.** The bytes are exactly as described
+below. Re-confirmed at HEAD this session:
+
+```text
+$ sed -n '117,118p;141,142p;443,444p' tools/runtime_memory.gd | cat -A
+        for ln in str(out[0]).split("$
+"):$
+        for ln in str(out[0]).split("$
+"):$
+        for ln in str(out[0]).split("$
+"):$
+```
+
+Three raw newlines inside ordinary double-quoted string literals. Byte-for-byte,
+`cat -A`-confirmed, provenance-traceable, corroborated by an adjacent site that
+was *not* mangled. Every one of those facts is real and none of them are
+retracted.
+
+**What was inferred, and was false.** *"GDScript does not permit a newline inside
+a `"`-delimited literal, so the script should fail to compile at load."* It does
+permit it. Godot 4 accepts a literal newline in an ordinary double-quoted string,
+and `.split("<newline>")` means precisely what `.split("\n")` means. The premise
+was wrong, so the whole chain below it — the blocker severity, the failure
+scenario, the ITEM 4 blockage — inherits the error.
+
+**The executed witness.** `tools/gd_parse_check.py`, four-sided and qualified in
+the same session, asks the compiler instead of the reader:
+
+```text
+$ python tools/gd_parse_check.py --selftest
+  ok   VALID NORMAL SCRIPT                        expect PASS got PASS
+  ok   LEGAL BUT SUSPICIOUS (raw newline in string) expect PASS got PASS
+  ok   ACTUALLY INVALID SCRIPT                    expect FAIL got FAIL
+  ok   NO_CONTACT: --check-only does not execute  expect SILENT got SILENT
+PARSE TOOTH GREEN
+
+$ python tools/gd_parse_check.py tools/runtime_memory.gd
+  ok   tools/runtime_memory.gd
+  === 1 parsed, 0 failed ===
+```
+
+The witness could have produced the opposite result: its third control is a
+genuinely corrupt script and it FAILS, so a checker that merely rubber-stamps
+everything would have been caught during qualification.
+
+**Downstream claims, kept separate.** Refuting RM-1 does not refute everything
+that was standing next to it:
+
+| claim | status |
+|---|---|
+| `runtime_memory.gd` cannot parse | **FALSE** — executed witness above |
+| the corrected harness has never been executed end-to-end | **UNDETERMINED** — it rested on RM-1; it now has no support either way |
+| existing `RUNTIME_MEMORY_*` artifacts appear old-schema | **INDEPENDENT** — never depended on RM-1; still unchecked |
+| `runtime_memory_selftest.py` is 41 regex checks and does not certify executable behaviour | **TRUE** — unaffected, and the reason this could go unnoticed |
+
+**The three line-continuation sites** at 150, 218 and 468 (a `\` replaced by
+literal tabs) are reported below as harmless. That sub-finding survives: it was
+shape evidence about an expression that still parses, and the file parses.
+
+**Why this matters more than the bug it failed to find.** The audit had exact
+bytes, `cat -A` output, git provenance, timestamps, and a plausible mechanism —
+and shipped a false BLOCKER with beautiful receipts, into a commit subject line
+(`07a3cb6`, "the arm harness does not parse") and into the supervisor's immutable
+event log, where neither can now be edited. Nothing in the apparatus was lying.
+The apparatus was *operationally correct and epistemically wrong*, which is the
+failure mode that permissions machinery cannot catch. See
+`docs/CLAIM_TO_WITNESS.md` for the classification this produced.
+
+---
+
+<details>
+<summary><b>ORIGINAL FINDING, PRESERVED VERBATIM — read as exhibit, not as fact</b></summary>
+
 
 Three `String.split()` calls have a **raw newline inside the string literal**
 instead of the escape `"\n"`:
@@ -85,6 +178,8 @@ syntax gate, no `--check-only` load, no registered suite that imports it.
 Status: **UNVERIFIED-BY-EXECUTION.** Proving the parse failure requires running
 Godot, which this shift's allowlist forbids. The literals are confirmed present;
 the compiler's reaction to them is inferred from the language specification.
+
+</details>
 
 ### RM-2 — HIGH — cheap samples fabricate a generation witness they did not observe
 
@@ -192,8 +287,8 @@ accumulated document. For a 40-window arm the artifact is destroyed and rebuilt
 are the largest and the exposure window is longest exactly when the most data is
 at risk.
 
-**Failure scenario.** The process is killed, the machine loses power, or RM-1's
-parse failure is fixed and something else crashes mid-`store_string` at window
+**Failure scenario.** The process is killed, the machine loses power, or
+something crashes mid-`store_string` at window
 38. The artifact on disk is a truncated JSON fragment — not merely stale, but
 unparseable — and the previous good full-artifact was already destroyed. The
 write-to-temp-then-rename that would make this safe is absent.
@@ -534,7 +629,16 @@ leak file handles.
 
 ## Consequence for the queue
 
-RM-1 blocks ITEM 4. A rerun procedure for the RUNTIME-MEMORY arms cannot be
-written as a working procedure while the harness does not parse; the procedure
-will have to name RM-1 as a precondition and stop there. Fixing RM-1 is a code
-change and belongs to a later item, not to ITEM 1.
+~~RM-1 blocks ITEM 4.~~ **WITHDRAWN — RM-1 is refuted; it blocks nothing.**
+
+The original text claimed a rerun procedure could not be written as a working
+procedure "while the harness does not parse", and that the procedure would have
+to name RM-1 as a precondition and stop there. The harness parses. Any ITEM 4
+draft that inherited RM-1 as precondition 1 is contaminated at its root and must
+be rewritten from accepted evidence rather than edited into respectability — see
+`docs/night/runs/20260908_081127/orphaned_RERUN_ABC_PROCEDURE.md`, which is
+quarantined for exactly this reason.
+
+What actually blocks ITEM 4 is the missing per-sample backend core-generation
+telemetry for arms A/B/C and the UNKNOWN verdicts that depend on it. That
+blockage is real, is unrelated to RM-1, and is not repaired by this correction.
