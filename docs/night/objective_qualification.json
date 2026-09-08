@@ -1,0 +1,20 @@
+{
+  "title": "SUPERVISOR QUALIFICATION -- tiny, safe, sized for CONTINUE then DONE",
+  "purpose": "Prove the outer loop can complete two independent Claude turns, preserve state, bind receipts to repo state, and stop for the right machine-readable reason. This is NOT Arena science.",
+  "rule": "Do EXACTLY ONE queue item per turn. After item 1, state must be CONTINUE. After item 2, state must be DONE. Do not do both in one turn even if trivial.",
+  "queue": [
+    "ITEM 1: create docs/night/README.md explaining the supervisor loop -- the stop conditions, the fail-closed receipt binding (nonce, objective_hash, starting/ending commit), the anti-runaway caps, and where the audit trail is written. Commit it.",
+    "ITEM 2: add a 'Supervisor' section to docs/NEXT_LIVE_RUN.md pointing a future operator at docs/night/README.md and at tools/night_supervisor.py, then commit."
+  ],
+  "boundaries": {
+    "lm_studio": "READ-ONLY / DO-NOT-CONTACT. No restart, unload/load, inference, or experiment runs.",
+    "tests": "Run ONLY via python tools/run_safe_tests.py",
+    "frozen": "Do not alter prereg history, quarantined evidence, ks/kh/n, or the 2048 MB floor",
+    "scope": "Documentation only. Do not modify any tool or script."
+  },
+  "stop_when": {
+    "DONE": "both queue items are committed",
+    "BLOCKED": "cannot proceed without violating a boundary",
+    "HUMAN_CLEARANCE_REQUIRED": "next action needs runtime contact or a judgement that is not the agent's"
+  }
+}
