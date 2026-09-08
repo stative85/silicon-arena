@@ -12,10 +12,12 @@ is checkable rather than assertable: the commit that froze the criterion must
 predate the commit that introduced the RUNTIME-MEMORY results.
 """
 
-import json
 import os
 import subprocess
 import sys
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from artifact_schema import SchemaRefused, load_checked  # noqa: E402
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 LABEL = os.path.join(REPO, "docs", "results", "RC_RUN1_QWEN_BLOCK.json")
@@ -38,7 +40,20 @@ def commit_time(sha):
 
 
 def main():
-    label = json.load(open(LABEL, encoding="utf-8"))
+    # Both inputs must declare what they are. Neither the quarantine label nor
+    # the results file is trusted because of where it sits on disk: an
+    # undeclared or mislabelled file at either path would previously have been
+    # hard-indexed into a KeyError, or -- worse for the results file, which is
+    # read entirely through .get() defaults -- silently scored as if it were a
+    # RUNTIME-MEMORY result. Refusal here always fails CLOSED, which for this
+    # tool means the block stays quarantined.
+    try:
+        label = load_checked(LABEL, "RC_QWEN_BLOCK_LABEL")
+    except SchemaRefused as e:
+        print("=== qwen fossil admissibility ===")
+        print("REFUSED: %s" % e)
+        print("FAILS CLOSED -> diagnostic_sensitivity_eligible = false")
+        return 1
     crit = label["admissibility_criterion"]
     print("=== qwen fossil admissibility ===")
     print("causal_evidence_eligible: %s (permanent: %s)"
@@ -51,7 +66,13 @@ def main():
         print("FAILS CLOSED -> diagnostic_sensitivity_eligible = false")
         return 1
 
-    rm = json.load(open(RM_RESULTS, encoding="utf-8"))
+    try:
+        rm = load_checked(RM_RESULTS, "RUNTIME_MEMORY_RESULTS")
+    except SchemaRefused as e:
+        print("REFUSED: %s" % e)
+        print("A results file that does not declare itself as RUNTIME-MEMORY")
+        print("cannot satisfy criterion 1. FAILS CLOSED.")
+        return 1
     checks = []
 
     checks.append(("1 preregistered independently",

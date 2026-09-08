@@ -50,6 +50,9 @@ SUITES = [
      "marker_allowance": {"kill": "declares taskkill as a FORBIDDEN pattern "
                                  "it scans the arm harness for"},
      "note": "static scan of the arm harness"},
+    {"name": "artifact_schema", "kind": "py", "cls": NO_CONTACT,
+     "path": "tools/artifact_schema.py", "group": "core", "args": ["--selftest"],
+     "note": "artifact identity refusals; reads docs/results read-only"},
     {"name": "backend_continuity", "kind": "py", "cls": NO_CONTACT,
      "path": "tools/backend_continuity.py", "group": "core", "args": ["--selftest"],
      "note": "pure functions over synthetic PID samples"},

@@ -17,6 +17,10 @@ REJECTED, always:
     missing eligibility fields       -- an artifact that cannot prove its own
                                         status is not admitted on the benefit
                                         of the doubt
+    no declared identity             -- a file that names no experiment and no
+                                        block is anonymous; position on disk
+                                        is not identity (see artifact_schema)
+    unparseable JSON                 -- refused, not crashed on
 
 This exists because eligibility that lives only in prose gets overridden by
 whoever is reading at 2 a.m. with a deadline. Here it is a return code.
@@ -26,6 +30,9 @@ import argparse
 import json
 import os
 import sys
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from artifact_schema import declaration_reasons  # noqa: E402
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 RESULTS = os.path.join(REPO, "docs", "results")
@@ -82,8 +89,17 @@ def load_for_comparison(paths, causal=False):
         if not os.path.exists(full):
             problems[name] = ["artifact does not exist"]
             continue
-        d = json.load(open(full, encoding="utf-8"))
-        bad = assess(d, name, causal)
+        try:
+            with open(full, encoding="utf-8") as fh:
+                d = json.load(fh)
+        except (ValueError, UnicodeDecodeError) as e:
+            problems[name] = ["not parseable as JSON (%s)" % e]
+            continue
+        # IDENTITY BEFORE ELIGIBILITY. Asking whether an artifact is qualified
+        # is meaningless until it has said which experiment it belongs to.
+        # An anonymous document is refused here rather than assessed on the
+        # strength of fields that anyone could have typed into any file.
+        bad = declaration_reasons(d, name) + assess(d, name, causal)
         if bad:
             problems[name] = bad
         else:
@@ -174,6 +190,25 @@ def selftest():
             ck("REFUSES the completed RUNTIME-MEMORY arms (no eligibility yet)",
                len(e.args[0]) == len(present),
                "%d of %d refused" % (len(e.args[0]), len(present)))
+
+    # IDENTITY BRANCHES. Added with the artifact-schema hardening; each is
+    # here because a refusal branch with no test is not coverage.
+    try:
+        load_for_comparison([os.path.join(REPO, "tools", "result_loader.py")])
+        ck("REFUSES a file that is not JSON at all", False, "it was admitted")
+    except Rejected as e:
+        ck("REFUSES a file that is not JSON at all",
+           any("not parseable" in x
+               for v in e.args[0].values() for x in v), str(e.args[0]))
+
+    if present:
+        try:
+            load_for_comparison(present)
+            ck("refusal of the arms cites their missing identity", False)
+        except Rejected as e:
+            ck("refusal of the arms cites their missing identity",
+               all(any("declares no identity" in x for x in v)
+                   for v in e.args[0].values()), str(e.args[0]))
 
     # the quarantined qwen block must be refused for causal use
     qb = os.path.join(RESULTS, "RC_RUN1_QWEN_BLOCK.json")
