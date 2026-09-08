@@ -145,6 +145,41 @@ reinterpretation of UNKNOWN as PASS.
 
 ---
 
+## Supervisor
+
+Some of the documentation state above was produced by an unattended night shift
+driven by `tools/night_supervisor.py`, a loop that lives outside the model and
+re-invokes it until a machine-readable stop condition is reached.
+**Read `docs/night/README.md` before running or trusting one.** It is the
+reference for the stop conditions, the receipt binding, and the caps.
+
+Three things a future operator needs to know before touching it:
+
+1. **It cannot grant runtime clearance.** The night shift runs under LM Studio
+   READ-ONLY / DO-NOT-CONTACT, enforced by an execution allowlist rather than by
+   the prompt: seven `git` verbs plus the exact string
+   `Bash(python tools/run_safe_tests.py)`. Everything in "NEXT PERMITTED LIVE
+   ACTION" above is therefore out of reach for it by construction. That section
+   still requires a human.
+2. **Every stop fails closed.** Only a verified `CONTINUE` — bound to this
+   run's nonce, the objective hash, and the commits the supervisor itself
+   observed — keeps the loop alive. A missing, stale or unparseable receipt is
+   `BLOCKED`, never progress.
+3. **Its own output is gitignored.** `docs/night/status.json`,
+   `supervisor.log` and `runs/` are operational output. Archiving a run into git
+   is a deliberate act.
+
+```
+python tools/night_supervisor.py --dry-run    # plan only, no agent invoked
+python tools/night_supervisor.py --status     # read the current receipt
+```
+
+Documentation written under a supervised shift is documentation, not evidence.
+Nothing in this file was measured by the supervisor, and no shift may promote a
+`UNKNOWN` arm, retouch a threshold, or reinterpret the quarantined block.
+
+---
+
 ## Blocked, and why
 
 The night shift could not resolve the integrity adjudication for arms A, B and
