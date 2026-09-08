@@ -1,0 +1,52 @@
+{
+	"record": "RUNTIME_MEMORY_RERUN_CLEARANCE",
+	"schema_version": 1,
+	"note": "Human clearance for the four-arm RUNTIME-MEMORY rerun, frozen BEFORE the first runtime contact so that no future log has to rely on 'the human said okay somewhere in chat'. Scope-limited and non-standing.",
+	"cleared_on": "2026-09-08",
+	"p4": "CLEARED",
+	"p5": "CLEARED",
+	"p6": "RESOLVED",
+	"scope": "four-arm RUNTIME-MEMORY rerun only",
+	"standing_permission": false,
+	"prereg_commit": "af2308c7ebb1e1b0b098d0e815830a8643a53872",
+	"procedure_commit": "af2308c7ebb1e1b0b098d0e815830a8643a53872",
+	"population_regime_id": "B",
+	"authorized_arms": [
+		"IDLE",
+		"CONTROL_WORKLOAD",
+		"RECOVERY_ONLY",
+		"FULL_WINDOW"
+	],
+	"p4_required_witnesses": [
+		"fresh_backend_start",
+		"residency_count_map",
+		"runtime_version_identity",
+		"health_surface_identity",
+		"host_ram_vram",
+		"zero_active_requests",
+		"backend_core_generation"
+	],
+	"p4_missing_witness_policy": "STOP",
+	"p5_authorizes": [
+		"backend restart at each frozen arm boundary",
+		"scheduled recoveries where the arm requires them",
+		"all four arms under the same corrected harness"
+	],
+	"p5_does_not_authorize": [
+		"RECOVERY-COUPLING",
+		"extra diagnostic reloads",
+		"threshold changes",
+		"RAM-floor changes",
+		"health-surface changes",
+		"new runtime experiments",
+		"quick checks outside the procedure",
+		"F-1..F-4 boundary refactor"
+	],
+	"frozen_constants": {
+		"ram_floor_mb": 2048,
+		"ks": 1.8,
+		"kh": 20,
+		"n": 3,
+		"windows_per_arm": 40
+	}
+}
