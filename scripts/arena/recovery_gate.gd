@@ -27,6 +27,13 @@ const UNSCHEDULED := "UNSCHEDULED_RECOVERY"
 const FOREIGN := "UNEXPECTED_RESIDENT_MODEL"
 const RAM_FLOOR := "RAM_FLOOR_EVENT"
 const TRANSPORT := "TRANSPORT_OR_RUNTIME_FAILURE"
+## A neighbour probe that did not finish in time is NOT the same event as a
+## broken transport. The treatment under test is expected to disturb
+## neighbours, so a large enough disturbance can stall a probe -- and a single
+## bucket would hide whether a void was the measured effect or the apparatus.
+## Nothing is relaxed: both still void the window. Only the cause becomes
+## visible in the artifact.
+const NEIGHBOUR_TIMEOUT := "NEIGHBOUR_COMPLETION_TIMEOUT"
 
 const HOST_FLOOR_MB := 2048.0
 
@@ -93,7 +100,10 @@ func sample(http: HTTPRequest, phase: String, elapsed_ms: int) -> Dictionary:
 	var counts := await RA.residency_counts(http)
 	var reason := OK
 	if counts.is_empty():
-		reason = TRANSPORT          # a failed read is not an empty pool
+		# A failed read is not an empty pool. The PHASE is recorded alongside so
+		# an empty read taken during a scheduled recovery is distinguishable
+		# from one in a quiet phase -- the window still voids either way.
+		reason = TRANSPORT
 	else:
 		reason = classify(counts, expected, flex_model)
 	var mem := OS.get_memory_info()
@@ -127,10 +137,11 @@ func note_unscheduled_recovery(model_id: String, elapsed_ms: int) -> void:
 		first_offence = s
 
 
-func note_transport(detail: String, elapsed_ms: int) -> void:
+func note_transport(detail: String, elapsed_ms: int,
+		reason: String = TRANSPORT) -> void:
 	var s := {
 		"window_id": window_id, "phase": "transport", "elapsed_ms": elapsed_ms,
-		"detail": detail, "reason": TRANSPORT, "at_ms": Time.get_ticks_msec(),
+		"detail": detail, "reason": reason, "at_ms": Time.get_ticks_msec(),
 	}
 	offences.append(s)
 	if first_offence.is_empty():

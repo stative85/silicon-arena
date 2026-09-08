@@ -304,7 +304,8 @@ func _probe_until(w: Dictionary, gate, neighbours: Array, t0: int,
 		for n in neighbours:
 			var e: Dictionary = _last.get(str(n), {})
 			if e.is_empty():
-				gate.note_transport("no completion for " + str(n), elapsed)
+				gate.note_transport("no completion for " + str(n), elapsed,
+					RG.NEIGHBOUR_TIMEOUT)
 				continue
 			var wctx := {
 				"window_id": int(w["window_id"]),
