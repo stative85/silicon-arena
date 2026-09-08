@@ -138,8 +138,6 @@ def main():
     src = open(os.path.join(REPO, "tools", "night_supervisor.py"),
                encoding="utf-8").read()
     ck("tests_ok() invokes the classified runner", "run_safe_tests.py" in src)
-    ck("supervisor never grants runtime clearance",
-       "i-have-clearance" not in src and "--attended" not in src)
     ck("tree checked BEFORE and AFTER an iteration", src.count("dirty()") >= 3)
     ck("tests checked BEFORE and AFTER an iteration",
        src.count("tests_ok()") >= 2)
@@ -157,6 +155,30 @@ def main():
                        r"\s*(=[^=]|\+=)", src)
     ck("no budget is ASSIGNED or incremented at runtime", raises is None,
        raises.group(0) if raises else "")
+
+    print("\n[the sub-agent's permissions are a boundary, not a setting]")
+    cmd = NS.agent_cmd("PROMPT BODY")
+    flags = [x for x in cmd if x != "PROMPT BODY"]
+    ck("agent is NEVER invoked with bypassPermissions",
+       "bypassPermissions" not in flags,
+       " ".join(flags))
+    ck("agent runs under acceptEdits",
+       flags[flags.index("--permission-mode") + 1] == "acceptEdits")
+    ck("supervisor never grants runtime clearance in the invocation",
+       not any("i-have-clearance" in x or "--attended" in x for x in flags))
+    ck("agent is constrained by an explicit allowlist",
+       "--allowedTools" in src and "AGENT_ALLOWED_TOOLS" in src)
+    ck("the test runner is allowed EXACTLY, with no argument wildcard",
+       "Bash(python tools/run_safe_tests.py)" in NS.AGENT_ALLOWED_TOOLS
+       and not any(t.startswith("Bash(python tools/run_safe_tests.py:")
+                   for t in NS.AGENT_ALLOWED_TOOLS))
+    ck("no allowlist entry can reach the runtime",
+       not any(w in t for t in NS.AGENT_ALLOWED_TOOLS
+               for w in ("lms", "curl", "godot", "PowerShell")))
+    for denied in ("Bash(lms:*)", "PowerShell", "Agent"):
+        ck("%s is denied outright" % denied, denied in NS.AGENT_DENIED_TOOLS)
+    ck("the denylist is actually passed to the agent",
+       "--disallowedTools" in src)
 
     print("\n[SUMMARY]")
     print("  checks %d, failures %d" % (_n, _f))

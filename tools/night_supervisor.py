@@ -212,6 +212,16 @@ HARD BOUNDARIES THIS SHIFT
   threshold (ks=1.8, kh=20, n=3, the 2048 MB floor).
 - Never commit a failing tree.
 
+YOUR EXECUTABLE SURFACE IS AN ALLOWLIST, NOT A REQUEST
+You may run exactly these, and nothing else:
+    git add / commit / status / diff / log / show / rev-parse
+    python tools/run_safe_tests.py      (no arguments -- the clearance flag is
+                                         not yours to pass)
+File edits are permitted. Every other command -- lms, curl, godot, taskkill,
+PowerShell, web access, spawning another agent -- is refused by the execution
+path, not merely forbidden by this prompt. Do not try to route around it; if a
+task genuinely needs one, that is HUMAN_CLEARANCE_REQUIRED.
+
 BEFORE YOU FINISH THIS TURN you MUST write docs/night/status.json:
 
 {
@@ -241,11 +251,78 @@ scientific judgement that is not yours to make.
        start_commit)
 
 
-def run_agent(prompt, timeout_s, model=None):
+# --- the sub-agent's permissions ARE part of the boundary ------------------
+#
+# Iteration 1 of the first qualification stopped BLOCKED because
+# --permission-mode acceptEdits lets the agent write files but refuses every
+# Bash call in a non-interactive session: it could author docs/night/README.md
+# and could not commit it. The obvious repair is --permission-mode
+# bypassPermissions. That repair is refused here.
+#
+# Law 6 (EXECUTION-BOUNDARY): a boundary that exists only as an instruction is
+# weaker than a boundary enforced by the execution path. Under
+# bypassPermissions the LM Studio DO-NOT-CONTACT rule is prose again -- an
+# unattended agent at 3 a.m. could run `lms unload`, drive godot, or POST to
+# the backend, and the only thing standing in the way would be a sentence in a
+# prompt. The night shift already produced one boundary violation that way.
+#
+# So: acceptEdits for file writes, plus an EXPLICIT ALLOWLIST of the only shell
+# commands an unattended documentation/analysis turn actually needs. Anything
+# not named falls through to a permission prompt, and a prompt in a
+# non-interactive session is a refusal. Fail-closed by construction rather than
+# by instruction.
+AGENT_ALLOWED_TOOLS = [
+    "Bash(git add:*)",
+    "Bash(git commit:*)",
+    "Bash(git status:*)",
+    "Bash(git diff:*)",
+    "Bash(git log:*)",
+    "Bash(git show:*)",
+    "Bash(git rev-parse:*)",
+    # Exact, deliberately NOT `Bash(python tools/run_safe_tests.py:*)`: the
+    # wildcard form would let the agent append --i-have-clearance and run the
+    # STATE_MUTATING suites that the classified runner exists to withhold.
+    "Bash(python tools/run_safe_tests.py)",
+]
+
+# Redundant against the allowlist, which already refuses these by omission.
+# Named anyway so that a future edit widening the allowlist -- or a shell form
+# that slips past prefix matching -- still cannot reach the runtime.
+AGENT_DENIED_TOOLS = [
+    "Bash(lms:*)",
+    "Bash(curl:*)",
+    "Bash(godot:*)",
+    "Bash(taskkill:*)",
+    "PowerShell",
+    "WebFetch",
+    "WebSearch",
+    # An unattended turn does not fan out; a spawned agent is a permission
+    # surface the supervisor cannot see the receipts of.
+    "Agent",
+]
+
+
+def agent_cmd(prompt, model=None):
+    """The exact argv used to invoke the agent.
+
+    Split out from run_agent so the self-test can assert on the COMMAND rather
+    than on the source text. Scanning source for a forbidden token matches the
+    shape of the forbidden thing, not the act: this file has to be able to
+    NAME the flags it refuses to pass, in the comment above, without tripping
+    its own teeth. Three false positives on that exact confusion were already
+    paid for during the night shift.
+    """
     cmd = ["claude", "-p", prompt, "--permission-mode", "acceptEdits",
+           "--allowedTools"] + AGENT_ALLOWED_TOOLS + [
+           "--disallowedTools"] + AGENT_DENIED_TOOLS + [
            "--add-dir", REPO]
     if model:
         cmd += ["--model", model]
+    return cmd
+
+
+def run_agent(prompt, timeout_s, model=None):
+    cmd = agent_cmd(prompt, model)
     r = subprocess.run(cmd, cwd=REPO, capture_output=True, text=True,
                        encoding="utf-8", errors="replace", timeout=timeout_s)
     return r.returncode, (r.stdout or "")[-4000:]
