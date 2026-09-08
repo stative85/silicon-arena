@@ -62,6 +62,17 @@ SUITES = [
     {"name": "result_loader", "kind": "py", "cls": NO_CONTACT,
      "path": "tools/result_loader.py", "group": "core", "args": ["--selftest"],
      "note": "eligibility rejection branches"},
+    # NO_CONTACT with a stated caveat rather than a silent one: this suite DOES
+    # spawn Godot. Three controls use --check-only, which its own fourth control
+    # proves does not execute the script (a sentinel printing from _init stays
+    # silent). That fourth control additionally runs ONE trivial generated
+    # script, in a temp dir, under a plain --script -- because proving silence
+    # requires proving the sentinel can speak. No repo .gd is ever executed and
+    # nothing addresses the runtime, so the classification holds; it is written
+    # down here so the next auditor does not have to rediscover it.
+    {"name": "gd_parse_check", "kind": "py", "cls": NO_CONTACT,
+     "path": "tools/gd_parse_check.py", "group": "core", "args": ["--selftest"],
+     "note": "four-sided parse tooth; --check-only proven non-executing"},
     {"name": "recovery_schedule", "kind": "py", "cls": NO_CONTACT,
      "path": "tools/recovery_schedule.py", "group": "core", "args": ["--verify"],
      "note": "schedule plan verification, touches nothing"},
