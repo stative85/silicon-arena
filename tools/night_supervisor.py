@@ -54,6 +54,13 @@ STATUS = os.path.join(NIGHT, "status.json")
 LOG = os.path.join(NIGHT, "supervisor.log")
 RUNS = os.path.join(NIGHT, "runs")
 
+## The run directory, status.json and supervisor.log are OPERATIONAL OUTPUT of
+## a run, not repository content, and are gitignored. Without that the
+## supervisor creates its own audit trail and then its own pre-flight dirty
+## check refuses to start -- which is exactly what happened on the first
+## qualification attempt. Archiving a run into git is a deliberate act, not a
+## side effect of running one.
+##
 ## THE SUPERVISOR OWNS THE AUDIT TRAIL. Every prompt, every raw agent output,
 ## every status receipt and every decision is written here by the supervisor
 ## itself. Depending on the agent to document the agent would be Law 6 wearing
