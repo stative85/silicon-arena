@@ -53,6 +53,9 @@ SUITES = [
     {"name": "backend_continuity", "kind": "py", "cls": NO_CONTACT,
      "path": "tools/backend_continuity.py", "group": "core", "args": ["--selftest"],
      "note": "pure functions over synthetic PID samples"},
+    {"name": "night_supervisor_selftest", "kind": "py", "cls": NO_CONTACT,
+     "path": "tools/night_supervisor_selftest.py", "group": "core",
+     "note": "supervisor decision teeth; never invokes the agent"},
     {"name": "result_loader", "kind": "py", "cls": NO_CONTACT,
      "path": "tools/result_loader.py", "group": "core", "args": ["--selftest"],
      "note": "eligibility rejection branches"},
@@ -190,6 +193,7 @@ DISCOVERY_EXEMPT = {
     "tools/runtime_memory_run.py",      # orchestrator, not a test
     "tools/recovery_window.gd",         # executor, not a test
     "tools/rc_start_state.py",          # procedure, not a test
+    "tools/night_supervisor.py",        # the supervisor itself
     "tools/run_safe_tests.py",          # this runner
     "tools/offline_selftest.gd",        # legacy aggregate runner
     "tools/embed_router_selftest.gd",
