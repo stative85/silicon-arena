@@ -153,15 +153,50 @@ def vram():
         return [-1, -1]
 
 
+# Teardown is POLLED, not slept through. The original code waited a fixed 6
+# seconds after taskkill and refused if anything was still alive. Six seconds
+# sufficed for three arms and not the fourth: the backend died, just later than
+# the superstition allowed, and RERUN-1 lost FULL_WINDOW to it.
+#
+# The refusal itself was right -- starting an arm against a half-dead backend
+# would be worse. What was wrong is guessing how long dying takes.
+TEARDOWN_DEADLINE_S = 90
+TEARDOWN_POLL_S = 1.0
+
+
+def wait_backend_dead(deadline_s=TEARDOWN_DEADLINE_S):
+    """Poll until the ACTUAL process count is 0 and the port stops answering.
+
+    Returns {ok, waited_s, final_count}. Fails CLOSED on the deadline: a
+    backend that will not die is not a backend to start an arm against.
+    """
+    t0 = time.time()
+    while time.time() - t0 < deadline_s:
+        pids, _ = lm_procs()
+        if not pids and resident() is None:
+            return {"ok": True, "waited_s": round(time.time() - t0, 1),
+                    "final_count": 0}
+        time.sleep(TEARDOWN_POLL_S)
+    pids, _ = lm_procs()
+    return {"ok": False, "waited_s": round(time.time() - t0, 1),
+            "final_count": len(pids)}
+
+
 def restart_backend():
-    """Called ONLY at an arm boundary. Never inside an arm."""
+    """Called ONLY at an arm boundary. Never inside an arm.
+
+    Returns (started_at, teardown) or (None, teardown) on refusal.
+    """
     subprocess.run([LMS, "server", "stop"], capture_output=True, text=True,
                    encoding="utf-8", errors="replace", timeout=120)
     subprocess.run(["taskkill", "/F", "/IM", "LM Studio.exe"],
                    capture_output=True, text=True)
-    time.sleep(6)
-    if lm_procs()[0] or resident() is not None:
-        return None
+    teardown = wait_backend_dead()
+    if not teardown["ok"]:
+        print("  teardown FAILED: %d process(es) still alive after %.1fs"
+              % (teardown["final_count"], teardown["waited_s"]))
+        return None, teardown
+    print("  teardown clean after %.1fs (count 0)" % teardown["waited_s"])
     started = time.strftime("%Y-%m-%dT%H:%M:%S")
     subprocess.Popen([LMSTUDIO_EXE], stdout=subprocess.DEVNULL,
                      stderr=subprocess.DEVNULL)
@@ -170,8 +205,8 @@ def restart_backend():
         subprocess.run([LMS, "server", "start"], capture_output=True,
                        text=True, encoding="utf-8", errors="replace")
         if resident() is not None:
-            return started
-    return None
+            return started, teardown
+    return None, teardown
 
 
 def witness(arm, started_at):
@@ -224,7 +259,7 @@ def main():
            "prereg": "docs/results/PREREG_RUNTIME_MEMORY_RERUN.md"}
     for arm in args.arms:
         print("\n########## ARM %s ##########" % arm)
-        started = restart_backend()          # arm boundary, and only here
+        started, teardown = restart_backend()   # arm boundary, and only here
         if not started:
             print("  FAIL backend did not restart cleanly")
             return 1
@@ -239,6 +274,7 @@ def main():
             print("  FAIL exact pool count map = 1/1/1 not established: %s" % c)
             return 1
         w = witness(arm, started)
+        w["teardown_wait_s"] = teardown["waited_s"]
         if w["active_requests_at_start"] != 0:
             print("  FAIL zero-active-requests witness: %s connections to :1234"
                   % w["active_requests_at_start"])
