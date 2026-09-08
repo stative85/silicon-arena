@@ -49,7 +49,7 @@ generation telemetry used the field names I expected — `core_generation`,
 `start_time` — and returned nothing. On that evidence precondition P1 was about
 to be written as UNMET, a second blocker. The field is `core_created`. A grep
 that returns nothing is evidence about the pattern, never about the code. The
-near-miss is recorded in `RERUN_ABC_PROCEDURE.md` §1 rather than quietly fixed.
+near-miss is recorded in `RERUN_FOUR_ARM_PROCEDURE.md` §1 rather than quietly fixed.
 
 ---
 

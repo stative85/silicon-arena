@@ -116,7 +116,7 @@ FULL_WINDOW            5,514   16,105   16,097            5,444
 - **The ITEM 4 draft from iteration 4** — `orphaned_RERUN_ABC_PROCEDURE.md`,
   quarantined as Q-1. No bound receipt, and contaminated by RM-1 in four places
   including its first precondition. Rewritten from accepted evidence rather
-  than edited; see `docs/RERUN_ABC_PROCEDURE.md`.
+  than edited; see `docs/RERUN_FOUR_ARM_PROCEDURE.md`.
 - **The supervisor's "receipt is not from this turn" wording** — reported for an
   invocation that produced no receipt at all. The refusal was correct; the
   explanation was not. Fixed by invocation-outcome classification: a missing
@@ -148,7 +148,7 @@ Rerun the three integrity-UNKNOWN RUNTIME-MEMORY arms — `IDLE`,
 `CONTROL_WORKLOAD`, `RECOVERY_ONLY` — with the corrected telemetry now in the
 harness. `FULL_WINDOW` already holds a PASS and does not need rerunning.
 
-**The procedure is `docs/RERUN_ABC_PROCEDURE.md`.** It replaces the eight-line
+**The procedure is `docs/RERUN_FOUR_ARM_PROCEDURE.md`.** It replaces the eight-line
 sketch that used to sit here. Do not follow the sketch from memory or from an
 older checkout: it carried five defects, recorded in §4 of that document, of
 which two were dangerous.
@@ -166,7 +166,7 @@ S-2  it gated readiness on runtime_memory_selftest.py "PREFLIGHT GREEN,
      keep the regex preflight for what it does catch.
 ```
 
-Blocking list at HEAD, from `RERUN_ABC_PROCEDURE.md` §1:
+Blocking list at HEAD, from `RERUN_FOUR_ARM_PROCEDURE.md` §1:
 
 ```text
 P1  harness persists per-sample core generation      MET

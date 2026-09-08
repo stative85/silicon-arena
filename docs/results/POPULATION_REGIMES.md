@@ -99,6 +99,28 @@ The distinction is the same one that quarantined the qwen3.5 block: a clean,
 complete, real dataset that was never assigned as a condition does not become
 causal evidence by being tidy.
 
+## Enforcement
+
+Every result artifact must be attributable to a regime, mechanically:
+
+```text
+python tools/population_regime.py --audit
+```
+
+- 151 artifacts predate the field. They are attributed to Regime A by the frozen
+  snapshot `config/population-regime-a-legacy.json` — **never by editing the
+  artifacts**. Adding a tag an artifact did not have when it was written
+  falsifies provenance, however true the tag is.
+- Any artifact NOT in that snapshot must declare `population_regime_id`, or it
+  is **REFUSED**. Not warned about.
+- An unknown regime value is refused. A frozen Regime A artifact claiming to be
+  Regime B is refused.
+- The snapshot is content-hashed and the hash is pinned in the tool. Appending a
+  name to the legacy list — the obvious way to silence a refusal on a new
+  untagged artifact — changes the hash and is refused. The escape hatch is
+  deliberately noisy: edit the list AND update the pin, in a commit that says
+  why.
+
 ## Provenance
 
 Regime A's exact roster is recorded in `HISTORICAL_ROSTER_PROVENANCE.md`,

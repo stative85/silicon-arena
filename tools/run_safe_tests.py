@@ -77,6 +77,10 @@ SUITES = [
      "path": "tools/arena_names.py", "group": "core", "args": ["--selftest"],
      "note": "display-name roster; reads config + docs/results read-only, "
              "writes only a temp file it removes"},
+    {"name": "population_regime", "kind": "py", "cls": NO_CONTACT,
+     "path": "tools/population_regime.py", "group": "core",
+     "args": ["--selftest"],
+     "note": "regime attribution; reads docs/results read-only, temp files only"},
     {"name": "build_canonical_roster", "kind": "py", "cls": NO_CONTACT,
      "path": "tools/build_canonical_roster.py", "group": "core",
      "args": ["--selftest"],

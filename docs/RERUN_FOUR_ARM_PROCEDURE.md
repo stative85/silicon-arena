@@ -1,4 +1,6 @@
-# RERUN A/B/C — rerunning RUNTIME-MEMORY arms IDLE, CONTROL_WORKLOAD, RECOVERY_ONLY
+# RERUN — all four RUNTIME-MEMORY arms
+
+**Scope changed 2026-09-08: FOUR arms, not three.** P6 was resolved by human decision before any new arm existed — `FULL_WINDOW` is rerun alongside `IDLE`, `CONTROL_WORKLOAD` and `RECOVERY_ONLY` rather than carried over. The frozen decision and the eight sameness conditions are in `docs/results/PREREG_RUNTIME_MEMORY_RERUN.md`, which this procedure implements and does not restate.
 
 **Static shift, ITEM 4. WRITTEN, NOT EXECUTED.** Every step below that touches
 LM Studio, Godot, or the process table is outside the static shift's execution
@@ -35,17 +37,27 @@ read, applied to arms whose per-sample core-generation telemetry was never
 persisted, against backends that no longer exist. The missing history cannot be
 reconstructed; it can only be recollected.
 
-**This rerun can deliver:** three arms whose continuity verdict is decidable.
+**This rerun can deliver:** four arms whose continuity verdict is decidable and
+which are commensurable with each other.
 
 **This rerun cannot deliver:** anything about the original arms. The old arms
 stay UNKNOWN forever. A rerun is new data, not a retroactive repair.
+
+**Why `FULL_WINDOW` is rerun despite already holding a PASS.** Carrying it over
+would build a four-cell comparison from two experimental eras: one cell
+collected under a different harness commit, without corrected per-sample
+core-generation telemetry, adjudicated by a witness that did not exist in its
+corrected form. That asymmetry sits on exactly the axis the experiment measures.
+The old PASS keeps `historical_valid = true` and
+`diagnostic_reference = true`, and is not deleted or downgraded — it is simply
+`new_cross_arm_evidence_eligible = false`.
 
 ---
 
 ## 1. Preconditions — the blocking list
 
-Each is stated with what actually witnesses it. **P1–P3 are met at HEAD.**
-P4–P6 are unmet or undecidable without a human.
+Each is stated with what actually witnesses it. **P1–P3 are met at HEAD. P6 is
+RESOLVED.** P4 and P5 remain UNMET and cannot be cleared by an agent.
 
 ### P1 — the harness persists per-sample core generation — **MET**
 
@@ -117,9 +129,43 @@ I cannot verify the current state without contacting the runtime, which is
 forbidden. The operator must establish a known starting state before arm 1, and
 must record what that state was. Do not assume the contamination has aged out.
 
-Residency validation here uses a **count map, not set membership** — LM Studio
-can hold `qwen3.5-2b` and `qwen3.5-2b:2` simultaneously, and presence is not
-enough when multiplicity exists (Law 5, Cardinality Is State).
+**"The pool looks right" is insufficient.** Given the prior unauthorised
+unload/reload activity, no inherited runtime state is grandfathered in merely
+because the expected models happen to be resident. The known state must be
+MECHANICALLY ESTABLISHED and recorded, and it requires all seven of:
+
+```text
+1. FRESH BACKEND START
+   not a reused session. The starting core must be one this run started.
+
+2. RESIDENCY COUNT MAP
+   {model_id: count}, never set membership. LM Studio can hold qwen3.5-2b
+   and qwen3.5-2b:2 at once; presence is not enough when multiplicity
+   exists (Law 5, Cardinality Is State).
+
+3. RUNTIME / VERSION IDENTITY
+   LM Studio version + lms CLI commit, recorded verbatim.
+
+4. HEALTH-SURFACE IDENTITY
+   the health surface hash, as recorded for the original run
+   (14536bd0e92f16ba there -- a new value is expected, not a failure;
+   an UNRECORDED value is the failure).
+
+5. HOST RAM / VRAM STATE
+   free and used, host-wide, at arm start.
+
+6. ZERO ACTIVE REQUESTS
+   no in-flight generation from any source, including a stray editor,
+   a previous arm, or an interactive session.
+
+7. BACKEND CORE-GENERATION WITNESS
+   core pid AND core creation time, producer-derived, present before the
+   first sample. The harness already refuses to start without it.
+```
+
+Any of the seven missing or unrecorded is a STOP, not a note in the write-up.
+Recording a value that turns out to be surprising is fine; proceeding without
+having recorded it is not.
 
 ### P5 — clearance for STATE_MUTATING execution — **UNMET by construction**
 
@@ -130,20 +176,25 @@ classification, STATE_MUTATING requires **clearance plus an attended human**.
 Amendment 2 authorised *one specific restart* for RECOVERY-COUPLING. It is not a
 standing licence and does not extend here.
 
-### P6 — the comparability decision — **UNMET, science decision, HUMAN ONLY**
+### P6 — the comparability decision — **RESOLVED 2026-09-08**
 
-Decide **before** starting, and record the decision before any data exists:
+```text
+EVIDENCE CLASS:  human decision, frozen BEFORE any new arm exists
+RECORD:          docs/results/PREREG_RUNTIME_MEMORY_RERUN.md
+```
 
-> May the existing `FULL_WINDOW` PASS be compared against three arms collected
-> under a different harness commit and corrected telemetry?
+**DECISION: rerun all four arms.** The existing `FULL_WINDOW` PASS is not used
+as the fourth cell of the new comparison. It keeps `historical_valid = true` and
+`diagnostic_reference = true`; it is `new_cross_arm_evidence_eligible = false`.
 
-Options are (a) accept the asymmetry and state it as a limitation, or (b) rerun
-all four for symmetric provenance. Arms differing in harness version is **a
-limitation to state, not a covariate to adjust for** (Amendment 3).
+This resolves P6 and does not clear P4 or P5. It cost roughly two hours of
+additional collection and bought a four-arm comparison that is actually
+interpretable rather than assembled across an instrumentation boundary.
 
-Deciding this after seeing the new arms is a post-hoc criterion change and is
-forbidden. If the answer is not obvious, that is a reason to preregister it, not
-a reason to defer it until the data can influence it.
+The eight sameness conditions — harness commit, corrected telemetry, start-state
+witness schema, horizon, sampling cadence, continuity witness, runtime version,
+load order — are frozen in the preregistration with the witness required for
+each. An arm that cannot demonstrate all eight is not part of the comparison.
 
 ---
 
@@ -181,22 +232,28 @@ STEP 3  PRE-FLIGHT, the witness
         it returning an inconvenient verdict.
 
 STEP 4  ESTABLISH AND RECORD BACKEND STATE  [P4]
-        Record the model residency COUNT MAP, not a set. Record core pid and
-        core creation time before arm 1.
+        All SEVEN witnesses from P4: fresh backend start, residency count
+        map, runtime/version identity, health-surface identity, host
+        RAM/VRAM, zero active requests, core-generation witness. Any one
+        missing or unrecorded is a STOP.
 
 STEP 5  RUN  [REQUIRES CLEARANCE + ATTENDED HUMAN]
         python tools/runtime_memory_run.py --confirm-restarts \
-            --arms IDLE CONTROL_WORKLOAD RECOVERY_ONLY
+            --arms IDLE CONTROL_WORKLOAD RECOVERY_ONLY FULL_WINDOW
+        FOUR arms, four restarts. Record the load order; with four arms and
+        no replication of position it is NOT estimable, so it is a stated
+        limitation, never a covariate (Amendment 3).
 
 STEP 6  CONTINUITY VERDICT, before any trajectory is read
         python tools/backend_continuity.py --apply
-        EXPECT: PASS for each rerun arm.
+        EXPECT: PASS for each of the FOUR rerun arms.
         UNKNOWN on any arm = the telemetry fix did not take. STOP.
         UNKNOWN IS NOT A SOFT PASS. It is not "probably fine". The arm is
         undecidable and stays undecidable.
 
 STEP 7  ADMISSIBILITY
-        python tools/result_loader.py --check <the three new artifacts>
+        python tools/result_loader.py --check <the four new artifacts>
+        Each must declare population_regime_id: "B" (POPULATION_REGIMES.md).
         EXPECT: ADMITTED, where the old artifacts are REFUSED (P2).
         Still refused = not admissible. Do not hand-edit an artifact to get
         it admitted; that defeats the entire schema tooth.
@@ -216,9 +273,11 @@ no discipline applied afterwards restores it.
 
 Stop, write a finding, and do not improvise:
 
-1. Any P1–P6 unmet or unresolved at start.
+1. Any P1-P5 unmet at start, or any of P4's seven witnesses unrecorded.
+   (P6 is resolved; re-opening it after data exists is forbidden.)
 2. Step 6 returns UNKNOWN for any arm.
-3. Step 7 refuses any new artifact.
+3. Step 7 refuses any new artifact, or any artifact lacks
+   population_regime_id.
 4. `RAM_FLOOR_EVENT` fires, as it did in RECOVERY-COUPLING Run 1 — that run is
    VOID/TERMINATED and its causal question remains **UNANSWERED**. Do not infer
    recovery coupling from it and do not attempt to rescue it.
@@ -254,6 +313,6 @@ ignore preconditions.
 ## 5. What this document does not authorise
 
 Executing any of it. Contacting LM Studio. Loading or unloading a model. Running
-inference. Rerunning `FULL_WINDOW` without a P6 decision. Analysing the
+inference. Reopening P6 once data exists. Analysing the
 quarantined qwen3.5 block. Promoting any UNKNOWN. Rescuing VOID data. Touching
 PIT A or SWARM/METABOLISM. Modifying anything outside `silicon-arena-public`.
