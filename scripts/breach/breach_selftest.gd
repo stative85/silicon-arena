@@ -129,8 +129,7 @@ func _init() -> void:
 	w.vault_slots["vault_slot_3"] = "key_C"
 	ck("three distinct keys open it", w.vault_should_open())
 
-	print("
-[vault operations are PHYSICAL -- no key teleportation]")
+	print("\n[vault operations are PHYSICAL -- no key teleportation]")
 	var w2 = WorldStateScript.new()
 	ArenaLayoutScript.build(w2, "TEST2")
 	var far = AgentStateScript.new("FAR", "m", "s", "m#1", 100, "spawn_vanta")
