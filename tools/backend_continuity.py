@@ -225,6 +225,58 @@ def selftest():
            all("does not declare experiment_id" in v for v in refused.values()),
            True)
 
+    # --- SABOTAGE ---------------------------------------------------------
+    #
+    # The clause that decides A/B/C is core_generation_unchanged. When the
+    # per-sample generation is absent it must return UNKNOWN, and UNKNOWN must
+    # survive aggregation instead of being rounded to PASS. That is the exact
+    # property the RUNTIME-MEMORY arms depend on -- three of them are UNKNOWN
+    # today because of it -- and until now nothing proved the clause could
+    # actually fail in the dangerous direction.
+    #
+    # The dangerous direction is never FAIL. It is UNKNOWN quietly becoming
+    # PASS, because a PASS is what lets an arm be read.
+    print("\n[sabotage: can UNKNOWN be turned into PASS without notice?]")
+
+    core = [1, 2, 3]
+    no_gen = _samples([core + [10], core + [11]])
+
+    honest = evaluate(no_gen, recoveries=1, core_pid=1)
+    ck("baseline: absent generation is UNKNOWN", honest["verdict"], UNKNOWN)
+
+    # SABOTAGE 1 -- the clause reports PASS when it cannot know.
+    real_eval = evaluate
+
+    def optimistic(samples, recoveries, core_pid=None):
+        r = real_eval(samples, recoveries, core_pid)
+        if r["clauses"].get("core_generation_unchanged") == UNKNOWN:
+            r["clauses"]["core_generation_unchanged"] = PASS
+            vals = list(r["clauses"].values())
+            r["verdict"] = (FAIL if FAIL in vals
+                            else UNKNOWN if UNKNOWN in vals else PASS)
+        return r
+
+    applied = optimistic is not real_eval
+    ck("SABOTAGE 1 APPLIED (evaluator replaced)", applied, True)
+    if applied:
+        sab = optimistic(no_gen, recoveries=1, core_pid=1)
+        # It BITES if the sabotage visibly changes the verdict away from
+        # UNKNOWN -- i.e. this failure mode is reachable and worth guarding.
+        ck("SABOTAGE 1 BITES: optimism turns UNKNOWN into PASS",
+           sab["verdict"], PASS)
+        ck("...and the honest evaluator is unchanged by it",
+           real_eval(no_gen, recoveries=1, core_pid=1)["verdict"], UNKNOWN)
+
+    # SABOTAGE 2 -- an arm with a genuinely changed generation must stay FAIL.
+    # If a mutation could make a KNOWN-BAD arm pass, the clause is not merely
+    # uninformative, it is wrong.
+    changed = [{"backend_pids": core + [10], "core_created": "T0"},
+               {"backend_pids": core + [11], "core_created": "T1"}]
+    ck("baseline: changed generation is FAIL",
+       real_eval(changed, recoveries=1, core_pid=1)["verdict"], FAIL)
+    ck("SABOTAGE 2: optimism does NOT rescue a changed generation",
+       optimistic(changed, recoveries=1, core_pid=1)["verdict"], FAIL)
+
     print("\nchecks %d, failures %d" % (n, f))
     print("WITNESS GREEN" if f == 0 else "WITNESS RED")
     return 0 if f == 0 else 1
