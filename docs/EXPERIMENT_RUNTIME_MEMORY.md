@@ -355,3 +355,85 @@ MECHANISM ONLY AS FAR AS THE DESIGN IDENTIFIES
 ```
 
 No statistical seance at the bottom.
+
+---
+
+# Amendment 5 — adjudicating the defective backend-continuity tooth
+
+Frozen after the integrity read and **before any RAM trajectory has been
+examined**. No arm outcome has been looked at.
+
+## The adjudication
+
+> `BACKEND_RESTARTED_MID_ARM` is invalid when derived from equality of the
+> complete LM Studio PID set, because scheduled recovery legitimately replaces
+> model-worker processes. The protected invariant is continuity of the
+> backend/core process lifetime, not worker PID identity. C and D remain
+> quarantined until a corrected backend-continuity witness is mechanically
+> qualified and applied to all four arms without reference to memory
+> trajectories.
+
+## Status
+
+```text
+ARM C RECOVERY_ONLY   INTEGRITY-ADJUDICATION PENDING   not VOID, not CLEAN
+ARM D FULL_WINDOW     INTEGRITY-ADJUDICATION PENDING   not VOID, not CLEAN
+
+no trajectory may be read for any arm until this is resolved
+```
+
+Honouring a detector after proving it measures the wrong thing is not rigour.
+Declaring the arms clean because the intent held would be post-hoc rescue. The
+classification has to be **earned mechanically**.
+
+## The corrected witness, defined before it is built
+
+```text
+BACKEND CONTINUITY PASS iff
+    backend/core process identity persists for the entire arm
+AND backend start-time / generation identity does not change
+AND no interval shows the backend unavailable
+AND worker PID churn is attributable only to scheduled recoveries
+```
+
+**"Nine stable PIDs" must NOT become the rule.** Nine is what happened to
+survive this run; adopting it would be another threshold invented from the
+specimen. The backend/core role must be identified from what the producer
+actually exposes — process tree, command line, start time, parent/child
+relationship — not from a count observed after the fact.
+
+## Sabotage required before the witness is trusted
+
+```text
+worker replacement only              -> PASS
+actual backend restart               -> FAIL
+backend disappears and reappears     -> FAIL
+foreign/unexplained process swap     -> FAIL or UNKNOWN
+```
+
+## Possible outcomes
+
+```text
+corrected witness evaluable on the existing C/D telemetry, and passes
+  -> original_tooth_valid = false
+     corrected_backend_continuity = PASS
+     integrity_qualified = true
+     the 676 / 582 offences are PRESERVED as instrument-defect evidence,
+     never deleted
+
+historical telemetry lacks the fields the corrected witness needs
+  -> integrity_qualified = UNKNOWN
+     C and D cannot carry the cross-arm result
+```
+
+UNKNOWN is a real and acceptable outcome. It is not a failure to try harder.
+
+## The methodology lesson, pending qualification
+
+> A treatment-aware integrity witness may relax only treatment-defined state,
+> while preserving the invariant it was created to protect.
+
+This was done correctly one layer up: `RecoveryGate.flex_model` relaxes exactly
+the target's scheduled absence and nothing else. The PID tooth missed the same
+structural issue one layer down — it had no notion that the treatment is
+*expected* to replace worker processes.
