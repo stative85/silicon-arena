@@ -1,0 +1,18 @@
+=== CLEAN RERUN (RERUN-2), Lane A frozen ===
+frozen_head=a5cb6528bd554c8b8c40b323b65f64b1530f1353
+frozen_head_short=a5cb652
+harness_blob=bcb535bcc525831daa6aa854ed2fda3d0493ffd5
+launched_at=2026-09-08T22:23:50Z
+lane_b_worktree=D:/silicon-arena-breach-work (branch breach-work)
+
+########## ARM IDLE ##########
+  teardown clean after 2.2s (count 0)
+  witness: pids=[6956, 10552, 13012, 21020, 22156, 25084, 26224, 28924, 29856, 31052, 31788, 32252] rss=5514 MB host_free=10838 MB vram=5662 MiB
+    post_disconnect + 5s  rss= 5121 MB  host_free=12005 MB
+    post_disconnect +15s  rss= 5121 MB  host_free=11850 MB
+    post_disconnect +30s  rss= 5121 MB  host_free=11920 MB
+    post_disconnect +60s  rss= 5122 MB  host_free=11984 MB
+
+########## ARM CONTROL_WORKLOAD ##########
+  teardown clean after 3.4s (count 0)
+  witness: pids=[15644, 15908, 16152, 16724, 27640, 29012, 29308, 29804, 29896, 29928, 30504, 31100] rss=5269 MB host_free=11485 MB vram=5530 MiB

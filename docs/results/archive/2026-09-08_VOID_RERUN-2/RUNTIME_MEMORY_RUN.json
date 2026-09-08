@@ -1,0 +1,143 @@
+{
+  "experiment": "RUNTIME-MEMORY",
+  "arms": {
+    "IDLE": {
+      "start_witness": {
+        "experiment_id": "RUNTIME-MEMORY",
+        "arm": "IDLE",
+        "backend_fresh_start_at": "2026-09-08T17:23:53",
+        "backend_pids": [
+          6956,
+          10552,
+          13012,
+          21020,
+          22156,
+          25084,
+          26224,
+          28924,
+          29856,
+          31052,
+          31788,
+          32252
+        ],
+        "lms_rss_mb": 5514,
+        "residency_counts": {
+          "liquidai/lfm2.5-1.2b-instruct": 1,
+          "qwen3.5-2b": 1,
+          "falcon-h1-1.5b-instruct": 1
+        },
+        "model_load_order": [
+          "liquidai/lfm2.5-1.2b-instruct",
+          "qwen3.5-2b",
+          "falcon-h1-1.5b-instruct"
+        ],
+        "vram_used_mib": 5662,
+        "vram_total_mib": 8151,
+        "host_free_ram_mb": 10838,
+        "active_requests_at_start": 0,
+        "runtime_version": "lms CLI commit df81c60",
+        "health_surface_sha256": "14536bd0e92f16ba",
+        "windows": 40,
+        "at": "2026-09-08T17:24:04",
+        "teardown_wait_s": 2.2
+      },
+      "post_disconnect": [
+        {
+          "seconds_after_client_exit": 5,
+          "lms_rss_mb": 5121,
+          "host_free_ram_mb": 12005,
+          "vram_used_mib": 5667,
+          "backend_pids": [
+            6956,
+            10552,
+            13012,
+            21020,
+            22156,
+            25084,
+            26224,
+            28924,
+            29856,
+            31052,
+            31788,
+            32252
+          ],
+          "backend_alive_after_disconnect": true
+        },
+        {
+          "seconds_after_client_exit": 15,
+          "lms_rss_mb": 5121,
+          "host_free_ram_mb": 11850,
+          "vram_used_mib": 5667,
+          "backend_pids": [
+            6956,
+            10552,
+            13012,
+            21020,
+            22156,
+            25084,
+            26224,
+            28924,
+            29856,
+            31052,
+            31788,
+            32252
+          ],
+          "backend_alive_after_disconnect": true
+        },
+        {
+          "seconds_after_client_exit": 30,
+          "lms_rss_mb": 5121,
+          "host_free_ram_mb": 11920,
+          "vram_used_mib": 5667,
+          "backend_pids": [
+            6956,
+            10552,
+            13012,
+            21020,
+            22156,
+            25084,
+            26224,
+            28924,
+            29856,
+            31052,
+            31788,
+            32252
+          ],
+          "backend_alive_after_disconnect": true
+        },
+        {
+          "seconds_after_client_exit": 60,
+          "lms_rss_mb": 5122,
+          "host_free_ram_mb": 11984,
+          "vram_used_mib": 5668,
+          "backend_pids": [
+            6956,
+            10552,
+            13012,
+            21020,
+            22156,
+            25084,
+            26224,
+            28924,
+            29856,
+            31052,
+            31788,
+            32252
+          ],
+          "backend_alive_after_disconnect": true
+        }
+      ]
+    }
+  },
+  "windows": 40,
+  "experiment_id": "RUNTIME-MEMORY",
+  "run_kind": "EXPERIMENT",
+  "measurement_pool_id": "RM3_V1",
+  "pool": [
+    "liquidai/lfm2.5-1.2b-instruct",
+    "qwen3.5-2b",
+    "falcon-h1-1.5b-instruct"
+  ],
+  "clearance_record": "docs/results/RUNTIME_MEMORY_RERUN_CLEARANCE.json",
+  "prereg": "docs/results/PREREG_RUNTIME_MEMORY_RERUN.md"
+}
