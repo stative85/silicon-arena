@@ -1,0 +1,31 @@
+{
+  "title": "Silicon Arena night shift — make the instrument harder to lie with",
+  "repo": "D:/silicon-arena-public",
+  "doctrine": "INVARIANT -> DETECTION -> TEETH -> RECOVERY -> PROOF",
+  "principle": "Do not make Silicon Arena look successful. Make it increasingly difficult for Silicon Arena to lie.",
+  "read_first": [
+    "docs/NEXT_LIVE_RUN.md",
+    "docs/ROBRUSTION_LAWS.md",
+    "docs/results/NIGHT_SHIFT_REPORT.md",
+    "docs/results/TREATMENT_AWARE_DETECTOR_AUDIT.md",
+    "docs/results/INSTRUMENT_DEFECT_PID_TOOTH.md"
+  ],
+  "queue": [
+    "Static audit of any harness file not yet reviewed; fix only defects that can be demonstrated mechanically",
+    "Improve failure diagnostics: every void/refusal must name a specific cause, never a bucket",
+    "Artifact validation: a loader or checker for each artifact family, fail-closed",
+    "Test coverage: for each new test show positive control, sabotage control, proof the sabotage applied, and the correct failure reason",
+    "Documentation reproducibility: any procedure a future operator must follow should be executable, not prose"
+  ],
+  "boundaries": {
+    "lm_studio": "READ-ONLY / DO-NOT-CONTACT. No restart, unload/load, inference, or experiment runs.",
+    "tests": "Run ONLY via python tools/run_safe_tests.py",
+    "frozen": "Do not alter prereg history, quarantined evidence, ks/kh/n, or the 2048 MB floor",
+    "commits": "Never commit a failing tree; small verified units with descriptive messages"
+  },
+  "stop_when": {
+    "DONE": "queue exhausted and no further mechanically-justified work remains",
+    "BLOCKED": "cannot proceed without violating a boundary or without information that does not exist",
+    "HUMAN_CLEARANCE_REQUIRED": "next action needs runtime contact or a scientific judgement that is not the agent's to make"
+  }
+}
