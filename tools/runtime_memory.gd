@@ -36,6 +36,20 @@ const SAMPLE_MS := 2000           ## resource sampling cadence
 const PROBE_LIST_LEN := 10        ## fixed, so the denominator cannot move
 const RECOVERY_AT_MS := 10000     ## within a window, arms C and D
 
+## GENERATION PROBE CADENCE. The producer probe (powershell/CIM) costs a
+## MEASURED 345 ms median and blocks the main loop. At SAMPLE_MS = 2000 that is
+## 17.3% of every interval and ~276 s over a 40-window arm, which would reduce
+## effective request throughput -- and requests are a primary independent
+## variable here ("MB per 100 requests"). Telemetry that changes the workload it
+## measures is the same defect this experiment exists to study.
+##
+## So the cheap PID probe (tasklist, ~150 ms) runs every sample and catches
+## disappearance or gross change immediately, while the full generation probe
+## runs every GENERATION_PROBE_EVERY samples and at the arm boundaries. A
+## backend restart takes seconds and cannot hide inside that window; the cheap
+## probe would show the PID set collapse regardless.
+const GENERATION_PROBE_EVERY := 10
+
 const IDLE := "IDLE"
 const CONTROL_WORKLOAD := "CONTROL_WORKLOAD"
 const RECOVERY_ONLY := "RECOVERY_ONLY"
@@ -59,6 +73,7 @@ var _recoveries := 0
 var _pids: Array = []
 var _core_pid := -1
 var _core_created := ""
+var _sample_i := -1
 var _rec_running := false
 
 
@@ -90,6 +105,26 @@ func _init() -> void:
 ## FAILS CLOSED. If the producer field cannot be obtained the sample records
 ## backend_probe_ok = false and the arm records a problem, rather than
 ## defaulting to an empty set that would read as "backend gone".
+## Cheap PID-only probe. Cannot identify roles, so it never sets ok=true; it
+## exists to catch a collapsing or wildly changed process set at full cadence.
+func _backend_pids_cheap() -> Array:
+	var out: Array = []
+	OS.execute("tasklist", PackedStringArray(["/FI",
+		"IMAGENAME eq LM Studio.exe", "/FO", "CSV", "/NH"]), out, false, false)
+	var pids: Array = []
+	if out.is_empty():
+		return pids
+	for ln in str(out[0]).split("
+"):
+		var parts := str(ln).split("\",\"")
+		if parts.size() > 1:
+			var t := str(parts[1]).replace("\"", "").strip_edges()
+			if t.is_valid_int():
+				pids.append(int(t))
+	pids.sort()
+	return pids
+
+
 func _backend_probe() -> Dictionary:
 	var out: Array = []
 	var ps := ("Get-CimInstance Win32_Process -Filter \"Name='LM Studio.exe'\" "
@@ -179,7 +214,17 @@ func _vram() -> Array:
 
 
 func _sample(phase: String) -> void:
-	var probe := _backend_probe()
+	_sample_i += 1
+	var full := (_sample_i % GENERATION_PROBE_EVERY) == 0 		or phase == "arm_start" or phase == "final_live_client"
+	var probe: Dictionary = {}
+	if full:
+		probe = _backend_probe()
+	else:
+		var cheap := _backend_pids_cheap()
+		probe = {"ok": not cheap.is_empty(), "procs": [], "pids": cheap,
+			"core_pid": (_core_pid if cheap.has(_core_pid) else -1),
+			"core_created": (_core_created if cheap.has(_core_pid) else ""),
+			"worker_pids": [], "support_pids": [], "cheap": true}
 	if not bool(probe["ok"]):
 		_problems.append("BACKEND_PROBE_FAILED at %s: producer field "
 			% phase + "unavailable; failing closed rather than recording an "
@@ -214,6 +259,7 @@ func _sample(phase: String) -> void:
 		"backend_worker_pids": probe["worker_pids"],
 		"backend_support_pids": probe["support_pids"],
 		"backend_procs": probe["procs"],
+		"backend_probe_full": full,
 	})
 
 

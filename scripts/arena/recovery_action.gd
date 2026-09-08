@@ -242,8 +242,15 @@ func perform(http: HTTPRequest, target: String, neighbours: Array,
 ## a second instance -- so every restore path must check first.
 static func ensure_loaded(http: HTTPRequest, model_id: String) -> bool:
 	var now := await residency_counts(http)
-	if int(now.get(model_id, 0)) >= 1:
+	var have := int(now.get(model_id, 0))
+	if have == 1:
 		return true
+	if have > 1:
+		# AT-LEAST-ONE IS NOT THE INVARIANT. Loading again would add a third
+		# instance; returning true would report a corrupted pool as restored.
+		# The caller's exact count-map check is the backstop, but this must not
+		# lie to it.
+		return false
 	real_runner(["load", model_id, "--gpu=max",
 		"--context-length=" + CONTEXT, "-y"])
 	var after := await residency_counts(http)
