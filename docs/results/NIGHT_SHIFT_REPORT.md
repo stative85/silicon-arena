@@ -2,9 +2,9 @@
 
 ```text
 starting commit   6a6b4d5   RUNTIME-MEMORY Amendment 5
-ending commit     0322a69   failure-path teeth
-commits           9
-files changed     25  (+90,835 / -52, dominated by raw arm artifacts)
+ending commit     see git log; final commit is this report's own update
+commits           13
+files changed     26  (+91,339 / -58, dominated by raw arm artifacts)
 ```
 
 **Objective:** make the next live run boring, mechanically witnessed, and hard
@@ -24,12 +24,19 @@ a8083d0  Preserve the PID-tooth defect history; corollary NOT promoted to Law 6
 62f1881  Static review: a failed read is no longer indistinguishable from an empty pool
 3d4263e  docs/NEXT_LIVE_RUN.md: deterministic handover
 0322a69  Pin the night-shift fixes with failure-path teeth, proven to bite
+38d22d9  Night shift report (initial)
+4142312  Execution-contact classification: fail-closed, found 32 blind spots
+1e67fd5  Law 6 EXECUTION-BOUNDARY, granted after the redundancy test
 ```
 
 ## Tests
 
-`python tools/run_safe_tests.py` — **9 no-contact suites pass, 0 fail, 2 contact
-suites correctly skipped.**
+`python tools/run_safe_tests.py` — **39 suites pass, 0 fail, 4 withheld**
+(2 CONTACT_REQUIRED, 2 STATE_MUTATING).
+
+The suite count rose from 9 to 39 because the fail-closed classification audit
+discovered **32 unclassified test-shaped files** that no runner had been
+tracking. Core suites and their check counts:
 
 ```text
 runtime_memory_selftest      41 checks   static scan of the arm harness
