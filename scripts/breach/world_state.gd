@@ -22,6 +22,13 @@ var vault_opened_at_tick: int = -1
 
 const VAULT_REQUIRED_KEYS := 3
 
+## The one place a key may be committed or withdrawn. Both are PHYSICAL acts:
+## an agent must be standing here to perform them. Without this, a key could be
+## committed from across the arena -- teleportation, and it would delete the
+## whole point of the mechanic, since distance is what makes controlling a key
+## cost anything.
+var vault_location: String = "vault_hall"
+
 
 func add_location(id: String, display: String, neighbors: Array) -> void:
 	locations[id] = {"name": display, "neighbors": neighbors.duplicate(),

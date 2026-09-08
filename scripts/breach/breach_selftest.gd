@@ -30,6 +30,8 @@ const CanonicalOperationScript := preload("res://scripts/breach/canonical_operat
 const DeciderScript := preload("res://scripts/breach/decider.gd")
 const BreachRosterScript := preload("res://scripts/breach/breach_roster.gd")
 const WorldStateScript := preload("res://scripts/breach/world_state.gd")
+const WorldReducerScript := preload("res://scripts/breach/world_reducer.gd")
+const AgentStateScript := preload("res://scripts/breach/agent_state.gd")
 const ArenaLayoutScript := preload("res://scripts/breach/arena_layout.gd")
 const TurnSchedulerScript := preload("res://scripts/breach/turn_scheduler.gd")
 const MemoryLedgerScript := preload("res://scripts/breach/memory_ledger.gd")
@@ -126,6 +128,38 @@ func _init() -> void:
 		not w.vault_should_open(), str(w.distinct_committed_keys()))
 	w.vault_slots["vault_slot_3"] = "key_C"
 	ck("three distinct keys open it", w.vault_should_open())
+
+	print("
+[vault operations are PHYSICAL -- no key teleportation]")
+	var w2 = WorldStateScript.new()
+	ArenaLayoutScript.build(w2, "TEST2")
+	var far = AgentStateScript.new("FAR", "m", "s", "m#1", 100, "spawn_vanta")
+	far.add_object("key_A")
+	var at_vault = AgentStateScript.new("NEAR", "m", "s", "m#1", 100, w2.vault_location)
+	at_vault.add_object("key_B")
+	var two := {"FAR": far, "NEAR": at_vault}
+	var r_far := WorldReducerScript.apply(w2, two, "FAR", CO.COMMIT_KEY,
+		{"target": "vault_slot_1"}, null)
+	ck("committing from across the arena is REFUSED", not bool(r_far["ok"]),
+		str(r_far["reason"]))
+	ck("  and the slot stayed empty",
+		str(w2.vault_slots["vault_slot_1"]).is_empty())
+	var r_near := WorldReducerScript.apply(w2, two, "NEAR", CO.COMMIT_KEY,
+		{"target": "vault_slot_1"}, null)
+	ck("committing while standing at the vault works", bool(r_near["ok"]),
+		str(r_near["reason"]))
+	ck("  the key is in the slot",
+		str(w2.vault_slots["vault_slot_1"]) == "key_B")
+	var r_wfar := WorldReducerScript.apply(w2, two, "FAR", CO.WITHDRAW_KEY,
+		{"target": "vault_slot_1"}, null)
+	ck("withdrawing from across the arena is REFUSED", not bool(r_wfar["ok"]))
+	var r_wnear := WorldReducerScript.apply(w2, two, "NEAR", CO.WITHDRAW_KEY,
+		{"target": "vault_slot_1"}, null)
+	ck("withdrawing at the vault transfers POSSESSION explicitly",
+		bool(r_wnear["ok"]) and at_vault.has_object("key_B")
+		and str(w2.objects["key_B"]["holder"]) == "NEAR")
+	ck("  and the slot is empty again",
+		str(w2.vault_slots["vault_slot_1"]).is_empty())
 
 	print("\n[a full offline round, no inference]")
 	var roster := BreachRosterScript.load_roster()

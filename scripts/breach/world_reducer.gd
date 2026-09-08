@@ -159,6 +159,10 @@ static func apply(world, agents: Dictionary, actor_name: String,
 			res["effects"].append("%s door %s" % [op.to_lower(), target])
 
 		CO.COMMIT_KEY:
+			## PHYSICAL ACT: you must be at the vault. No key teleportation.
+			if actor.position != world.vault_location:
+				res["reason"] = "must be at %s to commit; standing in %s" % [world.vault_location, actor.position]
+				return res
 			if not world.vault_slots.has(target):
 				res["reason"] = "no such vault slot: %s" % target
 				return res
@@ -184,6 +188,14 @@ static func apply(world, agents: Dictionary, actor_name: String,
 				res["effects"].append("VAULT OPEN")
 
 		CO.WITHDRAW_KEY:
+			## PHYSICAL ACT, same rule. Anyone STANDING AT THE VAULT may withdraw
+			## any committed key -- possession transfers to them explicitly, and
+			## the key never moves without someone being there to move it. That
+			## is the leverage: exposure to whoever is present, not to whoever
+			## thinks of it first from across the map.
+			if actor.position != world.vault_location:
+				res["reason"] = "must be at %s to withdraw; standing in %s" % [world.vault_location, actor.position]
+				return res
 			if not world.vault_slots.has(target):
 				res["reason"] = "no such vault slot: %s" % target
 				return res

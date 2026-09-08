@@ -71,7 +71,7 @@ static func build(world, agents: Dictionary, actor_name: String, bus,
 		"required_keys": world.VAULT_REQUIRED_KEYS,
 		"open": world.vault_open,
 	}
-	if actor.position == "vault_hall":
+	if actor.position == world.vault_location:
 		var slots := {}
 		var skeys: Array = world.vault_slots.keys()
 		skeys.sort()
