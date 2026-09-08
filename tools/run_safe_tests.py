@@ -305,6 +305,14 @@ def run_one(s):
             if any(k in ln for k in ("checks", "GREEN", "RED", "FAIL", "ok ",
                                      "ACCEPTED", "REJECTED", "FAILS CLOSED"))]
     ok = r.returncode == 0 or s.get("expect_nonzero", False)
+    if not ok:
+        # A failing suite must say WHICH check failed. The three-line tail is
+        # fine for a green run and useless for a red one: it showed the summary
+        # and hid the failure, so the next reader has to re-run the suite
+        # directly -- which is exactly what the classification forbids.
+        why = [ln for ln in out.splitlines() if "FAIL" in ln]
+        return ok, (why[:8] + tail[-2:]) if why else (tail[-3:] or
+                                                      out.splitlines()[-3:])
     return ok, tail[-3:] if tail else out.splitlines()[-2:]
 
 

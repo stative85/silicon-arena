@@ -180,6 +180,19 @@ def declaration_reasons(doc, name="<artifact>"):
     return []
 
 
+def doc_fingerprint(doc):
+    """A comparison that can see a change `==` cannot.
+
+    Sabotage helpers prove a mutation applied by comparing before and after.
+    `==` is too weak for that job: in Python `1 == True` and `1.0 == 1`, so
+    replacing a boolean True with the integer 1 -- a real and meaningful
+    corruption of an artifact -- compares EQUAL, and the sabotage reports
+    itself as never applied. This found a live false negative in
+    result_loader's integer-1 sabotage. Serialising with types visible makes
+    that mutation observable."""
+    return json.dumps(doc, sort_keys=True, default=repr)
+
+
 def load_checked(path, kind):
     """Load an artifact or raise SchemaRefused. The only sanctioned way for a
     result-bearing consumer to open one of these files."""
@@ -232,7 +245,7 @@ def selftest():
         base = _good_arm()
         d = mutate(_good_arm())
         n += 1
-        if d == base:
+        if doc_fingerprint(d) == doc_fingerprint(base):
             f += 1
             print("  FAIL %s -- SABOTAGE DID NOT APPLY (document unchanged)"
                   % label)
@@ -306,6 +319,18 @@ def selftest():
     ck("REFUSES an unknown kind rather than guessing",
        any("unknown artifact kind" in x
            for x in validate(_good_arm(), "SOMETHING_INVENTED")))
+
+    print("\n-- the sabotage-applied check can see what == cannot")
+    # If this regresses, every sabotage above silently becomes able to pass
+    # without applying. The helper's own tooth needs a tooth.
+    ck("True and 1 compare EQUAL under == (the trap)",
+       {"q": True} == {"q": 1})
+    ck("...but DIFFER under doc_fingerprint (the fix)",
+       doc_fingerprint({"q": True}) != doc_fingerprint({"q": 1}))
+    ck("...and True differs from the string 'true' too",
+       doc_fingerprint({"q": True}) != doc_fingerprint({"q": "true"}))
+    ck("...while an identical document still fingerprints identically",
+       doc_fingerprint(_good_arm()) == doc_fingerprint(_good_arm()))
 
     print("\n-- kind-agnostic declaration check (used by result_loader)")
     ck("REFUSES an anonymous document",
