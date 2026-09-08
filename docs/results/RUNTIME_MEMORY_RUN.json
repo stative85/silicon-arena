@@ -1,0 +1,506 @@
+{
+  "experiment": "RUNTIME-MEMORY",
+  "arms": {
+    "IDLE": {
+      "start_witness": {
+        "experiment_id": "RUNTIME-MEMORY",
+        "arm": "IDLE",
+        "backend_fresh_start_at": "2026-09-07T17:27:47",
+        "backend_pids": [
+          5720,
+          14992,
+          18320,
+          19848,
+          21628,
+          22652,
+          23668,
+          23804,
+          25188,
+          25396,
+          26488,
+          26964
+        ],
+        "lms_rss_mb": 5471,
+        "residency_counts": {
+          "liquidai/lfm2.5-1.2b-instruct": 1,
+          "qwen3.5-2b": 1,
+          "falcon-h1-1.5b-instruct": 1
+        },
+        "model_load_order": [
+          "liquidai/lfm2.5-1.2b-instruct",
+          "qwen3.5-2b",
+          "falcon-h1-1.5b-instruct"
+        ],
+        "vram_used_mib": 5669,
+        "vram_total_mib": 8151,
+        "host_free_ram_mb": 16652,
+        "runtime_version": "lms CLI commit df81c60",
+        "health_surface_sha256": "14536bd0e92f16ba",
+        "windows": 40,
+        "at": "2026-09-07T17:27:59"
+      },
+      "post_disconnect": [
+        {
+          "seconds_after_client_exit": 5,
+          "lms_rss_mb": 5597,
+          "host_free_ram_mb": 15637,
+          "vram_used_mib": 5646,
+          "backend_pids": [
+            5720,
+            14992,
+            18320,
+            19848,
+            21628,
+            22652,
+            23668,
+            23804,
+            25188,
+            25396,
+            26488,
+            26964
+          ],
+          "backend_alive_after_disconnect": true
+        },
+        {
+          "seconds_after_client_exit": 15,
+          "lms_rss_mb": 5597,
+          "host_free_ram_mb": 15628,
+          "vram_used_mib": 5646,
+          "backend_pids": [
+            5720,
+            14992,
+            18320,
+            19848,
+            21628,
+            22652,
+            23668,
+            23804,
+            25188,
+            25396,
+            26488,
+            26964
+          ],
+          "backend_alive_after_disconnect": true
+        },
+        {
+          "seconds_after_client_exit": 30,
+          "lms_rss_mb": 5597,
+          "host_free_ram_mb": 15671,
+          "vram_used_mib": 5646,
+          "backend_pids": [
+            5720,
+            14992,
+            18320,
+            19848,
+            21628,
+            22652,
+            23668,
+            23804,
+            25188,
+            25396,
+            26488,
+            26964
+          ],
+          "backend_alive_after_disconnect": true
+        },
+        {
+          "seconds_after_client_exit": 60,
+          "lms_rss_mb": 5597,
+          "host_free_ram_mb": 15649,
+          "vram_used_mib": 5646,
+          "backend_pids": [
+            5720,
+            14992,
+            18320,
+            19848,
+            21628,
+            22652,
+            23668,
+            23804,
+            25188,
+            25396,
+            26488,
+            26964
+          ],
+          "backend_alive_after_disconnect": true
+        }
+      ]
+    },
+    "CONTROL_WORKLOAD": {
+      "start_witness": {
+        "experiment_id": "RUNTIME-MEMORY",
+        "arm": "CONTROL_WORKLOAD",
+        "backend_fresh_start_at": "2026-09-07T17:56:08",
+        "backend_pids": [
+          8836,
+          11680,
+          19976,
+          21524,
+          22672,
+          25012,
+          25512,
+          25588,
+          25688,
+          26472,
+          27044,
+          27136
+        ],
+        "lms_rss_mb": 5500,
+        "residency_counts": {
+          "liquidai/lfm2.5-1.2b-instruct": 1,
+          "qwen3.5-2b": 1,
+          "falcon-h1-1.5b-instruct": 1
+        },
+        "model_load_order": [
+          "liquidai/lfm2.5-1.2b-instruct",
+          "qwen3.5-2b",
+          "falcon-h1-1.5b-instruct"
+        ],
+        "vram_used_mib": 5632,
+        "vram_total_mib": 8151,
+        "host_free_ram_mb": 15526,
+        "runtime_version": "lms CLI commit df81c60",
+        "health_surface_sha256": "14536bd0e92f16ba",
+        "windows": 40,
+        "at": "2026-09-07T17:56:18"
+      },
+      "post_disconnect": [
+        {
+          "seconds_after_client_exit": 5,
+          "lms_rss_mb": 16597,
+          "host_free_ram_mb": 4720,
+          "vram_used_mib": 5657,
+          "backend_pids": [
+            8836,
+            11680,
+            19976,
+            21524,
+            22672,
+            25012,
+            25512,
+            25588,
+            25688,
+            26472,
+            27044,
+            27136
+          ],
+          "backend_alive_after_disconnect": true
+        },
+        {
+          "seconds_after_client_exit": 15,
+          "lms_rss_mb": 16662,
+          "host_free_ram_mb": 4820,
+          "vram_used_mib": 5636,
+          "backend_pids": [
+            8836,
+            11680,
+            19976,
+            21524,
+            22672,
+            25012,
+            25512,
+            25588,
+            25688,
+            26472,
+            27044,
+            27136
+          ],
+          "backend_alive_after_disconnect": true
+        },
+        {
+          "seconds_after_client_exit": 30,
+          "lms_rss_mb": 16675,
+          "host_free_ram_mb": 4822,
+          "vram_used_mib": 5651,
+          "backend_pids": [
+            8836,
+            11680,
+            19976,
+            21524,
+            22672,
+            25012,
+            25512,
+            25588,
+            25688,
+            26472,
+            27044,
+            27136
+          ],
+          "backend_alive_after_disconnect": true
+        },
+        {
+          "seconds_after_client_exit": 60,
+          "lms_rss_mb": 16664,
+          "host_free_ram_mb": 4744,
+          "vram_used_mib": 5638,
+          "backend_pids": [
+            8836,
+            11680,
+            19976,
+            21524,
+            22672,
+            25012,
+            25512,
+            25588,
+            25688,
+            26472,
+            27044,
+            27136
+          ],
+          "backend_alive_after_disconnect": true
+        }
+      ]
+    },
+    "RECOVERY_ONLY": {
+      "start_witness": {
+        "experiment_id": "RUNTIME-MEMORY",
+        "arm": "RECOVERY_ONLY",
+        "backend_fresh_start_at": "2026-09-07T18:24:38",
+        "backend_pids": [
+          3540,
+          4248,
+          5828,
+          14024,
+          17452,
+          20076,
+          20400,
+          21468,
+          23372,
+          24036,
+          24984,
+          25796
+        ],
+        "lms_rss_mb": 5491,
+        "residency_counts": {
+          "liquidai/lfm2.5-1.2b-instruct": 1,
+          "qwen3.5-2b": 1,
+          "falcon-h1-1.5b-instruct": 1
+        },
+        "model_load_order": [
+          "liquidai/lfm2.5-1.2b-instruct",
+          "qwen3.5-2b",
+          "falcon-h1-1.5b-instruct"
+        ],
+        "vram_used_mib": 5672,
+        "vram_total_mib": 8151,
+        "host_free_ram_mb": 15621,
+        "runtime_version": "lms CLI commit df81c60",
+        "health_surface_sha256": "14536bd0e92f16ba",
+        "windows": 40,
+        "at": "2026-09-07T18:24:56"
+      },
+      "post_disconnect": [
+        {
+          "seconds_after_client_exit": 5,
+          "lms_rss_mb": 5410,
+          "host_free_ram_mb": 15723,
+          "vram_used_mib": 5646,
+          "backend_pids": [
+            3540,
+            4248,
+            4440,
+            5828,
+            14024,
+            14776,
+            17400,
+            17452,
+            20400,
+            23372,
+            24984,
+            25796
+          ],
+          "backend_alive_after_disconnect": true
+        },
+        {
+          "seconds_after_client_exit": 15,
+          "lms_rss_mb": 5409,
+          "host_free_ram_mb": 15712,
+          "vram_used_mib": 5646,
+          "backend_pids": [
+            3540,
+            4248,
+            4440,
+            5828,
+            14024,
+            14776,
+            17400,
+            17452,
+            20400,
+            23372,
+            24984,
+            25796
+          ],
+          "backend_alive_after_disconnect": true
+        },
+        {
+          "seconds_after_client_exit": 30,
+          "lms_rss_mb": 5395,
+          "host_free_ram_mb": 15717,
+          "vram_used_mib": 5646,
+          "backend_pids": [
+            3540,
+            4248,
+            4440,
+            5828,
+            14024,
+            14776,
+            17400,
+            17452,
+            20400,
+            23372,
+            24984,
+            25796
+          ],
+          "backend_alive_after_disconnect": true
+        },
+        {
+          "seconds_after_client_exit": 60,
+          "lms_rss_mb": 5414,
+          "host_free_ram_mb": 15690,
+          "vram_used_mib": 5646,
+          "backend_pids": [
+            3540,
+            4248,
+            4440,
+            5828,
+            14024,
+            14776,
+            17400,
+            17452,
+            20400,
+            23372,
+            24984,
+            25796
+          ],
+          "backend_alive_after_disconnect": true
+        }
+      ]
+    },
+    "FULL_WINDOW": {
+      "start_witness": {
+        "experiment_id": "RUNTIME-MEMORY",
+        "arm": "FULL_WINDOW",
+        "backend_fresh_start_at": "2026-09-07T18:53:25",
+        "backend_pids": [
+          9932,
+          14228,
+          16116,
+          18004,
+          19828,
+          20496,
+          20924,
+          21612,
+          22296,
+          23112,
+          25896,
+          25988
+        ],
+        "lms_rss_mb": 5514,
+        "residency_counts": {
+          "liquidai/lfm2.5-1.2b-instruct": 1,
+          "qwen3.5-2b": 1,
+          "falcon-h1-1.5b-instruct": 1
+        },
+        "model_load_order": [
+          "liquidai/lfm2.5-1.2b-instruct",
+          "qwen3.5-2b",
+          "falcon-h1-1.5b-instruct"
+        ],
+        "vram_used_mib": 5639,
+        "vram_total_mib": 8151,
+        "host_free_ram_mb": 15567,
+        "runtime_version": "lms CLI commit df81c60",
+        "health_surface_sha256": "14536bd0e92f16ba",
+        "windows": 40,
+        "at": "2026-09-07T18:53:36"
+      },
+      "post_disconnect": [
+        {
+          "seconds_after_client_exit": 5,
+          "lms_rss_mb": 16105,
+          "host_free_ram_mb": 5745,
+          "vram_used_mib": 5671,
+          "backend_pids": [
+            9932,
+            14228,
+            19828,
+            20496,
+            20924,
+            21408,
+            21612,
+            23036,
+            23112,
+            23992,
+            25896,
+            25988
+          ],
+          "backend_alive_after_disconnect": true
+        },
+        {
+          "seconds_after_client_exit": 15,
+          "lms_rss_mb": 16105,
+          "host_free_ram_mb": 5639,
+          "vram_used_mib": 5671,
+          "backend_pids": [
+            9932,
+            14228,
+            19828,
+            20496,
+            20924,
+            21408,
+            21612,
+            23036,
+            23112,
+            23992,
+            25896,
+            25988
+          ],
+          "backend_alive_after_disconnect": true
+        },
+        {
+          "seconds_after_client_exit": 30,
+          "lms_rss_mb": 16078,
+          "host_free_ram_mb": 5569,
+          "vram_used_mib": 5671,
+          "backend_pids": [
+            9932,
+            14228,
+            19828,
+            20496,
+            20924,
+            21408,
+            21612,
+            23036,
+            23112,
+            23992,
+            25896,
+            25988
+          ],
+          "backend_alive_after_disconnect": true
+        },
+        {
+          "seconds_after_client_exit": 60,
+          "lms_rss_mb": 16097,
+          "host_free_ram_mb": 5444,
+          "vram_used_mib": 5671,
+          "backend_pids": [
+            9932,
+            14228,
+            19828,
+            20496,
+            20924,
+            21408,
+            21612,
+            23036,
+            23112,
+            23992,
+            25896,
+            25988
+          ],
+          "backend_alive_after_disconnect": true
+        }
+      ]
+    }
+  },
+  "windows": 40
+}

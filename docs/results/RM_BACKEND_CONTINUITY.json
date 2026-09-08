@@ -1,0 +1,128 @@
+{
+  "IDLE": {
+    "clauses": {
+      "no_unavailable_interval": "PASS",
+      "core_identity_persists": "PASS_BY_RESTART_EXCLUSION",
+      "core_generation_unchanged": "UNKNOWN",
+      "churn_attributable": "PASS"
+    },
+    "observed": {
+      "empty_samples": 0,
+      "persistent_pids": 12,
+      "persistent_pid_list": [
+        5720,
+        14992,
+        18320,
+        19848,
+        21628,
+        22652,
+        23668,
+        23804,
+        25188,
+        25396,
+        26488,
+        26964
+      ],
+      "core_pid": null,
+      "churned_pids": 0,
+      "recoveries": 0
+    },
+    "verdict": "UNKNOWN",
+    "core_created": null,
+    "arm": "IDLE",
+    "original_tooth_offences": 0
+  },
+  "CONTROL_WORKLOAD": {
+    "clauses": {
+      "no_unavailable_interval": "PASS",
+      "core_identity_persists": "PASS_BY_RESTART_EXCLUSION",
+      "core_generation_unchanged": "UNKNOWN",
+      "churn_attributable": "PASS"
+    },
+    "observed": {
+      "empty_samples": 0,
+      "persistent_pids": 12,
+      "persistent_pid_list": [
+        8836,
+        11680,
+        19976,
+        21524,
+        22672,
+        25012,
+        25512,
+        25588,
+        25688,
+        26472,
+        27044,
+        27136
+      ],
+      "core_pid": null,
+      "churned_pids": 0,
+      "recoveries": 0
+    },
+    "verdict": "UNKNOWN",
+    "core_created": null,
+    "arm": "CONTROL_WORKLOAD",
+    "original_tooth_offences": 0
+  },
+  "RECOVERY_ONLY": {
+    "clauses": {
+      "no_unavailable_interval": "PASS",
+      "core_identity_persists": "PASS_BY_RESTART_EXCLUSION",
+      "core_generation_unchanged": "UNKNOWN",
+      "churn_attributable": "PASS"
+    },
+    "observed": {
+      "empty_samples": 0,
+      "persistent_pids": 9,
+      "persistent_pid_list": [
+        3540,
+        4248,
+        5828,
+        14024,
+        17452,
+        20400,
+        23372,
+        24984,
+        25796
+      ],
+      "core_pid": null,
+      "churned_pids": 43,
+      "recoveries": 40
+    },
+    "verdict": "UNKNOWN",
+    "core_created": null,
+    "arm": "RECOVERY_ONLY",
+    "original_tooth_offences": 676
+  },
+  "FULL_WINDOW": {
+    "clauses": {
+      "no_unavailable_interval": "PASS",
+      "core_identity_persists": "PASS",
+      "core_generation_unchanged": "PASS",
+      "churn_attributable": "PASS"
+    },
+    "observed": {
+      "empty_samples": 0,
+      "persistent_pids": 9,
+      "persistent_pid_list": [
+        9932,
+        14228,
+        19828,
+        20496,
+        20924,
+        21612,
+        23112,
+        25896,
+        25988
+      ],
+      "core_pid": 20924,
+      "churned_pids": 43,
+      "recoveries": 40
+    },
+    "verdict": "PASS",
+    "core_created": "09/07/2026 18:53:25",
+    "arm": "FULL_WINDOW",
+    "original_tooth_offences": 582
+  }
+}

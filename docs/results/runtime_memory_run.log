@@ -1,0 +1,30 @@
+
+########## ARM IDLE ##########
+  witness: pids=[5720, 14992, 18320, 19848, 21628, 22652, 23668, 23804, 25188, 25396, 26488, 26964] rss=5471 MB host_free=16652 MB vram=5669 MiB
+    post_disconnect + 5s  rss= 5597 MB  host_free=15637 MB
+    post_disconnect +15s  rss= 5597 MB  host_free=15628 MB
+    post_disconnect +30s  rss= 5597 MB  host_free=15671 MB
+    post_disconnect +60s  rss= 5597 MB  host_free=15649 MB
+
+########## ARM CONTROL_WORKLOAD ##########
+  witness: pids=[8836, 11680, 19976, 21524, 22672, 25012, 25512, 25588, 25688, 26472, 27044, 27136] rss=5500 MB host_free=15526 MB vram=5632 MiB
+    post_disconnect + 5s  rss=16597 MB  host_free= 4720 MB
+    post_disconnect +15s  rss=16662 MB  host_free= 4820 MB
+    post_disconnect +30s  rss=16675 MB  host_free= 4822 MB
+    post_disconnect +60s  rss=16664 MB  host_free= 4744 MB
+
+########## ARM RECOVERY_ONLY ##########
+  witness: pids=[3540, 4248, 5828, 14024, 17452, 20076, 20400, 21468, 23372, 24036, 24984, 25796] rss=5491 MB host_free=15621 MB vram=5672 MiB
+    post_disconnect + 5s  rss= 5410 MB  host_free=15723 MB
+    post_disconnect +15s  rss= 5409 MB  host_free=15712 MB
+    post_disconnect +30s  rss= 5395 MB  host_free=15717 MB
+    post_disconnect +60s  rss= 5414 MB  host_free=15690 MB
+
+########## ARM FULL_WINDOW ##########
+  witness: pids=[9932, 14228, 16116, 18004, 19828, 20496, 20924, 21612, 22296, 23112, 25896, 25988] rss=5514 MB host_free=15567 MB vram=5639 MiB
+    post_disconnect + 5s  rss=16105 MB  host_free= 5745 MB
+    post_disconnect +15s  rss=16105 MB  host_free= 5639 MB
+    post_disconnect +30s  rss=16078 MB  host_free= 5569 MB
+    post_disconnect +60s  rss=16097 MB  host_free= 5444 MB
+
+all arms complete; per-arm traces in RUNTIME_MEMORY_<ARM>.json

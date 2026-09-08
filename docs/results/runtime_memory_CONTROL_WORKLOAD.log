@@ -1,0 +1,10 @@
+Godot Engine v4.6.stable.official.89cea1439 - https://godotengine.org
+
+=== RUNTIME-MEMORY arm CONTROL_WORKLOAD ===
+windows 40, window 40000 ms, sample every 2000 ms
+backend pids at arm start: [8836, 11680, 19976, 21524, 22672, 25012, 25512, 25588, 25688, 26472, 27044, 27136]
+  final live-client sample taken; the orchestrator measures the
+  disconnect phase, since this process cannot observe its own exit
+
+[ARM CONTROL_WORKLOAD] samples 675, requests 5770, completions 5770, recoveries 0
+  wrote docs/results/RUNTIME_MEMORY_CONTROL_WORKLOAD.json

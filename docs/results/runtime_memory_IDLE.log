@@ -1,0 +1,10 @@
+Godot Engine v4.6.stable.official.89cea1439 - https://godotengine.org
+
+=== RUNTIME-MEMORY arm IDLE ===
+windows 40, window 40000 ms, sample every 2000 ms
+backend pids at arm start: [5720, 14992, 18320, 19848, 21628, 22652, 23668, 23804, 25188, 25396, 26488, 26964]
+  final live-client sample taken; the orchestrator measures the
+  disconnect phase, since this process cannot observe its own exit
+
+[ARM IDLE] samples 724, requests 0, completions 0, recoveries 0
+  wrote docs/results/RUNTIME_MEMORY_IDLE.json
