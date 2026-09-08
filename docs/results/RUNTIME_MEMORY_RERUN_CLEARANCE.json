@@ -8,8 +8,8 @@
 	"p6": "RESOLVED",
 	"scope": "four-arm RUNTIME-MEMORY rerun only",
 	"standing_permission": false,
-	"prereg_commit": "5f6111be05486e32effe7be9433fe3ca5f2b32fa",
-	"procedure_commit": "5f6111be05486e32effe7be9433fe3ca5f2b32fa",
+	"prereg_commit": "544d9b10b0b3f5f9711b201d28f9037039f53ca0",
+	"procedure_commit": "544d9b10b0b3f5f9711b201d28f9037039f53ca0",
 	"authorized_arms": [
 		"IDLE",
 		"CONTROL_WORKLOAD",
@@ -48,9 +48,16 @@
 		"n": 3,
 		"windows_per_arm": 40
 	},
-	"reissued_on": "2026-09-08",
-	"reissue_reason": "REGIME-1: the prereg was corrected before any data existed, so the original receipt pointed at a superseded prereg commit. Same human clearance, rebound to the corrected commits.",
+	"reissued_on": "2026-09-08 (second reissue)",
+	"reissue_reason": "Pre-sample instrument amendment. The generation witness could not be obtained on the production path; fixed before any sample existed. Same human clearance, rebound to the corrected harness commit. Design, pool, thresholds and sampling unchanged.",
 	"superseded_receipt_prereg_commit": "af2308c7ebb1e1b0b098d0e815830a8643a53872",
 	"measurement_pool_id": "RM3_V1",
-	"provenance_axis_note": "RUNTIME-MEMORY measures a pool and instantiates no Arena roster, so it carries measurement_pool_id and NEVER population_regime_id."
+	"provenance_axis_note": "RUNTIME-MEMORY measures a pool and instantiates no Arena roster, so it carries measurement_pool_id and NEVER population_regime_id.",
+	"receipt_history": [
+		{
+			"prereg_commit": "5f6111be05486e32effe7be9433fe3ca5f2b32fa",
+			"superseded_because": "pre-sample instrument amendment: _backend_probe production-path quoting fix"
+		}
+	],
+	"harness_commit": "544d9b10b0b3f5f9711b201d28f9037039f53ca0"
 }
