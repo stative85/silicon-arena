@@ -119,6 +119,30 @@ def counts():
     return c
 
 
+def active_requests():
+    """Established TCP connections to the inference port.
+
+    "Zero active requests" is a P4 witness, so it needs to be observed rather
+    than assumed. A freshly started backend with no client attached should show
+    none; a stray editor, a previous arm, or an interactive session shows up
+    here. Returns -1 if the count could not be taken -- which is UNKNOWN, and
+    UNKNOWN is not zero.
+    """
+    try:
+        out = subprocess.run(["netstat", "-ano", "-p", "TCP"],
+                             capture_output=True, text=True,
+                             encoding="utf-8", errors="replace",
+                             timeout=60).stdout or ""
+    except Exception:                                    # noqa: BLE001
+        return -1
+    n = 0
+    for ln in out.splitlines():
+        parts = ln.split()
+        if len(parts) >= 4 and parts[0].upper() == "TCP"                 and parts[1].endswith(":1234") and parts[3].upper() == "ESTABLISHED":
+            n += 1
+    return n
+
+
 def vram():
     out = subprocess.run(["nvidia-smi", "--query-gpu=memory.used,memory.total",
                           "--format=csv,noheader,nounits"],
@@ -169,6 +193,7 @@ def witness(arm, started_at):
         "residency_counts": counts(), "model_load_order": POOL,
         "vram_used_mib": used, "vram_total_mib": tot,
         "host_free_ram_mb": round(host_free_mb()),
+        "active_requests_at_start": active_requests(),
         "runtime_version": "lms CLI commit " + commit,
         "health_surface_sha256": hashlib.sha256(health).hexdigest()[:16],
         "windows": WINDOWS,
@@ -189,7 +214,14 @@ def main():
         print("\nRefusing to run. Re-invoke with --confirm-restarts when cleared.")
         return 1
 
-    out = {"experiment": "RUNTIME-MEMORY", "arms": {}, "windows": WINDOWS}
+    # PROVENANCE AXIS. RUNTIME-MEMORY measures a POOL and instantiates no Arena
+    # roster, so it carries measurement_pool_id and never population_regime_id.
+    # See docs/results/FINDING_REGIME_SCOPE_ERROR.md (REGIME-1).
+    out = {"experiment": "RUNTIME-MEMORY", "arms": {}, "windows": WINDOWS,
+           "experiment_id": "RUNTIME-MEMORY", "run_kind": "EXPERIMENT",
+           "measurement_pool_id": "RM3_V1", "pool": POOL,
+           "clearance_record": "docs/results/RUNTIME_MEMORY_RERUN_CLEARANCE.json",
+           "prereg": "docs/results/PREREG_RUNTIME_MEMORY_RERUN.md"}
     for arm in args.arms:
         print("\n########## ARM %s ##########" % arm)
         started = restart_backend()          # arm boundary, and only here
@@ -207,6 +239,12 @@ def main():
             print("  FAIL exact pool count map = 1/1/1 not established: %s" % c)
             return 1
         w = witness(arm, started)
+        if w["active_requests_at_start"] != 0:
+            print("  FAIL zero-active-requests witness: %s connections to :1234"
+                  % w["active_requests_at_start"])
+            print("  P4 requires ZERO. -1 means the count could not be taken,")
+            print("  which is UNKNOWN, and UNKNOWN is not zero. STOPPING.")
+            return 1
         print("  witness: pids=%s rss=%d MB host_free=%d MB vram=%d MiB"
               % (w["backend_pids"], w["lms_rss_mb"], w["host_free_ram_mb"],
                  w["vram_used_mib"]))
