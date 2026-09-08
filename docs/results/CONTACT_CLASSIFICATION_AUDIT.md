@@ -4,7 +4,7 @@
 justified against what the file actually does. 46 suites audited. No LM Studio
 contact, no inference, no arm run.
 
-**Result: no misclassification found in the dangerous direction.** Three
+**Result: no misclassification found in the dangerous direction.** Four
 structural findings are recorded (§4). Per the item's rule — *misclassification
 found = fix the classification, never the boundary* — nothing was reclassified,
 because nothing needed it, and no boundary was touched.
@@ -207,6 +207,51 @@ Nothing exploits this today. It is written down because the next person to add
 invocation cannot reach the contacting path*, and prefer a tripwire witness like
 §2.1 over a reading of the call graph.
 
+### F-4 — a `marker_allowance` is unscoped and never expires
+
+```text
+EVIDENCE CLASS:  OBSERVED_SHAPE + EXECUTED_WITNESS (the audit refused a real
+                 commit on 2026-09-08 and an allowance was added to clear it)
+SEVERITY:        MEDIUM -- a latent gap, armed by design
+STATUS:          RECORDED, NOT FIXED
+```
+
+An allowance is currently keyed to `(suite, marker)`. It says *this file may
+contain HTTP-looking text*, with no bound on which occurrence, and it does not
+expire. The failure mode is not hypothetical, it is scheduled:
+
+```text
+allow the endpoint literal because "this file only writes config"
+        |
+        v
+later somebody adds real HTTP code to the same file
+        |
+        v
+the allowance still suppresses the marker, silently
+```
+
+The suppression would be invisible: the audit prints nothing for an allowed
+marker, so the second author gets no signal that they just walked through a door
+someone else propped open. Two allowances exist today
+(`runtime_memory_selftest` naming `taskkill`, `build_canonical_roster` holding
+the endpoint literal) and both are currently honest.
+
+**What the eventual fix must eliminate**, recorded now so the requirement
+survives longer than the memory of this commit: an allowance must be scoped to
+the **exact known occurrence** — a line fingerprint, a content hash of the
+matched span, or an explicit count — so that a *new* occurrence of the same
+marker in the same file is flagged even though the old one is allowed. An
+allowance is a statement about a specific line, never a permanent property of a
+file.
+
+Deliberately not fixed here. It shares machinery with F-1 and F-2, and rebuilding
+the marker system mid-queue would change what the fail-closed audit refuses
+while the queue depends on it. The three findings should be fixed together, by a
+human, as one deliberate change to the boundary.
+
+**Treat every allowance as a loaded weapon**: documented, aimed at one thing,
+and re-examined whenever the file it points at changes.
+
 ---
 
 ## 5. What this audit did not do
@@ -215,6 +260,7 @@ invocation cannot reach the contacting path*, and prefer a tripwire witness like
 - It did not contact LM Studio, load or unload a model, or run inference.
 - It did not reclassify any suite, because no misclassification was found.
 - It did not change `CONTACT_MARKERS`, `DISCOVERY_EXEMPT`, or any boundary.
+- It did not scope, expire, or re-verify any existing `marker_allowance` (F-4).
 - It did not prove the 25 clean suites isolated — only unremarkable under ten
   probes.
 

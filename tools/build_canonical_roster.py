@@ -63,14 +63,31 @@ ENDPOINT = "http://127.0.0.1:1234/v1"
 
 # Personas are bound to the AGENT SLOT (agent-01..agent-05), never to a species.
 #
-# PERSONA_CONFOUND -- stated because it is not fixable by ordering:
-# with one instance per species and one persona per slot, persona and species
-# are PERFECTLY CONFOUNDED. Any observed difference between VANTA and BRINE is a
-# difference between (lfm2.5 + systems engineer) and (danube2 + historian), and
-# nothing in a single run can separate them. That is a limitation to state, not
-# a covariate to adjust for (Amendment 3). An experiment that wants to attribute
-# behaviour to the MODEL must rotate personas across species and say so in its
-# preregistration.
+# PERSONA_CONFOUND -- stated because it is not fixable by ordering: with one
+# instance per species and one persona per slot, persona and species are
+# PERFECTLY CONFOUNDED. Any difference between VANTA and BRINE is a difference
+# between (lfm2.5 + systems engineer) and (danube2 + historian), and no single
+# run separates them.
+#
+# The consequence depends on WHAT THE CLAIM SAYS, not on how the run is
+# configured. Do not over-correct by rotating personas everywhere: rotation
+# changes prompt identity, social framing and contention, so it is ANOTHER
+# TREATMENT, not a neutralisation.
+#
+#   SYSTEM-LEVEL ECOLOGY CLAIM -- "this five-agent system, with these models
+#   and these frozen personas, produced X" -> frozen assignment is ALLOWED.
+#   The claim attaches to the whole configured system and attributes nothing
+#   to a model alone.
+#
+#   SPECIES-ATTRIBUTION CLAIM -- "VANTA behaves differently BECAUSE it is
+#   LFM2.5" -> persona must be controlled experimentally: rotate, Latin
+#   square, neutralise, or otherwise PREREGISTER it.
+#
+# The trap is drift between the two. A run is designed as system-level, the
+# results are interesting, and the write-up reaches for the species explanation
+# because it is the better sentence. The moment a sentence attributes behaviour
+# to a MODEL rather than to the SYSTEM, it has switched claim types and needs
+# the control it never had. See docs/ARENA_IDENTITY_LAYERS.md.
 PERSONAS = [
     "a systems engineer who wants mechanisms and refuses abstraction",
     "a moral philosopher who tests every claim against a hard edge case",
@@ -318,10 +335,32 @@ def selftest():
     ck("the on-disk roster matches its frozen inputs", check() == 0)
 
     print("\n[persona is bound to the slot, and the confound is declared]")
+    ck("membership declares no display_name (decoration cannot hide there)",
+       not any("display_name" in r
+               for r in json.load(open(SPECIES_PATH,
+                                       encoding="utf-8"))["species"]))
+    ck("membership carries no residency or loaded flag",
+       not any(k in r
+               for r in json.load(open(SPECIES_PATH,
+                                       encoding="utf-8"))["species"]
+               for k in ("resident", "loaded", "instances", "count")))
+    ck("decoration declares no membership or instance count",
+       not any(k in json.load(open(os.path.join(REPO, "config",
+                                                "arena-names.v1.json"),
+                                   encoding="utf-8"))
+               for k in ("instances_per_species", "species")))
+    ck("I-5 holds: GEMMATRON:2 renders distinctly, same species_id",
+       NAMES.display_for("qwen3.5-2b:2", names) == "GEMMATRON:2"
+       and NAMES.species_for("qwen3.5-2b:2", names)
+       == NAMES.species_for("qwen3.5-2b", names))
     ck("persona order is positional, independent of species",
        [a["persona"] for a in doc["agents"]] == PERSONAS)
     ck("PERSONA_CONFOUND is stated in this file, not left implicit",
        "PERSONA_CONFOUND" in open(__file__, encoding="utf-8").read())
+    _src = open(__file__, encoding="utf-8").read()
+    ck("...and states BOTH claim types, not just the confound",
+       "SYSTEM-LEVEL ECOLOGY CLAIM" in _src
+       and "SPECIES-ATTRIBUTION CLAIM" in _src)
 
     print("\nchecks %d, failures %d" % (_n, _f))
     print("CANONICAL ROSTER GREEN" if _f == 0 else "CANONICAL ROSTER RED")
