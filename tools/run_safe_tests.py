@@ -77,6 +77,19 @@ SUITES = [
      "path": "tools/arena_names.py", "group": "core", "args": ["--selftest"],
      "note": "display-name roster; reads config + docs/results read-only, "
              "writes only a temp file it removes"},
+    {"name": "build_canonical_roster", "kind": "py", "cls": NO_CONTACT,
+     "path": "tools/build_canonical_roster.py", "group": "core",
+     "args": ["--selftest"],
+     "marker_allowance": {"http": "writes the endpoint into the generated "
+                                  "roster as a CONFIG VALUE; it never opens a "
+                                  "connection. A generator that emits a URL "
+                                  "must contain that URL -- the same shape as "
+                                  "runtime_memory_selftest naming taskkill. "
+                                  "Allowed explicitly rather than hidden from "
+                                  "the scanner by string-splitting, which "
+                                  "would be evasion, not safety."},
+     "note": "offline roster generation from frozen membership; unlike "
+             "build_roster.gd it never discovers or probes"},
     {"name": "recovery_schedule", "kind": "py", "cls": NO_CONTACT,
      "path": "tools/recovery_schedule.py", "group": "core", "args": ["--verify"],
      "note": "schedule plan verification, touches nothing"},
