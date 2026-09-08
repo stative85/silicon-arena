@@ -1,9 +1,11 @@
 # CLAIM-TO-WITNESS — every finding declares its strongest evidence
 
-**Status: METHODOLOGY, ADOPTED. Candidate for Law 7 — NOT self-granted.**
-Promotion to a numbered ROBRUSTION law requires the redundancy test and human
-clearance, exactly as Law 6 did. The redundancy analysis is in the last section;
-the decision is not mine to make.
+**Status: GRANTED AS LAW 7 — CLAIM-TO-WITNESS LAW, 2026-09-08.**
+Promoted by human clearance after the redundancy test in the last section. It
+was written as a candidate and deliberately not self-granted, because granting a
+law on the strength of one's own argument is the error it names. The normative
+statement now lives in `docs/ROBRUSTION_LAWS.md` §7; this document remains the
+working detail — the four classes, the six rules, and the form a finding takes.
 
 ---
 
@@ -152,3 +154,11 @@ That is a different family, and arguably the more dangerous one, because it
 produces artifacts that look exactly like good work. But "arguably" is a class-2
 word, and promoting doctrine on class-2 evidence is the error this document
 exists to name. **HUMAN_CLEARANCE_REQUIRED.**
+
+**CLEARED 2026-09-08.** Granted as Law 7. The clearing judgement recorded the
+distinctness this way: observation true, provenance true, receipts true,
+inference from those receipts to executable behaviour false, and an executable
+witness available that would have refuted the claim immediately. The law's third
+sentence — *a witness must itself be capable of producing the opposite result* —
+carries the separate lesson from the sentinel and the sabotages, not just from
+RM-1.

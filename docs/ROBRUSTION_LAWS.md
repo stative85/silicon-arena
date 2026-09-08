@@ -241,7 +241,69 @@ autonomous coding, robotics — anywhere `don't touch X` currently means
 
 ---
 
-## What these six have in common
+## 7. CLAIM-TO-WITNESS LAW
+
+```text
+A claim may be promoted only to the strength supported by its strongest
+qualified witness.
+
+When the claimed property is directly executable or observable, static shape,
+provenance, or inference cannot substitute for an executable witness.
+
+A witness must itself be capable of producing the opposite result.
+```
+
+**Granted 2026-09-08 by human clearance.** It was written as adopted methodology
+and deliberately NOT self-granted; the redundancy test lives in
+`docs/CLAIM_TO_WITNESS.md`, and the promotion was left to a human because
+granting a law on the strength of one's own argument is the error the law names.
+
+**Paid for by RM-1.** A static audit reported that `tools/runtime_memory.gd`
+could not parse, severity BLOCKER. Under it sat three raw newlines inside
+double-quoted literals, confirmed byte-for-byte with `cat -A`, traced through
+git provenance, timestamped, corroborated by an adjacent site that was not
+mangled, and explained by a plausible mechanism. Six independent pieces of
+evidence, every one of them true.
+
+The inference from those receipts to executable behaviour was false. Godot 4
+permits a literal newline in an ordinary string. One `--check-only` invocation —
+available the entire time, never run — refutes it in under a second.
+
+```text
+observation      TRUE
+provenance       TRUE
+receipts         TRUE
+inference to executable behaviour   FALSE
+an executable witness was available and would have refuted it immediately
+```
+
+The promotion hierarchy:
+
+```text
+OBSERVED_SHAPE
+      |
+STATIC_INFERENCE
+      |
+EXECUTED_WITNESS
+      |
+SABOTAGE_PROVEN
+```
+
+Not every claim needs gold-standard sabotage. But **no claim is promoted upward
+because the prose around it is impressive**, and corroboration between two
+class-1 facts never produces a class-3 fact.
+
+The third sentence of the law is the one bought with the most blood. A checker
+that never fails is a rubber stamp with a transcript; a green suite that could
+not have gone red certifies nothing. It is why `gd_parse_check` qualifies
+against a genuinely corrupt script, why the sentinel must be shown able to speak
+before its silence means anything, and why a sabotage must assert it actually
+applied — `artifact_schema` once reported SABOTAGE DID NOT APPLY because
+`1 == True` in Python, a false negative inside a witness.
+
+---
+
+## What these seven have in common
 
 Laws 1-4 describe the instrument being changed by the thing it was measuring,
 or its stated variables failing to capture what it actually responds to. Law 5
@@ -252,6 +314,23 @@ too coarse to represent the state the runtime could actually be in.
 about an experiment. The sixth is about a rule failing to bind the operator —
 including when the operator is the same system that wrote the rule down. That is the specific hazard of running experiments on a substrate
 you also built.
+
+**Law 7 is a third family, and the one with no mechanical tell.** Laws 1-5
+concern an instrument misrepresenting a system under measurement. Law 6
+restrains the hands. Law 7 restrains the conclusions — and it exists because
+during the RM-1 event *every other law held*. No boundary was crossed, no
+instrument was disturbed, nothing was deleted, no criterion was touched, and the
+output was still false. The hazard it names is a reasoner misrepresenting a file
+under inspection while every safety mechanism reports green:
+
+```text
+operationally safe, epistemically wrong
+```
+
+There is no permission that catches this, because nothing impermissible
+happens. The only counter-discipline is promotion control: state the evidence
+class on every finding, and refuse to let a well-documented claim outrank a
+witness it never had.
 
 The general form:
 

@@ -56,6 +56,8 @@ space reserved as a future manipulation:
 Any comparison across that boundary is a comparison across a changed population,
 not a changed condition. Results collected under this roster must say so.
 
+That rule is frozen as **REGIME A** in `POPULATION_REGIMES.md`.
+
 ## Honesty note — what is and is not proven about these bytes
 
 ```text
