@@ -1,0 +1,46 @@
+
+########## ARM IDLE ##########
+  witness: pids=[3104, 6608, 22972, 25360, 26312, 29868, 31044, 31256, 31768, 31884, 32256] rss=4799 MB host_free=9009 MB vram=6844 MiB
+    post_disconnect + 5s  rss= 4799 MB  host_free= 9268 MB
+    post_disconnect +15s  rss= 4799 MB  host_free= 8806 MB
+    post_disconnect +30s  rss= 4795 MB  host_free= 8590 MB
+    post_disconnect +60s  rss= 4796 MB  host_free= 9222 MB
+
+########## ARM CONTROL_WORKLOAD ##########
+Traceback (most recent call last):
+  File "D:\silicon-arena-public\tools\runtime_memory_run.py", line 284, in <module>
+    sys.exit(main())
+             ~~~~^^
+  File "D:\silicon-arena-public\tools\runtime_memory_run.py", line 233, in main
+    subprocess.run([LMS, "load", m, "--gpu=max",
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    "--context-length=" + CONTEXT, "-y"],
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   capture_output=True, text=True,
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   encoding="utf-8", errors="replace", timeout=300)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\cleve\AppData\Local\Programs\Python\Python314\Lib\subprocess.py", line 554, in run
+    with Popen(*popenargs, **kwargs) as process:
+         ~~~~~^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\cleve\AppData\Local\Programs\Python\Python314\Lib\subprocess.py", line 1038, in __init__
+    self._execute_child(args, executable, preexec_fn, close_fds,
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                        pass_fds, cwd, env,
+                        ^^^^^^^^^^^^^^^^^^^
+    ...<5 lines>...
+                        gid, gids, uid, umask,
+                        ^^^^^^^^^^^^^^^^^^^^^^
+                        start_new_session, process_group)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\cleve\AppData\Local\Programs\Python\Python314\Lib\subprocess.py", line 1552, in _execute_child
+    hp, ht, pid, tid = _winapi.CreateProcess(executable, args,
+                       ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+                             # no special security
+                             ^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                             cwd,
+                             ^^^^
+                             startupinfo)
+                             ^^^^^^^^^^^^
+PermissionError: [WinError 32] The process cannot access the file because it is being used by another process

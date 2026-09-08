@@ -146,6 +146,27 @@ def main():
         ck("preflight declares: %s" % item,
            item.lower() in orch.lower() or item.lower() in arm.lower())
 
+    # PROBE QUOTING REGRESSION, 2026-09-08. This file reported PREFLIGHT GREEN
+    # while _backend_probe() could not obtain a core identity at all: it wrapped
+    # its output format in DOUBLE quotes, Godot's OS.execute stripped them on
+    # Windows, and PowerShell parsed the "|" separators as pipeline operators.
+    # rc=1, zero rows, every arm failing closed before its first sample. Proven
+    # on the production path with the old construction as a control:
+    #
+    #   OLD  rc=1 rows=0  core_pid=-1
+    #   NEW  rc=0 rows=11 core_pid=31544 core_created='2026-09-08T14:36:24...'
+    #
+    # A regex cannot prove the probe works -- only execution does. It CAN stop
+    # the exact broken shape from returning, which is all this claims to do.
+    _probe = arm_raw[arm_raw.find("func _backend_probe"):]
+    _cut = _probe.find("\nfunc ", 1)
+    if _cut > 0:
+        _probe = _probe[:_cut]
+    ck("probe builds its PowerShell without double quotes to strip",
+       '\\"' not in _probe, "the double-quoted construction is back")
+    ck("probe still asks for CreationDate (the generation witness)",
+       "CreationDate" in _probe)
+
     print("\n[SUMMARY]")
     print("  checks %d, failures %d" % (checks, len(fails)))
     if fails:

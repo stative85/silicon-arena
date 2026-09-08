@@ -119,6 +119,43 @@ forever**. Their backends are gone and their generation was never recorded. This
 rerun produces new data; it does not retroactively repair old data, and no
 result here may be described as having "resolved" those arms.
 
+## Instrument amendment — 2026-09-08, before the first sample
+
+```text
+discovered            BEFORE FIRST SAMPLE. Zero arm data existed.
+defect                production-path PowerShell quoting in _backend_probe()
+scientific design     UNCHANGED
+treatments            UNCHANGED
+pool (RM3_V1)         UNCHANGED
+thresholds            UNCHANGED  (floor 2048, ks 1.8, kh 20, n 3)
+sampling / horizon    UNCHANGED  (40 windows, 40000 ms, 2000 ms)
+all four arms         run under the SAME corrected harness commit
+```
+
+The first launch attempt collected **nothing**. Every arm failed closed at
+preflight: `_backend_probe()` wrapped its output format in DOUBLE quotes, Godot's
+`OS.execute` strips those on Windows, and PowerShell then read the `|`
+separators as pipeline operators — `ExpressionsMustBeFirstInPipeline`, rc=1, zero
+rows, no core identity, no generation witness.
+
+The same query ran perfectly in a shell. It had never worked on the production
+path. **Law 3 (Production-Path Equivalence).**
+
+Rebuilt with single quotes and string concatenation only — no double quotes left
+to strip. Proven through the real Godot path, with the old construction kept as
+a control that must fail:
+
+```text
+OLD (control, must FAIL)  rc=1 rows=0  core_pid=-1  core_created=''
+NEW (must PASS)           rc=0 rows=11 core_pid=31544
+                          core_created='2026-09-08T14:36:24.9443880-05:00'
+```
+
+This also settles `NEXT_LIVE_RUN.md` open question 5. *"Has the corrected harness
+ever executed end-to-end?"* — **No, and it could not have.** The `core_created`
+field was real in source and unreachable at runtime. P1 was a correct
+OBSERVED_SHAPE claim about code; the executable claim underneath it was false.
+
 ## Provenance axis — CORRECTED 2026-09-08 under REGIME-1, before any data
 
 **This run is NOT Regime B.** The original text of this section claimed it was

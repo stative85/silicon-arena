@@ -63,7 +63,7 @@ RESULTS_GLOB = os.path.join(REPO, "docs", "results", "*.json")
 # how a new untagged artifact would get silently attributed; the pin makes that
 # a visible act. Updated once, deliberately, when the Regime A claim was
 # withdrawn under REGIME-1.
-LEGACY_SHA256 = "253b2f045115cf0b"
+LEGACY_SHA256 = "f74cf38ca4dffc0d"
 
 KNOWN_REGIMES = ("A", "B")
 

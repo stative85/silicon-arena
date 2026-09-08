@@ -127,9 +127,18 @@ func _backend_pids_cheap() -> Array:
 
 func _backend_probe() -> Dictionary:
 	var out: Array = []
-	var ps := ("Get-CimInstance Win32_Process -Filter \"Name='LM Studio.exe'\" "
-		+ "| ForEach-Object { \"$($_.ProcessId)|$($_.ParentProcessId)|"
-		+ "$($_.CreationDate)|$($_.CommandLine)\" }")
+	## PRE-SAMPLE INSTRUMENT AMENDMENT 2026-09-08. The previous construction
+	## wrapped the output format in DOUBLE quotes. Godot's OS.execute strips
+	## them on Windows, so PowerShell saw the "|" separators as pipeline
+	## operators and died with ExpressionsMustBeFirstInPipeline -- rc=1, no
+	## rows, no core identity, and every arm failed closed before its first
+	## sample. The query worked perfectly in a shell; it never worked on the
+	## PRODUCTION PATH (Law 3). Rebuilt with SINGLE quotes and string
+	## concatenation only: there are no double quotes left to strip.
+	var ps := ("Get-CimInstance Win32_Process -Filter 'Name=''LM Studio.exe''' "
+		+ "| ForEach-Object { $_.ProcessId.ToString() + '|' + "
+		+ "$_.ParentProcessId.ToString() + '|' + "
+		+ "$_.CreationDate.ToString('o') + '|' + $_.CommandLine }")
 	var rc := OS.execute("powershell", PackedStringArray(
 		["-NoProfile", "-Command", ps]), out, false, false)
 	var res := {"ok": false, "procs": [], "core_pid": -1, "core_created": "",
