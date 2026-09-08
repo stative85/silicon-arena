@@ -64,24 +64,49 @@ static func real_runner(args: Array) -> int:
 
 
 ## Read the resident set from the server. No inference; a state read only.
-## Returns [] on failure, which the caller treats as a failed verification
-## rather than as an empty pool.
-static func resident_set(http: HTTPRequest) -> Array:
-	var got: Array = []
+##
+## A FAILED READ IS NOT AN EMPTY POOL, AND THE TWO MUST BE DISTINGUISHABLE.
+## The previous version returned [] for a transport failure, a non-200, malformed
+## JSON, AND a genuinely empty pool. Callers therefore could not tell them apart,
+## with two demonstrable consequences:
+##
+##   * a real total eviction (every model gone -- catastrophic) was classified as
+##     TRANSPORT_OR_RUNTIME_FAILURE, a milder and misleading reason
+##   * ensure_loaded() saw count 0 after a transient read failure and issued a
+##     load for a model that was actually resident, creating a DUPLICATE
+##     INSTANCE -- the exact bug that once left 5 instances at 7,656 MiB VRAM,
+##     re-entering through a failure path
+##
+## `ok` is now explicit and callers fail closed on it.
+static func resident_set_result(http: HTTPRequest) -> Dictionary:
+	var out := {"ok": false, "ids": [], "reason": ""}
 	if http.request(MODELS_ENDPOINT) != OK:
-		return got
+		out["reason"] = "request could not be issued"
+		return out
 	var res: Array = await http.request_completed
 	if int(res[1]) != 200:
-		return got
+		out["reason"] = "http %d" % int(res[1])
+		return out
 	var parsed = JSON.parse_string(
 		(res[3] as PackedByteArray).get_string_from_utf8())
 	if typeof(parsed) != TYPE_DICTIONARY:
-		return got
+		out["reason"] = "malformed response"
+		return out
+	var got: Array = []
 	for entry in (parsed as Dictionary).get("data", []):
 		var e: Dictionary = entry
 		if str(e.get("state", "not-loaded")) != "not-loaded":
 			got.append(str(e.get("id", "")))
-	return got
+	out["ok"] = true
+	out["ids"] = got
+	return out
+
+
+## Backwards-compatible view. Returns [] on failure AND on an empty pool, so
+## prefer resident_set_result() anywhere the difference matters.
+static func resident_set(http: HTTPRequest) -> Array:
+	var r := await resident_set_result(http)
+	return r["ids"]
 
 
 ## PRODUCER CONTRACT, qualified empirically against this runtime rather than
@@ -114,14 +139,21 @@ static func base_id(instance_id: String, known: Array = []) -> String:
 
 
 ## Residency as a COUNT MAP: base model id -> number of live instances.
-static func residency_counts(http: HTTPRequest,
+static func residency_counts_result(http: HTTPRequest,
 		known: Array = []) -> Dictionary:
-	var ids := await resident_set(http)
+	var r := await resident_set_result(http)
 	var counts := {}
-	for i in ids:
+	for i in r["ids"]:
 		var b := base_id(str(i), known)
 		counts[b] = int(counts.get(b, 0)) + 1
-	return counts
+	return {"ok": bool(r["ok"]), "counts": counts, "reason": str(r["reason"])}
+
+
+## Backwards-compatible view. {} means EITHER a failed read or an empty pool.
+static func residency_counts(http: HTTPRequest,
+		known: Array = []) -> Dictionary:
+	var r := await residency_counts_result(http, known)
+	return r["counts"]
 
 
 ## Exact count-map equality. An EXTRA instance fails this; so does a missing one,
@@ -241,7 +273,12 @@ func perform(http: HTTPRequest, target: String, neighbours: Array,
 ## Load only if not already resident. `lms load` is NOT idempotent -- it spawns
 ## a second instance -- so every restore path must check first.
 static func ensure_loaded(http: HTTPRequest, model_id: String) -> bool:
-	var now := await residency_counts(http)
+	var probe := await residency_counts_result(http, [model_id])
+	if not bool(probe["ok"]):
+		# Fail closed. Treating an unreadable pool as "absent" would issue a
+		# load for a model that may already be resident and create a duplicate.
+		return false
+	var now: Dictionary = probe["counts"]
 	var have := int(now.get(model_id, 0))
 	if have == 1:
 		return true

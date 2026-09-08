@@ -97,9 +97,10 @@ static func classify(got: Dictionary, want: Dictionary,
 ## Sample the runtime. Call at every phase boundary of a window, in BOTH
 ## treatment and control, so the observation burden matches.
 func sample(http: HTTPRequest, phase: String, elapsed_ms: int) -> Dictionary:
-	var counts := await RA.residency_counts(http)
+	var probe := await RA.residency_counts_result(http)
+	var counts: Dictionary = probe["counts"]
 	var reason := OK
-	if counts.is_empty():
+	if not bool(probe["ok"]):
 		# A failed read is not an empty pool. The PHASE is recorded alongside so
 		# an empty read taken during a scheduled recovery is distinguishable
 		# from one in a quiet phase -- the window still voids either way.
