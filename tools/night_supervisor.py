@@ -43,6 +43,7 @@ import argparse
 import hashlib
 import json
 import os
+import re
 import secrets
 import subprocess
 import sys
@@ -132,7 +133,121 @@ def objective_hash(objective):
         json.dumps(objective, sort_keys=True).encode("utf-8")).hexdigest()[:16]
 
 
-def read_status(iteration, nonce, obj_hash, start_commit, end_commit):
+# ---------------------------------------------------------------------------
+# INVOCATION OUTCOME
+#
+# The 2026-09-08 shift stopped on iteration 4 with the reason "the receipt is
+# not from this turn". That was mechanically defensible and semantically
+# misleading. What actually happened: the model invocation hit a provider
+# session limit, wrote no status.json at all, and the PREVIOUS turn's file was
+# still sitting on disk. The nonce check compared against that leftover and
+# reported it as though a receipt had been PRESENTED and had failed binding.
+#
+# Those are different events, and the supervisor must not conflate them:
+#
+#     no fresh receipt was produced     !=     a stale receipt was presented
+#
+# So the invocation is classified from evidence gathered around it, BEFORE the
+# receipt is interpreted:
+#
+#     child_started        did the process start at all
+#     child_exit_code      what it returned
+#     stdout/stderr        captured verbatim
+#     status_file_changed  fingerprinted before AND after -- identity, not mtime
+#     bound_to_nonce       does the receipt echo THIS invocation
+#
+# None of this weakens any refusal. Every outcome except BOUND_STATUS_VALID
+# still stops the loop. The only thing that changes is that the supervisor stops
+# telling a true-sounding story about a model that never got to speak.
+INVOCATION_FAILED = "INVOCATION_FAILED"
+NO_STATUS_PRODUCED = "NO_STATUS_PRODUCED"
+STALE_STATUS_PRESENT = "STALE_STATUS_PRESENT"
+UNBOUND_STATUS_WRITTEN = "UNBOUND_STATUS_WRITTEN"
+BOUND_STATUS_VALID = "BOUND_STATUS_VALID"
+
+# Provider-authored text only. This is ADVISORY EVIDENCE attached to an outcome
+# that has ALREADY been decided -- it never selects the outcome, never rescues a
+# refusal, and is never treated as ground truth about a remote service. It
+# exists so the operator reads "the provider said quota" instead of inferring it
+# from a silent turn at 08:39.
+PROVIDER_QUOTA_PATTERNS = (
+    r"hit your (?:session|usage) limit",
+    r"(?:usage|rate) limit (?:reached|exceeded)",
+    r"exceeded your current quota",
+    r"insufficient (?:quota|credit)",
+    r"credit balance is too low",
+)
+
+
+def status_fingerprint():
+    """Identity of the status file, or None if absent.
+
+    sha256 of the bytes, deliberately NOT mtime. A file written twice in the
+    same second carries the same timestamp, and a turn that rewrites a receipt
+    byte-for-byte has produced no new information regardless of when it did so.
+    Content is the only honest identity here.
+    """
+    try:
+        with open(STATUS, "rb") as f:
+            return hashlib.sha256(f.read()).hexdigest()[:16]
+    except OSError:
+        return None
+
+
+def detect_external_cause(out):
+    """Name a provider-reported cause, or None. Advisory, never decisive."""
+    low = (out or "").lower()
+    for pat in PROVIDER_QUOTA_PATTERNS:
+        if re.search(pat, low):
+            return "PROVIDER_QUOTA"
+    return None
+
+
+def classify_invocation(pre_fp, post_fp, nonce, started, exit_code, out):
+    """Decide WHAT HAPPENED to the invocation, before reading what it said."""
+    inv = {"child_started": bool(started), "child_exit_code": exit_code,
+           "status_file_changed": (post_fp is not None and post_fp != pre_fp),
+           "bound_to_nonce": False, "external_cause": None}
+
+    if not started:
+        inv["outcome"] = INVOCATION_FAILED
+        inv["reason"] = ("the agent process never started (%s); no receipt was "
+                         "possible" % (out or "no error text"))
+    elif post_fp is None:
+        inv["outcome"] = NO_STATUS_PRODUCED
+        inv["reason"] = ("the agent produced no status.json and none was on "
+                         "disk; refusing to assume progress")
+    elif not inv["status_file_changed"]:
+        inv["outcome"] = STALE_STATUS_PRESENT
+        inv["reason"] = ("the agent wrote no status.json this turn; the file on "
+                         "disk is byte-identical to the one left by the "
+                         "previous iteration (%s). This is a MISSING receipt, "
+                         "not a forged one" % pre_fp)
+    else:
+        try:
+            d = json.load(open(STATUS, encoding="utf-8"))
+            inv["bound_to_nonce"] = str(d.get("iteration_id", "")) == nonce
+        except Exception:                                    # noqa: BLE001
+            inv["bound_to_nonce"] = False
+        if inv["bound_to_nonce"]:
+            inv["outcome"] = BOUND_STATUS_VALID
+            inv["reason"] = "a fresh receipt bound to this invocation"
+        else:
+            inv["outcome"] = UNBOUND_STATUS_WRITTEN
+            inv["reason"] = ("a NEW status.json was written this turn but does "
+                             "not echo the nonce issued for this invocation; "
+                             "the receipt is not from this turn")
+
+    # Attach the provider's own words only where no bound receipt exists. A
+    # green turn is never annotated with a quota message that happened to appear
+    # somewhere in the transcript.
+    if inv["outcome"] != BOUND_STATUS_VALID:
+        inv["external_cause"] = detect_external_cause(out)
+    return inv
+
+
+def read_status(iteration, nonce, obj_hash, start_commit, end_commit,
+                inv=None):
     """Fail closed, and bind the receipt to THIS invocation and THIS repo state.
 
     A fresh timestamp is not identity. Without a nonce an older process could
@@ -141,6 +256,19 @@ def read_status(iteration, nonce, obj_hash, start_commit, end_commit):
     describe the repository the supervisor actually observed -- a CONTINUE that
     refers to some other commit or objective is refused rather than believed.
     """
+    # The invocation outcome, when the caller has one, decides the WORDING and is
+    # strictly more informative than the checks below. It never admits anything
+    # those checks would have refused: only BOUND_STATUS_VALID falls through,
+    # and it then faces every original check unchanged.
+    if inv is not None and inv.get("outcome") != BOUND_STATUS_VALID:
+        reason = "%s: %s" % (inv["outcome"], inv["reason"])
+        if inv.get("external_cause"):
+            reason += (" [external_cause=%s, reported by the provider in the "
+                       "agent transcript]" % inv["external_cause"])
+        return {"state": BLOCKED, "reason": reason,
+                "invocation_outcome": inv["outcome"],
+                "external_cause": inv.get("external_cause")}
+
     if not os.path.exists(STATUS):
         return {"state": BLOCKED,
                 "reason": "agent wrote no status.json; refusing to assume "
@@ -322,10 +450,23 @@ def agent_cmd(prompt, model=None):
 
 
 def run_agent(prompt, timeout_s, model=None):
+    """Returns (started, exit_code, output).
+
+    "The child never started" and "the child ran and said nothing useful" are
+    different failures with different remedies -- a missing binary versus an
+    exhausted quota -- so the caller is TOLD which one it got instead of
+    inferring it from an empty transcript. stderr is captured too: the provider
+    quota notice on 2026-09-08 was the only evidence of why the turn died.
+    """
     cmd = agent_cmd(prompt, model)
-    r = subprocess.run(cmd, cwd=REPO, capture_output=True, text=True,
-                       encoding="utf-8", errors="replace", timeout=timeout_s)
-    return r.returncode, (r.stdout or "")[-4000:]
+    try:
+        r = subprocess.run(cmd, cwd=REPO, capture_output=True, text=True,
+                           encoding="utf-8", errors="replace",
+                           timeout=timeout_s)
+    except OSError as e:                                     # noqa: BLE001
+        return False, None, "agent process failed to start: %s" % e
+    out = ((r.stdout or "") + (r.stderr or ""))[-4000:]
+    return True, r.returncode, out
 
 
 def main():
@@ -411,17 +552,35 @@ def main():
             return 0
 
         log("--- iteration %d: invoking agent (nonce %s) ---" % (i, nonce))
+        # Fingerprint the receipt BEFORE the invocation. Without this the
+        # supervisor cannot tell a file the agent just wrote from one the
+        # previous iteration left behind, and reports a missing receipt as a
+        # mis-bound one.
+        pre_fp = status_fingerprint()
         try:
-            rc, out = run_agent(prompt, a.agent_timeout, a.model)
+            started, rc, out = run_agent(prompt, a.agent_timeout, a.model)
         except subprocess.TimeoutExpired:
             log("STOP BLOCKED: agent exceeded %d s" % a.agent_timeout)
             event("stop", reason="agent_timeout", iteration=i)
             return 1
         artifact("iteration_%03d_output.txt" % i, out)
-        log("agent exit %d" % rc)
+        log("agent started=%s exit=%s" % (started, rc))
+
+        inv = classify_invocation(pre_fp, status_fingerprint(), nonce,
+                                  started, rc, out)
+        log("invocation: %s -- %s" % (inv["outcome"], inv["reason"]))
+        if inv.get("external_cause"):
+            log("external cause reported by provider: %s"
+                % inv["external_cause"])
+        event("invocation", iteration=i, outcome=inv["outcome"],
+              child_started=inv["child_started"],
+              child_exit_code=inv["child_exit_code"],
+              status_file_changed=inv["status_file_changed"],
+              bound_to_nonce=inv["bound_to_nonce"],
+              external_cause=inv.get("external_cause"))
 
         end_commit = head()
-        st = read_status(i, nonce, obj_hash, start_commit, end_commit)
+        st = read_status(i, nonce, obj_hash, start_commit, end_commit, inv)
         if os.path.exists(STATUS):
             artifact("iteration_%03d_status.json" % i,
                      open(STATUS, encoding="utf-8").read())

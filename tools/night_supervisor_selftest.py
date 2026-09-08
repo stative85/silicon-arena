@@ -180,6 +180,149 @@ def main():
     ck("the denylist is actually passed to the agent",
        "--disallowedTools" in src)
 
+    # ---------------------------------------------------------------------
+    # INVOCATION OUTCOME
+    #
+    # Replays the real 2026-09-08 iteration-4 event and the four neighbours it
+    # was confused with. The bug was not a wrong decision -- BLOCKED was right
+    # -- it was a wrong STORY: a missing receipt reported as a mis-bound one.
+    # ---------------------------------------------------------------------
+    print("\n[invocation outcome: no receipt != a bad receipt]")
+
+    QUOTA = "You've hit your session limit \u00b7 resets 12:30pm (America/Chicago)"
+
+    def inv_case(pre, post_doc, nonce=NONCE, started=True, rc=0, out=""):
+        """Classify against a temp status file. post_doc None = no file."""
+        d = tempfile.mkdtemp()
+        path = os.path.join(d, "status.json")
+        old = NS.STATUS
+        NS.STATUS = path
+        try:
+            if pre is not None:
+                with open(path, "w", encoding="utf-8") as f:
+                    json.dump(pre, f)
+            pre_fp = NS.status_fingerprint()
+            if post_doc is None:
+                if os.path.exists(path):
+                    os.remove(path)
+            else:
+                with open(path, "w", encoding="utf-8") as f:
+                    json.dump(post_doc, f)
+            post_fp = NS.status_fingerprint()
+            inv = NS.classify_invocation(pre_fp, post_fp, nonce, started, rc,
+                                         out)
+            st = NS.read_status(3, nonce, OBJH, C0, C1, inv)
+            return inv, st
+        finally:
+            NS.STATUS = old
+
+    # THE ACTUAL EVENT: iteration 4 wrote nothing; iteration 3's receipt stayed.
+    prev = good(iteration_id="0289c831b7429824")
+    inv, st = inv_case(prev, prev, out=QUOTA)
+    ck("stale leftover receipt classifies STALE_STATUS_PRESENT",
+       inv["outcome"] == NS.STALE_STATUS_PRESENT, inv["outcome"])
+    ck("stale receipt is NOT called a receipt from another turn",
+       "not from this turn" not in st["reason"], st["reason"])
+    ck("stale receipt still BLOCKS", st["state"] == NS.BLOCKED)
+    ck("status_file_changed is False when nothing was written",
+       inv["status_file_changed"] is False)
+    ck("the provider's own quota text is attached as external_cause",
+       inv["external_cause"] == "PROVIDER_QUOTA", str(inv["external_cause"]))
+    ck("external_cause reaches the operator-visible reason",
+       "PROVIDER_QUOTA" in st["reason"])
+
+    # No file at all, before or after.
+    inv, st = inv_case(None, None)
+    ck("no status file at all classifies NO_STATUS_PRODUCED",
+       inv["outcome"] == NS.NO_STATUS_PRODUCED, inv["outcome"])
+    ck("NO_STATUS_PRODUCED blocks", st["state"] == NS.BLOCKED)
+
+    # The child never started.
+    inv, st = inv_case(None, None, started=False, rc=None,
+                       out="agent process failed to start: [Errno 2]")
+    ck("a child that never started classifies INVOCATION_FAILED",
+       inv["outcome"] == NS.INVOCATION_FAILED, inv["outcome"])
+    ck("INVOCATION_FAILED records child_started False",
+       inv["child_started"] is False)
+
+    # A genuinely new receipt that does not bind: the ONLY case where the
+    # original wording was ever correct.
+    inv, st = inv_case(prev, good(iteration_id="ffffffffffffffff"))
+    ck("a NEW but unbound receipt classifies UNBOUND_STATUS_WRITTEN",
+       inv["outcome"] == NS.UNBOUND_STATUS_WRITTEN, inv["outcome"])
+    ck("only the unbound case says the receipt is not from this turn",
+       "not from this turn" in st["reason"], st["reason"])
+    ck("UNBOUND_STATUS_WRITTEN blocks", st["state"] == NS.BLOCKED)
+
+    # A fresh, bound receipt passes classification and faces every original
+    # check unchanged.
+    inv, st = inv_case(prev, good())
+    ck("a fresh bound receipt classifies BOUND_STATUS_VALID",
+       inv["outcome"] == NS.BOUND_STATUS_VALID, inv["outcome"])
+    ck("a bound receipt still reaches CONTINUE", st["state"] == "CONTINUE")
+    ck("a bound receipt is NOT annotated with a quota cause",
+       inv["external_cause"] is None)
+
+    # A bound receipt whose transcript happens to contain quota text must not
+    # be annotated -- advisory evidence never decorates a green turn.
+    inv, st = inv_case(prev, good(), out=QUOTA)
+    ck("quota text in a green turn's transcript is ignored",
+       inv["external_cause"] is None and st["state"] == "CONTINUE")
+
+    # DIRECTION OF TRAVEL: nothing that previously stopped now continues.
+    for outcome_doc, label in ((None, "no receipt"),
+                               (prev, "stale receipt")):
+        _, st2 = inv_case(prev, outcome_doc)
+        ck("%s can never yield CONTINUE" % label, st2["state"] == NS.BLOCKED)
+
+    # Fingerprint identity is CONTENT, not timestamp.
+    d = tempfile.mkdtemp()
+    path = os.path.join(d, "status.json")
+    old = NS.STATUS
+    NS.STATUS = path
+    try:
+        with open(path, "w", encoding="utf-8") as f:
+            json.dump(prev, f)
+        fp1 = NS.status_fingerprint()
+        os.utime(path, (0, 0))          # move the clock, not the bytes
+        fp2 = NS.status_fingerprint()
+        ck("fingerprint ignores mtime: same bytes, same identity", fp1 == fp2)
+        with open(path, "w", encoding="utf-8") as f:
+            json.dump(good(reason="different"), f)
+        ck("fingerprint changes when the bytes change",
+           NS.status_fingerprint() != fp1)
+    finally:
+        NS.STATUS = old
+
+    # SABOTAGE: collapse STALE back into UNBOUND -- the pre-fix behaviour --
+    # and prove the tooth goes RED. A tooth that cannot detect its own
+    # regression is decoration.
+    print("\n[sabotage: reintroduce the conflation]")
+    real = NS.classify_invocation
+
+    def conflating(pre_fp, post_fp, nonce, started, exit_code, out):
+        inv = real(pre_fp, post_fp, nonce, started, exit_code, out)
+        if inv["outcome"] == NS.STALE_STATUS_PRESENT:
+            inv["outcome"] = NS.UNBOUND_STATUS_WRITTEN
+            inv["reason"] = ("iteration_id does not match the nonce issued for "
+                             "this invocation; the receipt is not from this turn")
+        return inv
+
+    NS.classify_invocation = conflating
+    applied = NS.classify_invocation is not real
+    ck("SABOTAGE APPLIED (classifier replaced before the assertion)", applied)
+    if applied:
+        _, st_sab = inv_case(prev, prev, out=QUOTA)
+        ck("sabotage BITES: the misleading wording returns",
+           "not from this turn" in st_sab["reason"])
+        ck("sabotage did not flip the decision (it was never wrong)",
+           st_sab["state"] == NS.BLOCKED)
+    NS.classify_invocation = real
+    ck("SABOTAGE REVERTED", NS.classify_invocation is real)
+    _, st_rev = inv_case(prev, prev, out=QUOTA)
+    ck("after revert the honest wording is back",
+       "not from this turn" not in st_rev["reason"])
+
     print("\n[SUMMARY]")
     print("  checks %d, failures %d" % (_n, _f))
     if _f:
