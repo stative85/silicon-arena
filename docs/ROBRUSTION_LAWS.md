@@ -31,6 +31,50 @@ Void rate monotone in list length. The treatment changed the probability that
 its own data survived, and the surviving cells in B and D were exactly those
 where the pathology did not fire — a biased subsample by construction.
 
+### Corollary 1a — treatment-aware witness construction
+
+```text
+A treatment-aware integrity witness must distinguish treatment-defined state
+transitions from violations of the invariant it protects.
+```
+
+**Earned by the RUNTIME-MEMORY `BACKEND_RESTARTED_MID_ARM` defect,
+2026-09-07.** The tooth compared the complete LM Studio PID set for equality.
+Scheduled recovery replaces model-worker processes by design, so the detector
+labelled the treatment itself as contamination: **676 offences in arm C, 582 in
+arm D**, both arms flagged, while the invariant it existed to protect — backend
+lifetime continuity — had in fact held throughout (9 processes present in every
+sample, set size never leaving 11-12, and for arm D the core pid and its
+creation time verified unchanged).
+
+**THIS IS DELIBERATELY NOT LAW 6.** The redundancy test was run before giving it
+a number, and it failed to earn one:
+
+```text
+Law 1 (Treatment-to-Observability)
+    an EPISTEMIC requirement on the experimenter:
+    establish whether the treatment changes the probability that its own data
+    are observed, retained, judged healthy, or allowed to complete
+
+Corollary 1a
+    the CONSTRUCTIVE counterpart on the instrument:
+    build the detector so that it does not, by conflating a treatment-defined
+    transition with a violation
+```
+
+The PID defect is Law 1's mechanism arriving through a detector rather than
+through a resource: the treatment changed the probability that its own windows
+were retained. Same law, different delivery. Promoting it to Law 6 would inflate
+the count without adding a distinct failure mode, and this file exists to be
+hard to cheat rather than impressive.
+
+**Reference implementation of the corollary:** `RecoveryGate.flex_model`. It
+relaxes exactly one model, for exactly the duration of that model's own
+scheduled recovery, tolerates 0 or 1 instances and never 2 or more, refuses to
+excuse any other model's disappearance or any foreign model, and records the
+expectation in force with every sample so the relaxation cannot be applied
+retroactively. Proven by `tools/detector_audit_selftest.gd`.
+
 ## 2. DETECTOR-SUPPORT LAW
 
 ```text
@@ -103,6 +147,7 @@ a wildly nonlinear proxy for the quantity of interest.
 See RECOVERY-COUPLING Amendment 1, which bars it as treatment evidence while
 leaving the `kh = 20` primary untouched — a threshold an order of magnitude
 above the dense region is not subject to this law.
+
 
 ## 5. CARDINALITY IS STATE LAW
 
