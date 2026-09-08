@@ -187,15 +187,70 @@ servers, subprocesses, agent pools — anywhere a `create`/`load`/`start` call i
 assumed idempotent and is not, presence-based health checks will certify a
 corrupted runtime as healthy.
 
+## 6. EXECUTION-BOUNDARY LAW
+
+```text
+A safety or experimental boundary that exists only as an instruction is weaker
+than a boundary enforced by the execution path.
+
+If violating the boundary can invalidate evidence or mutate protected runtime
+state, the toolchain must make the forbidden action mechanically hard or
+impossible.
+```
+
+**Earned by the night shift of 2026-09-07.** Operating under an explicit
+`treat LM Studio as READ-ONLY / DO-NOT-CONTACT` instruction, the agent ran
+`recovery_tooth_selftest.gd` as a routine regression check after editing
+`recovery_gate.gd`. That suite is not a unit test: it performed **four real
+unload/reload cycles, a neighbour eviction, and liveness inference** before the
+violation was noticed.
+
+Evidence integrity survived — the artifacts were already committed and the
+backend core never restarted — but **runtime state did not**, and the current
+LM Studio memory state can no longer be treated as a continuation of the
+measured experimental state.
+
+```text
+requested boundary   LM Studio READ-ONLY / DO-NOT-CONTACT
+enforcement          prose only
+outcome              violated within the hour, by the party that read it
+```
+
+Nothing in the repository distinguished a pure unit test from one that drives
+the runtime: same directory, same `*_selftest.gd` naming, same green output.
+
+**REDUNDANCY TEST, run before granting a number.** Laws 1-5 and Corollary 1a all
+govern **measurement validity** — whether an instrument reports the truth about
+an experiment. This one governs **operational enforcement** — whether a stated
+constraint survives contact with an operator. Nothing above covers it, and the
+failure mode is available to any system whose safety rules live in
+documentation. It earns Law 6.
+
+**Enforcement built in response:** `tools/run_safe_tests.py` classifies every
+suite `NO_CONTACT` / `CONTACT_REQUIRED` / `STATE_MUTATING`, defaults to the
+no-contact set, requires explicit clearance for contact and additionally
+`--attended` for state-mutating suites.
+
+The classification **fails closed**: test-shaped files are discovered from disk,
+and an unclassified suite is a hard error. Its first run found **32 unclassified
+suites** in a repository where 12 had been registered by hand.
+
+**Where this travels:** agents, CI systems, lab automation, database migrations,
+autonomous coding, robotics — anywhere `don't touch X` currently means
+`please remember not to`.
+
 ---
 
-## What these five have in common
+## What these six have in common
 
-The first four describe the instrument being changed by the thing it was
-measuring, or the instrument's stated variables failing to capture what it
-actually responds to. The fifth is the same disease one level down: the
-instrument's model of the runtime was too coarse to represent the state the
-runtime could actually be in. That is the specific hazard of running experiments on a substrate
+Laws 1-4 describe the instrument being changed by the thing it was measuring,
+or its stated variables failing to capture what it actually responds to. Law 5
+is the same disease one level down: the instrument's model of the runtime was
+too coarse to represent the state the runtime could actually be in.
+
+**Law 6 is a different family.** The first five are about an instrument lying
+about an experiment. The sixth is about a rule failing to bind the operator —
+including when the operator is the same system that wrote the rule down. That is the specific hazard of running experiments on a substrate
 you also built.
 
 The general form:

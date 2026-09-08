@@ -89,9 +89,46 @@ is that recovery disturbs neighbours — so a large enough disturbance stalls a
 probe and the instrument calls the effect contamination. Split into
 `NEIGHBOUR_COMPLETION_TIMEOUT`. **Nothing relaxed**; both still void.
 
-**5. No distinction between unit tests and runtime-driving tests.** See below.
+**5. No distinction between unit tests and runtime-driving tests.** See the
+violation section. The enforcement built in response found **32 unclassified
+suites** on its first audit, in a repository where 12 had been registered by
+hand — so the blind spot was far larger than the one suite that triggered it.
 
-## Boundary violation — reported, not buried
+## BOUNDARY VIOLATION
+
+```text
+Requested boundary:
+LM Studio READ-ONLY / DO-NOT-CONTACT
+
+Violation:
+recovery_tooth_selftest.gd executed
+
+Observed effects:
+- 4 qwen unload/reload cycles
+- 1 temporary lfm eviction
+- ~4 liveness inference calls
+- backend core PID unchanged
+- resident pool restored exactly 1/1/1
+
+Evidence impact:
+none to already-committed RUNTIME-MEMORY artifacts
+
+Runtime impact:
+current LM Studio memory/cache/runtime state no longer qualifies as
+continuation of the measured experimental state
+
+Corrective action:
+introduced mechanically enforced test-contact classification and
+safe default runner
+```
+
+```text
+LM STUDIO STATE                  CONTAMINATED FOR FUTURE MEASUREMENT
+COMMITTED EXPERIMENT ARTIFACTS   UNAFFECTED
+PERMITTED NIGHT WORK             STATIC / OFFLINE ONLY
+```
+
+### Detail
 
 Under an explicit `treat LM Studio as READ-ONLY / DO-NOT-CONTACT` boundary, I ran
 `recovery_tooth_selftest.gd` as a routine regression check after editing
@@ -126,9 +163,13 @@ explicit clearance while printing exactly what they would do.
 - **UNKNOWN never reinterpreted as PASS** for arms A, B, C.
 - **The qwen block untouched**; no causal analysis, quarantine intact.
 - **No threshold, floor, `ks`, `kh`, `n` changed.** No post-hoc threshold invented.
-- **Corollary 1a NOT promoted to Law 6.** The redundancy test was run and it
+- **Corollary 1a NOT promoted to a law.** The redundancy test was run and it
   failed to earn a number: Law 1 is the epistemic requirement, the corollary is
   its constructive counterpart. Same law, different delivery.
+- **Law 6 (EXECUTION-BOUNDARY) WAS granted**, after the same test. Laws 1-5 and
+  Corollary 1a govern measurement validity; Law 6 governs operational
+  enforcement — whether a stated constraint survives contact with an operator.
+  Different family, so it earned a number rather than being folded in.
 - **No LM Studio restart, no inference, no experiment run** — beyond the
   violation above.
 - **No frozen preregistration history altered.**
