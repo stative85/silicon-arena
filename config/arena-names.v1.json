@@ -1,0 +1,31 @@
+{
+	"schema_version": 1,
+	"note": "PRESENTATION ONLY. A display_name is a label for logs, replays, screenshots and lore. It is NEVER an identity. Provenance fields carry model_id and species_id and are never derived from, or reconciled against, a display name. The mapping is one-way by construction: display_for(model_id) exists; nothing resolves a display name back into provenance.",
+	"names": [
+		{
+			"display_name": "VANTA",
+			"model_id": "liquidai/lfm2.5-1.2b-instruct",
+			"species_id": "lfm25"
+		},
+		{
+			"display_name": "KESTREL",
+			"model_id": "falcon-h1-1.5b-instruct",
+			"species_id": "falconh1"
+		},
+		{
+			"display_name": "GEMMATRON",
+			"model_id": "qwen3.5-2b",
+			"species_id": "qwen35"
+		},
+		{
+			"display_name": "OZONIOUS",
+			"model_id": "rwkv7-1.5b-g1",
+			"species_id": "rwkv7"
+		},
+		{
+			"display_name": "BRINE",
+			"model_id": "h2o-danube2-1.8b-chat",
+			"species_id": "danube2"
+		}
+	]
+}

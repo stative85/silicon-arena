@@ -73,6 +73,10 @@ SUITES = [
     {"name": "gd_parse_check", "kind": "py", "cls": NO_CONTACT,
      "path": "tools/gd_parse_check.py", "group": "core", "args": ["--selftest"],
      "note": "four-sided parse tooth; --check-only proven non-executing"},
+    {"name": "arena_names", "kind": "py", "cls": NO_CONTACT,
+     "path": "tools/arena_names.py", "group": "core", "args": ["--selftest"],
+     "note": "display-name roster; reads config + docs/results read-only, "
+             "writes only a temp file it removes"},
     {"name": "recovery_schedule", "kind": "py", "cls": NO_CONTACT,
      "path": "tools/recovery_schedule.py", "group": "core", "args": ["--verify"],
      "note": "schedule plan verification, touches nothing"},
