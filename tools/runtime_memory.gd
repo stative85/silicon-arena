@@ -357,18 +357,107 @@ func _do_recovery(target: String, neighbours: Array) -> void:
 	_rec_running = false
 
 
+## IMMUTABLE ARM METADATA. No important evidence may depend on someone reading
+## terminal prose, so every arm artifact carries its own provenance and its own
+## integrity eligibility -- including the REASON when it is not qualified.
+func _metadata() -> Dictionary:
+	var git := _git_head()
+	return {
+		"experiment_id": "RUNTIME-MEMORY",
+		"arm": _arm,
+		"run_kind": "EXPERIMENT",
+		"git_commit": git,
+		"prereg_commit": "9707314",
+		"amendment_commits": ["0e9204f", "0793758", "f8a113d", "6a6b4d5"],
+		"runtime_version": _lms_version(),
+		"health_surface_sha256": _health_hash(),
+		"pool_identity": POOL,
+		"load_order": POOL,
+		"backend_core_pid": _core_pid,
+		"backend_core_created": _core_created,
+		"sampling_cadence_ms": SAMPLE_MS,
+		"window_ms": WINDOW_MS,
+		"window_horizon": _windows,
+		"ks": 1.8, "kh": 20.0, "n": 3,
+	}
+
+
+func _git_head() -> String:
+	var out: Array = []
+	OS.execute("git", PackedStringArray(["-C", ProjectSettings.globalize_path(
+		"res://"), "rev-parse", "--short", "HEAD"]), out, false, false)
+	return str(out[0]).strip_edges() if not out.is_empty() else ""
+
+
+func _lms_version() -> String:
+	var out: Array = []
+	OS.execute(RA.LMS, PackedStringArray(["version"]), out, false, false)
+	if out.is_empty():
+		return ""
+	for ln in str(out[0]).split("
+"):
+		if str(ln).contains("CLI commit"):
+			return "lms CLI commit " + str(ln).split(":")[-1].strip_edges()
+	return ""
+
+
+func _health_hash() -> String:
+	var f := FileAccess.open("res://scripts/arena/bridge_health.gd",
+		FileAccess.READ)
+	if f == null:
+		return ""
+	var txt := f.get_as_text()
+	f.close()
+	return txt.sha256_text().substr(0, 16)
+
+
+## Integrity eligibility, decided mechanically and stored in the artifact.
+## UNKNOWN is a first-class outcome and is never silently upgraded.
+func _eligibility() -> Dictionary:
+	var reasons: Array = []
+	if _core_pid <= 0 or _core_created == "":
+		reasons.append("no producer-derived core generation witness at arm start")
+	for p in _problems:
+		var t := str(p)
+		if t.begins_with("BACKEND_CORE_CHANGED") 				or t.begins_with("BACKEND_GENERATION_CHANGED"):
+			reasons.append("backend continuity violated: " + t)
+		elif t.begins_with("BACKEND_PROBE_FAILED"):
+			reasons.append("producer field unavailable during the arm: " + t)
+	var missing_gen := 0
+	for s in _samples:
+		var d: Dictionary = s
+		if str(d.get("backend_core_created", "")) == "":
+			missing_gen += 1
+	if missing_gen > 0:
+		reasons.append("%d samples lack a core generation" % missing_gen)
+	var status := "QUALIFIED"
+	if not reasons.is_empty():
+		status = "VOID" if reasons.size() > 1 else "UNKNOWN"
+	return {
+		"integrity_status": status,
+		"integrity_qualified": status == "QUALIFIED",
+		"causal_evidence_eligible": status == "QUALIFIED",
+		"reasons": reasons,
+		"samples_missing_generation": missing_gen,
+		"problem_count": _problems.size(),
+	}
+
+
 func _write(final: bool) -> void:
 	var f := FileAccess.open("res://docs/results/RUNTIME_MEMORY_%s.json" % _arm,
 		FileAccess.WRITE)
 	if f != null:
-		f.store_string(JSON.stringify({
+		var doc := _metadata()
+		doc.merge(_eligibility(), true)
+		doc.merge({
 			"arm": _arm, "windows": _windows, "window_ms": WINDOW_MS,
 			"sample_ms": SAMPLE_MS, "probe_list_len": PROBE_LIST_LEN,
 			"pool": POOL, "backend_pids_at_start": _pids,
 			"backend_core_pid_at_start": _core_pid,
 			"backend_core_created_at_start": _core_created,
 			"samples": _samples, "events": _events, "problems": _problems,
-		}, "  "))
+		}, true)
+		f.store_string(JSON.stringify(doc, "  "))
 		f.close()
 	if final:
 		print("\n[ARM %s] samples %d, requests %d, completions %d, recoveries %d"
