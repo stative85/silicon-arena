@@ -1,7 +1,14 @@
 {
 	"schema_version": 1,
-	"note": "FROZEN SNAPSHOT of every result artifact existing at the moment the population-regime rule was introduced (2026-09-08). Every one of these was collected under REGIME A (3 species, 5 agents, 2+2+1) and predates the population_regime_id field. They are attributed to Regime A BY THIS RECORD, never by editing the artifacts themselves -- rewriting an old artifact to add a field it never had is falsifying provenance. Any artifact NOT in this list must declare population_regime_id explicitly.",
-	"regime": "A",
+	"record": "PRE_AXIS_ARTIFACT_SNAPSHOT",
+	"superseded_note": "WITHDRAWN CLAIM. This file was frozen on 2026-09-08 as 'population-regime-a-legacy' and asserted that every artifact listed was collected under REGIME A. That assertion was FALSE and is withdrawn under finding REGIME-1 (docs/results/FINDING_REGIME_SCOPE_ERROR.md). The Regime A Arena roster (stablelm-2-zephyr-1.6b, h2o-danube3-4b-chat, gemma-3-1b-it-fast-guff) produced ZERO tracked result artifacts; executed check, 0/0/0. These artifacts were collected from MEASUREMENT POOLS, not from an instantiated Arena roster.",
+	"original_claim": "regime: A",
+	"current_status": "PRE_AXIS -- these artifacts predate both provenance axes and carry NEITHER label, because neither was true when they were written",
+	"withdrawn_on": "2026-09-08",
+	"withdrawn_by": "REGIME-1",
+	"filename_note": "The filename is deliberately unchanged. Renaming it would erase the trail from the false attribution to its withdrawal.",
+	"back_fill_policy": "FORBIDDEN. No artifact in this list may be edited to add a provenance axis it did not have when written. Attribution lives in this record, never in a rewritten artifact.",
+	"regime": "WITHDRAWN",
 	"frozen_at": "2026-09-08",
 	"count": 151,
 	"artifacts": [

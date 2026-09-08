@@ -1,6 +1,7 @@
 # PREREGISTRATION — RUNTIME-MEMORY four-arm rerun
 
-**FROZEN 2026-09-08, BEFORE ANY NEW ARM EXISTS.** Human decision, recorded in
+**FROZEN 2026-09-08, BEFORE ANY NEW ARM EXISTS. Corrected once, also before any
+arm existed, under finding REGIME-1 — see the provenance-axis section.** Human decision, recorded in
 advance precisely so the data cannot influence it. Nothing in this document may
 be revised after the first sample of the first arm is collected; a change after
 that point is a post-hoc criterion change and voids the run.
@@ -118,9 +119,38 @@ forever**. Their backends are gone and their generation was never recorded. This
 rerun produces new data; it does not retroactively repair old data, and no
 result here may be described as having "resolved" those arms.
 
-## Population regime
+## Provenance axis — CORRECTED 2026-09-08 under REGIME-1, before any data
 
-This run is **REGIME B** (5 species, 1 instance each). Every artifact it
-produces must carry `population_regime_id: "B"`. The original RUNTIME-MEMORY
-arms were collected under **REGIME A** (3 species, 2+2+1). See
-`POPULATION_REGIMES.md`; the two are never pooled.
+**This run is NOT Regime B.** The original text of this section claimed it was
+and required `population_regime_id: "B"` on every artifact. That was false and
+would have written false provenance. Corrected before the first runtime contact;
+the withdrawn claim is preserved in
+`docs/results/FINDING_REGIME_SCOPE_ERROR.md`.
+
+RUNTIME-MEMORY **measures a model pool**; it does not instantiate an Arena
+roster. It therefore carries the pool axis and never the roster axis:
+
+```text
+measurement_pool_id: "RM3_V1"
+pool_identity:       ["liquidai/lfm2.5-1.2b-instruct",
+                      "qwen3.5-2b",
+                      "falcon-h1-1.5b-instruct"]
+population_regime_id: ABSENT -- this run instantiates no Arena roster
+```
+
+`RM3_V1` is declared in `config/measurement-pools.v1.json` and is a **strict
+subset** of the Regime B membership, not that roster: `OZONIOUS` (rwkv7) and
+`BRINE` (danube2) are not in it and never were.
+
+**`tools/runtime_memory.gd` POOL is NOT changed.** Making the original claim
+true by enlarging the pool to five models would be a *design change to the
+experiment*, not a relabelling, and is not authorised. The pool stays as it has
+always been; only its name is now declared.
+
+`tools/population_regime.py` verifies the declared pool against the pool each
+artifact actually recorded. Declaring `RM3_V1` while measuring anything else is
+refused.
+
+The original arms are **PRE-AXIS**: they predate both axes and carry neither.
+They are not back-filled — adding a label an artifact did not have when written
+falsifies provenance however true the label is.

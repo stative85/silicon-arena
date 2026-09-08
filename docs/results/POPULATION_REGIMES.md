@@ -1,6 +1,21 @@
 # POPULATION REGIMES — what an Arena result was collected *from*
 
-**Frozen 2026-09-08.** Every Arena result belongs to a population regime. The
+**Frozen 2026-09-08. Scope corrected the same day under finding REGIME-1.**
+
+> **SCOPE.** `population_regime_id` applies ONLY to artifacts produced by an
+> **instantiated Arena roster**. It does NOT apply to experiments that measure a
+> model pool — those carry `measurement_pool_id` instead
+> (`config/measurement-pools.v1.json`). The two axes are mutually exclusive and
+> neither infers the other.
+>
+> **WITHDRAWN:** the original claim that *every result up to 2026-09-08* was
+> Regime A. Executed check: the Regime A roster models appear in **zero**
+> tracked artifacts. Those 151 artifacts came from measurement pools and are
+> **PRE-AXIS** — they carry neither label, and are never back-filled. As of this
+> writing **no Arena-roster result artifact exists**; Regime B's first will come
+> from ARENA IGNITION 0.
+
+Every Arena result belongs to a population regime. The
 regime is a property of the run, is never inferred from the write-up, and
 **results from different regimes are never pooled.**
 

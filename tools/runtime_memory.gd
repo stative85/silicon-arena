@@ -412,6 +412,13 @@ func _metadata() -> Dictionary:
 		"experiment_id": "RUNTIME-MEMORY",
 		"arm": _arm,
 		"run_kind": "EXPERIMENT",
+		## PROVENANCE AXIS. RUNTIME-MEMORY measures a MODEL POOL; it does not
+		## instantiate an Arena roster, so it carries measurement_pool_id and
+		## never population_regime_id. RM3_V1 is declared in
+		## config/measurement-pools.v1.json and is checked against the "pool"
+		## field below -- claiming RM3_V1 while measuring something else is
+		## refused. See docs/results/FINDING_REGIME_SCOPE_ERROR.md (REGIME-1).
+		"measurement_pool_id": "RM3_V1",
 		"git_commit": git,
 		"prereg_commit": "9707314",
 		"amendment_commits": ["0e9204f", "0793758", "f8a113d", "6a6b4d5"],

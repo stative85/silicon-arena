@@ -1,0 +1,17 @@
+{
+	"schema_version": 1,
+	"note": "MEASUREMENT POOLS. An independent provenance axis for experiments that MEASURE A MODEL POOL rather than instantiate an Arena roster. This axis and population_regime_id are mutually exclusive and never infer one another: a pool is what gets loaded and measured, a regime is who debates. Conflating them produced finding REGIME-1.",
+	"pools": [
+		{
+			"measurement_pool_id": "RM3_V1",
+			"used_by": "RUNTIME-MEMORY",
+			"frozen_on": "2026-09-08",
+			"models": [
+				"liquidai/lfm2.5-1.2b-instruct",
+				"qwen3.5-2b",
+				"falcon-h1-1.5b-instruct"
+			],
+			"note": "The pool tools/runtime_memory.gd has always measured. Declared here, not changed. It is a strict subset of the Regime B Arena roster and is NOT that roster."
+		}
+	]
+}
