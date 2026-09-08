@@ -1,0 +1,29 @@
+{
+  "title": "STATIC NIGHT SHIFT -- offline hardening only. No runtime, no science decisions.",
+  "purpose": "Make the next live run boring, mechanically witnessed and hard to misinterpret, without running it. Not to make Silicon Arena look successful. Make it harder for Silicon Arena to lie.",
+  "rule": "Do ONE queue item per turn. Verify it, commit it, write status.json. If an item is already done, say so and move to the next; do not pad. Prefer finishing an item properly over touching several.",
+  "queue": [
+    "ITEM 1: static audit of the runtime-memory and recovery code paths (tools/runtime_memory.gd, scripts/arena/recovery_action.gd, scripts/arena/recovery_gate.gd, tools/backend_continuity.py). Read them; write findings to docs/results/STATIC_AUDIT_RUNTIME_RECOVERY.md as a list of concrete defects or 'no defect found' per path. Do NOT fix anything in this turn -- separating finding from fixing is the point.",
+    "ITEM 2: harden artifact schemas. Every JSON artifact a result depends on should declare what it is and be rejected if it does not. Extend the schema checks, add teeth that prove a malformed artifact is refused.",
+    "ITEM 3: expand tools/result_loader.py fail-closed coverage. For each new refusal branch, add a test that PROVES it refuses -- a branch with no test does not count as coverage.",
+    "ITEM 4: write docs/RERUN_ABC_PROCEDURE.md: the exact, ordered, copy-pasteable procedure for rerunning RUNTIME-MEMORY arms IDLE, CONTROL_WORKLOAD and RECOVERY_ONLY with corrected telemetry, including every precondition, every witness that must be GREEN, and the explicit STOP conditions. Writing the procedure is permitted; executing it is NOT.",
+    "ITEM 5: review EVERY test suite for hidden runtime contact. For each suite in tools/run_safe_tests.py, justify its NO_CONTACT / CONTACT_REQUIRED / STATE_MUTATING classification against what the file actually does. Record the audit in docs/results/CONTACT_CLASSIFICATION_AUDIT.md. Misclassification found = fix the classification, never the boundary.",
+    "ITEM 6: improve sabotage coverage. Find teeth that are asserted but never proven to bite, and add a sabotage that proves each one. A sabotage must assert it actually applied before running, and must be reverted. NO_CONTACT suites only.",
+    "ITEM 7: bring docs/NEXT_LIVE_RUN.md current with everything above -- ESTABLISHED / UNRESOLVED / INVALIDATED / NEXT PERMITTED LIVE ACTION.",
+    "ITEM 8: write docs/results/STATIC_SHIFT_REPORT.md: commits, tests, bugs found, sabotages proven, what was deliberately NOT done, and unresolved blockers. Report failures and dead ends as prominently as successes. Then DONE."
+  ],
+  "boundaries": {
+    "lm_studio": "READ-ONLY / DO-NOT-CONTACT. No restart, unload/load, inference, or experiment runs. This is enforced by the execution path, not just this sentence: your Bash allowlist cannot reach the runtime.",
+    "tests": "Run ONLY via: python tools/run_safe_tests.py, with no arguments. If you author a new test suite you MUST register and classify it in that runner -- an unclassified test-shaped file fails the discovery audit and will halt the shift.",
+    "no_science_decisions": "You may not change any acceptance criterion, threshold, seed set, gate verdict logic, or statistical rule. Specifically frozen: ks=1.8, kh=20, n=3, the 2048 MB RAM floor, the coherence gate's 0.2 and its seeds 1..20, and every preregistration in docs/results/. If a gate looks wrong, WRITE THAT DOWN as a finding. Do not fix it.",
+    "no_reinterpretation": "UNKNOWN is never upgraded to PASS. The quarantined qwen block stays unanalysed for causal inference. Quarantined and VOID results stay quarantined and VOID. Do not rescue a failed experiment because the numbers look interesting.",
+    "no_deletion": "Delete nothing. Not Run 1, not artifacts, not models, not history. Superseded documents are amended, not removed.",
+    "do_not_touch": "PIT A and SWARM/METABOLISM experimental results. The monorepo -- all work stays in this repository.",
+    "honesty": "If you break something, report it in the commit message rather than quietly correcting it. A boundary violation must be reported, not buried."
+  },
+  "stop_when": {
+    "DONE": "all eight queue items are committed",
+    "BLOCKED": "cannot proceed without violating a boundary",
+    "HUMAN_CLEARANCE_REQUIRED": "the next action needs runtime contact, or a scientific judgement that is not yours to make -- including any decision about the coherence detector's marginal region, which belongs to a future COHERENCE-MARGIN experiment and not to this shift"
+  }
+}
