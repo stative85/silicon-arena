@@ -276,7 +276,14 @@ func is_echo_chamber() -> bool:
 
 # --- self test --------------------------------------------------------------
 
-func self_test() -> Dictionary:
+func self_test(seed: int = -1) -> Dictionary:
+	# A seed >= 0 makes this run reproducible. Live behaviour is untouched:
+	# _init() still calls _rng.randomize(), and the arena never passes a seed.
+	# Only the qualification path is deterministic, because a gate that answers
+	# differently on identical code is not a gate. See
+	# docs/results/COHERENCE_GATE_PREREG.md.
+	if seed >= 0:
+		_rng.seed = seed
 	# Runs a synthetic echo chamber and a synthetic real argument through the
 	# same math. If both come out the same, this engine measures nothing and
 	# the result says so. Call from a debug key; costs nothing at runtime.
@@ -322,3 +329,31 @@ func _drive(names: Array, matrix: Dictionary, repeat_text: String, turns: int) -
 		r = float(out["r"])
 		h = float(out["h_min"])
 	return {"r": r, "h": h}
+
+
+func self_test_suite(seeds: Array) -> Dictionary:
+	# Runs self_test() across a fixed seed set and reports the WORST case.
+	# Preregistered acceptance (COHERENCE_GATE_PREREG.md):
+	#     GATE PASSES iff min over seeds of (echo_r - argue_r) > 0.2
+	# The 0.2 is not a parameter of this function on purpose. It is the same
+	# constant self_test() already uses, and it is not to be passed in, scaled,
+	# or overridden by a caller having a bad night.
+	var rows := []
+	var worst := INF
+	var worst_seed := -1
+	for s in seeds:
+		var r: Dictionary = self_test(int(s))
+		var margin: float = float(r["echo_r"]) - float(r["argue_r"])
+		rows.append({
+			"seed": int(s), "echo_r": r["echo_r"], "argue_r": r["argue_r"],
+			"margin": margin, "separated": r["separated"],
+		})
+		if margin < worst:
+			worst = margin
+			worst_seed = int(s)
+	return {
+		"rows": rows,
+		"worst_margin": worst,
+		"worst_seed": worst_seed,
+		"all_separated": rows.all(func(x): return bool(x["separated"])),
+	}
