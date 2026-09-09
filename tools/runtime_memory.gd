@@ -31,6 +31,17 @@ const POOL := ["liquidai/lfm2.5-1.2b-instruct", "qwen3.5-2b",
 	"falcon-h1-1.5b-instruct"]
 
 ## Identical across every arm. Constants, not parameters.
+## HOST MEMORY FLOOR. Frozen at 2048 MB in the preregistration and in the
+## clearance receipt -- and, until 2026-09-08, enforced by NOTHING. The prereg
+## named RAM_FLOOR_EVENT as stop condition 4 against a harness that only ever
+## RECORDED host_free_mb. 117 of 647 samples in a completed CONTROL_WORKLOAD arm
+## sat below this floor, minimum 396 MB, and produced zero events, because there
+## was nothing to produce them. The OS eventually killed a run instead.
+##
+## This is a MACHINE-PROTECTION boundary, not a scientific threshold. The value
+## is unchanged; only the enforcement is new. See RAMFLOOR-1.
+const RAM_FLOOR_MB := 2048
+
 const WINDOW_MS := 40000          ## matches the RC window
 const SAMPLE_MS := 2000           ## resource sampling cadence
 const PROBE_LIST_LEN := 10        ## fixed, so the denominator cannot move
@@ -73,6 +84,8 @@ var _recoveries := 0
 var _pids: Array = []
 var _core_pid := -1
 var _core_created := ""
+var _ram_floor_fired := false
+var _terminated_by_floor := false
 var _sample_i := -1
 var _rec_running := false
 
@@ -271,6 +284,25 @@ func _sample(phase: String) -> void:
 		"backend_probe_full": full,
 	})
 
+	## RAM_FLOOR_EVENT. Fires on the sample that observes the breach, records it
+	## in BOTH events and problems so no consumer can miss it, and terminates the
+	## arm. An arm that continues past the floor is asking the operating system
+	## to make the decision instead, which is what happened to RERUN-2.
+	var free_mb := int(float(mem.get("free", 0)) / 1048576.0)
+	if free_mb < RAM_FLOOR_MB and not _ram_floor_fired:
+		_ram_floor_fired = true
+		var msg := "RAM_FLOOR_EVENT at %s: host free %d MB < floor %d MB" % [
+			phase, free_mb, RAM_FLOOR_MB]
+		_events.append({"event": "RAM_FLOOR_EVENT", "phase": phase,
+			"host_free_mb": free_mb, "floor_mb": RAM_FLOOR_MB,
+			"elapsed_ms": Time.get_ticks_msec() - _t0,
+			"sample_index": _samples.size() - 1})
+		_problems.append(msg)
+		printerr(msg)
+		printerr("     terminating the arm. This is a machine-protection")
+		printerr("     boundary, not a result. The arm is VOID.")
+		_terminated_by_floor = true
+
 
 func _visible(window: int, probe: int) -> Array:
 	var ids: Array = []
@@ -344,6 +376,17 @@ func _run() -> void:
 	for w in _windows:
 		await _one_window(w)
 		_write(false)
+		## FAIL CLOSED. The floor is a machine-protection boundary; an arm that
+		## keeps running past it hands the decision to the OS, which is exactly
+		## how RERUN-2 ended. The partial artifact is still written -- a void arm
+		## that vanishes cannot be audited.
+		if _terminated_by_floor:
+			_problems.append("ARM TERMINATED BY RAM_FLOOR_EVENT after window %d of %d" % [w + 1, _windows])
+			printerr("[ARM %s] TERMINATED at window %d of %d by RAM_FLOOR_EVENT" % [_arm, w + 1, _windows])
+			_write(true)
+			print("  arm is VOID by machine-protection boundary, not a result")
+			quit(2)
+			return
 	await _sample("final_live_client")
 	print("  final live-client sample taken; the orchestrator measures the")
 	print("  disconnect phase, since this process cannot observe its own exit")
@@ -441,6 +484,9 @@ func _metadata() -> Dictionary:
 		"window_ms": WINDOW_MS,
 		"window_horizon": _windows,
 		"ks": 1.8, "kh": 20.0, "n": 3,
+		"ram_floor_mb": RAM_FLOOR_MB,
+		"ram_floor_fired": _ram_floor_fired,
+		"terminated_by_floor": _terminated_by_floor,
 	}
 
 
