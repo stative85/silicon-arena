@@ -52,6 +52,7 @@ var _http: HTTPRequest
 var _ctx := 2048
 var _reps := 3
 var _out := "user://verb_access.json"
+var _only := ""
 var _models: Array = []
 
 
@@ -75,6 +76,7 @@ func _parse_args() -> void:
 			"--ctx": _ctx = int(argv[i + 1])
 			"--reps": _reps = int(argv[i + 1])
 			"--out": _out = str(argv[i + 1])
+			"--only": _only = str(argv[i + 1])
 
 
 ## Membership comes from the frozen population file and nowhere else. Display
@@ -90,8 +92,14 @@ func _roster() -> Array:
 		return []
 	var out := []
 	for s in d.get("species", []):
+		var sid := str(s.get("species_id", ""))
+		## --only narrows WHICH member is probed. It never changes membership:
+		## the file above still decides who is in the Arena, and a partial run
+		## is recorded as partial rather than as a smaller roster.
+		if not _only.is_empty() and sid != _only:
+			continue
 		out.append({"model_id": str(s.get("model_id", "")),
-			"species_id": str(s.get("species_id", ""))})
+			"species_id": sid})
 	return out
 
 
@@ -263,6 +271,13 @@ func _write(started: String, records: Array, matrix: Dictionary) -> void:
 	var payload := {
 		"gate": "STEP_1A_VERB_ACCESS",
 		"started_utc": started,
+		## SOLO_RESIDENCY when one species is loaded at a time, POOL when all
+		## five are co-resident. These are different regimes and their records
+		## are not merged blindly -- the METABOLISM correction established that
+		## two loading regimes on this box produce opposite-looking results.
+		"residency_regime": ("SOLO_RESIDENCY" if not _only.is_empty()
+			else "POOL"),
+		"only": _only,
 		"context": _ctx,
 		"reps": _reps,
 		"operations": OP.AGENT_CHOOSABLE,
