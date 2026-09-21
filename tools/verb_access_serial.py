@@ -73,6 +73,10 @@ def vram_mib():
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--ctx", type=int, default=2048)
+    ap.add_argument("--arms", default="LIVE",
+                    help="comma separated: LIVE (the frozen union seam), "
+                         "SCHEMA (per-operation, pins the verb), FREE "
+                         "(unconstrained; currently measures prompt wording)")
     ap.add_argument("--reps", type=int, default=3)
     ap.add_argument("--out", default=os.path.join(USERDATA,
                                                   "verb_access_serial.json"))
@@ -90,7 +94,8 @@ def main():
     lms("unload", "--all")
 
     merged = {"gate": "STEP_1A_VERB_ACCESS", "residency_regime":
-              "SOLO_RESIDENCY", "context": a.ctx, "reps": a.reps,
+              "SOLO_RESIDENCY", "arms": a.arms.split(","),
+              "context": a.ctx, "reps": a.reps,
               "per_species": {}, "matrix": {}, "records": []}
     failed_species = []
 
@@ -111,6 +116,7 @@ def main():
             [gb, "--headless", "--path", REPO, "--script",
              "tools/breach_verb_access.gd", "--",
              "--ctx", str(a.ctx), "--reps", str(a.reps),
+             "--arms", a.arms,
              "--only", sid, "--out", "user://" + out_name],
             capture_output=True, text=True, encoding="utf-8",
             errors="replace", timeout=5400)
@@ -129,6 +135,11 @@ def main():
             merged["per_species"][sid] = {"model_id": mid,
                                           "seconds": round(took, 1),
                                           "artifact": out_name}
+            merged.setdefault("provenance", d.get("provenance", {}))
+            if merged["provenance"] != d.get("provenance", {}):
+                # Two species measured under different instrument state is not
+                # one result. Record it rather than averaging over it.
+                merged.setdefault("provenance_mismatch", []).append(sid)
         else:
             print("  NO ARTIFACT -- probe produced nothing")
             failed_species.append(sid)

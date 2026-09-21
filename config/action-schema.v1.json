@@ -1,0 +1,294 @@
+{
+ "$schema": "https://json-schema.org/draft/2020-12/schema",
+ "title": "ACTION_SCHEMA_V1",
+ "description": "The live decision seam. A discriminated union over the 16 agent-choosable operations: the model selects the verb and the branch then requires exactly that verb's fields. NO_OP is host-authored and is deliberately absent -- an agent may not choose it.",
+ "anyOf": [
+  {
+   "type": "object",
+   "additionalProperties": false,
+   "required": [
+    "operation",
+    "target"
+   ],
+   "properties": {
+    "operation": {
+     "const": "MOVE"
+    },
+    "target": {
+     "type": "string",
+     "minLength": 1
+    }
+   }
+  },
+  {
+   "type": "object",
+   "additionalProperties": false,
+   "required": [
+    "operation",
+    "target"
+   ],
+   "properties": {
+    "operation": {
+     "const": "OBSERVE"
+    },
+    "target": {
+     "type": "string",
+     "minLength": 1
+    }
+   }
+  },
+  {
+   "type": "object",
+   "additionalProperties": false,
+   "required": [
+    "operation",
+    "target"
+   ],
+   "properties": {
+    "operation": {
+     "const": "TAKE"
+    },
+    "target": {
+     "type": "string",
+     "minLength": 1
+    }
+   }
+  },
+  {
+   "type": "object",
+   "additionalProperties": false,
+   "required": [
+    "operation",
+    "target"
+   ],
+   "properties": {
+    "operation": {
+     "const": "DROP"
+    },
+    "target": {
+     "type": "string",
+     "minLength": 1
+    }
+   }
+  },
+  {
+   "type": "object",
+   "additionalProperties": false,
+   "required": [
+    "operation",
+    "target",
+    "object"
+   ],
+   "properties": {
+    "operation": {
+     "const": "GIVE"
+    },
+    "target": {
+     "type": "string",
+     "minLength": 1
+    },
+    "object": {
+     "type": "string",
+     "minLength": 1
+    }
+   }
+  },
+  {
+   "type": "object",
+   "additionalProperties": false,
+   "required": [
+    "operation",
+    "target",
+    "object",
+    "requested"
+   ],
+   "properties": {
+    "operation": {
+     "const": "OFFER"
+    },
+    "target": {
+     "type": "string",
+     "minLength": 1
+    },
+    "object": {
+     "type": "string",
+     "minLength": 1
+    },
+    "requested": {
+     "type": "string",
+     "minLength": 1
+    }
+   }
+  },
+  {
+   "type": "object",
+   "additionalProperties": false,
+   "required": [
+    "operation",
+    "target"
+   ],
+   "properties": {
+    "operation": {
+     "const": "ACCEPT"
+    },
+    "target": {
+     "type": "string",
+     "minLength": 1
+    }
+   }
+  },
+  {
+   "type": "object",
+   "additionalProperties": false,
+   "required": [
+    "operation",
+    "target"
+   ],
+   "properties": {
+    "operation": {
+     "const": "DECLINE"
+    },
+    "target": {
+     "type": "string",
+     "minLength": 1
+    }
+   }
+  },
+  {
+   "type": "object",
+   "additionalProperties": false,
+   "required": [
+    "operation",
+    "text"
+   ],
+   "properties": {
+    "operation": {
+     "const": "MESSAGE_PUBLIC"
+    },
+    "text": {
+     "type": "string",
+     "minLength": 1
+    }
+   }
+  },
+  {
+   "type": "object",
+   "additionalProperties": false,
+   "required": [
+    "operation",
+    "target",
+    "text"
+   ],
+   "properties": {
+    "operation": {
+     "const": "MESSAGE_PRIVATE"
+    },
+    "target": {
+     "type": "string",
+     "minLength": 1
+    },
+    "text": {
+     "type": "string",
+     "minLength": 1
+    }
+   }
+  },
+  {
+   "type": "object",
+   "additionalProperties": false,
+   "required": [
+    "operation",
+    "target"
+   ],
+   "properties": {
+    "operation": {
+     "const": "LOCK"
+    },
+    "target": {
+     "type": "string",
+     "minLength": 1
+    }
+   }
+  },
+  {
+   "type": "object",
+   "additionalProperties": false,
+   "required": [
+    "operation",
+    "target"
+   ],
+   "properties": {
+    "operation": {
+     "const": "UNLOCK"
+    },
+    "target": {
+     "type": "string",
+     "minLength": 1
+    }
+   }
+  },
+  {
+   "type": "object",
+   "additionalProperties": false,
+   "required": [
+    "operation",
+    "target"
+   ],
+   "properties": {
+    "operation": {
+     "const": "COMMIT_KEY"
+    },
+    "target": {
+     "type": "string",
+     "minLength": 1
+    }
+   }
+  },
+  {
+   "type": "object",
+   "additionalProperties": false,
+   "required": [
+    "operation",
+    "target"
+   ],
+   "properties": {
+    "operation": {
+     "const": "WITHDRAW_KEY"
+    },
+    "target": {
+     "type": "string",
+     "minLength": 1
+    }
+   }
+  },
+  {
+   "type": "object",
+   "additionalProperties": false,
+   "required": [
+    "operation",
+    "target"
+   ],
+   "properties": {
+    "operation": {
+     "const": "USE_TERMINAL"
+    },
+    "target": {
+     "type": "string",
+     "minLength": 1
+    }
+   }
+  },
+  {
+   "type": "object",
+   "additionalProperties": false,
+   "required": [
+    "operation"
+   ],
+   "properties": {
+    "operation": {
+     "const": "WAIT"
+    }
+   }
+  }
+ ]
+}
