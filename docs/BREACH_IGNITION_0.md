@@ -1,7 +1,26 @@
 # THE BREACH — ARENA IGNITION 0
 
-**Status: DESIGN. Not implemented. Implementation begins when the four-arm
-RUNTIME-MEMORY run lands and its integrity/admissibility are resolved.**
+**Status: BUILT, UNEXECUTED — blocked on context decision (Options A-D).**
+
+The nineteen modules were implemented at `c0f3e07` (2851 lines, no Godot
+launched, no LM Studio contact, no inference, unexecuted by design).
+Construction is therefore done.
+
+The stated precondition was not waited out. `c0f3e07` landed 15:54, RUNTIME-MEMORY
+closed at `fe0c545` 21:42 the same day — the build ran as LANE B while LANE A
+still owned the box. What that satisfied was the condition's purpose (no runtime
+contact, no artifact touched) rather than its letter (the run having landed);
+the run has since closed, so the condition now holds either way. Recorded
+because the commit order says the opposite of what a reader would assume.
+
+Operational authorization is a separate fact and it is still missing: section 0
+below is a human call, and no arena round may be ignited until it is made.
+
+Construction state and execution authorization are separate facts and this line
+tracks both. It read "DESIGN. Not implemented." for thirteen days after the
+build landed — a stale status in a repo that runs a quarantine register is the
+same error class as RM-1, so it is corrected here rather than at the same time
+as the decision it is waiting on.
 
 The question:
 
