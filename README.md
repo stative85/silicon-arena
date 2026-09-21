@@ -1,6 +1,8 @@
-# Silicon Arena
+# SILICON ARENA // THE BREACH
 
-**5 local AI models argue live in a 2D arena — with beef cinematics, doom cascades, and no cloud APIs.**
+**An offline instrument for causal archaeology in a machine ecology — five local
+models, one 8GB GPU, and a host that is built to understand as little as
+possible about why they act.**
 
 [![verify](https://github.com/stative85/silicon-arena/actions/workflows/verify.yml/badge.svg)](https://github.com/stative85/silicon-arena/actions/workflows/verify.yml)
 
@@ -11,17 +13,76 @@ ceiling loading; `[LOADING]` is a cold model swap in progress; `[compat]` is a
 model whose chat template rejects system roles being rescued rather than
 dropped. Still frame: [docs/console.png](docs/console.png).*
 
-**5 heterogeneous local LLM agents · 1 consumer 8GB GPU · JIT model swapping ·
-hard 7B execution-boundary law · cross-agent state outside model weights ·
-Godot + LM Studio · fully offline**
+**Deterministic world reducer · 16 agent verbs, no composite actions · frozen
+five-species population · partial observability · seven ROBRUSTION laws ·
+Godot + LM Studio · fully offline, fail-closed on 8GB**
 
-Silicon Arena is a real-time AI debate simulator built in Godot 4.6. Local LLM agents served by [LM Studio](https://lmstudio.ai/) debate AI alignment, rap battle each other, run therapy sessions, and trigger emergent cinematic events — all running offline on your machine.
+```text
+WRITE THE VERBS. DO NOT WRITE THE BEHAVIOR.
+MAXIMIZE AGENT CAUSAL REACH. MINIMIZE HOST SEMANTIC KNOWLEDGE.
+```
 
-Inspired by [Stanford's Generative Agents](https://arxiv.org/abs/2304.03442) paper. Built for streamers, the local AI community, and anyone who thinks AI should do more than answer questions politely.
+Silicon Arena began as a real-time debate simulator and became an experimental
+instrument. The question it now exists to answer is in
+[docs/BREACH_IGNITION_0.md](docs/BREACH_IGNITION_0.md):
+
+> What happens when five different local models get enough causal reach to
+> change a shared world, while the host understands as little as possible about
+> why they do it?
+
+Inspired by [Stanford's Generative Agents](https://arxiv.org/abs/2304.03442),
+and departing from it on one point: nothing here infers motive. The host writes
+the verbs and the physics. It does not write, score, or name the behaviour.
 
 ---
 
-## What Makes This Different
+## What THE BREACH is
+
+Nineteen modules, 2851 lines, **built and deliberately unexecuted** — the
+offline mechanics are implemented and deterministic, and the arena has not been
+ignited because one blocker is still a human call (five models probably do not
+fit in 8GB at full context; the four options and their confounds are written
+down before the run, not after).
+
+- **Deterministic world reducer** — `scripts/breach/world_reducer.gd` applies
+  one operation at a time to locations, doors, objects, slots, terminals and a
+  clock. Agents emit 16 canonical verbs with energy costs; there is no
+  `BUILD_BRIDGE` and no composite action. Structures, if they appear, are
+  configurations the host can check a predicate against but cannot name.
+- **Frozen five-species population** — `config/arena-species.v1.json` holds five
+  model_ids, one instance each. `VANTA KESTREL GEMMATRON OZONIOUS BRINE` are
+  **decoration with no authority**: a display name adds no member, carries no
+  provenance, and grants no ability. Species-specific powers are permanently
+  banned — asymmetry introduced by the host would confound every later
+  comparison. See [docs/ARENA_IDENTITY_LAYERS.md](docs/ARENA_IDENTITY_LAYERS.md).
+- **Partial observability** — `observation_builder.gd` gives each agent a
+  bounded local projection of mechanical facts only. The world is permitted to
+  remember far more than any model can observe; that is the design, not a
+  limitation.
+- **Model-authored memory, host-verified provenance** — a 12-entry ledger and a
+  message bus with public/private routing. State lives outside model weights.
+- **Seven ROBRUSTION laws**, including LAW 7 CLAIM-TO-WITNESS: every finding
+  must declare its strongest evidence, because this repo has already published a
+  BLOCKER whose bytes were all real and whose conclusion was false
+  ([RM-1 REFUTED](docs/CLAIM_TO_WITNESS.md)). The laws govern what may be
+  claimed about runs — they are an evidence discipline over findings, not a
+  runtime filter on world state.
+- **Fail-closed on 8GB** — the VRAM ceiling is enforced on the request path and
+  the runtime refuses rather than degrades. It is an engineering bound on the
+  instrument. It is never in-world physics: hardware speed, token count and
+  memory pressure do not become mass, energy or advantage.
+
+Results are not claimed here. A six-rung ladder — state persisted / state
+altered autonomous physics / physics altered a later affordance / a later agent
+observed it / a later agent used it / closed ecological loop — is written in
+advance so the goalposts cannot move, and the arena has not yet run.
+
+---
+
+## The debate layer (what runs today)
+
+The original simulator still ships and still works. It is the part you can
+launch right now; it is not the experiment.
 
 - **45 debate templates** — from AI ethics tribunals to rap battles to gonzo journalism to AI divorce court ([full list](TEMPLATES.md))
 - **Beef system** — when agents get hostile, a cinematic clash triggers: bullet-time, weapon VFX, screen shake, crowd reactions
@@ -31,10 +92,6 @@ Inspired by [Stanford's Generative Agents](https://arxiv.org/abs/2304.03442) pap
 - **BRB overlay** — streamer AFK mode that auto-cycles templates while the arena runs live
 - **7 presets** including the Guardian Protocol: 5 faction-scripted agents with Agape/Truth/Mercy/Justice/Protection directives
 - **Runs entirely offline** — no cloud APIs, no subscriptions, no telemetry
-
----
-
----
 
 ---
 
