@@ -43,7 +43,15 @@ const AGENT_CHOOSABLE := [
 	COMMIT_KEY, WITHDRAW_KEY, USE_TERMINAL, WAIT,
 ]
 
-const ALL := AGENT_CHOOSABLE + [NO_OP]
+## Spelled out rather than AGENT_CHOOSABLE + [NO_OP]: array concatenation is
+## not a constant expression, so the concise form does not compile. The
+## membership test below keeps the two in agreement.
+const ALL := [
+	MOVE, OBSERVE, TAKE, DROP, GIVE, OFFER, ACCEPT, DECLINE,
+	MESSAGE_PUBLIC, MESSAGE_PRIVATE, LOCK, UNLOCK,
+	COMMIT_KEY, WITHDRAW_KEY, USE_TERMINAL, WAIT,
+	NO_OP,
+]
 
 ## Required fields per operation, checked structurally by the parser. "target"
 ## is the object/agent/location/slot the verb acts on; "text" is message body;

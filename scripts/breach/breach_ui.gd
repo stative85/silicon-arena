@@ -215,7 +215,7 @@ func update_agents(agents: Dictionary) -> void:
 		var a = agents[nm]
 		var row: Dictionary = _status_rows[nm]
 		(row["energy"] as Label).text = "E %d" % a.energy
-		var keys := a.keys_held()
+		var keys: Array = a.keys_held()
 		var letters := ""
 		for k in keys:
 			letters += str(k).replace("key_", "")

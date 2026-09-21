@@ -1,5 +1,5 @@
 extends RefCounted
-class_name MemoryLedger
+class_name BreachMemoryLedger
 
 ## BOUNDED, MODEL-AUTHORED MEMORY WITH HOST-VERIFIED PROVENANCE.
 ##

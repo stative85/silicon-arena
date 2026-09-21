@@ -212,7 +212,7 @@ func _init() -> void:
 			"%s vs %s" % [out_a["chain_head"], out_b["chain_head"]])
 
 		print("\n[the replay chain detects tampering]")
-		var v := round_a.log.verify_chain()
+		var v: Dictionary = round_a.log.verify_chain()
 		ck("an untouched log verifies", bool(v["ok"]))
 		if round_a.log.events.size() > 2:
 			## SABOTAGE: rewrite a recorded operation, the way a tidied log
@@ -222,7 +222,7 @@ func _init() -> void:
 			var applied := str(round_a.log.events[1]["operation"]) != before_op
 			ck("SABOTAGE APPLIED (an event was rewritten)", applied)
 			if applied:
-				var v2 := round_a.log.verify_chain()
+				var v2: Dictionary = round_a.log.verify_chain()
 				ck("SABOTAGE BITES: the chain refuses", not bool(v2["ok"]))
 				ck("  and names the first divergent event",
 					int(v2["first_divergence"]) == 1,
@@ -231,7 +231,7 @@ func _init() -> void:
 			ck("SABOTAGE REVERTED", bool(round_a.log.verify_chain()["ok"]))
 
 		print("\n[the artifact carries the roster axis, never a pool id]")
-		var art := round_a.log.to_artifact(round_a.world, out_a)
+		var art: Dictionary = round_a.log.to_artifact(round_a.world, out_a)
 		ck("population_regime_id is B",
 			str(art["population_regime_id"]) == "B")
 		ck("no measurement_pool_id on a roster artifact",

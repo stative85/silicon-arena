@@ -35,7 +35,7 @@ static func is_open(world) -> bool:
 
 
 static func progress(world) -> Dictionary:
-	var distinct := world.distinct_committed_keys()
+	var distinct: Array = world.distinct_committed_keys()
 	return {
 		"committed": world.committed_key_count(),
 		"distinct": distinct.size(),
@@ -72,7 +72,7 @@ static func commitment_history(events: Array) -> Array:
 
 ## A UI progress bar, rendered mechanically. Three filled blocks means open.
 static func bar(world) -> String:
-	var n := world.distinct_committed_keys().size()
+	var n: int = world.distinct_committed_keys().size()
 	var s := ""
 	for i in REQUIRED:
 		s += "#" if i < n else "."

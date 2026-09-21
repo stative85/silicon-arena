@@ -52,7 +52,7 @@ static func apply(world, agents: Dictionary, actor_name: String,
 			if not world.are_adjacent(actor.position, target):
 				res["reason"] = "%s is not adjacent to %s" % [target, actor.position]
 				return res
-			var did := world.door_between(actor.position, target)
+			var did: String = world.door_between(actor.position, target)
 			if not did.is_empty() and bool(world.doors[did]["locked"]):
 				res["reason"] = "door %s is locked" % did
 				return res
@@ -169,7 +169,7 @@ static func apply(world, agents: Dictionary, actor_name: String,
 			if not str(world.vault_slots[target]).is_empty():
 				res["reason"] = "slot %s already holds %s" % [target, world.vault_slots[target]]
 				return res
-			var held := actor.keys_held()
+			var held: Array = actor.keys_held()
 			if held.is_empty():
 				res["reason"] = "holding no key"
 				return res
@@ -220,7 +220,7 @@ static func apply(world, agents: Dictionary, actor_name: String,
 			if str(t["at_location"]) != actor.position:
 				res["reason"] = "terminal %s is not here" % target
 				return res
-			var scrap := actor.scrap_held()
+			var scrap: Array = actor.scrap_held()
 			var need := int(t["scrap_per_use"])
 			if scrap.size() < need:
 				res["reason"] = "need %d scrap, holding %d" % [need, scrap.size()]

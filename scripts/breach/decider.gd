@@ -32,17 +32,17 @@ class ScriptedDecider extends Decider:
 	## schedule, so the NO_OP path is exercised by qualification rather than
 	## being discovered live.
 
-	var script: Array = []       ## Array[String] raw outputs, cycled
+	var lines: Array = []        ## Array[String] raw outputs, cycled
 	var cursor: int = 0
 
 	func _init(p_script: Array) -> void:
-		script = p_script.duplicate()
+		lines = p_script.duplicate()
 
 	func decide(_observation: Dictionary, _agent) -> Dictionary:
-		if script.is_empty():
+		if lines.is_empty():
 			return {"raw": "{\"operation\":\"WAIT\"}", "latency_ms": 0,
 				"params": {"decider": "scripted"}}
-		var raw := str(script[cursor % script.size()])
+		var raw := str(lines[cursor % lines.size()])
 		cursor += 1
 		return {"raw": raw, "latency_ms": 0, "params": {"decider": "scripted"}}
 

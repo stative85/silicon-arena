@@ -89,7 +89,7 @@ func state_hash() -> String:
 func step() -> Dictionary:
 	if ended:
 		return {}
-	var actor_name := scheduler.next_able_actor(agents)
+	var actor_name: String = scheduler.next_able_actor(agents)
 	if actor_name.is_empty():
 		_end(END_NO_AGENT_CAN_ACT)
 		return {}
