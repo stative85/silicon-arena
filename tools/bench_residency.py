@@ -40,7 +40,7 @@ print = functools.partial(builtins.print, flush=True)  # unbuffered progress
 
 BASE = "http://127.0.0.1:1234"
 LMS = r"C:\Users\cleve\.lmstudio\bin\lms.exe"
-CTX = 8192
+CTX = 8192  # overridden by --ctx; the sweep varies exactly this
 
 MODELS = [
     "h2o-danube2-1.8b-chat",
@@ -98,6 +98,98 @@ def preload_pool():
                        capture_output=True, text=True,
             encoding="utf-8", errors="replace", timeout=600)
     return resident()
+
+
+## ------------------------------------------------- degraded-mode detector
+##
+## THE HOLE THIS CLOSES. The first EXPLICIT_RESIDENCY_MODE run recorded qwen3.5
+## executing at ~2.4 tok/s for five consecutive solo cases while the instrument
+## reported `fail 0` and `regime_held`. A model spilled off the GPU stays
+## RESIDENT and answers every request with correct-looking output, so neither
+## the residency assertion nor the liveness probe can see it
+## (docs/results/BENCH_RESIDENCY_RESULTS.md, "The instrument's own blind spot").
+## That run preregistered this check as the change to make BEFORE any rerun.
+##
+## WHY A FLOOR IS SOUND HERE. Measured separation is not marginal: GPU-resident
+## decode sits at ~200-330 tok/s, the degraded state at ~2.4-2.6 tok/s -- a
+## 50-100x gap with nothing observed in between. ABSOLUTE_TPS_FLOOR sits an
+## order of magnitude above the degraded ceiling and well below the slowest
+## GPU-resident member, so it separates placement, not model speed. It is NOT a
+## quality threshold and never compares one species against another.
+ABSOLUTE_TPS_FLOOR = 25.0
+
+## Per-model band, calibrated at run start. A model may be legitimately slower
+## than its neighbours (rwkv7 is ~5-7x slower than lfm2.5 GPU-resident, which is
+## a species fact, not a fault); it may not be far slower than ITSELF.
+RELATIVE_FLOOR_FRAC = 0.40
+
+CALIBRATION = {}      # model -> median decode_tps measured while verifiably GPU-resident
+DEGRADE_EVENTS = []
+
+
+def _median_tps(recs):
+    vals = sorted(r["decode_tps"] for r in recs
+                  if r.get("ok") and r.get("decode_tps"))
+    if not vals:
+        return None
+    return vals[len(vals) // 2]
+
+
+def calibrate_bands(reps=5):
+    """Establish each model's own GPU-resident decode rate, before measurement.
+
+    THE TRAP THIS AVOIDS: calibrating a model that is ALREADY spilled would
+    write the degraded rate in as that model's normal and make every later
+    comparison agree with the defect. So each calibration is checked against the
+    absolute floor, and a model that cannot clear it is not calibrated low --
+    the run refuses to start.
+    """
+    print("\n[CALIBRATION] per-model decode band, %d reps each" % reps)
+    prompt, mx = workload_b()
+    bad = []
+    for m in MODELS:
+        recs = [stream_request(m, prompt, mx) for _ in range(reps)]
+        med = _median_tps(recs)
+        CALIBRATION[m] = med
+        if med is None:
+            state = "NO DATA"
+            bad.append(m)
+        elif med < ABSOLUTE_TPS_FLOOR:
+            state = "BELOW ABSOLUTE FLOOR -- not GPU-resident"
+            bad.append(m)
+        else:
+            state = "ok, band >= %.1f tok/s" % (med * RELATIVE_FLOOR_FRAC)
+        print("  %-10s median %s tok/s   %s"
+              % (SHORT.get(m, m),
+                 "  n/a" if med is None else "%5.1f" % med, state))
+    return bad
+
+
+def band_breaches(out):
+    """Which models ran below their own calibrated band during this case?
+
+    Returns a list of breach records. A breach is a REGIME failure -- the case
+    did not measure what it claims to measure -- not a slow result to average in.
+    """
+    per = {}
+    for rec in _walk_records(out):
+        if rec.get("ok") and rec.get("decode_tps"):
+            per.setdefault(rec["model"], []).append(rec)
+    breaches = []
+    for m, recs in sorted(per.items()):
+        med = _median_tps(recs)
+        base = CALIBRATION.get(m)
+        if med is None:
+            continue
+        floor = ABSOLUTE_TPS_FLOOR
+        if base:
+            floor = max(floor, base * RELATIVE_FLOOR_FRAC)
+        if med < floor:
+            breaches.append({"model": m, "observed_tps": round(med, 2),
+                             "floor_tps": round(floor, 2),
+                             "calibrated_tps": round(base, 2) if base else None,
+                             "ratio": round(med / base, 4) if base else None})
+    return breaches
 
 
 def pool_intact():
@@ -276,17 +368,32 @@ def guarded(name, fn, results):
 
     ok_after, missing_after, after = pool_intact()
     v1 = vram_mib()
+    # The third failure mode: resident, answering, and 50-100x slow. Invisible
+    # to both checks above; caught only by the calibrated band.
+    degraded = band_breaches(out)
+    for b in degraded:
+        b["case"] = name
+        DEGRADE_EVENTS.append(b)
+
     case = {"case": name, "resident_before": before, "resident_after": after,
             "vram_before_mib": v0, "vram_after_mib": v1,
             "gpu": gpu_sample(), "regime_held": ok_before and ok_after
-            and not wedged,
-            "missing_after": missing_after, "wedged": wedged, "data": out}
+            and not wedged and not degraded,
+            "missing_after": missing_after, "wedged": wedged,
+            "degraded": degraded, "data": out}
     if not case["regime_held"]:
-        case["FAILED"] = ("model wedged during the case" if wedged
-                          else "residency changed during the case")
-        print("    *** FAILED: %s (missing=%s wedged=%s)"
+        if degraded:
+            case["FAILED"] = "model ran below its calibrated band during the case"
+        elif wedged:
+            case["FAILED"] = "model wedged during the case"
+        else:
+            case["FAILED"] = "residency changed during the case"
+        print("    *** FAILED: %s (missing=%s wedged=%s degraded=%s)"
               % (case["FAILED"], missing_after or "none",
-                 [SHORT.get(m, m) for m in wedged] or "none"))
+                 [SHORT.get(m, m) for m in wedged] or "none",
+                 ["%s %.1f<%.1f" % (SHORT.get(b["model"], b["model"]),
+                                    b["observed_tps"], b["floor_tps"])
+                  for b in degraded] or "none"))
         preload_pool()
     results.append(case)
     return case
@@ -466,15 +573,24 @@ def derive(results):
 
 
 def main():
+    global CTX
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", default="D:/bench_residency.json")
     ap.add_argument("--reps", type=int, default=10)
     ap.add_argument("--trials", type=int, default=3)
     ap.add_argument("--sustained", type=int, default=100)
+    ap.add_argument("--ctx", type=int, default=CTX,
+                    help="context length every model is loaded at (the sweep "
+                         "axis; all five always identical -- a per-model "
+                         "context would be a host-introduced asymmetry)")
+    ap.add_argument("--calib-reps", type=int, default=5)
     a = ap.parse_args()
+    CTX = a.ctx
 
     print("=== EXPLICIT_RESIDENCY_MODE throughput benchmark ===")
-    print("Hardware/runtime characterisation. No model-quality claims.\n")
+    print("Hardware/runtime characterisation. No model-quality claims.")
+    print("context: %d   absolute floor: %.0f tok/s   band: %.0f%% of own median\n"
+          % (CTX, ABSOLUTE_TPS_FLOOR, RELATIVE_FLOOR_FRAC * 100))
     print("preloading the five-model pool explicitly...")
     pool = preload_pool()
     ok, missing, res = pool_intact()
@@ -486,6 +602,25 @@ def main():
               "different regime.")
         return 1
 
+    bad = calibrate_bands(a.calib_reps)
+    if bad:
+        print("\nCANNOT ESTABLISH THE REGIME AT CONTEXT %d. These models are "
+              "resident but not running at GPU speed:\n  %s\n"
+              "This is the oversubscription result, not an instrument fault: "
+              "at this context the pool does not fit and the runtime has "
+              "silently placed a model elsewhere. Recording the refusal and "
+              "stopping -- measuring now would report Option D as Option A."
+              % (CTX, ", ".join(SHORT.get(m, m) for m in bad)))
+        with open(a.out, "w", encoding="utf-8") as f:
+            json.dump({"regime": "EXPLICIT_RESIDENCY_MODE", "models": MODELS,
+                       "context": CTX, "outcome": "REFUSED_OVERSUBSCRIBED",
+                       "calibration": CALIBRATION,
+                       "absolute_tps_floor": ABSOLUTE_TPS_FLOOR,
+                       "below_floor": bad,
+                       "vram_mib": vram_mib()}, f, indent=1)
+        print("wrote %s" % a.out)
+        return 2
+
     results = []
     solo(results, a.reps)
     concurrency(results, a.trials)
@@ -495,12 +630,20 @@ def main():
 
     with open(a.out, "w", encoding="utf-8") as f:
         json.dump({"regime": "EXPLICIT_RESIDENCY_MODE", "models": MODELS,
-                   "context": CTX, "cases": results, "derived": derived,
-                   "wedge_events": WEDGE_EVENTS}, f,
+                   "context": CTX, "outcome": "MEASURED",
+                   "calibration": CALIBRATION,
+                   "absolute_tps_floor": ABSOLUTE_TPS_FLOOR,
+                   "relative_floor_frac": RELATIVE_FLOOR_FRAC,
+                   "cases": results, "derived": derived,
+                   "wedge_events": WEDGE_EVENTS,
+                   "degrade_events": DEGRADE_EVENTS}, f,
                   indent=1)
     print("\nwrote %s" % a.out)
     failed = [c["case"] for c in results if not c.get("regime_held")]
     print("cases where the regime did not hold: %s" % (failed or "none"))
+    print("degrade events: %d %s" % (len(DEGRADE_EVENTS),
+          [(SHORT.get(e["model"], e["model"]), e["case"], e["observed_tps"])
+           for e in DEGRADE_EVENTS]))
     print("wedge events: %d %s" % (len(WEDGE_EVENTS),
           [(SHORT.get(e["model"], e["model"]), e["at"], e["recovered"])
            for e in WEDGE_EVENTS]))
