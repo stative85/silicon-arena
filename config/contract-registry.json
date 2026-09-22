@@ -15,7 +15,7 @@
  "flow_contract": {
   "1": {
    "path": "config/flow-scar-contract.v1.json",
-   "sha256": "1ea564c309ea9dd8116f48fdfb0389118fc5f76be84255fc053486537491e12a"
+   "sha256": "041cb7ced76c7e1937f930f1fa2fa4055679ed6af76b734439500cd994532264"
   }
  },
  "regime_bindings": {

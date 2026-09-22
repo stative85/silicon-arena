@@ -126,12 +126,21 @@
  },
 
  "residency": {
-  "regime": "JIT_RESIDENCY",
+  "regime": "SOLO_JIT_RESIDENCY",
+  "definition": "Before every inference request, ONLY the acting species may be resident. The previous species is unloaded before the next is loaded. The resident set is asserted before every request and a mismatch aborts the round; a finally block unloads everything on every exit path.",
+  "not": "This is not 'one or two resident at a time'. That would be an adaptive cache policy -- a free variable inside the experiment, where the number resident at any moment would depend on timing and on what ran before.",
   "vram_budget_mib": 6656,
-  "note": "The operator's machine must stay usable, so the five-species pool is NOT held co-resident. Models are loaded just in time and unloaded, one or two resident at a time, well under the budget.",
-  "why_this_does_not_change_the_result": "Residency changes LATENCY, not decisions. Generation is temperature 0 against identical prompt bytes and the identical frozen schema, so the same model returns the same operation whether it was resident for an hour or loaded a moment ago. Nothing about residency reaches the reducer: no host rule reads load state, swap time or token rate. The METABOLISM correction's warning that JIT and EXPLICIT residency produce opposite-looking results was about THROUGHPUT MEASUREMENT, and FLOWSCAR4 measures neither.",
-  "what_it_does_cost": "Wall-clock time. Turn latency becomes model-swap latency, which is why this is an overnight run.",
-  "recorded_because": "It is still a declared regime difference from the co-resident pool Section 0 was measured on, and a difference not written down is a difference someone later has to guess at."
+  "why_not_the_pool": "The five-species pool at context 2048 is about 6.9 GiB of weights alone, before the desktop. It does not fit the operator's budget, and the machine has to stay usable.",
+  "relationship_to_the_qualified_seam": "SOLO_JIT matches the SOLO_RESIDENCY regime under which the sixteen-verb seam was qualified 240/240 (docs/results/STEP_1B_SEAM_REQUALIFICATION.md) far more closely than a partial pool would.",
+  "what_is_claimed": [
+   "FLOWSCAR4 measures no latency and no throughput quantity",
+   "requests are stateless: no KV cache, conversation or server state is carried between turns",
+   "temperature is 0",
+   "prompt bytes and schema bytes are identical regardless of residency",
+   "no host rule reads load state, swap time or token rate; none of it reaches the reducer"
+  ],
+  "what_is_NOT_claimed": "That residency cannot affect a decision. That is not established and is not asserted here. Any residual effect of load order or reload on a model's output remains a DECLARED LIMITATION of this regime, recorded rather than argued away.",
+  "recorded_because": "It is a declared difference from the co-resident pool Section 0 was measured on, and a difference not written down is a difference someone later has to guess at."
  },
 
  "predeclared_before_first_live_tick": [
