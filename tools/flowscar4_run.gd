@@ -282,6 +282,19 @@ func _run() -> void:
 		var rid := "FLOWSCAR4-r%d" % r
 		var seed_entry: Dictionary = seeds.get(rid, {})
 		var seed := int(seed_entry.get("seed", 0))
+		## THE SEED THAT RAN MUST BE THE SEED THAT WAS PUBLISHED. Godot's JSON
+		## parser reads numbers as float; a seed above 2^53 loses its low bits
+		## on the way in, and the round would silently use a different number
+		## than the manifest names. Seeds are masked to 52 bits upstream, and
+		## this refuses rather than trusting that.
+		if float(seed) != float(seed_entry.get("seed", 0)) or seed <= 0:
+			refuse("seed for %s did not survive the manifest read: %d"
+				% [rid, seed])
+			return
+		if seed >= (1 << 53):
+			refuse("seed for %s is above the float64-exact range: %d"
+				% [rid, seed])
+			return
 		say("")
 		say("  [%s] seed %d" % [rid, seed])
 		seed(seed)

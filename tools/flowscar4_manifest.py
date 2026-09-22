@@ -147,15 +147,27 @@ def main():
     seeds = {}
     for r in range(1, rounds + 1):
         material = "FLOWSCAR4|%s|round:%d" % (commit, r)
-        # Masked to 63 bits. GDScript's int is SIGNED 64-bit, and an unsigned
-        # 64-bit seed overflowed it to -9223372036854775808 for two of three
-        # rounds in the dry run -- two different rounds silently sharing one
-        # seed. Caught by the mock pass, before any inference was paid for.
+        # Masked to 52 bits, and the reason is two separate defects.
+        #
+        # 1. GDScript's int is SIGNED 64-bit. An unsigned 64-bit seed
+        #    overflowed to -9223372036854775808 for two of three rounds in the
+        #    dry run -- two different rounds silently sharing one seed.
+        # 2. Godot's JSON parser reads numbers as FLOAT. A 63-bit seed read
+        #    back from the manifest lost its low bits: 4444051781970532886
+        #    became 4444051781970533376, so the seed a round actually used was
+        #    not the seed that was published. Caught on the live smoke test.
+        #
+        # Under 2^52 a seed survives a float64 round trip exactly, so the
+        # published number and the used number are the same number.
         raw = int(hashlib.sha256(material.encode()).hexdigest()[:16], 16)
+        seed_value = raw & ((1 << 52) - 1)
+        assert float(seed_value) == seed_value, "seed must survive float64"
         seeds["FLOWSCAR4-r%d" % r] = {
             "derivation":
-                "sha256(\"%s\")[:16] & 0x7FFFFFFFFFFFFFFF" % material,
-            "seed": raw & 0x7FFFFFFFFFFFFFFF,
+                "sha256(\"%s\")[:16] & (2**52 - 1)" % material,
+            "seed": seed_value,
+            "note": "masked to 52 bits so it round-trips exactly through "
+                    "Godot's float-based JSON parser",
         }
 
     manifest = {
