@@ -31,6 +31,29 @@ class_name BreachSoloJitDecider
 const LMS := "C:\\Users\\cleve\\.lmstudio\\bin\\lms.exe"
 const LM_BASE := "http://127.0.0.1:1234/v1"
 const PLACEHOLDER := "__LIVE_SCHEMA_BYTES__"
+const OP := preload("res://scripts/breach/canonical_operation.gd")
+
+
+## The contract text, generated from canonical_operation.gd rather than
+## restated. Identical for all five species: no persona, no behavioural
+## suggestion, no per-species wording.
+static func contract_text() -> String:
+	var lines: Array = []
+	for op in OP.AGENT_CHOOSABLE:
+		var req: Array = OP.required_fields(op)
+		if req.is_empty():
+			lines.append("  %s" % op)
+		else:
+			lines.append("  %s  (fields: %s)" % [op, ", ".join(req)])
+	return ("Reply with exactly one JSON object and no other text.
+"
+		+ "It must have an \"operation\" field whose value is one of:
+"
+		+ "
+".join(lines) + "
+"
+		+ "Include every field that operation requires, each a non-empty "
+		+ "string. Do not include an \"operations\" list.")
 
 var context_length: int = 2048
 var temperature: float = 0.0

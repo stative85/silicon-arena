@@ -40,6 +40,9 @@ var _mock_tick := 0
 var _abort_round := 0
 var _abort_tick := 0
 var _mock_profile := "mixed"
+var _live = null
+var _live_abort := ""
+var _residency_violations: Array = []
 
 
 func say(s: String) -> void:
@@ -240,6 +243,18 @@ func _init() -> void:
 	_http = HTTPRequest.new()
 	_http.timeout = 180.0
 	root.add_child(_http)
+	if _decider_kind == "live":
+		var fh2 := FileAccess.open("res://config/action-schema.v1.json",
+			FileAccess.READ)
+		if fh2 == null:
+			refuse("action schema unreadable")
+			return
+		var schema_text := fh2.get_as_text().strip_edges()
+		fh2.close()
+		_live = SoloJit.new(schema_text, _http,
+			int(_manifest["generation"]["context_length"]))
+		_live.temperature = float(_manifest["generation"]["temperature"])
+		_live.max_tokens = int(_manifest["generation"]["max_tokens"])
 	_run.call_deferred()
 
 
@@ -299,8 +314,12 @@ func _run() -> void:
 				break
 			var ev: Dictionary = await _one_turn(rd, roster)
 			if ev.is_empty():
-				abort_reason = ("no event produced at tick %d (%s)"
-					% [t, rd.end_reason])
+				if not _live_abort.is_empty():
+					abort_reason = _live_abort
+					_live_abort = ""
+				else:
+					abort_reason = ("no event produced at tick %d (%s)"
+						% [t, rd.end_reason])
 				break
 			committed += 1
 			oplog.append({"event_id": int(ev.get("event_id", -1)),
@@ -366,6 +385,7 @@ func _run() -> void:
 			"shells": shells,
 			"shells_on_channel": on_channel,
 			"ledger_violation": rd.ledger_violation,
+			"residency_violations": _residency_violations.duplicate(),
 			"end_reason": rd.end_reason,
 		}
 		var path := "%s/%s.json" % [_out_dir, rid]
@@ -392,6 +412,31 @@ func _one_turn(rd, roster: Array) -> Dictionary:
 		_mock_tick += 1
 		rd.deciders[actor_name] = _MockDecider.new(_mock_raw(actor_name),
 			_mock_profile, _mock_tick % 7 == 0)
+		return rd.step()
+
+	## LIVE. breach_round.step() is synchronous, so the inference cannot happen
+	## inside it: calling an awaiting decider from there returns a coroutine and
+	## the round would record an empty string as the model's answer. With NO
+	## decider wired at all it records exactly the same thing -- 420 NO_OPs that
+	## look like a clean null result.
+	##
+	## So the request is made HERE, awaited, and the finished text is handed to
+	## step() through a canned decider. The observation is built with the same
+	## ObservationBuilder call step() will make, from state that cannot change
+	## in between, so the model sees the packet that gets recorded.
+	var actor = rd.agents[actor_name]
+	var obs: Dictionary = OB.build(rd.world, rd.agents, actor_name, rd.bus,
+		rd.public_lines)
+	var model_id := str(actor.model_id)
+	var spoken: Dictionary = await _live.decide(JSON.stringify(obs, "	"),
+		SoloJit.contract_text(), model_id)
+	if not bool(spoken.get("residency_ok", true)):
+		_residency_violations.append(spoken)
+		_live_abort = str(spoken.get("reason", "RESIDENCY_VIOLATION"))
+		return {}
+	rd.deciders[actor_name] = _CannedDecider.new(str(spoken.get("raw", "")),
+		int(spoken.get("latency_ms", -1)), model_id,
+		(spoken.get("resident", []) as Array))
 	return rd.step()
 
 
@@ -409,6 +454,27 @@ func _denominator(completed: Array, aborted: Array, shells: int,
 	for a in aborted:
 		say("    ABORTED %s: %s" % [str((a as Dictionary).get("round_id", "?")),
 			str((a as Dictionary).get("abort_reason", ""))])
+
+
+## Hands step() a finished string. The inference already happened; this exists
+## only because step() is synchronous.
+class _CannedDecider:
+	var raw: String = ""
+	var latency_ms: int = -1
+	var model_id: String = ""
+	var resident: Array = []
+
+	func _init(p_raw: String, p_latency: int, p_model: String,
+			p_resident: Array) -> void:
+		raw = p_raw
+		latency_ms = p_latency
+		model_id = p_model
+		resident = p_resident
+
+	func decide(_observation: Dictionary, _agent) -> Dictionary:
+		return {"raw": raw, "latency_ms": latency_ms,
+			"params": {"decider": "SOLO_JIT_LIVE", "model_id": model_id,
+				"resident_at_request": resident}}
 
 
 class _MockDecider:
