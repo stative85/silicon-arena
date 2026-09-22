@@ -98,7 +98,64 @@ static func build(world, agents: Dictionary, actor_name: String, bus,
 	for m in bus.private_for(actor_name, PRIVATE_MESSAGE_WINDOW):
 		priv.append({"tick": m["tick"], "from": m["sender"], "text": m["text"]})
 
+	## OBSERVATION_CONTRACT_V2 -- typed, visible identifier DOMAINS.
+	##
+	## Grounding, not host control. These lists say which identifiers are
+	## SYNTACTICALLY VALID and VISIBLE in the fields an operation requires. They
+	## say nothing about whether using one will succeed: a door may be locked,
+	## an agent may refuse, energy may be short. Refusal stays the world's
+	## answer.
+	##
+	## A legal-actions menu would enumerate ACTIONS the host judged available,
+	## which is the host choosing for the agent. This enumerates identifiers and
+	## leaves every verb, target and combination to the agent -- including
+	## combinations that will be refused.
+	##
+	## AFFORDANCE_GROUNDING established that the V1 packet did not reliably
+	## communicate the MOVE.target domain: three of five species could not
+	## extract an exit from it, and all five succeeded once exits were listed
+	## explicitly. Nothing hidden is added here, and every list is sorted so the
+	## packet stays deterministic and hashable.
+	var adj: Array = []
+	if world.locations.has(actor.position):
+		adj = (world.locations[actor.position]["neighbors"] as Array).duplicate()
+	adj.sort()
+	var vis_agents: Array = []
+	for n in names:
+		if n != actor_name and agents[n].position == actor.position:
+			vis_agents.append(str(n))
+	vis_agents.sort()
+	var vis_objects: Array = world.objects_at(actor.position).duplicate()
+	vis_objects.sort()
+	var inv: Array = actor.inventory.duplicate()
+	inv.sort()
+	var vis_doors: Array = []
+	for did in world.doors.keys():
+		if (world.doors[did]["between"] as Array).has(actor.position):
+			vis_doors.append(str(did))
+	vis_doors.sort()
+	var vis_terminals: Array = []
+	for tid in world.terminals.keys():
+		if str(world.terminals[tid]["at_location"]) == actor.position:
+			vis_terminals.append(str(tid))
+	vis_terminals.sort()
+	var vis_slots: Array = []
+	if actor.position == world.vault_location:
+		vis_slots = world.vault_slots.keys().duplicate()
+		vis_slots.sort()
+
 	return {
+		"observation_contract": "OBSERVATION_CONTRACT_V2",
+		"domains": {
+			"current_location_id": actor.position,
+			"adjacent_location_ids": adj,
+			"visible_agent_ids": vis_agents,
+			"visible_object_ids": vis_objects,
+			"inventory_object_ids": inv,
+			"visible_door_ids": vis_doors,
+			"visible_terminal_ids": vis_terminals,
+			"visible_vault_slot_ids": vis_slots,
+		},
 		"self": {
 			"name": actor.display_name,
 			"energy": actor.energy,

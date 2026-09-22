@@ -1,0 +1,71 @@
+{
+ "schema_version": 2,
+ "title": "OBSERVATION_CONTRACT_V2",
+ "supersedes": "the unversioned V1 packet FLOWSCAR4 ran on",
+ "note": "Typed, visible identifier DOMAINS. This is grounding, not host control: the host exposes which identifiers are syntactically valid in the fields an operation requires, and says nothing about whether using one will succeed.",
+
+ "why": "AFFORDANCE_GROUNDING established that the V1 packet does not reliably communicate the MOVE.target domain. Three of five species failed to extract a valid exit from it, and all five succeeded when the exits were presented as an explicit list (docs/results/AFFORDANCE_GROUNDING_RESULT.md). The defect is in how the domain is communicated, not in the models' ability to act.",
+
+ "what_this_is_NOT": "A legal-actions menu. A menu enumerates ACTIONS the host has judged available, which is the host choosing on the agent's behalf. This enumerates IDENTIFIERS that are visible, leaving every choice of verb, target and combination to the agent -- including combinations that will be refused.",
+
+ "domains": {
+  "current_location_id": "the agent's own location id",
+  "adjacent_location_ids": "location ids reachable in one MOVE from here",
+  "visible_agent_ids": "other agents co-located with this agent",
+  "visible_object_ids": "objects lying on the floor here",
+  "inventory_object_ids": "objects this agent is holding",
+  "visible_door_ids": "doors touching this location",
+  "visible_terminal_ids": "terminals at this location"
+ },
+
+ "field_mapping": {
+  "MOVE.target": "adjacent_location_ids",
+  "OBSERVE.target": "visible_object_ids + visible_agent_ids + visible_terminal_ids + visible_door_ids + current_location_id",
+  "TAKE.target": "visible_object_ids",
+  "DROP.target": "inventory_object_ids",
+  "GIVE.target": "visible_agent_ids",
+  "GIVE.object": "inventory_object_ids",
+  "OFFER.target": "visible_agent_ids",
+  "OFFER.object": "inventory_object_ids",
+  "OFFER.requested": "visible_object_ids + inventory_object_ids",
+  "ACCEPT.target": "visible_agent_ids",
+  "DECLINE.target": "visible_agent_ids",
+  "MESSAGE_PRIVATE.target": "visible_agent_ids",
+  "MESSAGE_PUBLIC.text": "free text, no domain",
+  "MESSAGE_PRIVATE.text": "free text, no domain",
+  "LOCK.target": "visible_door_ids",
+  "UNLOCK.target": "visible_door_ids",
+  "COMMIT_KEY.target": "visible_vault_slot_ids",
+  "WITHDRAW_KEY.target": "visible_vault_slot_ids",
+  "USE_TERMINAL.target": "visible_terminal_ids",
+  "WAIT": "no fields"
+ },
+
+ "constraints": [
+  "EXHAUSTIVE over observable state: every identifier the agent could legally name in that field, given what it can see, appears in the domain",
+  "NOTHING HIDDEN: no identifier appears that the agent could not already observe; partial observability is unchanged",
+  "NOT RANKED, NOT RECOMMENDED, NOT PRESELECTED: the lists carry no order of preference and no marking of any element",
+  "DETERMINISTICALLY SORTED: every domain is sorted, so the packet is stable and hashable",
+  "EQUIVALENT SUPPORT: every agent-choosable operation with an identifier field receives a domain; no verb is easier to aim than another because the host happened to describe it better",
+  "NO PROMISE OF SUCCESS: a domain says an identifier is syntactically valid and visible. It does NOT say the operation will be accepted -- a door may be locked, an agent may refuse, energy may be insufficient. Refusal remains the world's answer, not something the host pre-empts."
+ ],
+
+ "what_the_diagnostic_supports": "Narrow and strong: the V1 packet does not reliably communicate the MOVE.target domain.",
+ "what_the_diagnostic_does_NOT_support": "That typed domains will make agents spontaneously MOVE under the original goal-less prompt. Condition A produced zero valid moves for every species, and that is consistent with both 'cannot' and 'sees no reason to'. V2 is expected to fix targeting. It is NOT expected, and must not be reported, as fixing motivation.",
+
+ "requalification_required": [
+  "the complete sixteen-verb seam qualification, re-run against the real V2 packet",
+  "cross-room leakage, as bytes",
+  "context budget under the 2048 ceiling",
+  "field-domain coverage: every relevant operation has a domain",
+  "a preregistered free-choice V2 check with NO movement instruction"
+ ],
+
+ "free_choice_check": {
+  "purpose": "Separate interface legibility from motivation.",
+  "prediction_recorded_before_running": "If V2 produces valid targeting but agents still choose OBSERVE under the goal-less prompt, the remaining issue is motivation and objective design, not interface legibility.",
+  "consequence": "Either way, no further 3 x 140 causal run is spent until that distinction is measured."
+ },
+
+ "successor_naming": "Any later causal experiment is FLOWSCAR5. FLOWSCAR4 remains permanently recorded as NO ANCESTOR / CAUSAL CLAIM NOT EVALUATED."
+}
