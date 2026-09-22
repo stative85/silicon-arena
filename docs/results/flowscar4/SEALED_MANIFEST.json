@@ -1,0 +1,277 @@
+{
+ "analysis": {
+  "counterfactual": "replay the recorded oplog deterministically with the ancestor's shell suppressed; models are never re-queried",
+  "denominator_rule": "completed rounds only; aborted-attempt shells are preserved separately in the audit record and never mixed in",
+  "leverage_criterion": "C0 > 0, C1 < C0, pre-treatment supply, pre-treatment receiver capacity -- ported unchanged from the closed FLOWSCAR3 regime",
+  "refusals": [
+   "tampered or absent ancestry",
+   "missing snapshot",
+   "unrelated state diverged"
+  ],
+  "ticks_are_a_ceiling": "140 is a HARD CEILING. A round ending NO_AGENT_CAN_ACT or VAULT_OPENED before it is COMPLETED, not aborted.",
+  "verdict_shape": "causal differs, unrelated identical, complete differs -- all three, every time",
+  "witness_identity": "round_id # ancestor_event_id, so a duplicate claim cannot be counted twice"
+ },
+ "apparatus_commit": "8d51993f66c2b532bfa9c77c124fc90bc4e7e418",
+ "bound_files": {
+  "config/action-schema.v1.json": "971592ddbf8f7c3d653a5a0d10ef5b4ee9281082ce01612ac392e4a92140e2d0",
+  "config/arena-names.v1.json": "0bf37d84c5bbcb69273c885dcbeb67e44cf0e919cb7411345fc44cca24e046db",
+  "config/arena-species.v1.json": "d244b890beae2a698e4be4e74ed7a483c01a69c324f4a0d4adf6d19eb6e5bb4f",
+  "config/contract-registry.json": "41ba078ad81c3a8abcb6b05e8b24c0bbee02eba97fd5e1f3b150a0530f2e444f",
+  "config/flow-scar-contract.v1.json": "041cb7ced76c7e1937f930f1fa2fa4055679ed6af76b734439500cd994532264",
+  "config/mass-contract.v1.json": "3e4c5b219ce8637cccd485ff05d11ae8312839dedf1d432a6b7ccd55bfb7389e",
+  "config/mass-contract.v2.json": "76ccd5ae1a1de938b3e92c6ef2db785b4b1f4ca61b0783e04d98752534e1ce42",
+  "config/state-profiles.v1.json": "58cc5ae0f841b31a3cf87c14e7179bc54033a00cd1a2c49d39d1f5c5e67125c0",
+  "scripts/breach/arena_layout.gd": "00fc6327e4f473422c1a076be971cd26a4623cc78dd3820d5a4b9b0972f023b7",
+  "scripts/breach/breach_round.gd": "364a5a80e2d86f3ac8159a9c4c331bf00a7fb1cd60e8a782807527c203cf23a0",
+  "scripts/breach/canonical_operation.gd": "1dc832544bfdbe0e5c90df293e8bc841426d6a57f12990a357c914d81e75a69c",
+  "scripts/breach/decider.gd": "f80e500cc0b1fe16ba4b9fb11bcd2ca69404ad15cd8de547f02cb0586c34b0a1",
+  "scripts/breach/flow_analysis.gd": "26cd4b01c15081afb86eae4f57e6600a6092bfa9044e3f81d9a82b38898593cb",
+  "scripts/breach/flow_contract.gd": "ce6a5ca0de69728de553e94b4d631d58fb10d198d3a26d9b135c0a38d544c7e7",
+  "scripts/breach/mass_contract.gd": "6c37e5a92eb0b2fede9598c15a4b73e14d11bd113aeccd37f4db56b6371d8b24",
+  "scripts/breach/observation_builder.gd": "6cf34323bf0e38b7041e1d01edd30869d337636ab9bfe68d0a19d9af32fd6e27",
+  "scripts/breach/output_parser.gd": "ab202f64256338b4ec13f908a20332dfe849991828ae103768ce8b009bb58916",
+  "scripts/breach/solo_jit_decider.gd": "09147e7d92f36e22bf626a4c360ed3b47e31d5f113d2ab0abff0e493491803e7",
+  "scripts/breach/state_profile.gd": "108cff55d938a5e10e2aafda568197fb39f77dc87ebedc9c035c6693a7f27639",
+  "scripts/breach/turn_scheduler.gd": "b5b4cf4c306ae0fcd0b95960464c698323c9cd5edf777c11c59d97f469bd78ed",
+  "scripts/breach/world_reducer.gd": "f5eeb9be8ce196093428019f40edc34eab46d80fa2f5efe3dd538de0d4106359",
+  "scripts/breach/world_state.gd": "d06af534661894a43fc6d05fc5403c6181b559e99a3df0c04674290ca2fbdd7c",
+  "tools/flowscar4_run.gd": "d8da37060e823bba4db7d12d1982ba1edaa4a327e26d9578da2eb38da756713d"
+ },
+ "claim_ladder_target": "FLOWSCAR4 succeeds at rung 3. Rungs 4 and 5 are a separate behavioural claim with their own witness and are not to be collapsed into this one. Only rung 6 buys the word recursive.",
+ "contract_binding": {
+  "flow_contract_version": 1,
+  "mass_contract_version": 2,
+  "state_profile": "FLOWSCAR4_STATE_V1"
+ },
+ "death_path": {
+  "enforced_by": "tools/flow_ledger_selftest.gd",
+  "equivalence_to_flowscar3": "FLOWSCAR3 created shells in a post-action sweep over ALL agents, because agents there could also die from metabolism drain. This repo has no asynchronous drain, so the acting agent is the only agent who can die on a given tick and the inline transition is equivalent -- AND ATOMIC WITH THE DEATH, which V2 requires.",
+  "guard": "This equivalence holds only while no non-acting agent can lose energy. An offline guard proves the acting agent's spend is the sole death path. If metabolism or any asynchronous drain is later introduced, that guard FAILS and must stay failing until sweep semantics are restored.",
+  "sole_path": "the acting agent's own spend inside WorldReducer.apply"
+ },
+ "denominator_required": [
+  "total rounds executed",
+  "total shells created",
+  "shells that landed on a channel node",
+  "shells with causal leverage under the pre-treatment gate",
+  "rung-3 witnesses"
+ ],
+ "frozen_constants": {
+  "FLOW_BASE_CAPACITY": 4,
+  "FLOW_DEPOSIT_MASS": 1,
+  "FLOW_DEPOSIT_THRESHOLD": 6,
+  "FLOW_MASS_BLOCK": 1,
+  "FLOW_SOURCE_RATE": 2,
+  "SHELL_MASS": 8,
+  "capacity_law": "flow_capacity_at(node) = max(0, FLOW_BASE_CAPACITY - FLOW_MASS_BLOCK * floor_mass_at(node))",
+  "source": "Lifted unchanged from the closed FLOWSCAR3 regime. FLOW_SOURCE_RATE in particular was derived there from a null-stability requirement that existed independently of any result, and it does not move if a FLOWSCAR4 run disappoints."
+ },
+ "generation": {
+  "context_length": 2048,
+  "decoding": "constrained by ACTION_SCHEMA_V1, sent as verbatim bytes",
+  "generations_per_cell": 1,
+  "max_tokens": 512,
+  "repair": false,
+  "retry": false,
+  "temperature": 0.0
+ },
+ "git_describe": "v0.1.0-rc5-259-g8d51993",
+ "host_events": {
+  "DEATH_SPILL": {
+   "agent_choosable": false,
+   "cause": "an agent reached zero energy while holding objects",
+   "creates_mass": false,
+   "note": "Transfers existing inventory to the floor. It creates nothing. Shell appearance is a SEPARATE event with its own record, so a reader can never mistake a spilled key for created matter."
+  },
+  "FLOW_DEPOSIT": {
+   "agent_choosable": false,
+   "cause": "accumulated flow material crossed FLOW_DEPOSIT_THRESHOLD at a node",
+   "creates_mass": true,
+   "fields": [
+    "object_id",
+    "kind",
+    "mass",
+    "location",
+    "tick",
+    "cause"
+   ]
+  },
+  "SHELL_APPEARED": {
+   "agent_choosable": false,
+   "cause": "an agent reached zero energy",
+   "creates_mass": true,
+   "fields": [
+    "object_id",
+    "kind",
+    "mass",
+    "location",
+    "tick",
+    "cause",
+    "death_event_id"
+   ],
+   "shell_id_is_safe_only_because": "FLOWSCAR4 permits exactly one lifecycle per agent and no revival. A name-derived id would collide the moment an agent could die twice. SHELL_APPEARED therefore also carries death_event_id, which is unique regardless of the id scheme. Any future resurrection mechanic REQUIRES A NEW REGIME and a new shell-id scheme; it may not be added to FLOWSCAR4.",
+   "shell_id_scheme": "shell_<agent name, lowercased>"
+  },
+  "forbidden": "No synthetic 'obstruction caused' event, and nothing equivalent under another name. The causal link from death to obstruction to redistribution must remain reconstructable ONLY through state, the capacity law, and replay. An event asserting the link would put the finding into the instrument."
+ },
+ "interruption_policy": {
+  "aborted_attempt": "A crashed, interrupted or manually stopped attempt is PRESERVED and labelled ABORTED. It is never deleted and never silently retried into the record.",
+  "atomic_writes": "Each round's artifact is written atomically after that round finishes -- temp file, then rename -- so a kill mid-write cannot leave a half-artifact that reads as a result.",
+  "cleanup": "A finally-block unloads every model on success, on failure, and on manual abort. The GPU is never left occupied by a dead run.",
+  "denominator": "Aborted attempts stay in the audit record and OUTSIDE the completed-round denominator. The denominator counts completed rounds only; the audit trail counts every attempt.",
+  "restart": "That same round restarts from tick 0 with the IDENTICAL seed. A seed is never substituted, and a fourth completed round is never added."
+ },
+ "lifecycle": {
+  "note": "A dead agent is never scheduled, never acts, and never returns. These two flags are what make a name-derived shell id sound.",
+  "one_death_per_agent": true,
+  "revival": false
+ },
+ "manifest_sha256": "08ed9e9c21dfb4826d0d9eb232d2590951b951a8247b09f73b011fe2fa2aa2f1",
+ "mass_source_ledger": {
+  "enforced_by": "selftest over every tick of every round, offline and live",
+  "invariant": "accounted_mass(t) = initial_accounted_mass + sum(recorded shell mass) + sum(recorded deposit mass)",
+  "per_tick_rule": "For every tick, the change in accounted_mass must EXACTLY equal the mass named by creation events in that same tick. No operation and no unnamed transition may alter it."
+ },
+ "not_compatible_with": "FLOWSCAR3 (different vocabulary, observation surface, mass law and schema identity)",
+ "projection_definitions": {
+  "causal_state_hash": {
+   "covers": [
+    "flow_channel",
+    "flow_material",
+    "flow_deposits",
+    "objects of kind shell",
+    "objects of kind deposit",
+    "objects lying at any channel node"
+   ],
+   "why_objects_at_channel_nodes": "Those are the affected affordances: what a later agent could pick up at an obstructed node is exactly what the scar changes."
+  },
+  "note": "A single complete state hash CANNOT prove 'unrelated state remains invariant', because the treatment is expected to change part of the state. Two projections are required and both are declared here rather than decided at analysis time.",
+  "unrelated_state_hash": {
+   "covers": "every field of the profile payload NOT covered above: doors, vault slots, vault flags, locations, and all objects lying away from the channel",
+   "requirement": "This must be IDENTICAL between a run and its ancestor-removed replay. A difference here means the replay changed something the ancestor could not have caused, and the counterfactual is void."
+  },
+  "verdict_note": "All three conditions, every time. A causal difference with an unrelated difference is contamination, not causation. No difference anywhere is NO_EFFECT, which is a legitimate reportable outcome.",
+  "verdict_shape": {
+   "causal_state_hash": "differs, in the predicted direction",
+   "complete_state_hash": "differs",
+   "unrelated_state_hash": "identical"
+  }
+ },
+ "regime": "FLOWSCAR4",
+ "residency": {
+  "definition": "Before every inference request, ONLY the acting species may be resident. The previous species is unloaded before the next is loaded. The resident set is asserted before every request and a mismatch aborts the round; a finally block unloads everything on every exit path.",
+  "not": "This is not 'one or two resident at a time'. That would be an adaptive cache policy -- a free variable inside the experiment, where the number resident at any moment would depend on timing and on what ran before.",
+  "recorded_because": "It is a declared difference from the co-resident pool Section 0 was measured on, and a difference not written down is a difference someone later has to guess at.",
+  "regime": "SOLO_JIT_RESIDENCY",
+  "relationship_to_the_qualified_seam": "SOLO_JIT matches the SOLO_RESIDENCY regime under which the sixteen-verb seam was qualified 240/240 (docs/results/STEP_1B_SEAM_REQUALIFICATION.md) far more closely than a partial pool would.",
+  "vram_budget_mib": 6656,
+  "what_is_NOT_claimed": "That residency cannot affect a decision. That is not established and is not asserted here. Any residual effect of load order or reload on a model's output remains a DECLARED LIMITATION of this regime, recorded rather than argued away.",
+  "what_is_claimed": [
+   "FLOWSCAR4 measures no latency and no throughput quantity",
+   "requests are stateless: no KV cache, conversation or server state is carried between turns",
+   "temperature is 0",
+   "prompt bytes and schema bytes are identical regardless of residency",
+   "no host rule reads load state, swap time or token rate; none of it reaches the reducer"
+  ],
+  "why_not_the_pool": "The five-species pool at context 2048 is about 6.9 GiB of weights alone, before the desktop. It does not fit the operator's budget, and the machine has to stay usable."
+ },
+ "roster_order": [
+  "BRINE",
+  "GEMMATRON",
+  "KESTREL",
+  "OZONIOUS",
+  "VANTA"
+ ],
+ "run_budget": {
+  "rounds": 3,
+  "stop_condition": "Execution stops at the declared round count whatever the outcome. A rung-3 witness does not buy another round to strengthen it, and zero witnesses do not buy another round to find one. If three rounds produce no qualifying ancestor, that is the reported result.",
+  "ticks_per_round": 140
+ },
+ "salvage": {
+  "flowscar3_value_not_ported": 30,
+  "reason": "A shell is ordinary obstructing mass, not an energy pickup that pays an agent to clear it. Leaving salvage out makes a later rung-4/5 claim more informative, not less: if an agent moves a shell, the instrument did not attach an immediate reward to moving it. Attaching one would make 'B cleared the obstruction' indistinguishable from 'B collected 30 energy'.",
+  "status": "OUT. SHELL_SALVAGE is not part of FLOWSCAR4."
+ },
+ "sealed_before_execution": true,
+ "seeds": {
+  "FLOWSCAR4-r1": {
+   "derivation": "sha256(\"FLOWSCAR4|8d51993f66c2b532bfa9c77c124fc90bc4e7e418|round:1\")[:16] & (2**52 - 1)",
+   "note": "masked to 52 bits so it round-trips exactly through Godot's float-based JSON parser",
+   "seed": 1938338670697508
+  },
+  "FLOWSCAR4-r2": {
+   "derivation": "sha256(\"FLOWSCAR4|8d51993f66c2b532bfa9c77c124fc90bc4e7e418|round:2\")[:16] & (2**52 - 1)",
+   "note": "masked to 52 bits so it round-trips exactly through Godot's float-based JSON parser",
+   "seed": 1351538822899565
+  },
+  "FLOWSCAR4-r3": {
+   "derivation": "sha256(\"FLOWSCAR4|8d51993f66c2b532bfa9c77c124fc90bc4e7e418|round:3\")[:16] & (2**52 - 1)",
+   "note": "masked to 52 bits so it round-trips exactly through Godot's float-based JSON parser",
+   "seed": 3625874628104545
+  }
+ },
+ "species": [
+  {
+   "architecture": "lfm2.5",
+   "model_id": "liquidai/lfm2.5-1.2b-instruct",
+   "params_b": 1.2,
+   "species_id": "lfm25"
+  },
+  {
+   "architecture": "falcon-h1",
+   "model_id": "falcon-h1-1.5b-instruct",
+   "params_b": 1.5,
+   "species_id": "falconh1"
+  },
+  {
+   "architecture": "qwen3.5",
+   "model_id": "qwen3.5-2b",
+   "params_b": 2.0,
+   "species_id": "qwen35"
+  },
+  {
+   "architecture": "rwkv7",
+   "model_id": "rwkv7-1.5b-g1",
+   "params_b": 1.5,
+   "species_id": "rwkv7"
+  },
+  {
+   "architecture": "danube2",
+   "model_id": "h2o-danube2-1.8b-chat",
+   "params_b": 1.8,
+   "species_id": "danube2"
+  }
+ ],
+ "state_profile_spec": {
+  "fields": [
+   "round_id",
+   "tick",
+   "locations",
+   "doors",
+   "objects",
+   "vault_slots",
+   "vault_open",
+   "vault_opened_at_tick",
+   "flow_channel",
+   "flow_material",
+   "flow_deposits"
+  ],
+  "flow_fields": {
+   "flow_channel": "ordered channel topology -- order is part of the state, because reversing it is a different world",
+   "flow_deposits": "the monotonic deposit counter, which is the ratchet state",
+   "flow_material": "material at every node, including nodes holding zero",
+   "pending_buffers": "none. flow_advance holds no state between calls; all in-flight material lives in flow_material.",
+   "shells_and_deposits": "carried inside `objects` as ordinary objects of kind shell and deposit -- they are matter, not a special table"
+  },
+  "includes_flow": true,
+  "note": "Everything BREACH_STATE_V1 carries, plus every dynamic flow field. Without these two worlds differing only in accumulated material hash identically, and the counterfactual cannot see the thing it exists to measure."
+ },
+ "tick_ordering": {
+  "conduct_advance": "ABSENT. FLOWSCAR3 ran an autonomous conduction phase for batteries and capacitors in the same slot as flow. FLOWSCAR4 has no batteries, no capacitors and no conduction. Declared explicitly rather than left implied: a reader comparing the two orderings must see the removal, not infer it.",
+  "consequence": "A shell created by a death obstructs the channel during the SAME tick, not the following one. This was read out of the closed regime, not decided here: deciding it would have given every ancestor one tick less leverage and quietly produced a different regime.",
+  "flow_advance_call_sites": 1,
+  "frozen": "committed action -> death/shell -> same-tick flow_advance -> state hash -> tick increment",
+  "inherited_from": "FLOWSCAR3 breach_round.step()"
+ }
+}
