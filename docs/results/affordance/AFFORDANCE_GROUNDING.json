@@ -1,0 +1,979 @@
+{
+	"apparatus_commit": "335574b1d39c7966755789ac4146eacdfa241045",
+	"artifact_kind": "AFFORDANCE_GROUNDING",
+	"conditions": [
+		"A",
+		"B",
+		"C",
+		"D"
+	],
+	"decider_kind": "live",
+	"fixtures": 15,
+	"observation_builder_sha256": "6cf34323bf0e38b7041e1d01edd30869d337636ab9bfe68d0a19d9af32fd6e27",
+	"packet_provenance": "RECONSTRUCTED from committed FLOWSCAR4 oplogs; NOT verifiable against a stored observation hash",
+	"parser_sha256": "ab202f64256338b4ec13f908a20332dfe849991828ae103768ce8b009bb58916",
+	"prereg": "docs/AFFORDANCE_GROUNDING_PREREG.md",
+	"records": [
+		{
+			"condition": "A",
+			"exits": [
+				"south_catwalk"
+			],
+			"model_id": "h2o-danube2-1.8b-chat",
+			"operation": "MOVE",
+			"packet_provenance": "RECONSTRUCTED",
+			"parse_failure": "",
+			"position": "spawn_brine",
+			"raw": "{\n    \"operation\": \"MOVE\",\n    \"target\": \"spawn_brine\"\n}",
+			"round_id": "FLOWSCAR4-r1",
+			"species": "BRINE",
+			"target": "spawn_brine",
+			"valid_move": false
+		},
+		{
+			"condition": "A",
+			"exits": [
+				"machine_floor"
+			],
+			"model_id": "qwen3.5-2b",
+			"operation": "OBSERVE",
+			"packet_provenance": "RECONSTRUCTED",
+			"parse_failure": "",
+			"position": "spawn_gemmatron",
+			"raw": "{\n\t\"operation\": \"OBSERVE\",\n\t\"target\": \"key_C\"\n}",
+			"round_id": "FLOWSCAR4-r1",
+			"species": "GEMMATRON",
+			"target": "key_C",
+			"valid_move": false
+		},
+		{
+			"condition": "A",
+			"exits": [
+				"north_catwalk"
+			],
+			"model_id": "falcon-h1-1.5b-instruct",
+			"operation": "OBSERVE",
+			"packet_provenance": "RECONSTRUCTED",
+			"parse_failure": "",
+			"position": "spawn_kestrel",
+			"raw": "{\"operation\": \"OBSERVE\", \"target\": \"spawn_kestrel\"}",
+			"round_id": "FLOWSCAR4-r1",
+			"species": "KESTREL",
+			"target": "spawn_kestrel",
+			"valid_move": false
+		},
+		{
+			"condition": "A",
+			"exits": [
+				"south_catwalk"
+			],
+			"model_id": "rwkv7-1.5b-g1",
+			"operation": "MOVE",
+			"packet_provenance": "RECONSTRUCTED",
+			"parse_failure": "",
+			"position": "spawn_ozonious",
+			"raw": "{\n\t\"operation\": \"MOVE\",\n\t\"target\": \"spawn_ozonious\"\n}\n\t",
+			"round_id": "FLOWSCAR4-r1",
+			"species": "OZONIOUS",
+			"target": "spawn_ozonious",
+			"valid_move": false
+		},
+		{
+			"condition": "A",
+			"exits": [
+				"north_catwalk"
+			],
+			"model_id": "liquidai/lfm2.5-1.2b-instruct",
+			"operation": "MOVE",
+			"packet_provenance": "RECONSTRUCTED",
+			"parse_failure": "",
+			"position": "spawn_vanta",
+			"raw": "{\"operation\": \"MOVE\" , \"target\": \"VANTA\"}",
+			"round_id": "FLOWSCAR4-r1",
+			"species": "VANTA",
+			"target": "VANTA",
+			"valid_move": false
+		},
+		{
+			"condition": "A",
+			"exits": [
+				"south_catwalk"
+			],
+			"model_id": "h2o-danube2-1.8b-chat",
+			"operation": "MOVE",
+			"packet_provenance": "RECONSTRUCTED",
+			"parse_failure": "",
+			"position": "spawn_brine",
+			"raw": "{\n    \"operation\": \"MOVE\",\n    \"target\": \"spawn_brine\"\n}",
+			"round_id": "FLOWSCAR4-r2",
+			"species": "BRINE",
+			"target": "spawn_brine",
+			"valid_move": false
+		},
+		{
+			"condition": "A",
+			"exits": [
+				"machine_floor"
+			],
+			"model_id": "qwen3.5-2b",
+			"operation": "OBSERVE",
+			"packet_provenance": "RECONSTRUCTED",
+			"parse_failure": "",
+			"position": "spawn_gemmatron",
+			"raw": "{\n\t\"operation\": \"OBSERVE\",\n\t\"target\": \"key_C\"\n}",
+			"round_id": "FLOWSCAR4-r2",
+			"species": "GEMMATRON",
+			"target": "key_C",
+			"valid_move": false
+		},
+		{
+			"condition": "A",
+			"exits": [
+				"north_catwalk"
+			],
+			"model_id": "falcon-h1-1.5b-instruct",
+			"operation": "OBSERVE",
+			"packet_provenance": "RECONSTRUCTED",
+			"parse_failure": "",
+			"position": "spawn_kestrel",
+			"raw": "{\"operation\": \"OBSERVE\", \"target\": \"spawn_kestrel\"}",
+			"round_id": "FLOWSCAR4-r2",
+			"species": "KESTREL",
+			"target": "spawn_kestrel",
+			"valid_move": false
+		},
+		{
+			"condition": "A",
+			"exits": [
+				"south_catwalk"
+			],
+			"model_id": "rwkv7-1.5b-g1",
+			"operation": "MOVE",
+			"packet_provenance": "RECONSTRUCTED",
+			"parse_failure": "",
+			"position": "spawn_ozonious",
+			"raw": "{\n\t\"operation\": \"MOVE\",\n\t\"target\": \"spawn_ozonious\"\n}\n\t",
+			"round_id": "FLOWSCAR4-r2",
+			"species": "OZONIOUS",
+			"target": "spawn_ozonious",
+			"valid_move": false
+		},
+		{
+			"condition": "A",
+			"exits": [
+				"north_catwalk"
+			],
+			"model_id": "liquidai/lfm2.5-1.2b-instruct",
+			"operation": "MOVE",
+			"packet_provenance": "RECONSTRUCTED",
+			"parse_failure": "",
+			"position": "spawn_vanta",
+			"raw": "{\"operation\": \"MOVE\" , \"target\": \"VANTA\"}",
+			"round_id": "FLOWSCAR4-r2",
+			"species": "VANTA",
+			"target": "VANTA",
+			"valid_move": false
+		},
+		{
+			"condition": "A",
+			"exits": [
+				"south_catwalk"
+			],
+			"model_id": "h2o-danube2-1.8b-chat",
+			"operation": "MOVE",
+			"packet_provenance": "RECONSTRUCTED",
+			"parse_failure": "",
+			"position": "spawn_brine",
+			"raw": "{\n    \"operation\": \"MOVE\",\n    \"target\": \"spawn_brine\"\n}",
+			"round_id": "FLOWSCAR4-r3",
+			"species": "BRINE",
+			"target": "spawn_brine",
+			"valid_move": false
+		},
+		{
+			"condition": "A",
+			"exits": [
+				"machine_floor"
+			],
+			"model_id": "qwen3.5-2b",
+			"operation": "OBSERVE",
+			"packet_provenance": "RECONSTRUCTED",
+			"parse_failure": "",
+			"position": "spawn_gemmatron",
+			"raw": "{\n\t\"operation\": \"OBSERVE\",\n\t\"target\": \"key_C\"\n}",
+			"round_id": "FLOWSCAR4-r3",
+			"species": "GEMMATRON",
+			"target": "key_C",
+			"valid_move": false
+		},
+		{
+			"condition": "A",
+			"exits": [
+				"north_catwalk"
+			],
+			"model_id": "falcon-h1-1.5b-instruct",
+			"operation": "OBSERVE",
+			"packet_provenance": "RECONSTRUCTED",
+			"parse_failure": "",
+			"position": "spawn_kestrel",
+			"raw": "{\"operation\": \"OBSERVE\", \"target\": \"spawn_kestrel\"}",
+			"round_id": "FLOWSCAR4-r3",
+			"species": "KESTREL",
+			"target": "spawn_kestrel",
+			"valid_move": false
+		},
+		{
+			"condition": "A",
+			"exits": [
+				"south_catwalk"
+			],
+			"model_id": "rwkv7-1.5b-g1",
+			"operation": "MOVE",
+			"packet_provenance": "RECONSTRUCTED",
+			"parse_failure": "",
+			"position": "spawn_ozonious",
+			"raw": "{\n\t\"operation\": \"MOVE\",\n\t\"target\": \"spawn_ozonious\"\n}\n\t",
+			"round_id": "FLOWSCAR4-r3",
+			"species": "OZONIOUS",
+			"target": "spawn_ozonious",
+			"valid_move": false
+		},
+		{
+			"condition": "A",
+			"exits": [
+				"north_catwalk"
+			],
+			"model_id": "liquidai/lfm2.5-1.2b-instruct",
+			"operation": "MOVE",
+			"packet_provenance": "RECONSTRUCTED",
+			"parse_failure": "",
+			"position": "spawn_vanta",
+			"raw": "{\"operation\": \"MOVE\" , \"target\": \"VANTA\"}",
+			"round_id": "FLOWSCAR4-r3",
+			"species": "VANTA",
+			"target": "VANTA",
+			"valid_move": false
+		},
+		{
+			"condition": "B",
+			"exits": [
+				"south_catwalk"
+			],
+			"model_id": "h2o-danube2-1.8b-chat",
+			"operation": "MOVE",
+			"packet_provenance": "RECONSTRUCTED",
+			"parse_failure": "",
+			"position": "spawn_brine",
+			"raw": "{\n    \"operation\": \"MOVE\",\n    \"target\": \"south_catwalk\"\n}",
+			"round_id": "FLOWSCAR4-r1",
+			"species": "BRINE",
+			"target": "south_catwalk",
+			"valid_move": true
+		},
+		{
+			"condition": "B",
+			"exits": [
+				"machine_floor"
+			],
+			"model_id": "qwen3.5-2b",
+			"operation": "MOVE",
+			"packet_provenance": "RECONSTRUCTED",
+			"parse_failure": "",
+			"position": "spawn_gemmatron",
+			"raw": "{\n  \"operation\": \"MOVE\",\n  \"target\": \"machine_floor\"\n}",
+			"round_id": "FLOWSCAR4-r1",
+			"species": "GEMMATRON",
+			"target": "machine_floor",
+			"valid_move": true
+		},
+		{
+			"condition": "B",
+			"exits": [
+				"north_catwalk"
+			],
+			"model_id": "falcon-h1-1.5b-instruct",
+			"operation": "OBSERVE",
+			"packet_provenance": "RECONSTRUCTED",
+			"parse_failure": "",
+			"position": "spawn_kestrel",
+			"raw": "{\"operation\": \"OBSERVE\", \"target\": \"Chamber II\"}",
+			"round_id": "FLOWSCAR4-r1",
+			"species": "KESTREL",
+			"target": "Chamber II",
+			"valid_move": false
+		},
+		{
+			"condition": "B",
+			"exits": [
+				"south_catwalk"
+			],
+			"model_id": "rwkv7-1.5b-g1",
+			"operation": "MOVE",
+			"packet_provenance": "RECONSTRUCTED",
+			"parse_failure": "",
+			"position": "spawn_ozonious",
+			"raw": "{\n\t\"operation\": \"MOVE\",\n\t\"target\": \"spawn_ozonious\"\n}\n\t",
+			"round_id": "FLOWSCAR4-r1",
+			"species": "OZONIOUS",
+			"target": "spawn_ozonious",
+			"valid_move": false
+		},
+		{
+			"condition": "B",
+			"exits": [
+				"north_catwalk"
+			],
+			"model_id": "liquidai/lfm2.5-1.2b-instruct",
+			"operation": "MOVE",
+			"packet_provenance": "RECONSTRUCTED",
+			"parse_failure": "",
+			"position": "spawn_vanta",
+			"raw": "{\"operation\": \"MOVE\" , \"target\": \"adjacent room\"}",
+			"round_id": "FLOWSCAR4-r1",
+			"species": "VANTA",
+			"target": "adjacent room",
+			"valid_move": false
+		},
+		{
+			"condition": "B",
+			"exits": [
+				"south_catwalk"
+			],
+			"model_id": "h2o-danube2-1.8b-chat",
+			"operation": "MOVE",
+			"packet_provenance": "RECONSTRUCTED",
+			"parse_failure": "",
+			"position": "spawn_brine",
+			"raw": "{\n    \"operation\": \"MOVE\",\n    \"target\": \"south_catwalk\"\n}",
+			"round_id": "FLOWSCAR4-r2",
+			"species": "BRINE",
+			"target": "south_catwalk",
+			"valid_move": true
+		},
+		{
+			"condition": "B",
+			"exits": [
+				"machine_floor"
+			],
+			"model_id": "qwen3.5-2b",
+			"operation": "MOVE",
+			"packet_provenance": "RECONSTRUCTED",
+			"parse_failure": "",
+			"position": "spawn_gemmatron",
+			"raw": "{\n  \"operation\": \"MOVE\",\n  \"target\": \"machine_floor\"\n}",
+			"round_id": "FLOWSCAR4-r2",
+			"species": "GEMMATRON",
+			"target": "machine_floor",
+			"valid_move": true
+		},
+		{
+			"condition": "B",
+			"exits": [
+				"north_catwalk"
+			],
+			"model_id": "falcon-h1-1.5b-instruct",
+			"operation": "OBSERVE",
+			"packet_provenance": "RECONSTRUCTED",
+			"parse_failure": "",
+			"position": "spawn_kestrel",
+			"raw": "{\"operation\": \"OBSERVE\", \"target\": \"Chamber II\"}",
+			"round_id": "FLOWSCAR4-r2",
+			"species": "KESTREL",
+			"target": "Chamber II",
+			"valid_move": false
+		},
+		{
+			"condition": "B",
+			"exits": [
+				"south_catwalk"
+			],
+			"model_id": "rwkv7-1.5b-g1",
+			"operation": "MOVE",
+			"packet_provenance": "RECONSTRUCTED",
+			"parse_failure": "",
+			"position": "spawn_ozonious",
+			"raw": "{\n\t\"operation\": \"MOVE\",\n\t\"target\": \"spawn_ozonious\"\n}\n\t",
+			"round_id": "FLOWSCAR4-r2",
+			"species": "OZONIOUS",
+			"target": "spawn_ozonious",
+			"valid_move": false
+		},
+		{
+			"condition": "B",
+			"exits": [
+				"north_catwalk"
+			],
+			"model_id": "liquidai/lfm2.5-1.2b-instruct",
+			"operation": "MOVE",
+			"packet_provenance": "RECONSTRUCTED",
+			"parse_failure": "",
+			"position": "spawn_vanta",
+			"raw": "{\"operation\": \"MOVE\" , \"target\": \"any adjacent room shown in the observation\"}",
+			"round_id": "FLOWSCAR4-r2",
+			"species": "VANTA",
+			"target": "any adjacent room shown in the observation",
+			"valid_move": false
+		},
+		{
+			"condition": "B",
+			"exits": [
+				"south_catwalk"
+			],
+			"model_id": "h2o-danube2-1.8b-chat",
+			"operation": "MOVE",
+			"packet_provenance": "RECONSTRUCTED",
+			"parse_failure": "",
+			"position": "spawn_brine",
+			"raw": "{\n    \"operation\": \"MOVE\",\n    \"target\": \"south_catwalk\"\n}",
+			"round_id": "FLOWSCAR4-r3",
+			"species": "BRINE",
+			"target": "south_catwalk",
+			"valid_move": true
+		},
+		{
+			"condition": "B",
+			"exits": [
+				"machine_floor"
+			],
+			"model_id": "qwen3.5-2b",
+			"operation": "MOVE",
+			"packet_provenance": "RECONSTRUCTED",
+			"parse_failure": "",
+			"position": "spawn_gemmatron",
+			"raw": "{\n  \"operation\": \"MOVE\",\n  \"target\": \"machine_floor\"\n}",
+			"round_id": "FLOWSCAR4-r3",
+			"species": "GEMMATRON",
+			"target": "machine_floor",
+			"valid_move": true
+		},
+		{
+			"condition": "B",
+			"exits": [
+				"north_catwalk"
+			],
+			"model_id": "falcon-h1-1.5b-instruct",
+			"operation": "OBSERVE",
+			"packet_provenance": "RECONSTRUCTED",
+			"parse_failure": "",
+			"position": "spawn_kestrel",
+			"raw": "{\"operation\": \"OBSERVE\", \"target\": \"Chamber II\"}",
+			"round_id": "FLOWSCAR4-r3",
+			"species": "KESTREL",
+			"target": "Chamber II",
+			"valid_move": false
+		},
+		{
+			"condition": "B",
+			"exits": [
+				"south_catwalk"
+			],
+			"model_id": "rwkv7-1.5b-g1",
+			"operation": "MOVE",
+			"packet_provenance": "RECONSTRUCTED",
+			"parse_failure": "",
+			"position": "spawn_ozonious",
+			"raw": "{\n\t\"operation\": \"MOVE\",\n\t\"target\": \"spawn_ozonious\"\n}\n\t",
+			"round_id": "FLOWSCAR4-r3",
+			"species": "OZONIOUS",
+			"target": "spawn_ozonious",
+			"valid_move": false
+		},
+		{
+			"condition": "B",
+			"exits": [
+				"north_catwalk"
+			],
+			"model_id": "liquidai/lfm2.5-1.2b-instruct",
+			"operation": "MOVE",
+			"packet_provenance": "RECONSTRUCTED",
+			"parse_failure": "",
+			"position": "spawn_vanta",
+			"raw": "{\"operation\": \"MOVE\" , \"target\": \"adjacent room\"}",
+			"round_id": "FLOWSCAR4-r3",
+			"species": "VANTA",
+			"target": "adjacent room",
+			"valid_move": false
+		},
+		{
+			"condition": "C",
+			"exits": [
+				"south_catwalk"
+			],
+			"model_id": "h2o-danube2-1.8b-chat",
+			"operation": "MOVE",
+			"packet_provenance": "RECONSTRUCTED",
+			"parse_failure": "",
+			"position": "spawn_brine",
+			"raw": "{\n    \"operation\": \"MOVE\",\n    \"target\": \"south_catwalk\"\n}",
+			"round_id": "FLOWSCAR4-r1",
+			"species": "BRINE",
+			"target": "south_catwalk",
+			"valid_move": true
+		},
+		{
+			"condition": "C",
+			"exits": [
+				"machine_floor"
+			],
+			"model_id": "qwen3.5-2b",
+			"operation": "MOVE",
+			"packet_provenance": "RECONSTRUCTED",
+			"parse_failure": "",
+			"position": "spawn_gemmatron",
+			"raw": "{\n\t\"operation\": \"MOVE\",\n\t\"target\": \"machine_floor\"\n}",
+			"round_id": "FLOWSCAR4-r1",
+			"species": "GEMMATRON",
+			"target": "machine_floor",
+			"valid_move": true
+		},
+		{
+			"condition": "C",
+			"exits": [
+				"north_catwalk"
+			],
+			"model_id": "falcon-h1-1.5b-instruct",
+			"operation": "MOVE",
+			"packet_provenance": "RECONSTRUCTED",
+			"parse_failure": "",
+			"position": "spawn_kestrel",
+			"raw": "{\"operation\": \"MOVE\", \"target\": \"north_catwalk\"}",
+			"round_id": "FLOWSCAR4-r1",
+			"species": "KESTREL",
+			"target": "north_catwalk",
+			"valid_move": true
+		},
+		{
+			"condition": "C",
+			"exits": [
+				"south_catwalk"
+			],
+			"model_id": "rwkv7-1.5b-g1",
+			"operation": "MOVE",
+			"packet_provenance": "RECONSTRUCTED",
+			"parse_failure": "",
+			"position": "spawn_ozonious",
+			"raw": "{\n\t\"operation\": \"MOVE\",\n\t\"target\": \"south_catwalk\"\n}\n\t",
+			"round_id": "FLOWSCAR4-r1",
+			"species": "OZONIOUS",
+			"target": "south_catwalk",
+			"valid_move": true
+		},
+		{
+			"condition": "C",
+			"exits": [
+				"north_catwalk"
+			],
+			"model_id": "liquidai/lfm2.5-1.2b-instruct",
+			"operation": "MOVE",
+			"packet_provenance": "RECONSTRUCTED",
+			"parse_failure": "",
+			"position": "spawn_vanta",
+			"raw": "{\"operation\": \"MOVE\" , \"target\": \"north_catwalk\"}",
+			"round_id": "FLOWSCAR4-r1",
+			"species": "VANTA",
+			"target": "north_catwalk",
+			"valid_move": true
+		},
+		{
+			"condition": "C",
+			"exits": [
+				"south_catwalk"
+			],
+			"model_id": "h2o-danube2-1.8b-chat",
+			"operation": "MOVE",
+			"packet_provenance": "RECONSTRUCTED",
+			"parse_failure": "",
+			"position": "spawn_brine",
+			"raw": "{\n    \"operation\": \"MOVE\",\n    \"target\": \"south_catwalk\"\n}",
+			"round_id": "FLOWSCAR4-r2",
+			"species": "BRINE",
+			"target": "south_catwalk",
+			"valid_move": true
+		},
+		{
+			"condition": "C",
+			"exits": [
+				"machine_floor"
+			],
+			"model_id": "qwen3.5-2b",
+			"operation": "MOVE",
+			"packet_provenance": "RECONSTRUCTED",
+			"parse_failure": "",
+			"position": "spawn_gemmatron",
+			"raw": "{\n\t\"operation\": \"MOVE\",\n\t\"target\": \"machine_floor\"\n}",
+			"round_id": "FLOWSCAR4-r2",
+			"species": "GEMMATRON",
+			"target": "machine_floor",
+			"valid_move": true
+		},
+		{
+			"condition": "C",
+			"exits": [
+				"north_catwalk"
+			],
+			"model_id": "falcon-h1-1.5b-instruct",
+			"operation": "MOVE",
+			"packet_provenance": "RECONSTRUCTED",
+			"parse_failure": "",
+			"position": "spawn_kestrel",
+			"raw": "{\"operation\": \"MOVE\", \"target\": \"north_catwalk\"}",
+			"round_id": "FLOWSCAR4-r2",
+			"species": "KESTREL",
+			"target": "north_catwalk",
+			"valid_move": true
+		},
+		{
+			"condition": "C",
+			"exits": [
+				"south_catwalk"
+			],
+			"model_id": "rwkv7-1.5b-g1",
+			"operation": "MOVE",
+			"packet_provenance": "RECONSTRUCTED",
+			"parse_failure": "",
+			"position": "spawn_ozonious",
+			"raw": "{\n\t\"operation\": \"MOVE\",\n\t\"target\": \"south_catwalk\"\n}\n\t",
+			"round_id": "FLOWSCAR4-r2",
+			"species": "OZONIOUS",
+			"target": "south_catwalk",
+			"valid_move": true
+		},
+		{
+			"condition": "C",
+			"exits": [
+				"north_catwalk"
+			],
+			"model_id": "liquidai/lfm2.5-1.2b-instruct",
+			"operation": "MOVE",
+			"packet_provenance": "RECONSTRUCTED",
+			"parse_failure": "",
+			"position": "spawn_vanta",
+			"raw": "{\"operation\": \"MOVE\" , \"target\": \"north_catwalk\"}",
+			"round_id": "FLOWSCAR4-r2",
+			"species": "VANTA",
+			"target": "north_catwalk",
+			"valid_move": true
+		},
+		{
+			"condition": "C",
+			"exits": [
+				"south_catwalk"
+			],
+			"model_id": "h2o-danube2-1.8b-chat",
+			"operation": "MOVE",
+			"packet_provenance": "RECONSTRUCTED",
+			"parse_failure": "",
+			"position": "spawn_brine",
+			"raw": "{\n    \"operation\": \"MOVE\",\n    \"target\": \"south_catwalk\"\n}",
+			"round_id": "FLOWSCAR4-r3",
+			"species": "BRINE",
+			"target": "south_catwalk",
+			"valid_move": true
+		},
+		{
+			"condition": "C",
+			"exits": [
+				"machine_floor"
+			],
+			"model_id": "qwen3.5-2b",
+			"operation": "MOVE",
+			"packet_provenance": "RECONSTRUCTED",
+			"parse_failure": "",
+			"position": "spawn_gemmatron",
+			"raw": "{\n\t\"operation\": \"MOVE\",\n\t\"target\": \"machine_floor\"\n}",
+			"round_id": "FLOWSCAR4-r3",
+			"species": "GEMMATRON",
+			"target": "machine_floor",
+			"valid_move": true
+		},
+		{
+			"condition": "C",
+			"exits": [
+				"north_catwalk"
+			],
+			"model_id": "falcon-h1-1.5b-instruct",
+			"operation": "MOVE",
+			"packet_provenance": "RECONSTRUCTED",
+			"parse_failure": "",
+			"position": "spawn_kestrel",
+			"raw": "{\"operation\": \"MOVE\", \"target\": \"north_catwalk\"}",
+			"round_id": "FLOWSCAR4-r3",
+			"species": "KESTREL",
+			"target": "north_catwalk",
+			"valid_move": true
+		},
+		{
+			"condition": "C",
+			"exits": [
+				"south_catwalk"
+			],
+			"model_id": "rwkv7-1.5b-g1",
+			"operation": "MOVE",
+			"packet_provenance": "RECONSTRUCTED",
+			"parse_failure": "",
+			"position": "spawn_ozonious",
+			"raw": "{\n\t\"operation\": \"MOVE\",\n\t\"target\": \"south_catwalk\"\n}\n\t",
+			"round_id": "FLOWSCAR4-r3",
+			"species": "OZONIOUS",
+			"target": "south_catwalk",
+			"valid_move": true
+		},
+		{
+			"condition": "C",
+			"exits": [
+				"north_catwalk"
+			],
+			"model_id": "liquidai/lfm2.5-1.2b-instruct",
+			"operation": "MOVE",
+			"packet_provenance": "RECONSTRUCTED",
+			"parse_failure": "",
+			"position": "spawn_vanta",
+			"raw": "{\"operation\": \"MOVE\" , \"target\": \"north_catwalk\"}",
+			"round_id": "FLOWSCAR4-r3",
+			"species": "VANTA",
+			"target": "north_catwalk",
+			"valid_move": true
+		},
+		{
+			"condition": "D",
+			"exits": [
+				"south_catwalk"
+			],
+			"model_id": "h2o-danube2-1.8b-chat",
+			"operation": "MOVE",
+			"packet_provenance": "RECONSTRUCTED",
+			"parse_failure": "",
+			"position": "spawn_brine",
+			"raw": "{\n    \"operation\": \"MOVE\",\n    \"target\": \"south_catwalk\"\n}",
+			"round_id": "FLOWSCAR4-r1",
+			"species": "BRINE",
+			"target": "south_catwalk",
+			"valid_move": true
+		},
+		{
+			"condition": "D",
+			"exits": [
+				"machine_floor"
+			],
+			"model_id": "qwen3.5-2b",
+			"operation": "MOVE",
+			"packet_provenance": "RECONSTRUCTED",
+			"parse_failure": "",
+			"position": "spawn_gemmatron",
+			"raw": "{\n  \"operation\": \"MOVE\",\n  \"target\": \"machine_floor\"\n}",
+			"round_id": "FLOWSCAR4-r1",
+			"species": "GEMMATRON",
+			"target": "machine_floor",
+			"valid_move": true
+		},
+		{
+			"condition": "D",
+			"exits": [
+				"north_catwalk"
+			],
+			"model_id": "falcon-h1-1.5b-instruct",
+			"operation": "MOVE",
+			"packet_provenance": "RECONSTRUCTED",
+			"parse_failure": "",
+			"position": "spawn_kestrel",
+			"raw": "{\"operation\": \"MOVE\", \"target\": \"north_catwalk\"}",
+			"round_id": "FLOWSCAR4-r1",
+			"species": "KESTREL",
+			"target": "north_catwalk",
+			"valid_move": true
+		},
+		{
+			"condition": "D",
+			"exits": [
+				"south_catwalk"
+			],
+			"model_id": "rwkv7-1.5b-g1",
+			"operation": "MOVE",
+			"packet_provenance": "RECONSTRUCTED",
+			"parse_failure": "",
+			"position": "spawn_ozonious",
+			"raw": "{\n  \"operation\": \"MOVE\",\n  \"target\": \"south_catwalk\"\n}\n\t",
+			"round_id": "FLOWSCAR4-r1",
+			"species": "OZONIOUS",
+			"target": "south_catwalk",
+			"valid_move": true
+		},
+		{
+			"condition": "D",
+			"exits": [
+				"north_catwalk"
+			],
+			"model_id": "liquidai/lfm2.5-1.2b-instruct",
+			"operation": "MOVE",
+			"packet_provenance": "RECONSTRUCTED",
+			"parse_failure": "",
+			"position": "spawn_vanta",
+			"raw": "{\"operation\": \"MOVE\" , \"target\": \"north_catwalk\"}",
+			"round_id": "FLOWSCAR4-r1",
+			"species": "VANTA",
+			"target": "north_catwalk",
+			"valid_move": true
+		},
+		{
+			"condition": "D",
+			"exits": [
+				"south_catwalk"
+			],
+			"model_id": "h2o-danube2-1.8b-chat",
+			"operation": "MOVE",
+			"packet_provenance": "RECONSTRUCTED",
+			"parse_failure": "",
+			"position": "spawn_brine",
+			"raw": "{\n    \"operation\": \"MOVE\",\n    \"target\": \"south_catwalk\"\n}",
+			"round_id": "FLOWSCAR4-r2",
+			"species": "BRINE",
+			"target": "south_catwalk",
+			"valid_move": true
+		},
+		{
+			"condition": "D",
+			"exits": [
+				"machine_floor"
+			],
+			"model_id": "qwen3.5-2b",
+			"operation": "MOVE",
+			"packet_provenance": "RECONSTRUCTED",
+			"parse_failure": "",
+			"position": "spawn_gemmatron",
+			"raw": "{\n  \"operation\": \"MOVE\",\n  \"target\": \"machine_floor\"\n}",
+			"round_id": "FLOWSCAR4-r2",
+			"species": "GEMMATRON",
+			"target": "machine_floor",
+			"valid_move": true
+		},
+		{
+			"condition": "D",
+			"exits": [
+				"north_catwalk"
+			],
+			"model_id": "falcon-h1-1.5b-instruct",
+			"operation": "MOVE",
+			"packet_provenance": "RECONSTRUCTED",
+			"parse_failure": "",
+			"position": "spawn_kestrel",
+			"raw": "{\"operation\": \"MOVE\", \"target\": \"north_catwalk\"}",
+			"round_id": "FLOWSCAR4-r2",
+			"species": "KESTREL",
+			"target": "north_catwalk",
+			"valid_move": true
+		},
+		{
+			"condition": "D",
+			"exits": [
+				"south_catwalk"
+			],
+			"model_id": "rwkv7-1.5b-g1",
+			"operation": "MOVE",
+			"packet_provenance": "RECONSTRUCTED",
+			"parse_failure": "",
+			"position": "spawn_ozonious",
+			"raw": "{\n  \"operation\": \"MOVE\",\n  \"target\": \"south_catwalk\"\n}\n\t",
+			"round_id": "FLOWSCAR4-r2",
+			"species": "OZONIOUS",
+			"target": "south_catwalk",
+			"valid_move": true
+		},
+		{
+			"condition": "D",
+			"exits": [
+				"north_catwalk"
+			],
+			"model_id": "liquidai/lfm2.5-1.2b-instruct",
+			"operation": "MOVE",
+			"packet_provenance": "RECONSTRUCTED",
+			"parse_failure": "",
+			"position": "spawn_vanta",
+			"raw": "{\"operation\": \"MOVE\" , \"target\": \"north_catwalk\"}",
+			"round_id": "FLOWSCAR4-r2",
+			"species": "VANTA",
+			"target": "north_catwalk",
+			"valid_move": true
+		},
+		{
+			"condition": "D",
+			"exits": [
+				"south_catwalk"
+			],
+			"model_id": "h2o-danube2-1.8b-chat",
+			"operation": "MOVE",
+			"packet_provenance": "RECONSTRUCTED",
+			"parse_failure": "",
+			"position": "spawn_brine",
+			"raw": "{\n    \"operation\": \"MOVE\",\n    \"target\": \"south_catwalk\"\n}",
+			"round_id": "FLOWSCAR4-r3",
+			"species": "BRINE",
+			"target": "south_catwalk",
+			"valid_move": true
+		},
+		{
+			"condition": "D",
+			"exits": [
+				"machine_floor"
+			],
+			"model_id": "qwen3.5-2b",
+			"operation": "MOVE",
+			"packet_provenance": "RECONSTRUCTED",
+			"parse_failure": "",
+			"position": "spawn_gemmatron",
+			"raw": "{\n  \"operation\": \"MOVE\",\n  \"target\": \"machine_floor\"\n}",
+			"round_id": "FLOWSCAR4-r3",
+			"species": "GEMMATRON",
+			"target": "machine_floor",
+			"valid_move": true
+		},
+		{
+			"condition": "D",
+			"exits": [
+				"north_catwalk"
+			],
+			"model_id": "falcon-h1-1.5b-instruct",
+			"operation": "MOVE",
+			"packet_provenance": "RECONSTRUCTED",
+			"parse_failure": "",
+			"position": "spawn_kestrel",
+			"raw": "{\"operation\": \"MOVE\", \"target\": \"north_catwalk\"}",
+			"round_id": "FLOWSCAR4-r3",
+			"species": "KESTREL",
+			"target": "north_catwalk",
+			"valid_move": true
+		},
+		{
+			"condition": "D",
+			"exits": [
+				"south_catwalk"
+			],
+			"model_id": "rwkv7-1.5b-g1",
+			"operation": "MOVE",
+			"packet_provenance": "RECONSTRUCTED",
+			"parse_failure": "",
+			"position": "spawn_ozonious",
+			"raw": "{\n  \"operation\": \"MOVE\",\n  \"target\": \"south_catwalk\"\n}\n\t",
+			"round_id": "FLOWSCAR4-r3",
+			"species": "OZONIOUS",
+			"target": "south_catwalk",
+			"valid_move": true
+		},
+		{
+			"condition": "D",
+			"exits": [
+				"north_catwalk"
+			],
+			"model_id": "liquidai/lfm2.5-1.2b-instruct",
+			"operation": "MOVE",
+			"packet_provenance": "RECONSTRUCTED",
+			"parse_failure": "",
+			"position": "spawn_vanta",
+			"raw": "{\"operation\": \"MOVE\" , \"target\": \"north_catwalk\"}",
+			"round_id": "FLOWSCAR4-r3",
+			"species": "VANTA",
+			"target": "north_catwalk",
+			"valid_move": true
+		}
+	],
+	"schema_sha256": "971592ddbf8f7c3d653a5a0d10ef5b4ee9281082ce01612ac392e4a92140e2d0"
+}
