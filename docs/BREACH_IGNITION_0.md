@@ -1,6 +1,7 @@
 # THE BREACH — ARENA IGNITION 0
 
-**Status: BUILT, UNEXECUTED — blocked on context decision (Options A-D).**
+**Status: QUALIFIED. Section 0 SIGNED 2026-09-21 by Michael Goings. Option A,
+context 2048, constrained decode via ACTION_SCHEMA_V1.**
 
 The nineteen modules were implemented at `c0f3e07` (2851 lines, no Godot
 launched, no LM Studio contact, no inference, unexecuted by design).
@@ -13,8 +14,45 @@ contact, no artifact touched) rather than its letter (the run having landed);
 the run has since closed, so the condition now holds either way. Recorded
 because the commit order says the opposite of what a reader would assume.
 
-Operational authorization is a separate fact and it is still missing: section 0
-below is a human call, and no arena round may be ignited until it is made.
+Operational authorization is now granted. Section 0 was a human call and it has
+been made, against measured evidence rather than the original estimate.
+
+## THE DECISION, AS SIGNED
+
+**Option A. Context 2048, identical for all five species. Generation is
+constrained by the frozen union `config/action-schema.v1.json`
+(ACTION_SCHEMA_V1).** Options C and D are refused permanently: both introduce
+per-agent asymmetry, and D is not a choice at all — above 2048 the runtime
+silently spills a model to the CPU at 50-100x slower, passing both the residency
+assertion and a liveness probe. Option B is held in reserve as a fit strategy,
+never as an audit instrument: re-running inference at a different ceiling is a
+new regime with its own preregistration, not a check.
+
+**The claim is narrow, and it is the only claim this evidence supports:**
+
+> All five species can deliberately select every canonical operation, and fill
+> that operation's fields, when explicitly instructed, through the frozen
+> schema, at context 2048.
+
+It does **not** establish spontaneous usage, behavioural competence, or anything
+about what a species would choose in a world.
+
+Evidence, all hashed and committed:
+
+| document | what it settles |
+|---|---|
+| `results/CONTEXT_SWEEP_BREACH0.md` | five co-resident at 2048, all genuinely GPU-resident; 4096 and 3072 refused |
+| `results/STEP_1A_VERB_ACCESS.md` | every verb reachable; free-form emission withdrawn as prompt-dependent |
+| `results/LIVE_SEAM_QUALIFICATION.md` | 240/240 selection + fields through the real union, one generation, no repair, no retry |
+
+Four conditions were made mandatory before ignition and all four are met:
+
+1. `decider.gd` no longer specifies the withdrawn free-form path
+2. the schema is sent as verbatim bytes, never parsed and re-serialised
+3. `tools/live_seam_regression.gd` asserts the outbound bytes hash to the frozen
+   file, and fails on a Godot round trip
+4. `gd_parse_check`, `action_schema_selftest`, `live_seam_regression` and
+   `breach_selftest` are wired into `tools/verify.cmd`
 
 Construction state and execution authorization are separate facts and this line
 tracks both. It read "DESIGN. Not implemented." for thirteen days after the

@@ -61,9 +61,33 @@ class LiveModelDecider extends Decider:
 	##   * record real latency_ms and the exact generation parameters
 	##   * return raw text UNMODIFIED, including when it is garbage
 	##
-	## The VRAM question in docs/BREACH_IGNITION_0.md section 0 must be settled
-	## before this runs: five models do not fit at context 8192 on an 8 GiB card
-	## on the measured evidence.
+	## THE INTERFACE IS DECIDED. Generation is CONSTRAINED by the frozen union
+	## config/action-schema.v1.json (ACTION_SCHEMA_V1), qualified 240/240 across
+	## all five species in docs/results/LIVE_SEAM_QUALIFICATION.md. The free-form
+	## path this file once specified is WITHDRAWN: unconstrained emission was
+	## measured twice and both times it measured the prompt wording rather than
+	## the model (docs/results/STEP_1A_VERB_ACCESS.md).
+	##
+	## "Return raw text UNMODIFIED" still holds and is not softened by the
+	## constraint: whatever the backend returns is handed to OutputParser
+	## verbatim, including when it is garbage, and a refusal becomes NO_OP with
+	## its reason -- never WAIT, never a retry, never a repair. One generation
+	## per turn.
+	##
+	## SEND THE SCHEMA AS BYTES. Read the file as text and splice it into the
+	## request body. NEVER JSON.parse_string it into a Dictionary and
+	## JSON.stringify it back: Godot reorders object keys alphabetically, the
+	## backend compiles properties order into the emission order of its grammar,
+	## and GIVE and OFFER become unreachable while the model appears to prefer
+	## simple verbs. That is an instrument defect wearing the costume of a
+	## behavioural finding. Measured, both directions, in the results document
+	## above; enforced by tools/live_seam_regression.gd.
+	##
+	## The VRAM question in docs/BREACH_IGNITION_0.md section 0 is SETTLED:
+	## context 2048, all five co-resident and genuinely GPU-resident
+	## (docs/results/CONTEXT_SWEEP_BREACH0.md). Above 2048 the runtime silently
+	## spills a model to the CPU at ~50-100x slower, which passes both the
+	## residency assertion and a liveness probe.
 
 	var model_id: String = ""
 	var instance_id: String = ""

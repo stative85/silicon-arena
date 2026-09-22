@@ -97,7 +97,16 @@ call :check "tools/pit_a_run.gd -- --negative"            "pit A runner"        
 call :check "tools/adversarial.gd"                        "adversarial pass"    "ADVERSARIAL OK"
 call :check "tools/offline_selftest.gd"                   "offline behaviour"   "OFFLINE OK"
 
+REM ---- THE BREACH: the seam the models are actually given ------------------
+REM Added after nineteen breach modules sat outside this gate through 30 green
+REM checks: "project parses" greps a headless --quit, which only loads what the
+REM engine reaches at startup, and nothing reaches scripts/breach/.
+call :check "tools/action_schema_selftest.gd"             "action schema"       "ACTION SCHEMA OK"
+call :check "tools/live_seam_regression.gd"               "live seam bytes"     "LIVE SEAM OK"
+call :check "scripts/breach/breach_selftest.gd"           "breach offline"      "BREACH OFFLINE GREEN"
+
 REM ---- documentation and workflow linting ---------------------------------
+call :pycheck "tools/gd_parse_check.py" "every gdscript parses"
 call :pycheck "tools/lint_docs.py"       "documentation lint"
 call :pycheck "tools/lint_workflows.py"  "workflow lint"
 call :pycheck "tools/lint_private_paths.py" "private path lint"

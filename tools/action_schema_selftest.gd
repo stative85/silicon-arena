@@ -45,6 +45,8 @@ func _init() -> void:
 	var parsed = JSON.parse_string(text)
 	ck("the schema file is valid JSON", typeof(parsed) == TYPE_DICTIONARY)
 	if typeof(parsed) != TYPE_DICTIONARY:
+		print("ACTION SCHEMA DRIFT: the seam is not a JSON object.")
+		print("Do not run the arena against a seam that does not parse.")
 		quit(1)
 		return
 	var doc: Dictionary = parsed

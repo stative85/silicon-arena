@@ -63,7 +63,8 @@ var _arms: Array = ["LIVE"]
 var _models: Array = []
 ## The schema is kept as TEXT, not as a parsed Dictionary. See _load_live_schema.
 var _live_schema_text := ""
-var _live_schema_sha := ""
+var _live_schema_sha := ""       ## sha256 of the bytes ON THE WIRE
+var _live_schema_file_sha := ""  ## sha256 of the file as stored
 var _prompt_sha := ""
 var _parser_sha := ""
 
@@ -137,8 +138,13 @@ func _load_live_schema() -> bool:
 	if not (parsed as Dictionary).has("anyOf"):
 		push_error("live schema is not a union")
 		return false
-	_live_schema_text = text
-	_live_schema_sha = _sha(text)
+	## Sent stripped, so the recorded wire hash is the hash of what the model
+	## actually saw. The file hash is kept separately: they differ by the
+	## trailing newline, and a provenance field that silently means one while
+	## naming the other is how a hash stops being evidence.
+	_live_schema_text = text.strip_edges()
+	_live_schema_sha = _sha(_live_schema_text)
+	_live_schema_file_sha = _sha(text)
 	return true
 
 
@@ -379,7 +385,8 @@ func _write(started: String, records: Array, matrix: Dictionary) -> void:
 		## later run can prove it measured the same thing or prove it did not.
 		"provenance": {
 			"live_schema_path": LIVE_SCHEMA_PATH,
-			"live_schema_sha256": _live_schema_sha,
+			"live_schema_wire_sha256": _live_schema_sha,
+			"live_schema_file_sha256": _live_schema_file_sha,
 			"prompt_contract_sha256": _prompt_sha,
 			"parser_path": "scripts/breach/output_parser.gd",
 			"parser_sha256": _parser_sha,
