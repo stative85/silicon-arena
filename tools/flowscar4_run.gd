@@ -335,7 +335,13 @@ func _run() -> void:
 						% [t, rd.end_reason])
 				break
 			committed += 1
+			## THE PACKET THE MODEL SAW, and its hash. FLOWSCAR4 persisted
+			## neither, so its observation packets can only be RECONSTRUCTED by
+			## replay and never verified against a stored hash. That gap is
+			## recorded in AFFORDANCE_GROUNDING_PREREG.md and closed here for
+			## every future run.
 			oplog.append({"event_id": int(ev.get("event_id", -1)),
+				"observation_hash": str(ev.get("observation_hash", "")),
 				"tick": int(ev.get("tick", -1)),
 				"actor": str(ev.get("actor", "")),
 				"operation": str(ev.get("operation", "")),
