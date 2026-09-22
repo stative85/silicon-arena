@@ -39,6 +39,7 @@ var _fail := 0
 var _mock_tick := 0
 var _abort_round := 0
 var _abort_tick := 0
+var _mock_profile := "mixed"
 
 
 func say(s: String) -> void:
@@ -72,6 +73,11 @@ func _parse_args() -> void:
 			## overnight run. Refused for the live decider below.
 			"--simulate-abort-round": _abort_round = int(argv[i + 1])
 			"--simulate-abort-tick": _abort_tick = int(argv[i + 1])
+			## mixed: a realistic spread of operations.
+			## drain: MOVE almost every turn, so agents exhaust and leave
+			## shells inside the budget. Dry-run only; proves shell counting,
+			## the on-channel tally and the ledger under the real runner.
+			"--mock-profile": _mock_profile = str(argv[i + 1])
 
 
 static func _sha_text(text: String) -> String:
@@ -198,6 +204,11 @@ func _mock_raw(actor: String) -> String:
 	## so the NO_OP path is exercised by the dry run rather than discovered live.
 	if _mock_tick % 7 == 0:
 		return "I think I will wait for now."
+	if _mock_profile == "drain":
+		## 28 turns per agent over 140 ticks, MOVE at 4 energy, START_ENERGY
+		## 100: an agent that keeps moving exhausts around turn 25. Death is
+		## reachable inside the budget, which is the property that matters.
+		return "{\"operation\": \"MOVE\", \"target\": \"commons_north\"}"
 	if _mock_tick % 3 == 0:
 		return "{\"operation\": \"OBSERVE\", \"target\": \"vault_ring\"}"
 	## MOVE drains energy, so agents eventually exhaust and leave shells. That
@@ -272,6 +283,11 @@ func _run() -> void:
 
 		var committed := 0
 		var shells: Array = []
+		## THE REPLAYABLE LOG. Operations only -- actor, verb, fields, tick and
+		## event id. This is what the counterfactual replays; models are never
+		## re-queried, so the analysis is deterministic and can be re-run by
+		## anyone holding the artifact.
+		var oplog: Array = []
 		var abort_reason := ""
 		for t in ticks:
 			if _abort_round == r and _abort_tick == t:
@@ -287,7 +303,18 @@ func _run() -> void:
 					% [t, rd.end_reason])
 				break
 			committed += 1
-			for rec in ev.get("mass_created", []):
+			oplog.append({"event_id": int(ev.get("event_id", -1)),
+				"tick": int(ev.get("tick", -1)),
+				"actor": str(ev.get("actor", "")),
+				"operation": str(ev.get("operation", "")),
+				"fields": (ev.get("fields", {}) as Dictionary).duplicate(),
+				"accepted": bool(ev.get("accepted", false))})
+			## mass_created lives under generation_params, where breach_round
+			## records it. Reading the top level silently found nothing and the
+			## dry run reported 0 shells for three rounds -- a false negative
+			## that would have looked exactly like a real null result.
+			var gp: Dictionary = ev.get("generation_params", {})
+			for rec in (gp.get("mass_created", []) as Array):
 				var mr: Dictionary = rec
 				if str(mr.get("kind", "")) == "shell":
 					shells.append(mr)
@@ -302,7 +329,17 @@ func _run() -> void:
 		shells_total += shells.size()
 		shells_on_channel += on_channel
 
-		var outcome := "COMPLETED" if committed == ticks else "ABORTED"
+		## A round that runs out of agents or opens the vault has ENDED, not
+		## been interrupted. Only an interruption is ABORTED: conflating them
+		## would drop legitimate rounds out of the denominator and quietly
+		## shrink the experiment.
+		var ended_naturally: bool = rd.end_reason == RoundScript.END_TIME_HORIZON 			or rd.end_reason == RoundScript.END_VAULT_OPENED 			or rd.end_reason == RoundScript.END_NO_AGENT_CAN_ACT
+		var full_budget: bool = committed == ticks
+		var natural_stop: bool = ended_naturally 			and abort_reason.begins_with("round ended early")
+		var outcome := "ABORTED"
+		if full_budget or natural_stop:
+			outcome = "COMPLETED"
+			abort_reason = "" if full_budget else 				"ended naturally: " + rd.end_reason
 		var artifact := {
 			"artifact_kind": "FLOWSCAR4_ROUND",
 			"round_id": rid,
@@ -314,13 +351,18 @@ func _run() -> void:
 			"residency": _manifest["residency"]["regime"],
 			"decider_kind": _decider_kind,
 			"seed": seed,
-			"ticks_budgeted": ticks,
+			"ticks_ceiling": ticks,
+			"ticks_ceiling_note":
+				"140 is a HARD CEILING, not a required length. A round that "
+				+ "ends NO_AGENT_CAN_ACT or VAULT_OPENED before the ceiling is "
+				+ "COMPLETED, not aborted.",
 			"ticks_committed": committed,
 			"starting_state_hash": start_hash,
 			"final_state_hash": _profile.state_hash(rd.world),
 			"final_causal_hash": _profile.causal_hash(rd.world,
 				SP.membership(rd.world, [])),
 			"roster_order": _manifest["roster_order"],
+			"oplog": oplog,
 			"shells": shells,
 			"shells_on_channel": on_channel,
 			"ledger_violation": rd.ledger_violation,
@@ -347,7 +389,9 @@ func _one_turn(rd, roster: Array) -> Dictionary:
 	if actor_name.is_empty():
 		return {}
 	if _decider_kind == "mock":
-		rd.deciders[actor_name] = _MockDecider.new(_mock_raw(actor_name))
+		_mock_tick += 1
+		rd.deciders[actor_name] = _MockDecider.new(_mock_raw(actor_name),
+			_mock_profile, _mock_tick % 7 == 0)
 	return rd.step()
 
 
@@ -368,11 +412,32 @@ func _denominator(completed: Array, aborted: Array, shells: int,
 
 
 class _MockDecider:
+	## A mock that ignores the observation cannot drain an agent: it emits MOVE
+	## to a room that is not adjacent, the reducer refuses, and refusal is
+	## INERT -- no energy spent, no state changed. The first drain profile did
+	## exactly that and "proved" a shell path that never ran. So the drain
+	## profile reads the actual exits out of the observation packet, which is
+	## also what a real model has to do.
 	var raw: String = ""
+	var profile: String = "mixed"
+	var garbage: bool = false
 
-	func _init(p_raw: String) -> void:
+	func _init(p_raw: String, p_profile: String = "mixed",
+			p_garbage: bool = false) -> void:
 		raw = p_raw
+		profile = p_profile
+		garbage = p_garbage
 
-	func decide(_observation: Dictionary, _agent) -> Dictionary:
+	func decide(observation: Dictionary, _agent) -> Dictionary:
+		if garbage:
+			return {"raw": "I think I will wait for now.", "latency_ms": 0,
+				"params": {"decider": "mock", "profile": profile}}
+		if profile == "drain":
+			var loc: Dictionary = observation.get("location", {})
+			var exits: Array = loc.get("exits", [])
+			if not exits.is_empty():
+				return {"raw": "{\"operation\": \"MOVE\", \"target\": \"%s\"}"
+					% str(exits[0]), "latency_ms": 0,
+					"params": {"decider": "mock", "profile": profile}}
 		return {"raw": raw, "latency_ms": 0,
-			"params": {"decider": "mock"}}
+			"params": {"decider": "mock", "profile": profile}}

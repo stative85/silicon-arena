@@ -57,6 +57,9 @@ BOUND_FILES = [
     "scripts/breach/mass_contract.gd",
     "scripts/breach/flow_contract.gd",
     "scripts/breach/state_profile.gd",
+    "scripts/breach/flow_analysis.gd",
+    "scripts/breach/solo_jit_decider.gd",
+    "tools/flowscar4_run.gd",
     "scripts/breach/breach_round.gd",
     "scripts/breach/decider.gd",
     "scripts/breach/turn_scheduler.gd",
@@ -195,6 +198,26 @@ def main():
         "seeds": seeds,
         "denominator_required": flow["denominator_required"],
         "claim_ladder_target": flow["claim_ladder"]["target"],
+        "analysis": {
+            "leverage_criterion": "C0 > 0, C1 < C0, pre-treatment supply, "
+                                  "pre-treatment receiver capacity -- ported "
+                                  "unchanged from the closed FLOWSCAR3 regime",
+            "counterfactual": "replay the recorded oplog deterministically "
+                              "with the ancestor's shell suppressed; models "
+                              "are never re-queried",
+            "verdict_shape": "causal differs, unrelated identical, complete "
+                             "differs -- all three, every time",
+            "refusals": ["tampered or absent ancestry", "missing snapshot",
+                         "unrelated state diverged"],
+            "witness_identity": "round_id # ancestor_event_id, so a duplicate "
+                                "claim cannot be counted twice",
+            "denominator_rule": "completed rounds only; aborted-attempt shells "
+                                "are preserved separately in the audit record "
+                                "and never mixed in",
+            "ticks_are_a_ceiling": "140 is a HARD CEILING. A round ending "
+                                   "NO_AGENT_CAN_ACT or VAULT_OPENED before it "
+                                   "is COMPLETED, not aborted.",
+        },
         "not_compatible_with": "FLOWSCAR3 (different vocabulary, observation "
                                "surface, mass law and schema identity)",
     }

@@ -110,6 +110,7 @@ call :check "tools/contract_isolation_selftest.gd"        "contract isolation"  
 call :check "tools/state_profile_selftest.gd"             "state profiles"      "STATE PROFILES OK"
 call :check "tools/flow_null_stability.gd"                "flow null stability" "NULL STABILITY OK"
 call :check "tools/flow_ledger_selftest.gd"               "flow mass ledger"    "FLOW LEDGER OK"
+call :check "tools/flow_analysis_selftest.gd"             "flow analysis"       "FLOW ANALYSIS OK"
 call :check "tools/mass_contract_selftest.gd"             "mass contract"       "MASS CONTRACT OK"
 call :check "tools/mass_physics_qualify.gd"               "mass physics"        "MASS PHYSICS GREEN"
 
