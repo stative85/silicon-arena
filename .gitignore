@@ -80,3 +80,6 @@ tools/eval/runs_roster/
 # Experiment run logs. The results that matter live in docs/EXPERIMENT_*.md;
 # a second copy here is duplicated truth that will eventually disagree.
 scratch/*.log
+
+# Run manifests record HEAD; committing one changes HEAD and invalidates it.
+scratch/
