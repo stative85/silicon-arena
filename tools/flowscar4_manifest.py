@@ -171,6 +171,8 @@ def main():
         "death_path": flow["death_path"],
         "mass_source_ledger": flow["mass_source_ledger"],
         "host_events": flow["host_events"],
+        "interruption_policy": flow["interruption_policy"],
+        "residency": flow["residency"],
         "run_budget": {"rounds": rounds, "ticks_per_round": ticks,
                        "stop_condition": budget["stop_condition"]},
         "roster_order": ROSTER_ORDER,

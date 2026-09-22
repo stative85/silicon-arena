@@ -117,6 +117,23 @@
   "conduct_advance": "ABSENT. FLOWSCAR3 ran an autonomous conduction phase for batteries and capacitors in the same slot as flow. FLOWSCAR4 has no batteries, no capacitors and no conduction. Declared explicitly rather than left implied: a reader comparing the two orderings must see the removal, not infer it."
  },
 
+ "interruption_policy": {
+  "aborted_attempt": "A crashed, interrupted or manually stopped attempt is PRESERVED and labelled ABORTED. It is never deleted and never silently retried into the record.",
+  "restart": "That same round restarts from tick 0 with the IDENTICAL seed. A seed is never substituted, and a fourth completed round is never added.",
+  "denominator": "Aborted attempts stay in the audit record and OUTSIDE the completed-round denominator. The denominator counts completed rounds only; the audit trail counts every attempt.",
+  "atomic_writes": "Each round's artifact is written atomically after that round finishes -- temp file, then rename -- so a kill mid-write cannot leave a half-artifact that reads as a result.",
+  "cleanup": "A finally-block unloads every model on success, on failure, and on manual abort. The GPU is never left occupied by a dead run."
+ },
+
+ "residency": {
+  "regime": "JIT_RESIDENCY",
+  "vram_budget_mib": 6656,
+  "note": "The operator's machine must stay usable, so the five-species pool is NOT held co-resident. Models are loaded just in time and unloaded, one or two resident at a time, well under the budget.",
+  "why_this_does_not_change_the_result": "Residency changes LATENCY, not decisions. Generation is temperature 0 against identical prompt bytes and the identical frozen schema, so the same model returns the same operation whether it was resident for an hour or loaded a moment ago. Nothing about residency reaches the reducer: no host rule reads load state, swap time or token rate. The METABOLISM correction's warning that JIT and EXPLICIT residency produce opposite-looking results was about THROUGHPUT MEASUREMENT, and FLOWSCAR4 measures neither.",
+  "what_it_does_cost": "Wall-clock time. Turn latency becomes model-swap latency, which is why this is an overnight run.",
+  "recorded_because": "It is still a declared regime difference from the co-resident pool Section 0 was measured on, and a difference not written down is a difference someone later has to guess at."
+ },
+
  "predeclared_before_first_live_tick": [
   "round seeds",
   "roster order",
