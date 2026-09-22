@@ -37,6 +37,8 @@ var _profile = null
 var _http: HTTPRequest = null
 var _fail := 0
 var _mock_tick := 0
+var _abort_round := 0
+var _abort_tick := 0
 
 
 func say(s: String) -> void:
@@ -65,6 +67,11 @@ func _parse_args() -> void:
 			"--manifest": _manifest_path = str(argv[i + 1])
 			"--decider": _decider_kind = str(argv[i + 1])
 			"--out": _out_dir = str(argv[i + 1])
+			## DRY-RUN ONLY. Simulates an interruption so the ABORTED path is
+			## exercised by the mock pass rather than discovered during a live
+			## overnight run. Refused for the live decider below.
+			"--simulate-abort-round": _abort_round = int(argv[i + 1])
+			"--simulate-abort-tick": _abort_tick = int(argv[i + 1])
 
 
 static func _sha_text(text: String) -> String:
@@ -154,33 +161,20 @@ func _write_atomic(path: String, payload: Dictionary) -> bool:
 	return da.rename(tmp.get_file(), path.get_file()) == OK
 
 
+## Roster order comes from the manifest; identity comes from the frozen species
+## file. Display names are decoration with no authority (ARENA_IDENTITY_LAYERS),
+## so they are mapped here and decide nothing but turn order.
 func _roster() -> Array:
 	var order: Array = _manifest.get("roster_order", [])
 	var species: Array = _manifest.get("species", [])
-	var by_name := {}
-	var names_fh := FileAccess.open("res://config/arena-names.v1.json",
-		FileAccess.READ)
-	var names = {}
-	if names_fh != null:
-		var nd = JSON.parse_string(names_fh.get_as_text())
-		names_fh.close()
-		if typeof(nd) == TYPE_DICTIONARY:
-			names = nd.get("names", nd)
-	for sp in species:
-		var s: Dictionary = sp
-		var display := ""
-		for k in names.keys():
-			if str(names[k]) == str(s["model_id"]) or str(k) == str(s["species_id"]):
-				display = str(k) if str(k).to_upper() == str(k) else str(names[k])
-		by_name[str(s["species_id"])] = s
 	var out: Array = []
 	for nm in order:
-		for sid in by_name.keys():
-			var s: Dictionary = by_name[sid]
-			if _display_for(str(sid)) == str(nm):
+		for sp in species:
+			var s: Dictionary = sp
+			if _display_for(str(s["species_id"])) == str(nm):
 				out.append({"display_name": str(nm),
 					"model_id": str(s["model_id"]),
-					"species_id": str(sid),
+					"species_id": str(s["species_id"]),
 					"instance_id": "%s#1" % str(s["model_id"])})
 	return out
 
@@ -206,6 +200,11 @@ func _mock_raw(actor: String) -> String:
 		return "I think I will wait for now."
 	if _mock_tick % 3 == 0:
 		return "{\"operation\": \"OBSERVE\", \"target\": \"vault_ring\"}"
+	## MOVE drains energy, so agents eventually exhaust and leave shells. That
+	## exercises shell counting, the on-channel tally and the mass ledger in the
+	## dry pass instead of meeting them for the first time live.
+	if _mock_tick % 2 == 0:
+		return "{\"operation\": \"MOVE\", \"target\": \"commons_north\"}"
 	return "{\"operation\": \"WAIT\"}"
 
 
@@ -214,6 +213,10 @@ func _init() -> void:
 	print("=== FLOWSCAR4 RUNNER (%s) ===" % _decider_kind)
 	if _decider_kind != "mock" and _decider_kind != "live":
 		refuse("unknown decider: " + _decider_kind)
+		return
+	if _decider_kind == "live" and _abort_round > 0:
+		refuse("--simulate-abort-round is a dry-run instrument and may not be "
+			+ "used with the live decider")
 		return
 	_verify_apparatus()
 	if _manifest.is_empty():
@@ -271,6 +274,10 @@ func _run() -> void:
 		var shells: Array = []
 		var abort_reason := ""
 		for t in ticks:
+			if _abort_round == r and _abort_tick == t:
+				abort_reason = ("simulated interruption at tick %d "
+					+ "(dry-run instrument)") % t
+				break
 			if rd.ended:
 				abort_reason = "round ended early: " + rd.end_reason
 				break

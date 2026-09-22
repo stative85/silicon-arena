@@ -144,9 +144,15 @@ def main():
     seeds = {}
     for r in range(1, rounds + 1):
         material = "FLOWSCAR4|%s|round:%d" % (commit, r)
+        # Masked to 63 bits. GDScript's int is SIGNED 64-bit, and an unsigned
+        # 64-bit seed overflowed it to -9223372036854775808 for two of three
+        # rounds in the dry run -- two different rounds silently sharing one
+        # seed. Caught by the mock pass, before any inference was paid for.
+        raw = int(hashlib.sha256(material.encode()).hexdigest()[:16], 16)
         seeds["FLOWSCAR4-r%d" % r] = {
-            "derivation": "sha256(\"%s\")[:16] as unsigned 64-bit" % material,
-            "seed": int(hashlib.sha256(material.encode()).hexdigest()[:16], 16),
+            "derivation":
+                "sha256(\"%s\")[:16] & 0x7FFFFFFFFFFFFFFF" % material,
+            "seed": raw & 0x7FFFFFFFFFFFFFFF,
         }
 
     manifest = {
