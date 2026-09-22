@@ -1,0 +1,33 @@
+{
+ "schema_version": 1,
+ "title": "CONTRACT_REGISTRY",
+ "note": "Explicit version selection. A runtime that loads 'the latest contract' cannot replay an older result, and keeping V1 on disk is worthless if nothing can select it. Every round names the contract version it runs under; ignition verifies the file on disk hashes to the value recorded here and REFUSES on mismatch, missing, or unknown.",
+ "mass_contract": {
+  "1": {
+   "path": "config/mass-contract.v1.json",
+   "sha256": "3e4c5b219ce8637cccd485ff05d11ae8312839dedf1d432a6b7ccd55bfb7389e"
+  },
+  "2": {
+   "path": "config/mass-contract.v2.json",
+   "sha256": "76ccd5ae1a1de938b3e92c6ef2db785b4b1f4ca61b0783e04d98752534e1ce42"
+  }
+ },
+ "flow_contract": {
+  "1": {
+   "path": "config/flow-scar-contract.v1.json",
+   "sha256": "811d3cc2563d5d5e0b7c1d288d0b1bcff9c8ae1893de6135850581d25e2df0f8"
+  }
+ },
+ "regime_bindings": {
+  "STEP_1B": {
+   "mass_contract": 1,
+   "flow_contract": null,
+   "note": "Signed 2026-09-21 against MASS_CONTRACT_V1. Replay must request version 1 explicitly."
+  },
+  "FLOWSCAR4": {
+   "mass_contract": 2,
+   "flow_contract": 1,
+   "note": "Requires shell and deposit kinds, which V1 does not declare. Under V1 both would be MASS_KIND_UNDECLARED and ignition would refuse -- the gate working correctly."
+  }
+ }
+}

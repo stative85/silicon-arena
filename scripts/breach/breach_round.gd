@@ -37,6 +37,9 @@ const END_TIME_HORIZON := "TIME_HORIZON"
 ## Not a round outcome. The round never started: the world it was built on does
 ## not satisfy MASS_CONTRACT_V1.
 const END_MASS_CONTRACT_VIOLATION := "MASS_CONTRACT_VIOLATION"
+## Also not a round outcome. The round was never built: the physics it asked
+## for is missing, unknown, or does not hash to the registry.
+const END_CONTRACT_REFUSED := "CONTRACT_REFUSED"
 
 var world
 var agents: Dictionary = {}
@@ -60,12 +63,31 @@ var end_reason: String = ""
 ## canonical layout. Without it the ignition refusal below would be an untested
 ## branch, and a gate whose abort path has never executed is not a gate.
 func _init(round_id: String, roster: Array, p_deciders: Dictionary,
-		p_horizon_ticks: int = 240, p_world = null) -> void:
+		p_horizon_ticks: int = 240, p_world = null,
+		p_mass_contract_version: int = MassContractScript.DEFAULT_VERSION) -> void:
+	## CONTRACT SELECTION IS EXPLICIT AND FIRST. A round names the physics it
+	## runs under before it builds anything. A missing, unknown or hash-
+	## mismatched contract is refused here, not reconciled, and nothing else in
+	## this constructor runs -- there is no world to leave half-built.
+	mass_contract_version = p_mass_contract_version
+	var sel: Dictionary = MassContractScript.open(p_mass_contract_version)
+	if not bool(sel["ok"]):
+		abort_reason = str(sel["reason"])
+		push_error(abort_reason)
+		ended = true
+		end_reason = END_CONTRACT_REFUSED
+		world = WorldStateScript.new()
+		return
+	contract = sel["contract"]
+	mass_contract_sha = str(contract.sha256)
+
 	if p_world == null:
 		world = WorldStateScript.new()
+		world.contract = contract
 		ArenaLayoutScript.build(world, round_id)
 	else:
 		world = p_world
+		world.contract = contract
 	bus = MessageBusScript.new()
 	log = ReplayLogScript.new(round_id)
 	deciders = p_deciders
@@ -90,7 +112,7 @@ func _init(round_id: String, roster: Array, p_deciders: Dictionary,
 	## The abort happens here, before any observation is built and before any
 	## turn is taken, so a violating world produces no round state at all --
 	## nothing to misread later as a short or unlucky round.
-	var violations: Array = MassContractScript.validate_world(world)
+	var violations: Array = contract.validate_world(world)
 	if not violations.is_empty():
 		mass_violations = violations
 		var parts: Array = []
@@ -105,6 +127,13 @@ func _init(round_id: String, roster: Array, p_deciders: Dictionary,
 ## Populated only when ignition validation refused to start the round.
 var mass_violations: Array = []
 var abort_reason: String = ""
+## The physics this round named, and the hash of the file it actually got.
+var mass_contract_version: int = 0
+var mass_contract_sha: String = ""
+## The round's own contract object. Immutable, and never shared with another
+## round: a V1 replay and a FLOWSCAR4 round can run in one process without
+## either inheriting the other's physics.
+var contract = null
 
 
 func _agents_dict() -> Dictionary:

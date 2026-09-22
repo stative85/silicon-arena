@@ -29,6 +29,7 @@ const MC := preload("res://scripts/breach/mass_contract.gd")
 const CO := preload("res://scripts/breach/canonical_operation.gd")
 const BusScript := preload("res://scripts/breach/message_bus.gd")
 
+var _mc = null
 var _fail := 0
 var _checks := 0
 
@@ -54,6 +55,7 @@ func _hash_world(world) -> String:
 ## a failure ambiguous.
 func _fixture() -> Dictionary:
 	var world = WorldStateScript.new()
+	world.contract = _mc
 	world.round_id = "MASS_FIXTURE"
 	world.add_location("room_a", "Room A", ["room_b"])
 	world.add_location("room_b", "Room B", ["room_a"])
@@ -85,10 +87,10 @@ func _take(fx: Dictionary, who: String, ids: Array) -> void:
 
 func gradient() -> void:
 	print("\n[MOVE cost across the capacity limit: below, exactly at, above]")
-	var cap := MC.capacity()
-	var base := MC.move_cost_base()
+	var cap: int = _mc.capacity()
+	var base: int = _mc.move_cost_base()
 	print("  capacity %d, base move cost %d, key %d, scrap %d"
-		% [cap, base, MC.mass_of_kind("key"), MC.mass_of_kind("scrap")])
+		% [cap, base, _mc.mass_of_kind("key"), _mc.mass_of_kind("scrap")])
 
 	## load -> expected carried mass. Chosen to straddle the limit exactly.
 	var loads := [
@@ -127,10 +129,10 @@ func take_is_not_a_wall() -> void:
 	for oid in ["scrap_1", "scrap_2", "scrap_3", "key_1", "key_2", "key_3"]:
 		var r := _op(fx, "ALPHA", CO.TAKE, {"target": oid})
 		ck("TAKE %s accepted while carrying %d (capacity %d)"
-			% [oid, a.carried_mass(fx["world"]), MC.capacity()], bool(r["ok"]))
+			% [oid, a.carried_mass(fx["world"]), _mc.capacity()], bool(r["ok"]))
 	ck("agent is overloaded far past capacity (%d > %d)"
-		% [a.carried_mass(fx["world"]), MC.capacity()],
-		a.carried_mass(fx["world"]) > MC.capacity())
+		% [a.carried_mass(fx["world"]), _mc.capacity()],
+		a.carried_mass(fx["world"]) > _mc.capacity())
 	ck("DROP remains available while pinned",
 		bool(_op(fx, "ALPHA", CO.DROP, {"target": "scrap_1"})["ok"]))
 
@@ -339,7 +341,23 @@ func determinism() -> void:
 
 func _init() -> void:
 	print("=== STEP 1B -- MASS PHYSICS QUALIFICATION (no model) ===")
-	print("contract: MASS_CONTRACT_V1, ACTION_SCHEMA_V1 untouched")
+	## EXPLICIT VERSION SELECTION. Step 1B was signed against V1 and this gate
+	## replays it against V1, by name and by hash. Loading "the latest contract"
+	## would silently re-measure Step 1B under FLOWSCAR4 physics -- where death
+	## creates a shell -- and the signed result would quietly stop being what
+	## this file checks.
+	var sel: Dictionary = MC.open(1)
+	if not bool(sel["ok"]):
+		print("  FAIL %s" % str(sel["reason"]))
+		print("")
+		print("MASS PHYSICS FAILED: cannot load MASS_CONTRACT_V1.")
+		quit(1)
+		return
+	_mc = sel["contract"]
+	print("contract: MASS_CONTRACT_V1 %s" % str(_mc.sha256).substr(0, 16))
+	print("ACTION_SCHEMA_V1 untouched; no shell kind at this version")
+	ck("V1 does not declare the shell kind", not _mc.is_declared("shell"))
+	ck("V1 does not declare the deposit kind", not _mc.is_declared("deposit"))
 	gradient()
 	take_is_not_a_wall()
 	refusal_is_inert()

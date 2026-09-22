@@ -106,6 +106,7 @@ call :check "tools/live_seam_regression.gd"               "live seam bytes"     
 call :check "scripts/breach/breach_selftest.gd"           "breach offline"      "BREACH OFFLINE GREEN"
 
 REM ---- STEP 1B: mass physics, and the information surface it changed -------
+call :check "tools/contract_isolation_selftest.gd"        "contract isolation"  "CONTRACT ISOLATION OK"
 call :check "tools/mass_contract_selftest.gd"             "mass contract"       "MASS CONTRACT OK"
 call :check "tools/mass_physics_qualify.gd"               "mass physics"        "MASS PHYSICS GREEN"
 

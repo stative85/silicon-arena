@@ -1,0 +1,41 @@
+{
+ "schema_version": 2,
+ "title": "MASS_CONTRACT_V2",
+ "supersedes": "MASS_CONTRACT_V1",
+ "note": "V1 is NOT edited. Step 1B was signed against V1 and its artifacts must stay replayable against the file they were measured on. V2 adds exactly two kinds and changes nothing else: every V1 number is reproduced here byte-for-byte, and a diff of the two files is the whole change record.",
+ "why_v2": "FLOWSCAR4 introduces two object kinds V1 never declared -- 'shell', the inert matter a dead agent becomes, and 'deposit', the matter that accumulates behind an obstruction. Under V1 both would be MASS_KIND_UNDECLARED and ignition would refuse, which is the gate working correctly.",
+ "capacity_per_agent": 4,
+ "mass_by_kind": {
+  "key": 1,
+  "scrap": 3,
+  "shell": 8,
+  "deposit": 1
+ },
+ "inherited_values": "shell 8 and deposit 1 are NOT new numbers. Both are lifted unchanged from the closed FLOWSCAR3 regime (WorldState.SHELL_MASS = 8, FLOW_DEPOSIT_MASS = 1). Choosing fresh values here would be a parameter selected after seeing what the physics needs, which is a conclusion wearing a number.",
+ "shell_mass_consequence": "A shell weighs 8 against a carry capacity of 4. Nothing refuses to lift it -- TAKE is a gradient, not a wall -- but carrying one costs 4 + (8 - 4) = 8 energy per MOVE, double an unencumbered move. Moving a shell to restore flow therefore costs lifetime, leaving it preserves a local pool, and putting it somewhere else may obstruct something else. That choice surface is produced by the existing mass law and by nothing else: there is no shell-specific rule.",
+ "move_cost_base": 4,
+ "move_cost_rule": "carried_mass <= capacity: cost = move_cost_base. carried_mass > capacity: cost = move_cost_base + (carried_mass - capacity). One extra energy per unit of overload, so encumbrance is a GRADIENT and never a wall.",
+ "take_exceeds_capacity": true,
+ "take_rule": "TAKE may exceed capacity. An agent is permitted to knowingly overload itself; the consequence is paid at MOVE, not refused at pickup.",
+ "drop_rule": "An alive, encumbered agent retains access to DROP. On transition to zero energy, death atomically spills all carried objects at the agent's final location.",
+ "death_spill_rule": "If an accepted action reduces energy exactly to zero, that action completes first, then alive becomes false, then every remaining inventory object is placed at the agent's final location in one atomic step, the inventory is cleared, and a host-authored DEATH_SPILL event records the object ids. DEATH_SPILL is NOT a verb, not a turn, and never enters ACTION_SCHEMA_V1. Dead agents remain unscheduled and perform no actions.",
+ "shell_rule": "Under FLOWSCAR4 the same death transition also deposits one object of kind 'shell' at the agent's final location, in the same atomic step, recorded by the same host-authored event. A shell is ordinary matter: it has a kind, it has a mass, it lies on a floor, it obstructs by the one generic law, and anyone standing there may TAKE it. There is no shell-specific verb, no ANCHOR type, and no death hook that knows what a shell is for.",
+ "refusal_rule": "An insufficient-energy MOVE is refused BEFORE any mutation. Energy and world state remain byte-identical.",
+ "conservation": "accounted_mass is invariant across every operation, without exception. Objects change holder and location; mass is neither created nor destroyed, and nothing is exempt from the books.",
+ "conservation_amendment_v2": "Two host-authored transitions ADD mass to the world rather than moving it: a shell appearing at death, and a deposit forming from accumulated flow material. Both are creation events and both are recorded. accounted_mass is therefore invariant only BETWEEN creation events; the invariant enforced is that no operation changes accounted_mass except a recorded DEATH_SPILL shell or a recorded flow deposit, and that every unit of created mass appears in exactly one such record.",
+ "active_mass": "Mass that is still in play: objects on floors, in inventories, and committed to vault slots.",
+ "accounted_mass": "active_mass + consumed_mass.",
+ "use_terminal_rule": "USE_TERMINAL transfers scrap from active mass to consumed mass. The object REMAINS IN STATE with holder=consumed, retains its immutable kind and mass, and can never re-enter play. A host-authored MASS_CONVERSION event records object id, mass, terminal, agent and energy gained.",
+ "mass_conversion_event": "MASS_CONVERSION is host-authored. It is not a verb, not a turn, and never enters ACTION_SCHEMA_V1.",
+ "host_authored_events": ["DEATH_SPILL", "FLOW_DEPOSIT", "MASS_CONVERSION"],
+ "host_authored_events_note": "Structured, not prose. The gate asserts each of these is absent from CO.ALL and CO.AGENT_CHOOSABLE.",
+ "undeclared_kind_policy": "MASS_KIND_UNDECLARED",
+ "undeclared_kind_note": "An object kind with no declared mass is a CONTRACT VIOLATION, never mass 0. Every object is validated at ignition and the round aborts before any state can advance.",
+ "observation_exposes": [
+  "mass of each visible object",
+  "this agent's carry capacity",
+  "this agent's carried mass",
+  "this agent's current MOVE cost"
+ ],
+ "observation_note": "Withholding these would make the physics unreasonable-about rather than difficult, and any resulting behaviour would be a fact about the observation packet instead of about the agent."
+}

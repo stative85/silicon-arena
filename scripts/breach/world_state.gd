@@ -12,11 +12,23 @@ class_name WorldState
 
 const MassContract := preload("res://scripts/breach/mass_contract.gd")
 
+## THE ROUND'S CONTRACT, owned here and never reselected. Set by ignition. A
+## world without one cannot answer a mass question, which is deliberate: it
+## fails loudly rather than silently using somebody else's physics.
+var contract = null
+const FlowContract := preload("res://scripts/breach/flow_contract.gd")
+
 var locations: Dictionary = {}     ## id -> {name, neighbors:[], objects:[]}
 var doors: Dictionary = {}         ## id -> {between:[a,b], locked:bool}
 var objects: Dictionary = {}       ## id -> {kind, at_location or "", holder}
 var vault_slots: Dictionary = {}   ## id -> key_id or ""
 var terminals: Dictionary = {}     ## id -> {at_location, scrap_per_use, energy_per_use}
+## FLOWSCAR4. One directed channel carrying one resource. Empty by default:
+## a round without a channel is the pre-flow arena, unchanged.
+var flow_channel: Array = []          ## ordered node ids, head -> tail
+var flow_material: Dictionary = {}    ## node id -> accumulated material
+var flow_deposits: int = 0            ## monotonic counter for deposit ids
+
 var tick: int = 0
 var round_id: String = ""
 var vault_open: bool = false
@@ -75,7 +87,10 @@ func objects_at(loc_id: String) -> Array:
 func object_mass(obj_id: String) -> int:
 	if not objects.has(obj_id):
 		return 0
-	return MassContract.mass_of_kind(str(objects[obj_id]["kind"]))
+	if contract == null:
+		push_error("world has no contract; mass cannot be answered")
+		return MassContract.MASS_KIND_UNDECLARED
+	return contract.mass_of_kind(str(objects[obj_id]["kind"]))
 
 
 ## MASS IS ACCOUNTED IN TWO TOTALS, and the distinction is the whole point.
@@ -106,6 +121,79 @@ func consumed_mass() -> int:
 
 func accounted_mass() -> int:
 	return active_mass() + consumed_mass()
+
+
+## Mass lying on the floor here. A shell is matter, not a special case -- it is
+## counted by exactly the rule that counts a key.
+func floor_mass_at(loc_id: String) -> int:
+	var total := 0
+	for oid in objects.keys():
+		var o: Dictionary = objects[oid]
+		if str(o["holder"]).is_empty() and str(o["at_location"]) == loc_id:
+			total += object_mass(str(oid))
+	return total
+
+
+## THE ONE CAPACITY LAW. It knows mass and nothing else: not what the mass is,
+## not that a channel exists, not that anything is blocked.
+func flow_capacity_at(loc_id: String) -> int:
+	return maxi(0, FlowContract.base_capacity()
+		- FlowContract.mass_block() * floor_mass_at(loc_id))
+
+
+## ONE deterministic advance, called ONCE per committed turn and nowhere else.
+## Ported unchanged from the closed FLOWSCAR3 regime. Returns the effects it
+## produced, including a structured record for every unit of mass it CREATES.
+func flow_advance(now_tick: int) -> Dictionary:
+	var effects: Array = []
+	var created: Array = []
+	if flow_channel.is_empty():
+		return {"effects": effects, "created": created}
+
+	## Tail-first, so material cannot traverse two nodes in one tick.
+	for i in range(flow_channel.size() - 1, -1, -1):
+		var here := str(flow_channel[i])
+		var have := int(flow_material.get(here, 0))
+		if have <= 0:
+			continue
+		## Crossing is limited by the mass at BOTH ends. Without the receiving
+		## end a node shoves material into a blocked neighbour and the pile
+		## forms AT the obstruction instead of behind it, which is not what an
+		## obstruction does. Still one rule over ordinary floor mass.
+		var cap := flow_capacity_at(here)
+		if i < flow_channel.size() - 1:
+			cap = mini(cap, flow_capacity_at(str(flow_channel[i + 1])))
+		var moved := mini(have, cap)
+		if moved <= 0:
+			continue
+		flow_material[here] = have - moved
+		if i == flow_channel.size() - 1:
+			effects.append("%d material left the channel at %s" % [moved, here])
+		else:
+			var nxt := str(flow_channel[i + 1])
+			flow_material[nxt] = int(flow_material.get(nxt, 0)) + moved
+			effects.append("%d material moved %s -> %s" % [moved, here, nxt])
+
+	## The head receives.
+	var head := str(flow_channel[0])
+	flow_material[head] = int(flow_material.get(head, 0)) 		+ FlowContract.source_rate()
+
+	## Accumulation becomes ordinary matter: same kind system, same mass rules,
+	## takeable by anyone standing there. Every deposit is a MASS CREATION and
+	## is recorded as one -- object id, kind, mass, location, tick, cause.
+	var threshold := FlowContract.deposit_threshold()
+	for node in flow_channel:
+		var loc := str(node)
+		while int(flow_material.get(loc, 0)) >= threshold:
+			flow_material[loc] = int(flow_material[loc]) - threshold
+			flow_deposits += 1
+			var oid := "deposit_%d" % flow_deposits
+			add_object(oid, "deposit", loc)
+			created.append({"event": "FLOW_DEPOSIT", "object_id": oid,
+				"kind": "deposit", "mass": object_mass(oid), "location": loc,
+				"tick": now_tick, "cause": "flow_accumulation_threshold"})
+			effects.append("%s formed at %s" % [oid, loc])
+	return {"effects": effects, "created": created}
 
 
 func object_kind(obj_id: String) -> String:

@@ -276,13 +276,45 @@ static func apply(world, agents: Dictionary, actor_name: String,
 		## is not in ACTION_SCHEMA_V1, and no agent may choose it. It is
 		## recorded as its own effect precisely so an analyst never reads it as
 		## a dead agent acting -- the host moved the objects, nobody chose to.
-		if not actor.alive and not actor.inventory.is_empty():
-			var spilled: Array = actor.inventory.duplicate()
-			spilled.sort()
-			for oid in spilled:
-				actor.remove_object(str(oid))
-				world.put_down(str(oid), actor.position)
-			res["effects"].append("DEATH_SPILL at %s: %s"
-				% [actor.position, ", ".join(spilled)])
-			res["death_spill"] = {"at": actor.position, "objects": spilled}
+		if not actor.alive:
+			## DEATH_SPILL: transfers existing inventory to the floor. It
+			## CREATES NOTHING. Kept a separate record from the shell so a
+			## reader can never mistake a spilled key for created matter.
+			if not actor.inventory.is_empty():
+				var spilled: Array = actor.inventory.duplicate()
+				spilled.sort()
+				for oid in spilled:
+					actor.remove_object(str(oid))
+					world.put_down(str(oid), actor.position)
+				res["effects"].append("DEATH_SPILL at %s: %s"
+					% [actor.position, ", ".join(spilled)])
+				res["death_spill"] = {"at": actor.position,
+					"objects": spilled, "mass_created": 0}
+
+			## SHELL_APPEARED: the agent itself becomes inert matter. This is a
+			## MASS CREATION and is recorded as one, separately from the spill.
+			##
+			## ORDERING, INHERITED AND NOT DECIDED HERE: the shell exists before
+			## this tick's flow_advance, so a death obstructs on the DEATH TICK
+			## rather than the next one (FLOWSCAR3 breach_round.step()).
+			##
+			## The id is name-derived, which is sound ONLY because FLOWSCAR4
+			## permits one lifecycle per agent and no revival. death_event_id is
+			## carried regardless, and is unique whatever the id scheme.
+			## THE SHELL IS FLOWSCAR4 PHYSICS, NOT V1 PHYSICS, and the loaded
+			## contract decides -- not a flag and not a build constant. V1 never
+			## declares the shell kind, so a round that named V1 gets V1's death
+			## transition exactly as Step 1B measured it. V2 declares it, so a
+			## FLOWSCAR4 round gets a shell. The behaviour follows the contract
+			## the round asked for, which is the whole point of naming one.
+			var sid := "shell_%s" % actor_name.to_lower()
+			if world.contract.is_declared("shell") 					and not world.objects.has(sid):
+				world.add_object(sid, "shell", actor.position)
+				res["effects"].append("SHELL_APPEARED at %s: %s"
+					% [actor.position, sid])
+				res["shell_appeared"] = {"event": "SHELL_APPEARED",
+					"object_id": sid, "kind": "shell",
+					"mass": world.object_mass(sid),
+					"location": actor.position, "tick": world.tick,
+					"cause": "energy_exhausted", "death_event_id": -1}
 	return res

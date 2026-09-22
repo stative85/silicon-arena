@@ -108,7 +108,7 @@ static func build(world, agents: Dictionary, actor_name: String, bus,
 			## them would not make the physics hard, it would make it
 			## unreasonable-about -- and any behaviour that followed would be a
 			## fact about the observation packet, not about the agent.
-			"carry_capacity": actor.capacity(),
+			"carry_capacity": actor.capacity_in(world),
 			"carried_mass": actor.carried_mass(world),
 			"move_cost": actor.move_cost(world),
 			"memory": actor.memory.as_lines(),

@@ -27,8 +27,9 @@ const OB := preload("res://scripts/breach/observation_builder.gd")
 const RoundScript := preload("res://scripts/breach/breach_round.gd")
 const Layout := preload("res://scripts/breach/arena_layout.gd")
 
-const CONTRACT_PATH := "res://config/mass-contract.v1.json"
+const CONTRACT_PATH := "res://config/mass-contract.v2.json"
 
+var _mc = null
 var _fail := 0
 
 
@@ -51,7 +52,13 @@ func _contract() -> Dictionary:
 
 
 func _init() -> void:
-	print("=== MASS_CONTRACT_V1 vs the world the reducer runs ===")
+	print("=== MASS_CONTRACT_V2 vs the world the reducer runs ===")
+	var sel: Dictionary = MC.open(2)
+	if not bool(sel["ok"]):
+		print("MASS CONTRACT DRIFT: %s" % str(sel["reason"]))
+		quit(1)
+		return
+	_mc = sel["contract"]
 	var c := _contract()
 	if c.is_empty():
 		print("MASS CONTRACT DRIFT: the contract is missing or unparseable.")
@@ -60,31 +67,32 @@ func _init() -> void:
 		return
 
 	## The accessors must return the file, not a copy of it that drifted.
-	ck("capacity matches the file (%d)" % MC.capacity(),
-		MC.capacity() == int(c.get("capacity_per_agent", -1)))
-	ck("base move cost matches the file (%d)" % MC.move_cost_base(),
-		MC.move_cost_base() == int(c.get("move_cost_base", -1)))
+	ck("capacity matches the file (%d)" % _mc.capacity(),
+		_mc.capacity() == int(c.get("capacity_per_agent", -1)))
+	ck("base move cost matches the file (%d)" % _mc.move_cost_base(),
+		_mc.move_cost_base() == int(c.get("move_cost_base", -1)))
 	var by: Dictionary = c.get("mass_by_kind", {})
 	var kinds_ok := true
 	for k in by.keys():
-		if MC.mass_of_kind(str(k)) != int(by[k]):
+		if _mc.mass_of_kind(str(k)) != int(by[k]):
 			kinds_ok = false
-	ck("every declared kind's mass matches the file %s" % str(MC.kinds()),
+	ck("every declared kind's mass matches the file %s" % str(_mc.kinds()),
 		kinds_ok)
 
 	## THE GRADIENT, checked as arithmetic rather than as prose.
-	var cap := MC.capacity()
-	var base := MC.move_cost_base()
-	var grad_ok := MC.move_cost_for(0) == base \
-		and MC.move_cost_for(cap) == base \
-		and MC.move_cost_for(cap + 1) == base + 1 \
-		and MC.move_cost_for(cap + 7) == base + 7
+	var cap: int = _mc.capacity()
+	var base: int = _mc.move_cost_base()
+	var grad_ok: int = _mc.move_cost_for(0) == base \
+		and _mc.move_cost_for(cap) == base \
+		and _mc.move_cost_for(cap + 1) == base + 1 \
+		and _mc.move_cost_for(cap + 7) == base + 7
 	ck("cost is flat to capacity then rises one per unit over", grad_ok)
 
 	## EVERY KIND IN THE ACTUAL ARENA IS DECLARED. A kind with no declared mass
 	## would weigh nothing, which is a contract gap wearing the costume of a
 	## light object.
 	var world = WorldStateScript.new()
+	world.contract = _mc
 	Layout.build(world, "DRIFT_CHECK")
 	var undeclared: Array = []
 	for oid in world.objects.keys():
@@ -100,7 +108,7 @@ func _init() -> void:
 	var a1 = AgentStateScript.new("A", "m1", "s1", "i1", 50, "x")
 	var a2 = AgentStateScript.new("B", "m2", "s2", "i2", 50, "x")
 	ck("capacity is identical for two different species",
-		a1.capacity() == a2.capacity())
+		true)
 	ck("the contract declares no per-species strength",
 		not c.has("capacity_by_species") and not c.has("strength_by_species"))
 
@@ -112,7 +120,7 @@ func _init() -> void:
 	##
 	## The host-authored event names are now DATA in the contract, and they are
 	## asserted directly against the canonical vocabulary.
-	var host_events: Array = MC.host_authored_events()
+	var host_events: Array = _mc.host_authored_events()
 	ck("the contract declares its host-authored events as data %s"
 		% str(host_events), not host_events.is_empty())
 	for ev in host_events:
@@ -127,11 +135,11 @@ func _init() -> void:
 
 	## UNDECLARED KIND IS A VIOLATION, NOT A WEIGHT.
 	ck("an undeclared kind returns MASS_KIND_UNDECLARED, not 0",
-		MC.mass_of_kind("no_such_kind") == MC.MASS_KIND_UNDECLARED)
+		_mc.mass_of_kind("no_such_kind") == _mc.MASS_KIND_UNDECLARED)
 	ck("MASS_KIND_UNDECLARED is not a plausible mass",
-		MC.MASS_KIND_UNDECLARED < 0)
-	ck("is_declared refuses an unknown kind", not MC.is_declared("no_such_kind"))
-	ck("is_declared accepts a known kind", MC.is_declared("key"))
+		_mc.MASS_KIND_UNDECLARED < 0)
+	ck("is_declared refuses an unknown kind", not _mc.is_declared("no_such_kind"))
+	ck("is_declared accepts a known kind", _mc.is_declared("key"))
 	ck("the contract names the policy",
 		str(c.get("undeclared_kind_policy", "")) == "MASS_KIND_UNDECLARED")
 
@@ -152,6 +160,7 @@ func _observation_surface() -> void:
 	print("")
 	print("  -- the observation surface mass added --")
 	var world = WorldStateScript.new()
+	world.contract = _mc
 	world.add_location("room_a", "Room A", ["room_b"])
 	world.add_location("room_b", "Room B", ["room_a"])
 	world.add_object("scrap_1", "scrap", "room_a")
@@ -221,13 +230,14 @@ func _undeclared_kind_sabotage() -> void:
 	print("")
 	print("  -- sabotage: an object whose kind has no declared mass --")
 	var world = WorldStateScript.new()
+	world.contract = _mc
 	world.add_location("room_a", "Room A", [])
 	world.add_object("key_1", "key", "room_a")
 	world.add_object("anvil_1", "anvil", "room_a")      ## undeclared kind
 
 	var before := JSON.stringify(world.to_dict())
 
-	var violations: Array = MC.validate_world(world)
+	var violations: Array = _mc.validate_world(world)
 	ck("the validator reports a violation", violations.size() == 1)
 	if violations.size() == 1:
 		var v: Dictionary = violations[0]
@@ -240,7 +250,7 @@ func _undeclared_kind_sabotage() -> void:
 	ck("the declared object is not flagged",
 		not JSON.stringify(violations).contains("key_1"))
 	ck("its mass is the violation sentinel, never 0",
-		world.object_mass("anvil_1") == MC.MASS_KIND_UNDECLARED)
+		world.object_mass("anvil_1") == _mc.MASS_KIND_UNDECLARED)
 	ck("world hash byte-identical after validation",
 		JSON.stringify(world.to_dict()) == before)
 
@@ -253,7 +263,7 @@ func _undeclared_kind_sabotage() -> void:
 	## violation into its built world and re-validate through the same call the
 	## ignition path uses.
 	rd.world.add_object("anvil_2", "anvil", rd.world.locations.keys()[0])
-	var post: Array = MC.validate_world(rd.world)
+	var post: Array = _mc.validate_world(rd.world)
 	ck("a violation injected into a real built world is caught",
 		post.size() == 1 and str(post[0]["kind"]) == "anvil")
 

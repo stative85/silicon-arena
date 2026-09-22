@@ -19,68 +19,179 @@ class_name BreachMassContract
 ## unit over capacity. That is what makes a body that is too heavy to move
 ## possible, which is the raw material FLOW SCAR needs.
 
-const PATH := "res://config/mass-contract.v1.json"
+## EXPLICIT VERSION SELECTION. There is no "latest".
+##
+## A runtime that silently loads the newest contract cannot replay an older
+## result, and keeping V1 on disk is worthless if nothing can select it. Every
+## round NAMES the version it runs under; the file on disk must hash to the
+## value recorded in config/contract-registry.json, and a missing, unknown or
+## mismatched contract is REFUSED rather than reconciled.
+##
+## Step 1B was signed against V1. FLOWSCAR4 requires V2, which adds the shell
+## and deposit kinds V1 never declared -- under V1 both are
+## MASS_KIND_UNDECLARED and ignition refuses, which is the gate working.
+const REGISTRY := "res://config/contract-registry.json"
 
-static var _cache: Dictionary = {}
+const DEFAULT_VERSION := 2
+
+## AN INSTANCE, NOT A GLOBAL.
+##
+## This was a static singleton with a module-level cache, and select() mutated
+## it. Two rounds on different contracts in one process then shared whichever
+## version was selected last: a V1 replay running after a FLOWSCAR4 round would
+## silently inherit V2 physics, and the failure would look like a result.
+##
+## A contract is now an immutable object owned by the round that named it.
+## Nothing can reselect it, so nothing can contaminate a neighbour.
+var version: int = 0
+var sha256: String = ""
+var _data: Dictionary = {}
 
 
-static func _load() -> Dictionary:
-	if not _cache.is_empty():
-		return _cache
-	var fh := FileAccess.open(PATH, FileAccess.READ)
+static func _registry() -> Dictionary:
+	var fh := FileAccess.open(REGISTRY, FileAccess.READ)
 	if fh == null:
-		push_error("MASS_CONTRACT_V1 missing: " + PATH)
 		return {}
+	var t := fh.get_as_text()
+	fh.close()
+	var d = JSON.parse_string(t)
+	return d if typeof(d) == TYPE_DICTIONARY else {}
+
+
+static func known_versions() -> Array:
+	var reg: Dictionary = _registry().get("mass_contract", {})
+	var out: Array = []
+	for k in reg.keys():
+		out.append(int(str(k)))
+	out.sort()
+	return out
+
+
+static func path_for(version: int) -> String:
+	var reg: Dictionary = _registry().get("mass_contract", {})
+	var e = reg.get(str(version), null)
+	if typeof(e) != TYPE_DICTIONARY:
+		return ""
+	return "res://" + str((e as Dictionary).get("path", ""))
+
+
+static func expected_sha(version: int) -> String:
+	var reg: Dictionary = _registry().get("mass_contract", {})
+	var e = reg.get(str(version), null)
+	if typeof(e) != TYPE_DICTIONARY:
+		return ""
+	return str((e as Dictionary).get("sha256", ""))
+
+
+static func _sha_of(text: String) -> String:
+	var c := HashingContext.new()
+	c.start(HashingContext.HASH_SHA256)
+	c.update(text.to_utf8_buffer())
+	return c.finish().hex_encode()
+
+
+## THE ONLY WAY TO GET A CONTRACT. Returns
+## {"ok": bool, "reason": String, "contract": BreachMassContract or null}.
+## Never guesses and never pushes an error: the caller decides what a refusal
+## means, and ignition turns it into a refused round.
+static func open(version_wanted: int) -> Dictionary:
+	var res := {"ok": false, "reason": "", "contract": null}
+	var path := path_for(version_wanted)
+	if path.is_empty():
+		res["reason"] = "UNKNOWN_CONTRACT_VERSION: %d (known: %s)" % [
+			version_wanted, str(known_versions())]
+		return res
+	var fh := FileAccess.open(path, FileAccess.READ)
+	if fh == null:
+		res["reason"] = "CONTRACT_FILE_MISSING: " + path
+		return res
 	var text := fh.get_as_text()
 	fh.close()
+	var sha := _sha_of(text)
+	var want := expected_sha(version_wanted)
+	if sha != want:
+		res["reason"] = "CONTRACT_HASH_MISMATCH v%d: on disk %s, registry %s" 			% [version_wanted, sha.substr(0, 16), want.substr(0, 16)]
+		return res
 	var d = JSON.parse_string(text)
 	if typeof(d) != TYPE_DICTIONARY:
-		push_error("MASS_CONTRACT_V1 is not a JSON object")
-		return {}
-	_cache = d
-	return _cache
+		res["reason"] = "CONTRACT_NOT_AN_OBJECT: " + path
+		return res
+	var c := new()
+	c.version = version_wanted
+	c.sha256 = sha
+	## DEEP copy. JSON.parse_string already returns a fresh tree, but relying on
+	## that makes immutability an accident of the parser rather than a property
+	## of this class. Two instances of the same version must not share a nested
+	## dictionary that either could mutate.
+	c._data = (d as Dictionary).duplicate(true)
+	res["ok"] = true
+	res["contract"] = c
+	return res
 
 
-static func capacity() -> int:
-	return int(_load().get("capacity_per_agent", 0))
+# ------------------------------------------------------------- instance API
+
+func capacity() -> int:
+	return int(_data.get("capacity_per_agent", 0))
 
 
-static func move_cost_base() -> int:
-	return int(_load().get("move_cost_base", 4))
+func move_cost_base() -> int:
+	return int(_data.get("move_cost_base", 4))
 
 
-## AN UNDECLARED KIND IS A VIOLATION, NOT A WEIGHT.
-##
-## This returned 0 once. Zero is a legitimate mass -- a feather is not a bug --
-## so a kind with no declared mass was indistinguishable from a light object,
-## and a contract gap could travel the whole reducer as a valid number. It now
-## returns MASS_KIND_UNDECLARED, which no arithmetic can mistake for a weight.
+## AN UNDECLARED KIND IS A VIOLATION, NOT A WEIGHT. This returned 0 once. Zero
+## is a legitimate mass -- a feather is not a bug -- so a contract gap was
+## indistinguishable from a light object and could travel the whole reducer as
+## a valid number.
 const MASS_KIND_UNDECLARED := -1
 
 
-static func is_declared(kind: String) -> bool:
-	return (_load().get("mass_by_kind", {}) as Dictionary).has(kind)
+## The nested table is never handed out. Callers get scalars or defensive
+## copies, so no caller can reach in and change this contract's physics.
+func mass_table() -> Dictionary:
+	return (_data.get("mass_by_kind", {}) as Dictionary).duplicate(true)
 
 
-static func mass_of_kind(kind: String) -> int:
-	var by: Dictionary = _load().get("mass_by_kind", {})
+func is_declared(kind: String) -> bool:
+	return (_data.get("mass_by_kind", {}) as Dictionary).has(kind)
+
+
+func mass_of_kind(kind: String) -> int:
+	var by: Dictionary = _data.get("mass_by_kind", {})
 	if not by.has(kind):
 		return MASS_KIND_UNDECLARED
 	return int(by[kind])
 
 
-## Host-authored event names, read from the contract as DATA. The gate asserts
-## these against the canonical vocabulary directly; nothing reads the prose.
-static func host_authored_events() -> Array:
-	var out: Array = (_load().get("host_authored_events", []) as Array).duplicate()
+func kinds() -> Array:
+	var out: Array = (_data.get("mass_by_kind", {}) as Dictionary).keys()
 	out.sort()
 	return out
 
 
-## EVERY object, checked before a round may advance. Returns one violation per
-## offending object, naming the id and the kind, because "something is
-## undeclared" is not an actionable abort message.
-static func validate_world(world) -> Array:
+func raw() -> Dictionary:
+	return _data.duplicate(true)
+
+
+## Host-authored event names, read as DATA. Nothing reads the prose.
+func host_authored_events() -> Array:
+	var out: Array = (_data.get("host_authored_events", []) as Array).duplicate()
+	out.sort()
+	return out
+
+
+## THE GRADIENT. Flat to capacity, then one extra per unit of overload.
+func move_cost_for(carried_mass: int) -> int:
+	var base := move_cost_base()
+	var cap := capacity()
+	if carried_mass <= cap:
+		return base
+	return base + (carried_mass - cap)
+
+
+## EVERY object, checked before a round may advance. One violation per
+## offending object, naming id and kind.
+func validate_world(world) -> Array:
 	var violations: Array = []
 	var ids: Array = world.objects.keys()
 	ids.sort()
@@ -90,21 +201,3 @@ static func validate_world(world) -> Array:
 			violations.append({"violation": "MASS_KIND_UNDECLARED",
 				"object": str(oid), "kind": kind})
 	return violations
-
-
-static func kinds() -> Array:
-	var by: Dictionary = _load().get("mass_by_kind", {})
-	var out: Array = by.keys()
-	out.sort()
-	return out
-
-
-## THE GRADIENT. At or under capacity a move costs the base. Over capacity it
-## costs one more per unit of overload, without bound, so an agent can always
-## become pinned but never becomes unable to shed.
-static func move_cost_for(carried_mass: int) -> int:
-	var base := move_cost_base()
-	var cap := capacity()
-	if carried_mass <= cap:
-		return base
-	return base + (carried_mass - cap)

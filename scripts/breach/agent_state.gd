@@ -9,7 +9,6 @@ class_name AgentState
 ## identity, here or anywhere else.
 
 const MemoryLedgerScript := preload("res://scripts/breach/memory_ledger.gd")
-const MassContractScript := preload("res://scripts/breach/mass_contract.gd")
 
 var display_name: String = ""        ## VANTA        -- decoration
 var model_id: String = ""            ## qwen3.5-2b   -- identity
@@ -86,11 +85,13 @@ func carried_mass(world) -> int:
 
 
 func move_cost(world) -> int:
-	return MassContractScript.move_cost_for(carried_mass(world))
+	return world.contract.move_cost_for(carried_mass(world))
 
 
-func capacity() -> int:
-	return MassContractScript.capacity()
+## Capacity is a property of the ROUND'S contract, so it takes the world. There
+## is no global to ask, which is what stops a V1 replay reading V2 capacity.
+func capacity_in(world) -> int:
+	return world.contract.capacity()
 
 
 func can_act() -> bool:
