@@ -10,6 +10,8 @@ class_name WorldState
 ## Everything is deterministic and ordered. Any iteration that reaches a hash
 ## sorts first.
 
+const MassContract := preload("res://scripts/breach/mass_contract.gd")
+
 var locations: Dictionary = {}     ## id -> {name, neighbors:[], objects:[]}
 var doors: Dictionary = {}         ## id -> {between:[a,b], locked:bool}
 var objects: Dictionary = {}       ## id -> {kind, at_location or "", holder}
@@ -66,6 +68,44 @@ func objects_at(loc_id: String) -> Array:
 			out.append(oid)
 	out.sort()
 	return out
+
+
+## MASS. Intrinsic to kind, read from MASS_CONTRACT_V1, never stored per object
+## and never mutated -- an object's mass is a fact about what it is.
+func object_mass(obj_id: String) -> int:
+	if not objects.has(obj_id):
+		return 0
+	return MassContract.mass_of_kind(str(objects[obj_id]["kind"]))
+
+
+## MASS IS ACCOUNTED IN TWO TOTALS, and the distinction is the whole point.
+##
+## active_mass is what is still in play: floors, inventories, vault slots.
+## USE_TERMINAL may reduce it, because scrap becomes energy and the object can
+## never re-enter play.
+##
+## accounted_mass is active + consumed, and it may NEVER change. A consumed
+## object stays in state with its kind and its mass, marked holder=consumed.
+## Nothing is exempt from the books -- an exemption is where a leak would hide.
+func active_mass() -> int:
+	var total := 0
+	for oid in objects.keys():
+		if str(objects[oid]["holder"]) == "consumed":
+			continue
+		total += object_mass(str(oid))
+	return total
+
+
+func consumed_mass() -> int:
+	var total := 0
+	for oid in objects.keys():
+		if str(objects[oid]["holder"]) == "consumed":
+			total += object_mass(str(oid))
+	return total
+
+
+func accounted_mass() -> int:
+	return active_mass() + consumed_mass()
 
 
 func object_kind(obj_id: String) -> String:

@@ -1,0 +1,29 @@
+{
+ "schema_version": 1,
+ "title": "MASS_CONTRACT_V1",
+ "note": "Frozen mass physics for THE BREACH. Mass is INTRINSIC TO OBJECT KIND: every object of a kind weighs the same, always, and no object's mass ever changes. Capacity is IDENTICAL FOR EVERY AGENT -- there is no species-specific strength, and introducing one would be a host-authored asymmetry that confounds every later comparison. These are world constants, not tuning knobs to be adjusted once a round looks boring.",
+ "capacity_per_agent": 4,
+ "mass_by_kind": {
+  "key": 1,
+  "scrap": 3
+ },
+ "move_cost_base": 4,
+ "move_cost_rule": "carried_mass <= capacity: cost = move_cost_base. carried_mass > capacity: cost = move_cost_base + (carried_mass - capacity). One extra energy per unit of overload, so encumbrance is a GRADIENT and never a wall.",
+ "take_exceeds_capacity": true,
+ "take_rule": "TAKE may exceed capacity. An agent is permitted to knowingly overload itself; the consequence is paid at MOVE, not refused at pickup.",
+ "drop_rule": "An alive, encumbered agent retains access to DROP. On transition to zero energy, death atomically spills all carried objects at the agent's final location.",
+ "death_spill_rule": "If an accepted action reduces energy exactly to zero, that action completes first, then alive becomes false, then every remaining inventory object is placed at the agent's final location in one atomic step, the inventory is cleared, and a host-authored DEATH_SPILL event records the object ids. DEATH_SPILL is NOT a verb, not a turn, and never enters ACTION_SCHEMA_V1. Dead agents remain unscheduled and perform no actions. The earlier draft of this contract said DROP stays available at zero energy; that was written without the existing death rule in view and would have put a dead agent in the log performing a canonical operation, corrupting the meaning of both 'dead' and 'agent-chosen operation'.",
+ "refusal_rule": "An insufficient-energy MOVE is refused BEFORE any mutation. Energy and world state remain byte-identical.",
+ "conservation": "accounted_mass is invariant across every operation, without exception. Objects change holder and location; mass is neither created nor destroyed, and nothing is exempt from the books.",
+ "active_mass": "Mass that is still in play: objects on floors, in inventories, and committed to vault slots.",
+ "accounted_mass": "active_mass + consumed_mass. This total must always equal the initial total mass of the world.",
+ "use_terminal_rule": "USE_TERMINAL transfers scrap from active mass to consumed mass. The object REMAINS IN STATE with holder=consumed, retains its immutable kind and mass, and can never re-enter play. active_mass may therefore decrease; accounted_mass may not. A host-authored MASS_CONVERSION event records object id, mass, terminal, agent and energy gained, so consumption is an explicit ledger entry rather than a conservation exception.",
+ "mass_conversion_event": "MASS_CONVERSION is host-authored. It is not a verb, not a turn, and never enters ACTION_SCHEMA_V1.",
+ "observation_exposes": [
+  "mass of each visible object",
+  "this agent's carry capacity",
+  "this agent's carried mass",
+  "this agent's current MOVE cost"
+ ],
+ "observation_note": "Withholding these would make the physics unreasonable-about rather than difficult, and any resulting behaviour would be a fact about the observation packet instead of about the agent."
+}

@@ -30,7 +30,13 @@ static func apply(world, agents: Dictionary, actor_name: String,
 		res["reason"] = "agent has no energy"
 		return res
 
+	## ENCUMBRANCE. Every operation costs its constant except MOVE, which costs
+	## the base plus one per unit of carried mass over capacity. The cost is
+	## computed BEFORE the affordability gate below, so an overloaded agent that
+	## cannot pay is refused rather than moved and then billed.
 	var cost := CO.energy_cost(op)
+	if op == CO.MOVE:
+		cost = actor.move_cost(world)
 	if op != CO.WAIT and op != CO.NO_OP and actor.energy < cost:
 		res["reason"] = "insufficient energy: %d < %d" % [actor.energy, cost]
 		return res
@@ -225,15 +231,31 @@ static func apply(world, agents: Dictionary, actor_name: String,
 			if scrap.size() < need:
 				res["reason"] = "need %d scrap, holding %d" % [need, scrap.size()]
 				return res
+			## MASS CONVERSION, not mass destruction. The object stays in
+			## state with its kind and its mass and is marked consumed: it
+			## leaves active_mass and enters consumed_mass, and accounted_mass
+			## does not move. MASS_CONVERSION is host-authored -- not a verb,
+			## not a turn, never in ACTION_SCHEMA_V1 -- and it names every
+			## object so the ledger can be replayed.
+			var converted: Array = []
+			var converted_mass := 0
 			for i in need:
 				var s := str(scrap[i])
+				converted_mass += world.object_mass(s)
 				actor.remove_object(s)
 				world.objects[s]["holder"] = "consumed"
 				world.objects[s]["at_location"] = ""
-			actor.gain(int(t["energy_per_use"]))
+				converted.append(s)
+			var gained := int(t["energy_per_use"])
+			actor.gain(gained)
 			res["ok"] = true
 			res["effects"].append("converted %d scrap to %d energy"
-				% [need, int(t["energy_per_use"])])
+				% [need, gained])
+			res["effects"].append("MASS_CONVERSION at %s: %s (mass %d) -> %d energy"
+				% [target, ", ".join(converted), converted_mass, gained])
+			res["mass_conversion"] = {"terminal": target, "agent": actor_name,
+				"objects": converted, "mass": converted_mass,
+				"energy_gained": gained}
 
 		_:
 			res["reason"] = "unhandled operation: %s" % op
@@ -241,4 +263,26 @@ static func apply(world, agents: Dictionary, actor_name: String,
 
 	if res["ok"]:
 		actor.spend(cost)
+		## ATOMIC DEATH SPILL. The accepted action has already completed. If it
+		## took the agent to zero, it is now dead -- and everything it was
+		## carrying would otherwise be unreachable forever, held by a body that
+		## can never be scheduled again.
+		##
+		## So the world takes it back, in one step, at the position the agent
+		## died in. Mass is conserved through the transition: the objects move
+		## from an inventory to a floor, they are not destroyed.
+		##
+		## DEATH_SPILL IS NOT A VERB. It is host-authored, it is not a turn, it
+		## is not in ACTION_SCHEMA_V1, and no agent may choose it. It is
+		## recorded as its own effect precisely so an analyst never reads it as
+		## a dead agent acting -- the host moved the objects, nobody chose to.
+		if not actor.alive and not actor.inventory.is_empty():
+			var spilled: Array = actor.inventory.duplicate()
+			spilled.sort()
+			for oid in spilled:
+				actor.remove_object(str(oid))
+				world.put_down(str(oid), actor.position)
+			res["effects"].append("DEATH_SPILL at %s: %s"
+				% [actor.position, ", ".join(spilled)])
+			res["death_spill"] = {"at": actor.position, "objects": spilled}
 	return res

@@ -42,15 +42,19 @@ static func build(world, agents: Dictionary, actor_name: String, bus,
 		var other = agents[n]
 		if other.position != actor.position:
 			continue
+		## Mass is externally visible -- you can see what someone is lugging.
+		## Their energy and memory remain private, as before.
 		visible.append({
 			"entity": n,
 			"position": other.position,
 			"visible_inventory": other.inventory.duplicate(),
+			"visible_carried_mass": other.carried_mass(world),
 		})
 
 	## Loose objects here.
 	for oid in world.objects_at(actor.position):
 		visible.append({"entity": oid, "kind": world.object_kind(oid),
+			"mass": world.object_mass(oid),
 			"position": actor.position})
 
 	## Terminals here.
@@ -100,6 +104,13 @@ static func build(world, agents: Dictionary, actor_name: String, bus,
 			"energy": actor.energy,
 			"position": actor.position,
 			"inventory": actor.inventory.duplicate(),
+			## MASS_CONTRACT_V1 requires these four to be observable. Withholding
+			## them would not make the physics hard, it would make it
+			## unreasonable-about -- and any behaviour that followed would be a
+			## fact about the observation packet, not about the agent.
+			"carry_capacity": actor.capacity(),
+			"carried_mass": actor.carried_mass(world),
+			"move_cost": actor.move_cost(world),
 			"memory": actor.memory.as_lines(),
 		},
 		"location": {

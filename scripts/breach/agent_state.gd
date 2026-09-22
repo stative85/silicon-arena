@@ -9,6 +9,7 @@ class_name AgentState
 ## identity, here or anywhere else.
 
 const MemoryLedgerScript := preload("res://scripts/breach/memory_ledger.gd")
+const MassContractScript := preload("res://scripts/breach/mass_contract.gd")
 
 var display_name: String = ""        ## VANTA        -- decoration
 var model_id: String = ""            ## qwen3.5-2b   -- identity
@@ -74,6 +75,24 @@ func scrap_held() -> Array:
 ## An agent can act while it has energy for the cheapest non-free operation.
 ## WAIT costs nothing, so "unable to act" means unable to do anything that
 ## changes the world -- which is the condition the round-end rule cares about.
+## Sum of the mass of everything held. Recomputed, never cached: a cached
+## encumbrance that drifts from the inventory would be a physics bug that looks
+## like a decision.
+func carried_mass(world) -> int:
+	var total := 0
+	for oid in inventory:
+		total += world.object_mass(str(oid))
+	return total
+
+
+func move_cost(world) -> int:
+	return MassContractScript.move_cost_for(carried_mass(world))
+
+
+func capacity() -> int:
+	return MassContractScript.capacity()
+
+
 func can_act() -> bool:
 	return alive and energy > 0
 

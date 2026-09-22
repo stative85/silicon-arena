@@ -105,6 +105,10 @@ call :check "tools/action_schema_selftest.gd"             "action schema"       
 call :check "tools/live_seam_regression.gd"               "live seam bytes"     "LIVE SEAM OK"
 call :check "scripts/breach/breach_selftest.gd"           "breach offline"      "BREACH OFFLINE GREEN"
 
+REM ---- STEP 1B: mass physics, and the information surface it changed -------
+call :check "tools/mass_contract_selftest.gd"             "mass contract"       "MASS CONTRACT OK"
+call :check "tools/mass_physics_qualify.gd"               "mass physics"        "MASS PHYSICS GREEN"
+
 REM ---- documentation and workflow linting ---------------------------------
 call :pycheck "tools/gd_parse_check.py" "every gdscript parses"
 call :pycheck "tools/lint_docs.py"       "documentation lint"

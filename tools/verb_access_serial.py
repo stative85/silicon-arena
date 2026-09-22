@@ -136,6 +136,12 @@ def main():
                                           "seconds": round(took, 1),
                                           "artifact": out_name}
             merged.setdefault("provenance", d.get("provenance", {}))
+            m = d.get("measurements", {})
+            prev = merged.setdefault("measurements", {"context_ceiling":
+                                                     m.get("context_ceiling")})
+            prev["max_prompt_tokens_observed"] = max(
+                int(prev.get("max_prompt_tokens_observed", 0)),
+                int(m.get("max_prompt_tokens_observed", 0)))
             if merged["provenance"] != d.get("provenance", {}):
                 # Two species measured under different instrument state is not
                 # one result. Record it rather than averaging over it.

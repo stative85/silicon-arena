@@ -39,6 +39,10 @@ extends SceneTree
 
 const OP := preload("res://scripts/breach/canonical_operation.gd")
 const PARSER := preload("res://scripts/breach/output_parser.gd")
+const WorldStateScript := preload("res://scripts/breach/world_state.gd")
+const AgentStateScript := preload("res://scripts/breach/agent_state.gd")
+const BusScript := preload("res://scripts/breach/message_bus.gd")
+const OB := preload("res://scripts/breach/observation_builder.gd")
 
 const LM_BASE := "http://127.0.0.1:1234/v1"
 ## THE LIVE SEAM. One frozen union over all 16 operations -- the model SELECTS
@@ -66,6 +70,8 @@ var _live_schema_text := ""
 var _live_schema_sha := ""       ## sha256 of the bytes ON THE WIRE
 var _live_schema_file_sha := ""  ## sha256 of the file as stored
 var _prompt_sha := ""
+var _obs_cache := ""
+var _max_prompt_tokens := 0
 var _parser_sha := ""
 
 
@@ -79,7 +85,10 @@ func _init() -> void:
 	if _arms.has("LIVE") and not _load_live_schema():
 		quit(1)
 		return
-	_prompt_sha = _sha(_contract())
+	## The prompt contract hash MUST change when the observation format
+	## changes. That is the point of hashing it: a run against a different
+	## information surface is a different run, even with an identical schema.
+	_prompt_sha = _sha(_contract() + _observation())
 	_parser_sha = _sha_file("res://scripts/breach/output_parser.gd")
 	_http = HTTPRequest.new()
 	_http.timeout = REQUEST_TIMEOUT_S
@@ -206,6 +215,43 @@ func _contract() -> String:
 		+ "string. Do not include an \"operations\" list.")
 
 
+## THE REAL OBSERVATION PACKET. Mass added fields to it, so the seam is being
+## asked a different question than it was at qualification time even though
+## ACTION_SCHEMA_V1 is byte-identical. Qualifying against a hand-written prompt
+## would qualify a surface the arena does not use.
+##
+## Deliberately boring and ENCUMBERED: the actor carries mass 7 against capacity
+## 4, so carried_mass, move_cost and a co-located agent's burden are all present
+## and non-trivial in every cell.
+func _observation() -> String:
+	if not _obs_cache.is_empty():
+		return _obs_cache
+	var world = WorldStateScript.new()
+	world.round_id = "VERB_ACCESS_FIXTURE"
+	world.add_location("chamber_north", "Chamber North", ["vault_hall"])
+	world.add_location("vault_hall", "Vault Hall", ["chamber_north"])
+	world.add_door("door_1", "chamber_north", "vault_hall", false)
+	world.add_object("key_blue", "key", "chamber_north")
+	world.add_object("key_red", "key", "chamber_north")
+	world.add_object("scrap_a", "scrap", "chamber_north")
+	world.add_object("scrap_b", "scrap", "chamber_north")
+	world.add_terminal("terminal_1", "chamber_north", 2, 10)
+	world.add_vault_slot("slot_1")
+	var me = AgentStateScript.new("ACTOR", "fixture", "fixture", "fixture#1",
+		40, "chamber_north")
+	var them = AgentStateScript.new("OTHER", "fixture", "fixture", "fixture#2",
+		40, "chamber_north")
+	var agents := {"ACTOR": me, "OTHER": them}
+	for oid in ["scrap_a", "scrap_b", "key_blue"]:
+		world.pick_up(oid, "ACTOR")
+		me.add_object(oid)
+	world.pick_up("key_red", "OTHER")
+	them.add_object("key_red")
+	var obs: Dictionary = OB.build(world, agents, "ACTOR", BusScript.new(), [])
+	_obs_cache = JSON.stringify(obs, "	")
+	return _obs_cache
+
+
 func _task(op: String) -> String:
 	var req: Array = OP.required_fields(op)
 	var s := "Emit the operation %s." % op
@@ -247,7 +293,8 @@ func _schema(op: String) -> Dictionary:
 func _ask(model: String, op: String, arm: String) -> Dictionary:
 	var body := {"model": model,
 		"messages": [{"role": "user",
-			"content": _contract() + "\n\n" + _task(op)}],
+			"content": _contract() + "\n\nOBSERVATION:\n" + _observation()
+				+ "\n\n" + _task(op)}],
 		"max_tokens": MAX_TOKENS, "temperature": TEMPERATURE, "stream": false}
 	if arm == "SCHEMA":
 		body["response_format"] = {"type": "json_schema", "json_schema": {
@@ -281,7 +328,14 @@ func _ask(model: String, op: String, arm: String) -> Dictionary:
 		(res[3] as PackedByteArray).get_string_from_utf8())
 	if typeof(parsed) != TYPE_DICTIONARY or not parsed.has("choices"):
 		return {"transport": false, "raw": "", "latency_ms": ms}
-	return {"transport": true, "latency_ms": ms,
+	## CONTEXT FIT. The expanded observation has to survive the 2048 ceiling
+	## Section 0 was signed at. Measured from the backend's own accounting,
+	## never estimated from character counts.
+	var usage: Dictionary = parsed.get("usage", {})
+	var ptok := int(usage.get("prompt_tokens", 0))
+	if ptok > _max_prompt_tokens:
+		_max_prompt_tokens = ptok
+	return {"transport": true, "latency_ms": ms, "prompt_tokens": ptok,
 		"raw": str(parsed["choices"][0]["message"].get("content", ""))}
 
 
@@ -333,6 +387,7 @@ func _run() -> void:
 						"parse_failure": str(verdict["parse_failure"]),
 						"parse_detail": str(verdict["parse_detail"]),
 						"latency_ms": int(got.get("latency_ms", -1)),
+						"prompt_tokens": int(got.get("prompt_tokens", -1)),
 						"raw": str(got.get("raw", ""))})
 				row[op] = {"ok": ok_n, "n": _reps, "failures": fails}
 			matrix[arm + "/" + sid] = row
@@ -383,6 +438,15 @@ func _write(started: String, records: Array, matrix: Dictionary) -> void:
 		"arms": _arms,
 		## PROVENANCE. Everything that could change the result, hashed, so a
 		## later run can prove it measured the same thing or prove it did not.
+		## MEASUREMENTS ARE NOT PROVENANCE. max_prompt_tokens_observed varies by
+		## species because it IS a measurement; leaving it inside provenance made
+		## the serial driver report four of five species as measured under
+		## different instrument state. Provenance is identity -- what was run.
+		## Measurements are results -- what happened.
+		"measurements": {
+			"max_prompt_tokens_observed": _max_prompt_tokens,
+			"context_ceiling": _ctx,
+		},
 		"provenance": {
 			"live_schema_path": LIVE_SCHEMA_PATH,
 			"live_schema_wire_sha256": _live_schema_sha,
@@ -392,6 +456,7 @@ func _write(started: String, records: Array, matrix: Dictionary) -> void:
 			"parser_sha256": _parser_sha,
 			"temperature": TEMPERATURE,
 			"max_tokens": MAX_TOKENS,
+			"observation_in_prompt": true,
 			"generations_per_cell": 1,
 			"repair": false,
 			"retry": false,
