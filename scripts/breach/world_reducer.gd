@@ -19,8 +19,13 @@ const CO := CanonicalOperationScript
 
 ## Returns {ok, reason, effects: Array[String], vault_opened: bool}
 ## `agents` maps display_name -> AgentState.
+## causing_event_id is passed IN, never patched afterwards. The round allocates
+## the event id before calling this, so a created record is born with its final
+## ancestry reference: persisting -1 and repairing it later would invalidate
+## every hash taken in between.
 static func apply(world, agents: Dictionary, actor_name: String,
-		op: String, fields: Dictionary, bus) -> Dictionary:
+		op: String, fields: Dictionary, bus,
+		causing_event_id: int = -1) -> Dictionary:
 	var res := {"ok": false, "reason": "", "effects": [], "vault_opened": false}
 	if not agents.has(actor_name):
 		res["reason"] = "no such agent"
@@ -316,5 +321,6 @@ static func apply(world, agents: Dictionary, actor_name: String,
 					"object_id": sid, "kind": "shell",
 					"mass": world.object_mass(sid),
 					"location": actor.position, "tick": world.tick,
-					"cause": "energy_exhausted", "death_event_id": -1}
+					"cause": "energy_exhausted",
+					"causing_event_id": causing_event_id}
 	return res

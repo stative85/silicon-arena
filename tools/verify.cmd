@@ -107,6 +107,9 @@ call :check "scripts/breach/breach_selftest.gd"           "breach offline"      
 
 REM ---- STEP 1B: mass physics, and the information surface it changed -------
 call :check "tools/contract_isolation_selftest.gd"        "contract isolation"  "CONTRACT ISOLATION OK"
+call :check "tools/state_profile_selftest.gd"             "state profiles"      "STATE PROFILES OK"
+call :check "tools/flow_null_stability.gd"                "flow null stability" "NULL STABILITY OK"
+call :check "tools/flow_ledger_selftest.gd"               "flow mass ledger"    "FLOW LEDGER OK"
 call :check "tools/mass_contract_selftest.gd"             "mass contract"       "MASS CONTRACT OK"
 call :check "tools/mass_physics_qualify.gd"               "mass physics"        "MASS PHYSICS GREEN"
 

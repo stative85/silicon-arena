@@ -1,0 +1,53 @@
+{
+ "schema_version": 1,
+ "title": "STATE_HASH_PROFILES",
+ "note": "A hash profile says WHICH state is hashed. It is named by the round, never 'latest', never held globally. Adding flow fields to the existing payload unconditionally would have silently changed Step 1B's historical hash surface and quietly invalidated a signed result.",
+
+ "profiles": {
+  "BREACH_STATE_V1": {
+   "note": "Reproduces the Step 1B payload byte-for-byte. This profile is FROZEN: it is what every pre-FLOWSCAR4 artifact was hashed under, and a field may never be added to it. A new field means a new profile.",
+   "fields": ["round_id", "tick", "locations", "doors", "objects", "vault_slots", "vault_open", "vault_opened_at_tick"],
+   "includes_flow": false
+  },
+
+  "FLOWSCAR4_STATE_V1": {
+   "note": "Everything BREACH_STATE_V1 carries, plus every dynamic flow field. Without these two worlds differing only in accumulated material hash identically, and the counterfactual cannot see the thing it exists to measure.",
+   "fields": ["round_id", "tick", "locations", "doors", "objects", "vault_slots", "vault_open", "vault_opened_at_tick", "flow_channel", "flow_material", "flow_deposits"],
+   "includes_flow": true,
+   "flow_fields": {
+    "flow_channel": "ordered channel topology -- order is part of the state, because reversing it is a different world",
+    "flow_material": "material at every node, including nodes holding zero",
+    "flow_deposits": "the monotonic deposit counter, which is the ratchet state",
+    "shells_and_deposits": "carried inside `objects` as ordinary objects of kind shell and deposit -- they are matter, not a special table",
+    "pending_buffers": "none. flow_advance holds no state between calls; all in-flight material lives in flow_material."
+   }
+  }
+ },
+
+ "counterfactual_projections": {
+  "note": "A single complete state hash CANNOT prove 'unrelated state remains invariant', because the treatment is expected to change part of the state. Two projections are required and both are declared here rather than decided at analysis time.",
+
+  "causal_state_hash": {
+   "covers": ["flow_channel", "flow_material", "flow_deposits", "objects of kind shell", "objects of kind deposit", "objects lying at any channel node"],
+   "why_objects_at_channel_nodes": "Those are the affected affordances: what a later agent could pick up at an obstructed node is exactly what the scar changes."
+  },
+
+  "unrelated_state_hash": {
+   "covers": "every field of the profile payload NOT covered above: doors, vault slots, vault flags, locations, and all objects lying away from the channel",
+   "requirement": "This must be IDENTICAL between a run and its ancestor-removed replay. A difference here means the replay changed something the ancestor could not have caused, and the counterfactual is void."
+  },
+
+  "verdict_shape": {
+   "causal_state_hash": "differs, in the predicted direction",
+   "unrelated_state_hash": "identical",
+   "complete_state_hash": "differs"
+  },
+  "verdict_note": "All three conditions, every time. A causal difference with an unrelated difference is contamination, not causation. No difference anywhere is NO_EFFECT, which is a legitimate reportable outcome."
+ },
+
+ "binding": {
+  "STEP_1B": "BREACH_STATE_V1",
+  "FLOWSCAR4": "FLOWSCAR4_STATE_V1",
+  "refusal": "An unknown profile name, or a profile that does not match the one stamped in the regime, is REFUSED. The round does not start."
+ }
+}

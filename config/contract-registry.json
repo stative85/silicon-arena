@@ -29,5 +29,11 @@
    "flow_contract": 1,
    "note": "Requires shell and deposit kinds, which V1 does not declare. Under V1 both would be MASS_KIND_UNDECLARED and ignition would refuse -- the gate working correctly."
   }
+ },
+ "state_profiles": {
+  "1": {
+   "path": "config/state-profiles.v1.json",
+   "sha256": "58cc5ae0f841b31a3cf87c14e7179bc54033a00cd1a2c49d39d1f5c5e67125c0"
+  }
  }
 }

@@ -40,6 +40,9 @@ const END_MASS_CONTRACT_VIOLATION := "MASS_CONTRACT_VIOLATION"
 ## Also not a round outcome. The round was never built: the physics it asked
 ## for is missing, unknown, or does not hash to the registry.
 const END_CONTRACT_REFUSED := "CONTRACT_REFUSED"
+## Also not a round outcome. The books did not balance, or an agent died on a
+## path that is supposed to be impossible. No further tick may execute.
+const END_LEDGER_VIOLATION := "LEDGER_VIOLATION"
 
 var world
 var agents: Dictionary = {}
@@ -128,6 +131,9 @@ func _init(round_id: String, roster: Array, p_deciders: Dictionary,
 var mass_violations: Array = []
 var abort_reason: String = ""
 ## The physics this round named, and the hash of the file it actually got.
+## Populated only when the transactional ledger or the async-death guard
+## refused a tick. Empty on every healthy round.
+var ledger_violation: Dictionary = {}
 var mass_contract_version: int = 0
 var mass_contract_sha: String = ""
 ## The round's own contract object. Immutable, and never shared with another
@@ -190,9 +196,23 @@ func step() -> Dictionary:
 	ev.latency_ms = int(spoken.get("latency_ms", -1))
 	ev.generation_params = (spoken.get("params", {}) as Dictionary).duplicate()
 
+	## THE TRANSACTION OPENS. Everything from here to the ledger check is one
+	## committed turn: the action, the death and its shell, and the same-tick
+	## flow advance. The ledger is verified BEFORE the after-state hash, so a
+	## violating tick can never be hashed, recorded, or followed by another.
+	var mass_before: int = world.accounted_mass()
+	var alive_before := {}
+	for nm in agents.keys():
+		alive_before[str(nm)] = bool(agents[nm].alive)
+	var created: Array = []
+
 	if bool(parsed["ok"]):
 		var out := WorldReducerScript.apply(world, agents, actor_name,
-			ev.operation, ev.fields, bus)
+			ev.operation, ev.fields, bus, ev.event_id)
+		if out.has("shell_appeared"):
+			created.append(out["shell_appeared"])
+		if out.has("mass_conversion"):
+			ev.generation_params["mass_conversion"] = out["mass_conversion"]
 		ev.accepted = bool(out["ok"])
 		ev.refusal_reason = str(out["reason"])
 		ev.effects = (out["effects"] as Array).duplicate()
@@ -203,6 +223,76 @@ func step() -> Dictionary:
 		## NO_OP: the turn is consumed, no energy charged, raw text retained.
 		ev.accepted = false
 		ev.refusal_reason = "invalid output: " + ev.parse_failure
+
+	## SAME-TICK FLOW. Exactly one advance per committed turn, here and nowhere
+	## else, and AFTER the death so a shell obstructs on the tick it appeared.
+	## Inherited ordering, read out of the closed FLOWSCAR3 regime.
+	if not world.flow_channel.is_empty():
+		var fx: Dictionary = world.flow_advance(world.tick)
+		var fe: Array = fx["effects"]
+		if not fe.is_empty():
+			ev.effects.append_array(fe)
+			ev.generation_params["flow_advance"] = fe.duplicate()
+		for rec in (fx["created"] as Array):
+			var r: Dictionary = rec
+			r["causing_event_id"] = ev.event_id
+			created.append(r)
+
+	## THE ASYNC-DEATH GUARD, over EVERY agent across the whole transaction.
+	## The only permitted alive -> dead transition is the current actor during
+	## its own reducer spend. Any other death means an asynchronous drain
+	## exists, the inline shell transition is no longer equivalent to
+	## FLOWSCAR3's sweep, and the regime is void.
+	var async_deaths: Array = []
+	for nm in agents.keys():
+		var was: bool = bool(alive_before.get(str(nm), true))
+		var now: bool = bool(agents[nm].alive)
+		if was and not now and str(nm) != actor_name:
+			async_deaths.append(str(nm))
+	if not async_deaths.is_empty():
+		ledger_violation = {"violation": "ASYNC_DEATH_PATH_VIOLATION",
+			"agents": async_deaths, "tick": world.tick,
+			"event_id": ev.event_id}
+		abort_reason = "ASYNC_DEATH_PATH_VIOLATION: %s died without acting" 			% ", ".join(async_deaths)
+		push_error(abort_reason)
+		ended = true
+		end_reason = END_LEDGER_VIOLATION
+		return {}
+
+	## THE MASS LEDGER. Over the whole committed turn:
+	##
+	##     delta accounted_mass == sum of mass named by creation events
+	##
+	## Nothing unnamed may move it. Multiple creations in one tick must sum;
+	## a duplicated object id is a violation rather than a second unit.
+	var mass_after: int = world.accounted_mass()
+	var declared := 0
+	var seen := {}
+	var dupes: Array = []
+	for rec in created:
+		var r: Dictionary = rec
+		var oid := str(r.get("object_id", ""))
+		if seen.has(oid):
+			dupes.append(oid)
+		seen[oid] = true
+		declared += int(r.get("mass", 0))
+	if not dupes.is_empty() or (mass_after - mass_before) != declared:
+		ledger_violation = {"violation": "MASS_LEDGER_MISMATCH",
+			"tick": world.tick, "event_id": ev.event_id,
+			"accounted_before": mass_before, "accounted_after": mass_after,
+			"delta": mass_after - mass_before, "declared": declared,
+			"duplicate_object_ids": dupes, "creations": created.duplicate()}
+		abort_reason = ("MASS_LEDGER_MISMATCH at tick %d: delta %d, declared %d"
+			% [world.tick, mass_after - mass_before, declared])
+		if not dupes.is_empty():
+			abort_reason += ", duplicate ids " + str(dupes)
+		push_error(abort_reason)
+		ended = true
+		end_reason = END_LEDGER_VIOLATION
+		return {}
+
+	if not created.is_empty():
+		ev.generation_params["mass_created"] = created.duplicate()
 
 	ev.after_state_hash = state_hash()
 	log.append(ev)

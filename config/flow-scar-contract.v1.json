@@ -1,0 +1,176 @@
+{
+ "schema_version": 1,
+ "title": "FLOW_SCAR_CONTRACT_V1",
+ "regime": "FLOWSCAR4",
+ "note": "Predeclared BEFORE execution. Nothing in this file may be changed to rescue a result. A parameter changed after seeing a run is not a parameter, it is a conclusion wearing a number.",
+
+ "relationship_to_flowscar3": {
+  "status": "FLOWSCAR3 IS PERMANENTLY CLOSED AND IS NOT INHERITED",
+  "reason": "Its result stands inside its own frozen breach-work regime. It cannot transfer here: that regime carries a 33-constant vocabulary including PUSH and DRAG, a different observation surface, batteries and capacitors, residue traces, and a different mass law. This repo's signed ACTION_SCHEMA_V1 has sixteen verbs and no PUSH.",
+  "compatibility_claim": "NONE. No FLOWSCAR4 result may be compared with, averaged into, or described as reproducing FLOWSCAR3.",
+  "what_is_inherited": "Constants only, unchanged, so that no number here was chosen after seeing what the physics needed."
+ },
+
+ "frozen_constants": {
+  "FLOW_SOURCE_RATE": 2,
+  "FLOW_BASE_CAPACITY": 4,
+  "FLOW_MASS_BLOCK": 1,
+  "FLOW_DEPOSIT_THRESHOLD": 6,
+  "FLOW_DEPOSIT_MASS": 1,
+  "SHELL_MASS": 8,
+  "capacity_law": "flow_capacity_at(node) = max(0, FLOW_BASE_CAPACITY - FLOW_MASS_BLOCK * floor_mass_at(node))",
+  "source": "Lifted unchanged from the closed FLOWSCAR3 regime. FLOW_SOURCE_RATE in particular was derived there from a null-stability requirement that existed independently of any result, and it does not move if a FLOWSCAR4 run disappoints."
+ },
+
+ "the_six_questions": {
+  "does_a_dead_agent_remain_an_obstructing_shell": "Yes. The death transition that already spills inventory also deposits one object of kind 'shell' at the agent's final location, atomically, in the same host-authored event.",
+  "shell_intrinsic_mass": "8, declared in MASS_CONTRACT_V2 like any other kind. A shell is ordinary matter with no special case anywhere in the reducer.",
+  "how_it_obstructs": "By the one generic capacity law above, over ordinary floor mass. The law does not know what the mass is. A shell, a pile of scrap and a deposit of equal mass obstruct identically. There is no DAM operation and no ANCHOR type.",
+  "can_flow_relocate_it": "No. Flow moves flow material; it never moves objects. A shell leaves a channel node only because an agent TAKEs it and DROPs it elsewhere, paying the encumbrance cost. Flow that could clear its own obstruction would erase the phenomenon being measured.",
+  "what_observations_reveal": "An agent at a channel node sees that node's flow material, that node's current capacity, and the objects lying there with their masses -- the same per-object mass every other location already exposes. It is NOT told that the node is a channel, that capacity is reduced, that a pool is upstream of an obstruction, or that anything is blocked. Those are analyst words.",
+  "the_causal_event": "There is no event linking death to obstruction to redistribution, and there must not be. Death records a shell appearing. Flow records material moving and deposits forming. The link between them is the capacity law acting on ordinary mass, reconstructed by replay, never asserted by the host. A host event saying 'this death obstructed the channel' would put the finding into the instrument."
+ },
+
+ "channel": {
+  "topology": ["west_pipe", "commons_north", "vault_ring"],
+  "note": "Three nodes, head to tail, ported unchanged from FLOWSCAR3. One flow resource, one small subgraph, one capacity law, no flow objective.",
+  "advance": "flow_advance() runs ONCE per committed turn and nowhere else. Material moves tail-first so nothing traverses two nodes in one tick; each crossing is limited by capacity at BOTH ends, so material piles BEHIND an obstruction rather than at it."
+ },
+
+ "host_knows": ["mass", "capacity", "location", "flow material", "energy"],
+ "host_does_not_know": ["dam", "blockage", "inheritance", "resource manipulation", "infrastructure", "opportunity", "cooperation", "sabotage", "scar"],
+
+ "null_stability_bar": {
+  "note": "Passed BEFORE any treatment counts. A mechanism can be locally correct and experimentally useless if its UNTREATED dynamics collapse before the treatment arrives.",
+  "ticks": 200,
+  "requires": [
+   "source_rate below the unobstructed minimum capacity",
+   "zero spontaneous deposits",
+   "all channel nodes remain transmissive",
+   "no capacity collapse"
+  ],
+  "enforced_by": "selftest, offline, before any live round"
+ },
+
+ "run_budget": {
+  "status": "PREREGISTERED AND CONFIRMED by Michael Goings, 2026-09-22",
+  "rounds": 3,
+  "ticks_per_round": 140,
+  "stop_condition": "Execution stops at the declared round count whatever the outcome. A rung-3 witness does not buy another round to strengthen it, and zero witnesses do not buy another round to find one. If three rounds produce no qualifying ancestor, that is the reported result.",
+  "no_one_more_round": "The phrase this clause exists to forbid is 'maybe one more flow round'."
+ },
+
+ "salvage": {
+  "status": "OUT. SHELL_SALVAGE is not part of FLOWSCAR4.",
+  "flowscar3_value_not_ported": 30,
+  "reason": "A shell is ordinary obstructing mass, not an energy pickup that pays an agent to clear it. Leaving salvage out makes a later rung-4/5 claim more informative, not less: if an agent moves a shell, the instrument did not attach an immediate reward to moving it. Attaching one would make 'B cleared the obstruction' indistinguishable from 'B collected 30 energy'."
+ },
+
+ "mass_source_ledger": {
+  "invariant": "accounted_mass(t) = initial_accounted_mass + sum(recorded shell mass) + sum(recorded deposit mass)",
+  "per_tick_rule": "For every tick, the change in accounted_mass must EXACTLY equal the mass named by creation events in that same tick. No operation and no unnamed transition may alter it.",
+  "enforced_by": "selftest over every tick of every round, offline and live"
+ },
+
+ "host_events": {
+  "SHELL_APPEARED": {
+   "cause": "an agent reached zero energy",
+   "creates_mass": true,
+   "fields": ["object_id", "kind", "mass", "location", "tick", "cause", "death_event_id"],
+   "agent_choosable": false,
+   "shell_id_scheme": "shell_<agent name, lowercased>",
+   "shell_id_is_safe_only_because": "FLOWSCAR4 permits exactly one lifecycle per agent and no revival. A name-derived id would collide the moment an agent could die twice. SHELL_APPEARED therefore also carries death_event_id, which is unique regardless of the id scheme. Any future resurrection mechanic REQUIRES A NEW REGIME and a new shell-id scheme; it may not be added to FLOWSCAR4."
+  },
+  "FLOW_DEPOSIT": {
+   "cause": "accumulated flow material crossed FLOW_DEPOSIT_THRESHOLD at a node",
+   "creates_mass": true,
+   "fields": ["object_id", "kind", "mass", "location", "tick", "cause"],
+   "agent_choosable": false
+  },
+  "DEATH_SPILL": {
+   "cause": "an agent reached zero energy while holding objects",
+   "creates_mass": false,
+   "note": "Transfers existing inventory to the floor. It creates nothing. Shell appearance is a SEPARATE event with its own record, so a reader can never mistake a spilled key for created matter.",
+   "agent_choosable": false
+  },
+  "forbidden": "No synthetic 'obstruction caused' event, and nothing equivalent under another name. The causal link from death to obstruction to redistribution must remain reconstructable ONLY through state, the capacity law, and replay. An event asserting the link would put the finding into the instrument."
+ },
+
+ "lifecycle": {
+  "one_death_per_agent": true,
+  "revival": false,
+  "note": "A dead agent is never scheduled, never acts, and never returns. These two flags are what make a name-derived shell id sound."
+ },
+
+ "death_path": {
+  "sole_path": "the acting agent's own spend inside WorldReducer.apply",
+  "equivalence_to_flowscar3": "FLOWSCAR3 created shells in a post-action sweep over ALL agents, because agents there could also die from metabolism drain. This repo has no asynchronous drain, so the acting agent is the only agent who can die on a given tick and the inline transition is equivalent -- AND ATOMIC WITH THE DEATH, which V2 requires.",
+  "guard": "This equivalence holds only while no non-acting agent can lose energy. An offline guard proves the acting agent's spend is the sole death path. If metabolism or any asynchronous drain is later introduced, that guard FAILS and must stay failing until sweep semantics are restored.",
+  "enforced_by": "tools/flow_ledger_selftest.gd"
+ },
+
+ "tick_ordering": {
+  "frozen": "committed action -> death/shell -> same-tick flow_advance -> state hash -> tick increment",
+  "inherited_from": "FLOWSCAR3 breach_round.step()",
+  "consequence": "A shell created by a death obstructs the channel during the SAME tick, not the following one. This was read out of the closed regime, not decided here: deciding it would have given every ancestor one tick less leverage and quietly produced a different regime.",
+  "flow_advance_call_sites": 1,
+  "conduct_advance": "ABSENT. FLOWSCAR3 ran an autonomous conduction phase for batteries and capacitors in the same slot as flow. FLOWSCAR4 has no batteries, no capacitors and no conduction. Declared explicitly rather than left implied: a reader comparing the two orderings must see the removal, not infer it."
+ },
+
+ "predeclared_before_first_live_tick": [
+  "round seeds",
+  "roster order",
+  "starting-state hash"
+ ],
+
+ "denominator_required": [
+  "total rounds executed",
+  "total shells created",
+  "shells that landed on a channel node",
+  "shells with causal leverage under the pre-treatment gate",
+  "rung-3 witnesses"
+ ],
+ "denominator_note": "Reported in full, always, including the rounds that produced nothing. FLOWSCAR3's honest rate was 13 shells, 2 on channel, 1 leveraged, 1 witness. A result quoted without its denominator is advertising.",
+
+ "causal_leverage_gate": {
+  "evaluated_on": "the PRE-TREATMENT state, before the ancestor event",
+  "conditions": ["C0 > 0", "C1 < C0", "supply reaches the node", "a downstream node can receive"],
+  "note": "A shell landing on a saturated or dead channel has no leverage and is reported as NO_CAUSAL_LEVERAGE, not as a failure of the physics."
+ },
+
+ "counterfactual": {
+  "method": "Remove one ancestor event at time tau, strip its descendants at or after tau, replay deterministically from tau.",
+  "pass_condition": "The later affordance that the scar produced disappears, AND unrelated state is invariant.",
+  "note": "A stochastic rerun is NOT a counterfactual. The replay is deterministic reducer replay with no model in the loop."
+ },
+
+ "claim_ladder": {
+  "1": "state persisted",
+  "2": "state altered autonomous physics",
+  "3": "physics altered a later affordance",
+  "4": "a later agent observed the altered state",
+  "5": "a later agent used the altered affordance",
+  "6": "closed ecological loop",
+  "target": "FLOWSCAR4 succeeds at rung 3. Rungs 4 and 5 are a separate behavioural claim with their own witness and are not to be collapsed into this one. Only rung 6 buys the word recursive."
+ },
+
+ "two_result_classes": {
+  "mechanical_causation": "proven by deterministic reducer replay",
+  "behavioral_consequence": "proven by repeated intervention under the frozen regime",
+  "the_smuggle_this_blocks": "proven mechanically: the shell changed flow. smuggled in free: therefore B exploited the dam."
+ },
+
+ "regime_identity": {
+  "note": "Stamped into every artifact. A run whose stamped hashes do not match the loaded files is REFUSED, not reconciled.",
+  "stamps": [
+   "action_schema_file_sha256",
+   "action_schema_wire_sha256",
+   "prompt_contract_sha256",
+   "mass_contract_v2_sha256",
+   "flow_scar_contract_sha256",
+   "world_reducer_sha256",
+   "roster_sha256",
+   "git_commit"
+  ]
+ }
+}
