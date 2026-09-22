@@ -19,10 +19,12 @@ extends SceneTree
 ##    would be about that sensor.
 
 const MC := preload("res://scripts/breach/mass_contract.gd")
+const CO := preload("res://scripts/breach/canonical_operation.gd")
 const WorldStateScript := preload("res://scripts/breach/world_state.gd")
 const AgentStateScript := preload("res://scripts/breach/agent_state.gd")
 const BusScript := preload("res://scripts/breach/message_bus.gd")
 const OB := preload("res://scripts/breach/observation_builder.gd")
+const RoundScript := preload("res://scripts/breach/breach_round.gd")
 const Layout := preload("res://scripts/breach/arena_layout.gd")
 
 const CONTRACT_PATH := "res://config/mass-contract.v1.json"
@@ -103,17 +105,38 @@ func _init() -> void:
 		not c.has("capacity_by_species") and not c.has("strength_by_species"))
 
 	## HOST-AUTHORED EVENTS ARE NOT VERBS.
-	## Case-insensitive: the contract writes "NOT a verb" for emphasis in one
-	## rule and "not a verb" in the other, and a tooth that depends on which is
-	## a tooth that bites the prose instead of the physics.
-	var ds := str(c.get("death_spill_rule", "")).to_lower()
-	var mcv := str(c.get("mass_conversion_event", "")).to_lower()
-	ck("the contract states DEATH_SPILL is host-authored and not a verb",
-		ds.contains("not a verb") and ds.contains("action_schema_v1"))
-	ck("the contract states MASS_CONVERSION is host-authored and not a verb",
-		mcv.contains("not a verb") and mcv.contains("action_schema_v1"))
+	## NO PROSE MATCHING. An earlier version of this file searched the contract's
+	## sentences for "not a verb", first case-sensitively and then case-
+	## insensitively. Both were tests of the wording: rephrasing a comment could
+	## turn the gate green or red without changing one rule of physics.
+	##
+	## The host-authored event names are now DATA in the contract, and they are
+	## asserted directly against the canonical vocabulary.
+	var host_events: Array = MC.host_authored_events()
+	ck("the contract declares its host-authored events as data %s"
+		% str(host_events), not host_events.is_empty())
+	for ev in host_events:
+		var name := str(ev)
+		ck("%s is absent from CO.ALL" % name, not CO.ALL.has(name))
+		ck("%s is absent from CO.AGENT_CHOOSABLE" % name,
+			not CO.AGENT_CHOOSABLE.has(name))
+	## And the events the reducer actually emits are exactly those, no others.
+	for name in ["DEATH_SPILL", "MASS_CONVERSION"]:
+		ck("%s is declared in host_authored_events" % name,
+			host_events.has(name))
+
+	## UNDECLARED KIND IS A VIOLATION, NOT A WEIGHT.
+	ck("an undeclared kind returns MASS_KIND_UNDECLARED, not 0",
+		MC.mass_of_kind("no_such_kind") == MC.MASS_KIND_UNDECLARED)
+	ck("MASS_KIND_UNDECLARED is not a plausible mass",
+		MC.MASS_KIND_UNDECLARED < 0)
+	ck("is_declared refuses an unknown kind", not MC.is_declared("no_such_kind"))
+	ck("is_declared accepts a known kind", MC.is_declared("key"))
+	ck("the contract names the policy",
+		str(c.get("undeclared_kind_policy", "")) == "MASS_KIND_UNDECLARED")
 
 	_observation_surface()
+	_undeclared_kind_sabotage()
 
 	print("")
 	if _fail == 0:
@@ -186,3 +209,74 @@ func _observation_surface() -> void:
 		if str(e.get("entity", "")) == "ALSO":
 			shown = int(e.get("visible_carried_mass", -1))
 	ck("a co-located agent's carried mass IS exposed (%d)" % shown, shown == 1)
+
+
+## SABOTAGE: a world containing an object whose kind has no declared mass.
+##
+## The offline drift check above proves the CURRENT fixtures are declared. It
+## cannot prove that an undeclared kind introduced later would be caught, and
+## "would silently weigh zero" was exactly the hole. So a violating world is
+## constructed on purpose and the refusal is demonstrated rather than asserted.
+func _undeclared_kind_sabotage() -> void:
+	print("")
+	print("  -- sabotage: an object whose kind has no declared mass --")
+	var world = WorldStateScript.new()
+	world.add_location("room_a", "Room A", [])
+	world.add_object("key_1", "key", "room_a")
+	world.add_object("anvil_1", "anvil", "room_a")      ## undeclared kind
+
+	var before := JSON.stringify(world.to_dict())
+
+	var violations: Array = MC.validate_world(world)
+	ck("the validator reports a violation", violations.size() == 1)
+	if violations.size() == 1:
+		var v: Dictionary = violations[0]
+		ck("  the violation is MASS_KIND_UNDECLARED",
+			str(v["violation"]) == "MASS_KIND_UNDECLARED")
+		ck("  it names the object id (%s)" % str(v["object"]),
+			str(v["object"]) == "anvil_1")
+		ck("  it names the kind (%s)" % str(v["kind"]),
+			str(v["kind"]) == "anvil")
+	ck("the declared object is not flagged",
+		not JSON.stringify(violations).contains("key_1"))
+	ck("its mass is the violation sentinel, never 0",
+		world.object_mass("anvil_1") == MC.MASS_KIND_UNDECLARED)
+	ck("world hash byte-identical after validation",
+		JSON.stringify(world.to_dict()) == before)
+
+	## AND THE ROUND MUST REFUSE TO START. A validator nobody calls is not a
+	## gate, so this drives the real ignition path.
+	var rd = RoundScript.new("SABOTAGE_ROUND", [{
+		"display_name": "ALPHA", "model_id": "fixture",
+		"species_id": "fixture", "instance_id": "fixture#1"}], {}, 10)
+	## The real layout is declared, so the round above starts clean. Inject the
+	## violation into its built world and re-validate through the same call the
+	## ignition path uses.
+	rd.world.add_object("anvil_2", "anvil", rd.world.locations.keys()[0])
+	var post: Array = MC.validate_world(rd.world)
+	ck("a violation injected into a real built world is caught",
+		post.size() == 1 and str(post[0]["kind"]) == "anvil")
+
+	## THE REAL IGNITION PATH, not a simulation of it. A violating world is
+	## handed to the round constructor, which must refuse before a tick.
+	var sabotaged = WorldStateScript.new()
+	sabotaged.add_location("room_a", "Room A", [])
+	sabotaged.add_object("key_1", "key", "room_a")
+	sabotaged.add_object("anvil_3", "anvil", "room_a")
+	var bad = RoundScript.new("SABOTAGE_ROUND_2", [{
+		"display_name": "ALPHA", "model_id": "fixture",
+		"species_id": "fixture", "instance_id": "fixture#1"}], {}, 10,
+		sabotaged)
+	ck("_init refused to start the round", bad.ended)
+	ck("it recorded the violation", bad.mass_violations.size() == 1)
+	ck("the abort reason names the object and the kind (%s)"
+		% bad.abort_reason,
+		bad.abort_reason.contains("anvil_3") and bad.abort_reason.contains("anvil"))
+	var world_before := JSON.stringify(bad.world.to_dict())
+	var ev: Dictionary = bad.step()
+	ck("step() produces no event once ignition has refused", ev.is_empty())
+	ck("no observation was emitted", not ev.has("observation"))
+	ck("world hash byte-identical after the refused step",
+		JSON.stringify(bad.world.to_dict()) == world_before)
+	ck("the end reason is MASS_CONTRACT_VIOLATION, not a round outcome",
+		bad.end_reason == RoundScript.END_MASS_CONTRACT_VIOLATION)

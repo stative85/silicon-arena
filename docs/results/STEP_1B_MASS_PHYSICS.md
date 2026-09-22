@@ -7,7 +7,8 @@ straight into `WorldReducer.apply()`. **No model is involved.**
 **Schema:** `ACTION_SCHEMA_V1` untouched. Step 1B adds no verb.
 
 ```
-  checks 99, failures 0        MASS PHYSICS GREEN
+  checks 99, failures 0        MASS PHYSICS GREEN      (mass_physics_qualify)
+  MASS CONTRACT OK                                     (mass_contract_selftest)
 ```
 
 This says nothing whatever about any species. The species half is claim 2,
@@ -128,19 +129,73 @@ where a leak would hide; this is a ledger entry instead.
 
 Two identical injected sequences produce one world hash.
 
-## The drift tooth
+## The drift tooth, and two false-green paths closed after first review
 
 `tools/mass_contract_selftest.gd` → `MASS CONTRACT OK`. It checks that the
 accessors return the file rather than a drifted copy, that the gradient is
-flat-then-linear as arithmetic, that **every kind in the actually-built arena
-has a declared mass** (an undeclared kind would silently weigh nothing), that
-capacity is identical across species with no per-species strength field
-admitted, and that both host-authored events are declared not-verbs.
+flat-then-linear as arithmetic, that capacity is identical across species with
+no per-species strength field admitted, and that every kind in the built arena
+has a declared mass.
 
-It caught its own first failure: the check searched for `"not a verb"` while the
-contract writes `"NOT a verb"` for emphasis. The check was fixed, not the
-contract — a tooth that depends on capitalisation bites the prose instead of the
-physics.
+The first version of this gate shipped two ways to be falsely green. Both were
+caught in review, before signing, and both are closed.
+
+**1. The gate read human prose.** It searched the contract's sentences for
+`"not a verb"` — first case-sensitively, then, after that failed, case-
+insensitively. Both were tests of the wording: rephrasing a comment could turn
+the gate green or red without changing one rule of physics. The contract now
+declares `host_authored_events` as **data**, and the gate asserts each name
+directly against `CO.ALL` and `CO.AGENT_CHOOSABLE`. Nothing reads a sentence.
+
+**2. An undeclared kind weighed zero.** `mass_of_kind` returned `0` for an
+unknown kind. Zero is a legitimate mass — a feather is not a bug — so a contract
+gap was indistinguishable from a light object and could travel the whole reducer
+as a valid number. The offline check only proved the *current* fixtures were
+declared; it could not prove a kind introduced later would be caught.
+
+Now:
+
+- `mass_of_kind` returns `MASS_KIND_UNDECLARED` (-1), which no arithmetic can
+  mistake for a weight
+- `MassContract.validate_world()` returns one violation per offending object,
+  naming id and kind
+- `BreachRound._init` validates **every object at ignition** and refuses:
+  `ended = true`, `end_reason = MASS_CONTRACT_VIOLATION`, before any observation
+  is built and before any tick
+
+## Sabotage: the refusal is demonstrated, not asserted
+
+A world containing `anvil_1` of undeclared kind `anvil` is constructed on
+purpose:
+
+```
+  ok   the validator reports a violation
+  ok     the violation is MASS_KIND_UNDECLARED
+  ok     it names the object id (anvil_1) and the kind (anvil)
+  ok   the declared object is not flagged
+  ok   its mass is the violation sentinel, never 0
+  ok   world hash byte-identical after validation
+
+  ok   _init refused to start the round
+  ok   it recorded the violation
+  ok   the abort reason names the object and the kind
+       MASS_KIND_UNDECLARED: anvil_3 (kind 'anvil')
+  ok   step() produces no event once ignition has refused
+  ok   no observation was emitted
+  ok   world hash byte-identical after the refused step
+  ok   the end reason is MASS_CONTRACT_VIOLATION, not a round outcome
+```
+
+The last block drives the **real** `BreachRound._init`, not a re-implementation
+of it. `_init` gained an optional `p_world` parameter for exactly this: the
+canonical layout would never produce a violating world, so without it the
+ignition refusal would be a branch that had never executed, and a gate whose
+abort path has never run is not a gate. Production rounds pass nothing and get
+the canonical layout.
+
+`MASS_CONTRACT_VIOLATION` is deliberately not a round outcome. The round did not
+end — it never started, because the world it was built on does not satisfy the
+frozen contract.
 
 ## Wired into the gate
 

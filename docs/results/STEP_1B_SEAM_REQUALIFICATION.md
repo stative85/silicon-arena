@@ -92,6 +92,29 @@ stops being evidence — the same failure as the wire-versus-file hash corrected
 before Section 0 was signed. The run above is the clean re-run, with the
 mismatch field absent.
 
+## Runtime hardening after qualification, and why this run stands
+
+Two runtime holes were closed after this matrix was measured: the gate's prose
+matching was replaced with structural assertions against the canonical
+vocabulary, and an undeclared object kind became an explicit
+`MASS_KIND_UNDECLARED` violation validated at ignition rather than a silent
+mass of zero.
+
+The 240/240 above was **not** re-run, and that is a claim about bytes rather
+than a convenience. Re-measured after the hardening:
+
+```
+prompt_contract_sha256   bc7d77d5…   IDENTICAL
+live_schema_wire_sha256  0c0851f0…   IDENTICAL
+live_schema_file_sha256  971592dd…   IDENTICAL
+```
+
+Nothing the model saw changed: not the observation bytes, not the schema, not
+the parser, not a generation-affecting parameter. The hardening touched
+`mass_contract.gd`, `breach_round.gd` ignition, and the offline gate — none of
+which reaches the request. Had any of those three hashes moved, the run would
+have been repeated.
+
 ## What this does and does not establish
 
 **Established:** with mass in the observation, all five species still select

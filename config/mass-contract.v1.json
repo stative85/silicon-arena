@@ -19,6 +19,10 @@
  "accounted_mass": "active_mass + consumed_mass. This total must always equal the initial total mass of the world.",
  "use_terminal_rule": "USE_TERMINAL transfers scrap from active mass to consumed mass. The object REMAINS IN STATE with holder=consumed, retains its immutable kind and mass, and can never re-enter play. active_mass may therefore decrease; accounted_mass may not. A host-authored MASS_CONVERSION event records object id, mass, terminal, agent and energy gained, so consumption is an explicit ledger entry rather than a conservation exception.",
  "mass_conversion_event": "MASS_CONVERSION is host-authored. It is not a verb, not a turn, and never enters ACTION_SCHEMA_V1.",
+ "host_authored_events": ["DEATH_SPILL", "MASS_CONVERSION"],
+ "host_authored_events_note": "Structured, not prose. The gate asserts each of these is absent from CO.ALL and CO.AGENT_CHOOSABLE. A check that reads the sentences above would be testing the wording.",
+ "undeclared_kind_policy": "MASS_KIND_UNDECLARED",
+ "undeclared_kind_note": "An object kind with no declared mass is a CONTRACT VIOLATION, never mass 0. Zero is a legitimate weight and would make a gap indistinguishable from a feather. Every object is validated at ignition and the round aborts before any state can advance.",
  "observation_exposes": [
   "mass of each visible object",
   "this agent's carry capacity",

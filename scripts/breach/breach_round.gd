@@ -25,6 +25,7 @@ const WorldReducerScript := preload("res://scripts/breach/world_reducer.gd")
 const ObservationBuilderScript := preload("res://scripts/breach/observation_builder.gd")
 const OutputParserScript := preload("res://scripts/breach/output_parser.gd")
 const TurnSchedulerScript := preload("res://scripts/breach/turn_scheduler.gd")
+const MassContractScript := preload("res://scripts/breach/mass_contract.gd")
 const MessageBusScript := preload("res://scripts/breach/message_bus.gd")
 const ReplayLogScript := preload("res://scripts/breach/replay_log.gd")
 const EventRecordScript := preload("res://scripts/breach/event_record.gd")
@@ -33,6 +34,9 @@ const CO := CanonicalOperationScript
 const END_VAULT_OPENED := "VAULT_OPENED"
 const END_NO_AGENT_CAN_ACT := "NO_AGENT_CAN_ACT"
 const END_TIME_HORIZON := "TIME_HORIZON"
+## Not a round outcome. The round never started: the world it was built on does
+## not satisfy MASS_CONTRACT_V1.
+const END_MASS_CONTRACT_VIOLATION := "MASS_CONTRACT_VIOLATION"
 
 var world
 var agents: Dictionary = {}
@@ -50,10 +54,18 @@ var end_reason: String = ""
 ## `roster` is Array[{display_name, model_id, species_id, instance_id}] in
 ## canonical order. Order here is roster order, NOT turn order -- the scheduler
 ## rotates initiative so that roster position confers no advantage.
+## p_world exists so a FIXTURE can drive the real ignition path with a world the
+## canonical layout would never produce -- an undeclared object kind, say. It is
+## not a production parameter: every real round passes nothing and gets the
+## canonical layout. Without it the ignition refusal below would be an untested
+## branch, and a gate whose abort path has never executed is not a gate.
 func _init(round_id: String, roster: Array, p_deciders: Dictionary,
-		p_horizon_ticks: int = 240) -> void:
-	world = WorldStateScript.new()
-	ArenaLayoutScript.build(world, round_id)
+		p_horizon_ticks: int = 240, p_world = null) -> void:
+	if p_world == null:
+		world = WorldStateScript.new()
+		ArenaLayoutScript.build(world, round_id)
+	else:
+		world = p_world
 	bus = MessageBusScript.new()
 	log = ReplayLogScript.new(round_id)
 	deciders = p_deciders
@@ -69,6 +81,30 @@ func _init(round_id: String, roster: Array, p_deciders: Dictionary,
 			ArenaLayoutScript.START_ENERGY, ArenaLayoutScript.spawn_of(nm))
 	scheduler = TurnSchedulerScript.new(names)
 	log.declare_roster(agents)
+
+	## IGNITION VALIDATION. Every object in the built world must have a declared
+	## mass before the round may advance one tick. An undeclared kind is a
+	## CONTRACT VIOLATION, not a light object, and letting it through would mean
+	## running physics that the frozen contract does not describe.
+	##
+	## The abort happens here, before any observation is built and before any
+	## turn is taken, so a violating world produces no round state at all --
+	## nothing to misread later as a short or unlucky round.
+	var violations: Array = MassContractScript.validate_world(world)
+	if not violations.is_empty():
+		mass_violations = violations
+		var parts: Array = []
+		for v in violations:
+			parts.append("%s (kind '%s')" % [str(v["object"]), str(v["kind"])])
+		abort_reason = "MASS_KIND_UNDECLARED: " + ", ".join(parts)
+		push_error(abort_reason)
+		ended = true
+		end_reason = END_MASS_CONTRACT_VIOLATION
+
+
+## Populated only when ignition validation refused to start the round.
+var mass_violations: Array = []
+var abort_reason: String = ""
 
 
 func _agents_dict() -> Dictionary:

@@ -49,12 +49,47 @@ static func move_cost_base() -> int:
 	return int(_load().get("move_cost_base", 4))
 
 
-## An unknown kind weighs nothing rather than guessing. A kind that reaches the
-## world without a declared mass is a contract gap, and the selftest is what
-## catches it -- silently inventing a weight here would hide exactly that.
+## AN UNDECLARED KIND IS A VIOLATION, NOT A WEIGHT.
+##
+## This returned 0 once. Zero is a legitimate mass -- a feather is not a bug --
+## so a kind with no declared mass was indistinguishable from a light object,
+## and a contract gap could travel the whole reducer as a valid number. It now
+## returns MASS_KIND_UNDECLARED, which no arithmetic can mistake for a weight.
+const MASS_KIND_UNDECLARED := -1
+
+
+static func is_declared(kind: String) -> bool:
+	return (_load().get("mass_by_kind", {}) as Dictionary).has(kind)
+
+
 static func mass_of_kind(kind: String) -> int:
 	var by: Dictionary = _load().get("mass_by_kind", {})
-	return int(by.get(kind, 0))
+	if not by.has(kind):
+		return MASS_KIND_UNDECLARED
+	return int(by[kind])
+
+
+## Host-authored event names, read from the contract as DATA. The gate asserts
+## these against the canonical vocabulary directly; nothing reads the prose.
+static func host_authored_events() -> Array:
+	var out: Array = (_load().get("host_authored_events", []) as Array).duplicate()
+	out.sort()
+	return out
+
+
+## EVERY object, checked before a round may advance. Returns one violation per
+## offending object, naming the id and the kind, because "something is
+## undeclared" is not an actionable abort message.
+static func validate_world(world) -> Array:
+	var violations: Array = []
+	var ids: Array = world.objects.keys()
+	ids.sort()
+	for oid in ids:
+		var kind := str(world.objects[oid]["kind"])
+		if not is_declared(kind):
+			violations.append({"violation": "MASS_KIND_UNDECLARED",
+				"object": str(oid), "kind": kind})
+	return violations
 
 
 static func kinds() -> Array:
